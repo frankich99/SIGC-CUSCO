@@ -36,12 +36,14 @@ Route::post('courses/{course}/enroll', [EnrollmentController::class, 'store'])->
 
 Route::resource('courses', CourseController::class);
 
-Route::get('certificates', function () {
-    return redirect('/#certificados');
+Route::get('certificates', function (Request $request) {
+    return Inertia::render('certificates/Index', [
+        'initialDni' => (string) $request->query('dni', ''),
+    ]);
 })->name('certificates.index');
 
-Route::get('certificados', function () {
-    return redirect('/#certificados');
+Route::get('certificados', function (Request $request) {
+    return redirect()->route('certificates.index', array_filter(['dni' => $request->query('dni')]));
 });
 
 Route::get('api/dni/{dni}', [DniController::class, 'lookup'])->name('dni.lookup')->middleware('throttle:60,1');

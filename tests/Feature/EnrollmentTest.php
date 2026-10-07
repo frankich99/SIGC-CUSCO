@@ -121,3 +121,59 @@ test('no permite matricula duplicada con el mismo DNI en el mismo curso', functi
 
     $response->assertSessionHasErrors(['dni']);
 });
+
+test('portal publico de certificados carga correctamente', function () {
+    $response = $this->get(route('certificates.index'));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page->component('certificates/Index'));
+});
+
+test('ruta alias certificados redirige a certificates', function () {
+    $response = $this->get('/certificados');
+
+    $response->assertRedirect(route('certificates.index'));
+});
+
+test('api de consulta de certificados retorna registros por DNI', function () {
+    $course = Course::factory()->create([
+        'code' => 'SIGC-TEST-01',
+        'title' => 'Taller de Liderazgo y Gestión',
+        'hours' => 30,
+    ]);
+
+    Enrollment::create([
+        'course_id' => $course->id,
+        'dni' => '78901234',
+        'nombres' => 'DINA',
+        'paterno' => 'PAUCAR',
+        'email' => 'dina@example.com',
+        'status' => 'aprobado',
+        'attended_sessions' => 5,
+        'final_grade' => 19,
+        'certificate_code' => 'CERT-TEST-78901234',
+    ]);
+
+    $response = $this->getJson('/api/certificates/lookup?dni=78901234');
+
+    $response->assertOk()
+        ->assertJson([
+            'success' => true,
+            'dni' => '78901234',
+        ])
+        ->assertJsonFragment([
+            'course_code' => 'SIGC-TEST-01',
+            'course_title' => 'Taller de Liderazgo y Gestión',
+            'certificate_code' => 'CERT-TEST-78901234',
+            'status' => 'aprobado',
+        ]);
+});
+
+test('api de consulta de certificados valida formato de 8 digitos', function () {
+    $response = $this->getJson('/api/certificates/lookup?dni=123');
+
+    $response->assertStatus(422)
+        ->assertJson([
+            'success' => false,
+        ]);
+});
