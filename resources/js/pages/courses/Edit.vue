@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,6 @@ import {
     AlertCircle,
     ArrowLeft,
     Calendar,
-    Check,
     Clock,
     GraduationCap,
     BookOpen,
@@ -21,11 +20,6 @@ import {
     Users,
     Eye,
     Info,
-    Copy,
-    Search,
-    X,
-    CheckCircle2,
-    Sparkles,
 } from '@lucide/vue';
 import { THEME_BUTTONS, THEME_BADGES } from '@/lib/theme';
 import { formatDateRange, formatHours } from '@/lib/formatters';
@@ -439,9 +433,14 @@ function submit() {
                                 {{ form.title || 'Nombre de la capacitación...' }}
                             </h4>
 
-                            <div class="text-[11px] text-slate-600 dark:text-slate-400 font-medium flex items-center gap-1.5">
-                                <Building2 class="size-3 text-slate-500 shrink-0" />
-                                <span class="truncate">{{ form.institution || 'Entidad convocante oficial' }}</span>
+                            <div class="text-[11px] text-slate-600 dark:text-slate-400 font-medium flex items-center justify-between gap-2">
+                                <span class="truncate flex items-center gap-1.5">
+                                    <Building2 class="size-3 text-slate-500 shrink-0" />
+                                    {{ form.institution || 'Entidad convocante oficial' }}
+                                </span>
+                                <span v-if="form.instructor_name" class="text-rose-900 dark:text-rose-400 font-bold truncate text-right">
+                                    {{ form.instructor_name }}
+                                </span>
                             </div>
 
                             <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-700 dark:text-slate-300 font-bold">
