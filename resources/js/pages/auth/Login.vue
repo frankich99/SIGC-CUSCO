@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { LogIn } from '@lucide/vue';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
@@ -15,8 +16,8 @@ import PasskeyVerify from '@/components/PasskeyVerify.vue';
 
 defineOptions({
     layout: {
-        title: 'Iniciar sesión en tu cuenta',
-        description: 'Ingresa tu correo electrónico y contraseña para acceder',
+        title: 'Iniciar Sesión',
+        description: 'Ingresa tus credenciales para acceder a tu panel de capacitaciones',
     },
 });
 
@@ -27,11 +28,11 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Iniciar sesión" />
+    <Head title="Iniciar sesión - SIGC-CUSCO" />
 
     <div
         v-if="status"
-        class="mb-4 text-center text-sm font-medium text-green-600"
+        class="mb-4 text-center text-xs font-bold text-rose-900 bg-rose-50 p-2.5 rounded-lg border border-rose-200"
     >
         {{ status }}
     </div>
@@ -42,11 +43,13 @@ defineProps<{
         v-bind="store.form()"
         :reset-on-success="['password']"
         v-slot="{ errors, processing }"
-        class="flex flex-col gap-6"
+        class="flex flex-col gap-5"
     >
-        <div class="grid gap-6">
-            <div class="grid gap-2">
-                <Label for="email">Correo electrónico</Label>
+        <div class="grid gap-5">
+            <div class="grid gap-1.5">
+                <Label for="email" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    Correo electrónico
+                </Label>
                 <Input
                     id="email"
                     type="email"
@@ -56,17 +59,20 @@ defineProps<{
                     :tabindex="1"
                     autocomplete="email"
                     placeholder="correo@ejemplo.com"
+                    class="text-xs text-slate-900 font-medium"
                 />
                 <InputError :message="errors.email" />
             </div>
 
-            <div class="grid gap-2">
+            <div class="grid gap-1.5">
                 <div class="flex items-center justify-between">
-                    <Label for="password">Contraseña</Label>
+                    <Label for="password" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        Contraseña
+                    </Label>
                     <TextLink
                         v-if="canResetPassword"
                         :href="request()"
-                        class="text-sm"
+                        class="text-xs font-bold text-rose-900 dark:text-rose-400 hover:underline"
                         :tabindex="5"
                     >
                         ¿Olvidaste tu contraseña?
@@ -78,33 +84,37 @@ defineProps<{
                     required
                     :tabindex="2"
                     autocomplete="current-password"
-                    placeholder="Contraseña"
+                    placeholder="••••••••"
+                    class="text-xs text-slate-900"
                 />
                 <InputError :message="errors.password" />
             </div>
 
             <div class="flex items-center justify-between">
-                <Label for="remember" class="flex items-center space-x-3">
+                <Label for="remember" class="flex items-center space-x-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
                     <Checkbox id="remember" name="remember" :tabindex="3" />
-                    <span>Recordarme</span>
+                    <span>Recordar mi sesión</span>
                 </Label>
             </div>
 
             <Button
                 type="submit"
-                class="mt-4 w-full"
+                class="mt-2 w-full bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs h-10 shadow-xs cursor-pointer"
                 :tabindex="4"
                 :disabled="processing"
                 data-test="login-button"
             >
                 <Spinner v-if="processing" />
-                Iniciar sesión
+                <LogIn v-else class="size-4 mr-1.5" />
+                Ingresar al Sistema
             </Button>
         </div>
 
-        <div class="text-center text-sm text-muted-foreground">
-            ¿No tienes una cuenta?
-            <TextLink :href="register()" :tabindex="5">Regístrate</TextLink>
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 text-center text-xs text-slate-600 dark:text-slate-400 font-medium">
+            ¿No tienes una cuenta aún?
+            <TextLink :href="register()" :tabindex="5" class="text-rose-900 dark:text-rose-400 font-bold hover:underline ml-1">
+                Regístrate aquí
+            </TextLink>
         </div>
     </Form>
 </template>

@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
+import { THEME_BUTTONS, THEME_MODAL } from '@/lib/theme';
 import {
     Search,
     Loader2,
@@ -203,7 +204,7 @@ function closeModal() {
 
 <template>
     <Dialog :open="open" @update:open="emit('update:open', $event)">
-        <DialogContent class="w-full sm:max-w-xl md:max-w-2xl max-h-[92vh] overflow-y-auto p-4 sm:p-6 rounded-2xl shadow-xl border border-rose-200 dark:border-rose-900 bg-white dark:bg-slate-950">
+        <DialogContent :class="THEME_MODAL.formDialog">
             <!-- Header Compacto y Responsivo - Granate Cusco -->
             <DialogHeader class="space-y-1.5 border-b pb-3">
                 <div class="flex flex-wrap items-center justify-between gap-1.5">

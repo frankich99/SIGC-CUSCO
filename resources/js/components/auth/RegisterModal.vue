@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UserPlus, Loader2, AlertCircle, ShieldCheck } from '@lucide/vue';
+import { THEME_BUTTONS, THEME_MODAL } from '@/lib/theme';
 
 const props = defineProps<{
     open: boolean;
@@ -42,72 +43,72 @@ function submitRegister() {
 
 <template>
     <Dialog :open="open" @update:open="emit('update:open', $event)">
-        <DialogContent class="sm:max-w-md">
-            <DialogHeader>
-                <div class="flex items-center gap-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-1">
-                    <ShieldCheck class="size-4" />
-                    <span>Registro de Nuevo Usuario</span>
+        <DialogContent :class="THEME_MODAL.authDialog">
+            <DialogHeader class="space-y-1">
+                <div class="flex items-center gap-1.5 text-[11px] font-black text-rose-900 dark:text-rose-300 uppercase tracking-wider">
+                    <ShieldCheck class="size-4 text-rose-800 dark:text-rose-400" />
+                    <span>Registro Oficial</span>
                 </div>
-                <DialogTitle class="text-xl font-bold">
-                    Crear una Cuenta
+                <DialogTitle class="text-lg font-black text-slate-950 dark:text-white">
+                    Crear Cuenta
                 </DialogTitle>
-                <DialogDescription class="text-xs text-neutral-500">
-                    Regístrate como participante para inscribirte a cursos y descargar tus certificados.
+                <DialogDescription class="text-xs text-slate-600 dark:text-slate-400">
+                    Regístrate para inscribirte en capacitaciones y acceder a tus certificados.
                 </DialogDescription>
             </DialogHeader>
 
-            <form @submit.prevent="submitRegister" class="space-y-3.5 py-2">
+            <form @submit.prevent="submitRegister" class="space-y-3 py-1">
                 <!-- Validation error alert -->
-                <div v-if="Object.keys(form.errors).length > 0" class="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
-                    <AlertCircle class="size-4 shrink-0" />
+                <div v-if="Object.keys(form.errors).length > 0" class="p-2.5 rounded-lg bg-rose-100 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-900 text-rose-950 dark:text-rose-200 text-xs font-bold flex items-center gap-2">
+                    <AlertCircle class="size-4 shrink-0 text-rose-800" />
                     <span>{{ Object.values(form.errors)[0] }}</span>
                 </div>
 
                 <div class="space-y-1">
-                    <Label for="register-modal-name" class="text-xs font-semibold">Nombre Completo</Label>
+                    <Label for="register-modal-name" class="text-xs font-bold text-slate-900 dark:text-white">Nombre Completo</Label>
                     <Input
                         id="register-modal-name"
                         v-model="form.name"
                         type="text"
                         placeholder="Nombres y Apellidos"
-                        class="text-xs"
+                        class="text-xs h-9 font-medium"
                         required
                         autofocus
                     />
                 </div>
 
                 <div class="space-y-1">
-                    <Label for="register-modal-email" class="text-xs font-semibold">Correo Electrónico</Label>
+                    <Label for="register-modal-email" class="text-xs font-bold text-slate-900 dark:text-white">Correo Electrónico</Label>
                     <Input
                         id="register-modal-email"
                         v-model="form.email"
                         type="email"
                         placeholder="correo@ejemplo.com"
-                        class="text-xs"
+                        class="text-xs h-9 font-medium"
                         required
                     />
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div class="space-y-1">
-                        <Label for="register-modal-password" class="text-xs font-semibold">Contraseña</Label>
+                        <Label for="register-modal-password" class="text-xs font-bold text-slate-900 dark:text-white">Contraseña</Label>
                         <Input
                             id="register-modal-password"
                             v-model="form.password"
                             type="password"
-                            placeholder="Mínimo 8 caracteres"
-                            class="text-xs"
+                            placeholder="Mín. 8 caracteres"
+                            class="text-xs h-9 font-medium"
                             required
                         />
                     </div>
                     <div class="space-y-1">
-                        <Label for="register-modal-password-conf" class="text-xs font-semibold">Confirmar</Label>
+                        <Label for="register-modal-password-conf" class="text-xs font-bold text-slate-900 dark:text-white">Confirmar</Label>
                         <Input
                             id="register-modal-password-conf"
                             v-model="form.password_confirmation"
                             type="password"
-                            placeholder="Repetir contraseña"
-                            class="text-xs"
+                            placeholder="Repetir clave"
+                            class="text-xs h-9 font-medium"
                             required
                         />
                     </div>
@@ -115,7 +116,7 @@ function submitRegister() {
 
                 <Button
                     type="submit"
-                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs mt-2"
+                    :class="['w-full h-9.5 text-xs mt-1', THEME_BUTTONS.primary]"
                     :disabled="form.processing"
                 >
                     <Loader2 v-if="form.processing" class="size-3.5 mr-1.5 animate-spin" />
@@ -123,11 +124,11 @@ function submitRegister() {
                     Registrar Cuenta
                 </Button>
 
-                <div class="pt-3 border-t text-center text-xs text-neutral-500">
+                <div class="pt-2.5 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-600 dark:text-slate-400">
                     ¿Ya tienes una cuenta registrada?
                     <button
                         type="button"
-                        class="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline ml-1"
+                        class="text-rose-900 dark:text-rose-300 font-black hover:underline ml-1 cursor-pointer"
                         @click="emit('switchToLogin')"
                     >
                         Inicia sesión aquí

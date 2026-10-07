@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
+import { THEME_BUTTONS, THEME_BADGES } from '@/lib/theme';
 import {
     Calendar,
     Clock,
@@ -76,22 +77,22 @@ function getStatusBadge(status: string) {
         case 'abierto':
             return {
                 label: 'Convocatoria Abierta',
-                class: 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800',
+                class: THEME_BADGES.abierto,
             };
         case 'en_curso':
             return {
                 label: 'En curso',
-                class: 'bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800',
+                class: THEME_BADGES.en_curso,
             };
         case 'concluido':
             return {
                 label: 'Concluido',
-                class: 'bg-neutral-100 text-neutral-700 border-neutral-300 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700',
+                class: THEME_BADGES.concluido,
             };
         default:
             return {
                 label: status,
-                class: 'bg-neutral-100 text-neutral-600 border-neutral-200',
+                class: THEME_BADGES.concluido,
             };
     }
 }

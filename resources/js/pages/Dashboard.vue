@@ -530,17 +530,17 @@ function roleBadgeData(role?: string) {
                             </CardContent>
 
                             <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 rounded-b-xl">
-                                <Button size="sm" class="bg-rose-900 hover:bg-rose-950 text-white text-xs font-bold h-9 shadow-xs" @click="openScanModal(item)">
+                                <Button size="sm" class="flex-1 bg-rose-900 hover:bg-rose-950 text-white text-xs font-bold h-9 shadow-xs" @click="openScanModal(item)">
                                     <Camera class="size-4 mr-1.5" />
-                                    Marcar Asistencia QR
+                                    Escanear QR
                                 </Button>
-                                <Button v-if="item.status === 'aprobado' || item.certificate_code" size="sm" variant="outline" class="text-xs font-bold h-9 border-amber-400 text-amber-900">
+                                <Button v-if="item.status === 'aprobado' || item.certificate_code" size="sm" variant="outline" class="flex-1 text-xs font-bold h-9 border-amber-400 text-amber-900">
                                     <Download class="size-4 mr-1.5 text-amber-700" />
-                                    Certificado PDF
+                                    Certificado
                                 </Button>
-                                <Button v-else as-child variant="outline" size="sm" class="text-xs font-bold h-9 border-slate-300 text-slate-800">
+                                <Button v-else as-child variant="outline" size="sm" class="flex-1 text-xs font-bold h-9 border-slate-300 text-slate-800">
                                     <Link :href="`/courses/${item.course_id}`">
-                                        Detalles →
+                                        Detalles
                                     </Link>
                                 </Button>
                             </div>
@@ -580,7 +580,7 @@ function roleBadgeData(role?: string) {
                                     {{ course.title }}
                                 </CardTitle>
                                 <div class="text-xs font-bold text-rose-900 dark:text-rose-400 truncate">
-                                    {{ course.institution || 'Universidad Nacional de San Antonio Abad del Cusco' }}
+                                    {{ course.institution || 'Entidad Organizadora' }}
                                 </div>
                                 <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 pt-1">
                                     <Calendar class="size-3.5 text-rose-800 shrink-0" />
@@ -601,10 +601,10 @@ function roleBadgeData(role?: string) {
                             </CardContent>
 
                             <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 rounded-b-xl">
-                                <Button as-child variant="ghost" size="sm" class="text-xs font-bold h-9 text-slate-700 hover:text-slate-900">
-                                    <Link :href="`/courses/${course.id}`">Ver Temario</Link>
+                                <Button as-child variant="outline" size="sm" class="flex-1 text-xs font-bold h-9 border-slate-300 text-slate-800 hover:text-slate-900">
+                                    <Link :href="`/courses/${course.id}`">Temario</Link>
                                 </Button>
-                                <Button size="sm" class="bg-rose-900 hover:bg-rose-950 text-white text-xs font-black h-9 px-4 shadow-sm" @click="openEnroll(course)">
+                                <Button size="sm" class="flex-1 bg-rose-900 hover:bg-rose-950 text-white text-xs font-black h-9 px-4 shadow-sm" @click="openEnroll(course)">
                                     <CheckCircle2 class="size-4 mr-1.5" />
                                     Inscribirme
                                 </Button>
@@ -620,7 +620,7 @@ function roleBadgeData(role?: string) {
                     <DialogHeader class="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-4">
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-950 text-xs font-black uppercase tracking-wider mx-auto">
                             <QrCode class="size-4 text-rose-800" />
-                            <span>Control de Asistencia Digital • UNSAAC</span>
+                            <span>Control de Asistencia Digital</span>
                         </div>
                         <DialogTitle class="text-2xl font-black text-slate-950 dark:text-white">
                             {{ activeQrCourse?.title }}
@@ -653,10 +653,10 @@ function roleBadgeData(role?: string) {
 
             <!-- MODAL: MARCAR ASISTENCIA (PARA ALUMNO) -->
             <Dialog :open="isScanQrModalOpen" @update:open="isScanQrModalOpen = $event">
-                <DialogContent class="w-full sm:max-w-xl p-6 sm:p-8 rounded-2xl shadow-2xl border border-slate-300 text-left bg-white dark:bg-slate-900">
-                    <DialogHeader class="space-y-1 border-b border-slate-200 dark:border-slate-800 pb-4">
-                        <DialogTitle class="text-xl font-black text-slate-950 dark:text-white flex items-center gap-2">
-                            <Camera class="size-6 text-rose-800" />
+                <DialogContent class="w-[94vw] sm:max-w-md p-4 sm:p-6 rounded-2xl shadow-xl border border-rose-200 dark:border-rose-900 text-left bg-white dark:bg-slate-950">
+                    <DialogHeader class="space-y-1 border-b border-slate-200 dark:border-slate-800 pb-3">
+                        <DialogTitle class="text-lg font-black text-slate-950 dark:text-white flex items-center gap-2">
+                            <Camera class="size-5 text-rose-800" />
                             <span>Marcar Mi Asistencia Oficial</span>
                         </DialogTitle>
                         <DialogDescription class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -664,14 +664,14 @@ function roleBadgeData(role?: string) {
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div v-if="scanSuccessMessage" class="py-8 text-center space-y-4">
-                        <div class="size-16 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto">
-                            <CheckCircle2 class="size-10" />
+                    <div v-if="scanSuccessMessage" class="py-6 text-center space-y-3">
+                        <div class="size-14 rounded-full bg-rose-100 text-rose-900 flex items-center justify-center mx-auto">
+                            <CheckCircle2 class="size-8" />
                         </div>
-                        <p class="text-base font-extrabold text-emerald-950 dark:text-emerald-300">
+                        <p class="text-sm font-extrabold text-rose-950 dark:text-rose-200">
                             {{ scanSuccessMessage }}
                         </p>
-                        <Button @click="isScanQrModalOpen = false" class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold h-11 text-sm shadow-md">
+                        <Button @click="isScanQrModalOpen = false" class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold h-10 text-xs shadow-md">
                             Aceptar y Continuar
                         </Button>
                     </div>

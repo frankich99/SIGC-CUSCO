@@ -1,6 +1,7 @@
 /**
- * Centralized Theme Palette for SIGC-CUSCO
- * Institutional Granate Imperial & Dorado Sol de Echenique (UNSAAC / Cusco)
+ * Centralized Design System & Theme Utilities for SIGC-CUSCO.
+ * Palette: Granate Imperial (#800020 / Rose 900-950) & Sol Dorado (#d97706 / Amber 600-700).
+ * Standardized for responsive modals, unified buttons, badges, and accessible contrast.
  */
 
 export const CUSCO_PALETTE = {
@@ -29,9 +30,43 @@ export const CUSCO_PALETTE = {
     },
 } as const;
 
+/**
+ * Reusable Unified Button Styles
+ */
 export const THEME_BUTTONS = {
-    primary: 'bg-rose-900 hover:bg-rose-950 text-white font-bold shadow-sm transition-all',
-    secondary: 'bg-white hover:bg-rose-50 text-rose-950 border border-rose-200 font-bold shadow-2xs',
-    gold: 'bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-sm',
-    outline: 'border-slate-300 hover:border-rose-800 text-slate-800 hover:text-rose-900 font-semibold',
+    primary: 'bg-rose-900 hover:bg-rose-950 text-white font-bold shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-rose-900/40',
+    secondary: 'bg-white hover:bg-rose-50 text-rose-950 border border-rose-200 dark:border-rose-900 dark:bg-slate-900 dark:text-rose-200 font-bold shadow-2xs transition-all',
+    gold: 'bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-sm transition-all',
+    outline: 'border-slate-300 dark:border-slate-700 hover:border-rose-800 text-slate-800 dark:text-slate-200 hover:text-rose-900 dark:hover:text-rose-300 font-semibold transition-all',
+    ghost: 'text-slate-700 dark:text-slate-300 hover:text-rose-900 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-semibold transition-all',
+    danger: 'bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-sm transition-all',
+} as const;
+
+/**
+ * Reusable Status & Category Badges
+ */
+export const THEME_BADGES = {
+    abierto: 'bg-rose-100 text-rose-950 border border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800 font-bold',
+    en_curso: 'bg-sky-100 text-sky-950 border border-sky-300 dark:bg-sky-950 dark:text-sky-200 dark:border-sky-800 font-bold',
+    concluido: 'bg-slate-100 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 font-bold',
+    cancelado: 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-400 dark:border-rose-900 font-semibold',
+    aprobado: 'bg-rose-100 text-rose-950 border border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800 font-bold',
+    official: 'bg-rose-50 text-rose-900 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-800 font-bold',
+} as const;
+
+/**
+ * Standardized Slim & Responsive Modal Layout Configurations
+ */
+export const THEME_MODAL = {
+    // Narrow & slim auth modal dialog (Login / Register)
+    authDialog: 'w-[92vw] sm:max-w-sm max-h-[90vh] overflow-y-auto p-4 sm:p-5 rounded-2xl shadow-xl border border-rose-200 dark:border-rose-900 bg-white dark:bg-slate-950',
+    // Focused & slim form dialog (Enrollment / Confirmation)
+    formDialog: 'w-[94vw] sm:max-w-md md:max-w-lg max-h-[88vh] overflow-y-auto p-4 sm:p-5 rounded-2xl shadow-xl border border-rose-200 dark:border-rose-900 bg-white dark:bg-slate-950',
+} as const;
+
+/**
+ * Reusable Form Control Classes
+ */
+export const THEME_INPUT = {
+    focusRing: 'focus:border-rose-900 focus:ring-rose-900/20 focus:outline-hidden',
 } as const;
