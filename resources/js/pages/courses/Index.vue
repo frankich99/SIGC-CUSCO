@@ -270,7 +270,7 @@ function instructorName(inst?: Instructor): string {
                             <Button
                                 v-if="course.status === 'abierto'"
                                 size="sm"
-                                class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs"
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs flex-1"
                                 @click="openEnroll(course)"
                             >
                                 Inscribirme

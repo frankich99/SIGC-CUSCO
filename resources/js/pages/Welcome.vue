@@ -28,6 +28,7 @@ import EnrollmentModal from '@/components/EnrollmentModal.vue';
 import CertificateLookupCard from '@/components/CertificateLookupCard.vue';
 import LoginModal from '@/components/auth/LoginModal.vue';
 import RegisterModal from '@/components/auth/RegisterModal.vue';
+import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
 
 interface CourseItem {
@@ -237,62 +238,65 @@ function statusBadgeInfo(status: string) {
         <!-- HERO SECTION -->
         <section class="relative overflow-hidden pt-12 pb-16 md:pt-20 md:pb-24 bg-gradient-to-b from-emerald-50/60 via-transparent to-transparent dark:from-emerald-950/20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-                <!-- Pill tag -->
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100/80 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-semibold shadow-xs">
-                    <Sparkles class="size-3.5" />
-                    <span>Convocatorias y Cursos Abiertos 2026</span>
+                <!-- Pill tags -->
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/90 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs font-bold shadow-xs">
+                        <Sparkles class="size-3.5 text-emerald-600" />
+                        <span>Convocatorias 2026</span>
+                    </div>
+                    <PeruGeoBadge />
                 </div>
 
                 <!-- Headline -->
-                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-neutral-950 dark:text-white max-w-4xl mx-auto leading-[1.15]">
-                    Capacítate, Asiste con <span class="bg-gradient-to-r from-emerald-600 to-teal-700 bg-clip-text text-transparent">Código QR</span> y Certifícate con Validez Oficial
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-950 dark:text-white max-w-3xl mx-auto leading-tight">
+                    Capacitaciones con <span class="text-emerald-600 dark:text-emerald-400">Asistencia QR</span> y Certificación Oficial
                 </h1>
 
                 <!-- Subtitle -->
-                <p class="text-base sm:text-lg text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto leading-relaxed">
-                    Plataforma para inscripción inmediata con DNI validado, control biométrico de asistencia en cada sesión y emisión de diplomas digitales verificables.
+                <p class="text-sm sm:text-base text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto leading-relaxed font-normal">
+                    Inscripción inmediata con DNI, control de asistencia por código QR y diplomas digitales con validación web institucional.
                 </p>
 
                 <!-- CTA Buttons -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                    <Button as-child size="lg" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md shadow-emerald-500/20 px-8 text-sm">
+                    <Button as-child size="lg" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md shadow-emerald-500/20 px-6 text-xs sm:text-sm">
                         <a href="#cursos">
                             <GraduationCap class="mr-2 size-4" />
-                            Ver Catálogo de Capacitaciones
+                            Ver Cursos Disponibles
                         </a>
                     </Button>
-                    <Button as-child variant="outline" size="lg" class="w-full sm:w-auto text-sm">
+                    <Button as-child variant="outline" size="lg" class="w-full sm:w-auto text-xs sm:text-sm font-semibold">
                         <a href="#certificados">
                             <Award class="mr-2 size-4 text-emerald-600" />
-                            Descargar Mi Certificado por DNI
+                            Consultar Certificado por DNI
                         </a>
                     </Button>
                 </div>
 
-                <!-- Stats Bar -->
-                <div class="pt-8 max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
-                        <div class="text-2xl md:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                <!-- Stats Bar (3 columnas compactas en mobile y desktop) -->
+                <div class="pt-6 max-w-3xl mx-auto grid grid-cols-3 gap-2 sm:gap-4">
+                    <div class="p-3 sm:p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
+                        <div class="text-xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
                             {{ stats.totalCourses }}
                         </div>
-                        <div class="text-xs text-neutral-500 font-medium mt-0.5">
-                            Cursos y Talleres Registrados
+                        <div class="text-[11px] sm:text-xs text-neutral-500 font-medium mt-0.5 truncate">
+                            Cursos Registrados
                         </div>
                     </div>
-                    <div class="p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
-                        <div class="text-2xl md:text-3xl font-extrabold text-teal-600 dark:text-teal-400">
+                    <div class="p-3 sm:p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
+                        <div class="text-xl sm:text-3xl font-extrabold text-teal-600 dark:text-teal-400">
                             {{ stats.openCourses }}
                         </div>
-                        <div class="text-xs text-neutral-500 font-medium mt-0.5">
-                            Con Inscripciones Abiertas
+                        <div class="text-[11px] sm:text-xs text-neutral-500 font-medium mt-0.5 truncate">
+                            Convocatorias
                         </div>
                     </div>
-                    <div class="col-span-2 md:col-span-1 p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
-                        <div class="text-2xl md:text-3xl font-extrabold text-neutral-800 dark:text-neutral-200">
+                    <div class="p-3 sm:p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
+                        <div class="text-xl sm:text-3xl font-extrabold text-neutral-800 dark:text-neutral-200">
                             {{ stats.totalEnrolled }}
                         </div>
-                        <div class="text-xs text-neutral-500 font-medium mt-0.5">
-                            Participantes Matriculados
+                        <div class="text-[11px] sm:text-xs text-neutral-500 font-medium mt-0.5 truncate">
+                            Inscritos
                         </div>
                     </div>
                 </div>
@@ -306,13 +310,13 @@ function statusBadgeInfo(status: string) {
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div class="space-y-1">
                         <div class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                            Exploración Abierta al Público
+                            Convocatorias Abiertas
                         </div>
                         <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 dark:text-white">
-                            Catálogo de Capacitaciones y Eventos
+                            Cursos y Capacitaciones
                         </h2>
                         <p class="text-xs sm:text-sm text-neutral-500 max-w-xl">
-                            Selecciona una capacitación para consultar la entidad convocante, temario, aforo disponible e inscribirte directamente con tu DNI.
+                            Capacitaciones con entidad convocante, aforo oficial e inscripción directa con DNI.
                         </p>
                     </div>
 
@@ -449,7 +453,7 @@ function statusBadgeInfo(status: string) {
 
                         <!-- Card Footer Action -->
                         <CardFooter class="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between gap-2 bg-neutral-50/50 dark:bg-neutral-900/50">
-                            <Button as-child variant="ghost" size="sm" class="text-xs">
+                            <Button as-child variant="ghost" size="sm" class="text-xs flex-1">
                                 <Link :href="`/courses/${course.id}`">
                                     Detalles
                                 </Link>
@@ -458,20 +462,20 @@ function statusBadgeInfo(status: string) {
                             <Button
                                 v-if="course.status === 'abierto' && course.capacity - course.enrollments_count > 0"
                                 size="sm"
-                                class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs"
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs flex-1"
                                 @click="openEnrollment(course)"
                             >
                                 <CheckCircle2 class="mr-1.5 size-3.5" />
-                                Inscribirme Ahora
+                                Inscribirme
                             </Button>
                             <Button
                                 v-else
                                 size="sm"
                                 variant="secondary"
                                 disabled
-                                class="text-xs opacity-75"
+                                class="text-xs opacity-75 flex-1"
                             >
-                                {{ course.status !== 'abierto' ? 'No Disponible' : 'Aforo Completo' }}
+                                {{ course.status !== 'abierto' ? 'Cerrado' : 'Agotado' }}
                             </Button>
                         </CardFooter>
                     </Card>

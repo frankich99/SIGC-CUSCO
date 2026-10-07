@@ -131,21 +131,21 @@ function printMockCertificate(record: CertificateRecord) {
 <template>
     <Card class="border border-neutral-200/90 dark:border-neutral-800 shadow-sm overflow-hidden">
         <CardHeader class="bg-gradient-to-r from-emerald-50/80 to-teal-50/40 dark:from-emerald-950/20 dark:to-neutral-900 border-b pb-4">
-            <div class="flex items-center gap-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-1">
-                <Award class="size-4" />
-                <span>Consulta Ciudadana Oficial</span>
+            <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                <Award class="size-4 text-emerald-600" />
+                <span>Validación Oficial</span>
             </div>
-            <CardTitle class="text-xl font-bold tracking-tight">
-                Verificación y Descarga de Certificados por DNI
+            <CardTitle class="text-lg sm:text-xl font-bold tracking-tight">
+                Consulta y Descarga de Certificados
             </CardTitle>
             <CardDescription class="text-xs text-neutral-500">
-                Ingresa tu número de DNI para consultar las capacitaciones aprobadas y descargar tu certificado digital con validez institucional.
+                Ingresa tu DNI para consultar tus cursos aprobados y obtener tu certificado digital oficial.
             </CardDescription>
         </CardHeader>
 
-        <CardContent class="p-6 space-y-6">
+        <CardContent class="p-4 sm:p-6 space-y-6">
             <!-- Search bar -->
-            <form @submit.prevent="searchCertificates" class="flex flex-col sm:flex-row gap-2 max-w-lg">
+            <form @submit.prevent="searchCertificates" class="flex flex-col sm:flex-row gap-2 max-w-md">
                 <div class="relative flex-1">
                     <Search class="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400" />
                     <Input
@@ -159,12 +159,12 @@ function printMockCertificate(record: CertificateRecord) {
                 </div>
                 <Button
                     type="submit"
-                    class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shrink-0 shadow-xs"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0 shadow-xs"
                     :disabled="loading || dniQuery.trim().length !== 8"
                 >
                     <Loader2 v-if="loading" class="size-3.5 mr-1.5 animate-spin" />
                     <Search v-else class="size-3.5 mr-1.5" />
-                    Buscar Certificados
+                    Consultar
                 </Button>
             </form>
 
@@ -191,7 +191,7 @@ function printMockCertificate(record: CertificateRecord) {
                         <strong class="text-neutral-900 dark:text-white ml-1.5">{{ studentName }}</strong>
                     </div>
                     <span class="text-xs text-emerald-600 font-semibold">
-                        {{ records.length }} registro(s) encontrado(s)
+                        {{ records.length }} registro(s)
                     </span>
                 </div>
 
@@ -244,13 +244,13 @@ function printMockCertificate(record: CertificateRecord) {
                             </div>
                         </div>
 
-                        <div class="pt-2 border-t flex items-center justify-between">
+                        <div class="pt-2 border-t flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <span class="text-[11px] text-neutral-500">
-                                Asistencias: <strong>{{ cert.attended_sessions }} sesiones</strong>
+                                Asistencia: <strong>{{ cert.attended_sessions }} ses.</strong>
                             </span>
                             <Button
                                 size="sm"
-                                class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-8 shadow-xs"
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-8 shadow-xs w-full sm:w-auto"
                                 @click="printMockCertificate(cert)"
                             >
                                 <Download class="size-3.5 mr-1" />

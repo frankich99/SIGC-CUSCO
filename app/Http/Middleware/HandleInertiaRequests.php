@@ -45,6 +45,15 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'peru' => [
+                'country' => config('peru.country', 'Perú'),
+                'countryCode' => config('peru.country_code', 'PE'),
+                'phonePrefix' => config('peru.phone_prefix', '+51'),
+                'timezone' => config('peru.timezone', 'America/Lima'),
+                'currency' => config('peru.currency'),
+                'institution' => config('peru.institution'),
+                'currentTime' => now()->setTimezone('America/Lima')->format('d/m/Y H:i:s'),
+            ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

@@ -15,6 +15,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
+import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
 import {
     GraduationCap,
@@ -192,6 +193,7 @@ function roleBadgeData(role?: string) {
                             <span class="text-[11px] uppercase tracking-wider px-3 py-1 rounded-full" :class="roleBadgeData(user?.role).badgeClass">
                                 {{ roleBadgeData(user?.role).label }}
                             </span>
+                            <PeruGeoBadge />
                         </div>
 
                         <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white drop-shadow-xs">
@@ -246,77 +248,77 @@ function roleBadgeData(role?: string) {
             <!-- 1. VISTA: ORGANIZADOR / DOCENTE / INSTRUCTOR                 -->
             <!-- ============================================================ -->
             <div v-if="isOrganizerOrTeacher && (user?.role !== 'admin' || activeDashboardTab === 'organizador')" class="space-y-8">
-                <!-- Grilla de Métricas Vivas con Contraste Elevado -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Grilla de Métricas Compacta y Responsiva -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                     <!-- Métrica 1: Cursos Asignados -->
-                    <Card class="border-2 border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-sm hover:shadow-md transition-all">
-                        <CardHeader class="pb-2">
-                            <CardDescription class="text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center justify-between">
-                                <span>Cursos a mi Cargo</span>
-                                <div class="size-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs">
-                                    <BookOpen class="size-4" />
+                    <Card class="border border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-xs hover:shadow-md transition-all">
+                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
+                            <CardDescription class="text-[11px] sm:text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center justify-between">
+                                <span class="truncate">Mis Cursos</span>
+                                <div class="size-7 sm:size-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                                    <BookOpen class="size-3.5 sm:size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ metrics.taughtCount }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                            Capacitaciones asignadas activas
+                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400">
+                            Cursos activos
                         </CardContent>
                     </Card>
 
                     <!-- Métrica 2: Inscripciones Abiertas -->
-                    <Card class="border-2 border-teal-300 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20 shadow-sm hover:shadow-md transition-all">
-                        <CardHeader class="pb-2">
-                            <CardDescription class="text-xs font-bold text-teal-900 dark:text-teal-300 flex items-center justify-between">
-                                <span>Inscripciones Abiertas</span>
-                                <div class="size-8 rounded-lg bg-teal-600 text-white flex items-center justify-center shadow-xs">
-                                    <GraduationCap class="size-4" />
+                    <Card class="border border-teal-300 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20 shadow-xs hover:shadow-md transition-all">
+                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
+                            <CardDescription class="text-[11px] sm:text-xs font-bold text-teal-900 dark:text-teal-300 flex items-center justify-between">
+                                <span class="truncate">Convocatorias</span>
+                                <div class="size-7 sm:size-8 rounded-lg bg-teal-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                                    <GraduationCap class="size-3.5 sm:size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ metrics.openCourses }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                            Recibiendo nuevos participantes
+                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400">
+                            Con vacantes
                         </CardContent>
                     </Card>
 
                     <!-- Métrica 3: Total Registrados -->
-                    <Card class="border-2 border-indigo-300 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-sm hover:shadow-md transition-all">
-                        <CardHeader class="pb-2">
-                            <CardDescription class="text-xs font-bold text-indigo-900 dark:text-indigo-300 flex items-center justify-between">
-                                <span>Total Capacitaciones</span>
-                                <div class="size-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs">
-                                    <Award class="size-4" />
+                    <Card class="border border-indigo-300 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-xs hover:shadow-md transition-all">
+                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
+                            <CardDescription class="text-[11px] sm:text-xs font-bold text-indigo-900 dark:text-indigo-300 flex items-center justify-between">
+                                <span class="truncate">Total Cursos</span>
+                                <div class="size-7 sm:size-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                                    <Award class="size-3.5 sm:size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ metrics.totalCourses }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                            Registradas en SIGC-CUSCO
+                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400">
+                            En catálogo
                         </CardContent>
                     </Card>
 
                     <!-- Métrica 4: Asistencia QR Dinámica -->
-                    <Card class="border-2 border-amber-300 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/20 shadow-sm hover:shadow-md transition-all">
-                        <CardHeader class="pb-2">
-                            <CardDescription class="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center justify-between">
-                                <span>Asistencia QR en Vivo</span>
-                                <div class="size-8 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs">
-                                    <QrCode class="size-4" />
+                    <Card class="border border-amber-300 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/20 shadow-xs hover:shadow-md transition-all">
+                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
+                            <CardDescription class="text-[11px] sm:text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center justify-between">
+                                <span class="truncate">Asistencia QR</span>
+                                <div class="size-7 sm:size-8 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                                    <QrCode class="size-3.5 sm:size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-base font-extrabold text-amber-950 dark:text-amber-200 pt-2">
-                                Proyección en Aula
+                            <CardTitle class="text-sm sm:text-base font-extrabold text-amber-950 dark:text-amber-200 pt-1">
+                                QR en Vivo
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                            Genera códigos QR dinámicos para tus clases
+                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400">
+                            Proyección en aula
                         </CardContent>
                     </Card>
                 </div>
@@ -395,11 +397,11 @@ function roleBadgeData(role?: string) {
                             </CardContent>
 
                             <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 rounded-b-xl">
-                                <Button size="sm" variant="outline" class="text-xs font-bold border-emerald-600 text-emerald-800 hover:bg-emerald-50 h-9" @click="openQrProjection(course)">
+                                <Button size="sm" variant="outline" class="text-xs font-bold border-emerald-600 text-emerald-800 hover:bg-emerald-50 h-9 flex-1 sm:flex-none" @click="openQrProjection(course)">
                                     <QrCode class="size-4 mr-1.5 text-emerald-600" />
                                     Proyectar QR
                                 </Button>
-                                <Button as-child size="sm" class="text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white h-9">
+                                <Button as-child size="sm" class="text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white h-9 flex-1 sm:flex-none">
                                     <Link :href="`/courses/${course.id}`">
                                         Ver Alumnos →
                                     </Link>
@@ -414,56 +416,56 @@ function roleBadgeData(role?: string) {
             <!-- 2. VISTA: PARTICIPANTE / ALUMNO / ESTUDIANTE                 -->
             <!-- ============================================================ -->
             <div v-if="isStudentOrParticipant && (user?.role === 'participante' || activeDashboardTab === 'participante')" class="space-y-8" id="mis-cursos">
-                <!-- Métricas del Participante -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <Card class="border-2 border-blue-300 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 shadow-sm">
-                        <CardHeader class="pb-2">
-                            <CardDescription class="text-xs font-bold text-blue-900 dark:text-blue-300 flex items-center justify-between">
-                                <span>Mis Cursos Matriculados</span>
-                                <div class="size-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs">
-                                    <GraduationCap class="size-4" />
+                <!-- Métricas del Participante (3 columnas compactas y responsivas) -->
+                <div class="grid grid-cols-3 gap-2 sm:gap-4">
+                    <Card class="border border-blue-300 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 shadow-xs">
+                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
+                            <CardDescription class="text-[11px] sm:text-xs font-bold text-blue-900 dark:text-blue-300 flex items-center justify-between">
+                                <span class="truncate">Mis Cursos</span>
+                                <div class="size-7 sm:size-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                                    <GraduationCap class="size-3.5 sm:size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ metrics.enrolledCount }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                            Capacitaciones activas en tu cuenta
+                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400 truncate">
+                            Inscritos
                         </CardContent>
                     </Card>
 
-                    <Card class="border-2 border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-sm">
-                        <CardHeader class="pb-2">
-                            <CardDescription class="text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center justify-between">
-                                <span>Asistencias Marcadas</span>
-                                <div class="size-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs">
-                                    <QrCode class="size-4" />
+                    <Card class="border border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-xs">
+                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
+                            <CardDescription class="text-[11px] sm:text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center justify-between">
+                                <span class="truncate">Asistencias</span>
+                                <div class="size-7 sm:size-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                                    <QrCode class="size-3.5 sm:size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ studentEnrollments.reduce((acc, curr) => acc + (curr.attended_sessions || 0), 0) }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                            Sesiones validadas con código QR
+                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400 truncate">
+                            Sesiones QR
                         </CardContent>
                     </Card>
 
-                    <Card class="border-2 border-indigo-300 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-sm">
-                        <CardHeader class="pb-2">
-                            <CardDescription class="text-xs font-bold text-indigo-900 dark:text-indigo-300 flex items-center justify-between">
-                                <span>Certificados Obtenidos</span>
-                                <div class="size-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs">
-                                    <Award class="size-4" />
+                    <Card class="border border-indigo-300 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-xs">
+                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
+                            <CardDescription class="text-[11px] sm:text-xs font-bold text-indigo-900 dark:text-indigo-300 flex items-center justify-between">
+                                <span class="truncate">Certificados</span>
+                                <div class="size-7 sm:size-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                                    <Award class="size-3.5 sm:size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ studentEnrollments.filter(e => e.status === 'aprobado' || e.certificate_code).length }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                            Diplomas oficiales con validez web
+                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400 truncate">
+                            Aprobados
                         </CardContent>
                     </Card>
                 </div>

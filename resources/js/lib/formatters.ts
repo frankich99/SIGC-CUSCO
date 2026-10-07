@@ -136,3 +136,15 @@ export function formatHours(hours?: number | null): string {
     if (!hours || hours <= 0) return '0 hrs';
     return `${hours} hrs académicas`;
 }
+
+// Re-export Peru official configurations and formatters
+export {
+    PERU_CONFIG,
+    PERU_DEPARTMENTS,
+    validatePeruDni,
+    validatePeruPhone,
+    formatPeruPhone,
+    formatCurrencyPEN,
+    getCurrentPeruTime,
+} from '@/lib/peru';
+

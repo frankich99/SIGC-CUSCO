@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Contracts\DniLookupService;
 use App\Services\Dni\PeruDevsDniService;
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -38,6 +39,13 @@ class AppServiceProvider extends ServiceProvider
     protected function configureDefaults(): void
     {
         Date::use(CarbonImmutable::class);
+
+        // Configuración oficial de Zona Horaria y Localización de Perú
+        $timezone = config('app.timezone', 'America/Lima');
+        date_default_timezone_set($timezone);
+        Carbon::setLocale('es');
+        CarbonImmutable::setLocale('es');
+        setlocale(LC_TIME, 'es_PE.utf8', 'es_PE', 'es_ES', 'es');
 
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
