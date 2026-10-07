@@ -374,7 +374,7 @@ function statusBadgeInfo(status: string) {
                             <!-- Organizing Entity / Institución -->
                             <div class="flex items-center gap-1.5 text-xs text-rose-950 dark:text-rose-200 bg-rose-50/80 dark:bg-rose-950/40 px-2.5 py-1 rounded-md border border-rose-200/80 dark:border-rose-800/60 font-semibold">
                                 <Building2 class="size-3.5 shrink-0 text-rose-800 dark:text-rose-400" />
-                                <span class="truncate">{{ course.institution || 'UNSAAC Cusco' }}</span>
+                                <span class="truncate">{{ course.institution || 'Dirección Académica • Cusco' }}</span>
                             </div>
 
                             <CardDescription class="text-xs line-clamp-2 text-slate-600 dark:text-neutral-400 font-medium">
@@ -516,7 +516,7 @@ function statusBadgeInfo(status: string) {
                     <span class="font-bold text-slate-900 dark:text-neutral-200">
                         SIGC-CUSCO
                     </span>
-                    <span>— Sistema Integral de Gestión de Capacitaciones • UNSAAC</span>
+                    <span>— Sistema Integral de Gestión de Capacitaciones • Cusco</span>
                 </div>
                 <div class="font-medium">
                     Gestión Académica e Institucional • Cusco, Perú 2026

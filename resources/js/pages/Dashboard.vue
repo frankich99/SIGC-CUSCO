@@ -183,7 +183,7 @@ function roleBadgeData(role?: string) {
                     <div class="space-y-3">
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="text-[11px] uppercase tracking-wider font-black bg-white/20 text-white px-3 py-1 rounded-full backdrop-blur-sm border border-white/20">
-                                SIGC-CUSCO • UNSAAC
+                                SIGC-CUSCO • Sistema Integral
                             </span>
                             <span class="text-[11px] uppercase tracking-wider px-3 py-1 rounded-full" :class="roleBadgeData(user?.role).badgeClass">
                                 {{ roleBadgeData(user?.role).label }}
