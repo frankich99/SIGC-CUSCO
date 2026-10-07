@@ -425,10 +425,6 @@ onMounted(() => {
 
                 <!-- Auth / Guest Actions -->
                 <div class="flex items-center gap-3">
-                    <div class="hidden lg:block">
-                        <PeruGeoBadge />
-                    </div>
-
                     <template v-if="authUser">
                         <Button as-child size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer">
                             <Link href="/dashboard">
@@ -786,7 +782,7 @@ onMounted(() => {
         </main>
 
         <!-- FOOTER INSTITUCIONAL -->
-        <footer class="border-t border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-950 py-8 text-xs text-slate-600 dark:text-neutral-400">
+        <footer class="border-t border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-950 py-6 text-xs text-slate-600 dark:text-neutral-400">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-2 font-medium">
                     <GraduationCap class="size-4 text-rose-900" />
@@ -795,8 +791,9 @@ onMounted(() => {
                     </span>
                     <span>— Sistema Integral de Gestión de Capacitaciones • Cusco</span>
                 </div>
-                <div class="font-medium text-slate-700 dark:text-slate-300">
-                    Portal Oficial de Acreditación y Diplomas • Cusco, Perú 2026
+                <div class="flex items-center gap-4">
+                    <PeruGeoBadge />
+                    <span class="font-medium text-slate-700 dark:text-slate-300 hidden md:inline">Cusco, Perú 2026</span>
                 </div>
             </div>
         </footer>

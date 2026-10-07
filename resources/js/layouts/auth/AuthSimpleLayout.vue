@@ -66,7 +66,6 @@ const mobileMenuOpen = ref(false);
 
                 <!-- Acciones Derecha (Desktop) -->
                 <div class="hidden sm:flex items-center gap-3">
-                    <PeruGeoBadge />
                     <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 hover:bg-rose-50 hover:text-rose-900 dark:border-slate-700">
                         <Link :href="home()">
                             <ArrowLeft class="size-3.5 mr-1 text-rose-900" />
@@ -113,9 +112,6 @@ const mobileMenuOpen = ref(false);
                                     <Award class="size-4 text-amber-600" />
                                     <span>Certificados por DNI</span>
                                 </Link>
-                                <div class="pt-4 border-t border-slate-200">
-                                    <PeruGeoBadge />
-                                </div>
                             </div>
                         </SheetContent>
                     </Sheet>
@@ -148,13 +144,16 @@ const mobileMenuOpen = ref(false);
         </main>
 
         <!-- PIE DE PÁGINA INSTITUCIONAL -->
-        <footer class="border-t border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-950 py-4 text-center text-xs text-slate-600 dark:text-slate-400 font-medium">
-            <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <footer class="border-t border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-950 py-4 text-xs text-slate-600 dark:text-slate-400 font-medium">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200">
                     <GraduationCap class="size-4 text-rose-900" />
                     <span>SIGC-CUSCO • Universidad Nacional de San Antonio Abad del Cusco</span>
                 </div>
-                <div>Gestión Académica e Institucional • Cusco, Perú 2026</div>
+                <div class="flex items-center gap-4">
+                    <PeruGeoBadge />
+                    <span class="hidden md:inline">Cusco, Perú 2026</span>
+                </div>
             </div>
         </footer>
     </div>

@@ -15,7 +15,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
-import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
 import {
     GraduationCap,
