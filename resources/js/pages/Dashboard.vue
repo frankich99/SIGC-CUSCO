@@ -31,13 +31,8 @@ import {
     BookOpen,
     Camera,
     Sparkles,
-    UserCheck,
-    Search,
-    AlertCircle,
     Download,
     ExternalLink,
-    Building2,
-    Layers,
 } from '@lucide/vue';
 import type { BreadcrumbItem } from '@/types';
 
@@ -155,20 +150,20 @@ function roleBadgeData(role?: string) {
         case 'admin':
             return {
                 label: 'Administrador General',
-                desc: 'Control integral de capacitaciones, docentes, vacantes y actas académicas.',
-                badgeClass: 'bg-indigo-600 text-white font-extrabold shadow-xs',
+                desc: 'Control integral de programas, docentes, cupos y actas académicas.',
+                badgeClass: 'bg-rose-900 text-white font-black shadow-xs',
             };
         case 'docente':
             return {
                 label: 'Docente / Instructor',
-                desc: 'Control de sesiones, proyección de QR de asistencia en vivo y registro de evaluaciones.',
-                badgeClass: 'bg-emerald-600 text-white font-extrabold shadow-xs',
+                desc: 'Dictado de clases, proyección de QR de asistencia en aula y evaluación.',
+                badgeClass: 'bg-amber-700 text-white font-black shadow-xs',
             };
         default:
             return {
                 label: 'Participante / Alumno',
                 desc: 'Inscripción a programas, registro de asistencia con QR y descarga de certificados.',
-                badgeClass: 'bg-blue-600 text-white font-extrabold shadow-xs',
+                badgeClass: 'bg-blue-800 text-white font-black shadow-xs',
             };
     }
 }
@@ -179,43 +174,42 @@ function roleBadgeData(role?: string) {
         <Head title="Panel de Control - SIGC-CUSCO" />
 
         <div class="space-y-8 px-4 py-6 md:px-8 max-w-7xl mx-auto">
-            <!-- BANNER PRINCIPAL CON COLORES VIVOS Y ALTO CONTRASTE -->
-            <div class="relative overflow-hidden rounded-2xl border-2 border-emerald-600/30 bg-gradient-to-r from-emerald-800 via-teal-900 to-slate-950 p-6 sm:p-8 text-white shadow-xl">
-                <!-- Background decorative shapes -->
-                <div class="absolute -right-10 -bottom-10 size-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <!-- BANNER PRINCIPAL: GRANATE IMPERIAL CUSCO (UNSAAC) -->
+            <div class="relative overflow-hidden rounded-2xl border-2 border-rose-900/40 bg-gradient-to-r from-[#4c0519] via-[#701a31] to-slate-950 p-6 sm:p-8 text-white shadow-xl">
+                <!-- Background decorative glow -->
+                <div class="absolute -right-10 -bottom-10 size-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                     <div class="space-y-3">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-[11px] uppercase tracking-wider font-extrabold bg-white/20 text-white px-3 py-1 rounded-full backdrop-blur-sm border border-white/20">
-                                SIGC-CUSCO • Sistema Integrado
+                            <span class="text-[11px] uppercase tracking-wider font-black bg-white/20 text-white px-3 py-1 rounded-full backdrop-blur-sm border border-white/20">
+                                SIGC-CUSCO • UNSAAC
                             </span>
                             <span class="text-[11px] uppercase tracking-wider px-3 py-1 rounded-full" :class="roleBadgeData(user?.role).badgeClass">
                                 {{ roleBadgeData(user?.role).label }}
                             </span>
-                            <PeruGeoBadge />
                         </div>
 
                         <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white drop-shadow-xs">
                             ¡Bienvenido, {{ user?.name }}!
                         </h1>
 
-                        <p class="text-xs sm:text-sm text-emerald-100 font-medium max-w-2xl leading-relaxed">
+                        <p class="text-xs sm:text-sm text-rose-100 font-medium max-w-2xl leading-relaxed">
                             {{ roleBadgeData(user?.role).desc }}
                         </p>
                     </div>
 
-                    <!-- Botones de Acción Primarios Claros -->
+                    <!-- Botones de Acción Primarios Granate y Dorado -->
                     <div class="flex flex-wrap items-center gap-3">
-                        <Button v-if="user?.role === 'admin'" as-child size="default" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md">
+                        <Button v-if="user?.role === 'admin'" as-child size="default" class="bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shadow-md">
                             <Link href="/courses/create">
                                 <Plus class="mr-1.5 size-4" />
                                 Nueva Capacitación
                             </Link>
                         </Button>
-                        <Button as-child size="default" variant="secondary" class="bg-white hover:bg-emerald-50 text-slate-900 font-bold text-xs shadow-md">
+                        <Button as-child size="default" variant="secondary" class="bg-white hover:bg-rose-50 text-rose-950 font-bold text-xs shadow-md">
                             <Link href="/courses">
-                                <GraduationCap class="mr-1.5 size-4 text-emerald-700" />
+                                <GraduationCap class="mr-1.5 size-4 text-rose-900" />
                                 Catálogo Completo
                             </Link>
                         </Button>
@@ -224,20 +218,20 @@ function roleBadgeData(role?: string) {
 
                 <!-- Selector de Vista para Administradores -->
                 <div v-if="user?.role === 'admin'" class="relative z-10 mt-6 pt-4 border-t border-white/20 flex flex-wrap items-center gap-2">
-                    <span class="text-xs font-bold text-emerald-200 mr-2">Modo de visualización:</span>
+                    <span class="text-xs font-bold text-rose-200 mr-2">Modo de visualización:</span>
                     <button
                         type="button"
                         @click="activeDashboardTab = 'organizador'"
-                        class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
-                        :class="activeDashboardTab === 'organizador' ? 'bg-white text-emerald-950 shadow-md ring-2 ring-emerald-400' : 'bg-white/10 text-white hover:bg-white/20'"
+                        class="px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
+                        :class="activeDashboardTab === 'organizador' ? 'bg-white text-rose-950 shadow-md ring-2 ring-amber-400' : 'bg-white/10 text-white hover:bg-white/20'"
                     >
                         Vista Organizador / Docente
                     </button>
                     <button
                         type="button"
                         @click="activeDashboardTab = 'participante'"
-                        class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
-                        :class="activeDashboardTab === 'participante' ? 'bg-white text-emerald-950 shadow-md ring-2 ring-emerald-400' : 'bg-white/10 text-white hover:bg-white/20'"
+                        class="px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
+                        :class="activeDashboardTab === 'participante' ? 'bg-white text-rose-950 shadow-md ring-2 ring-amber-400' : 'bg-white/10 text-white hover:bg-white/20'"
                     >
                         Vista Participante / Alumno
                     </button>
@@ -248,77 +242,77 @@ function roleBadgeData(role?: string) {
             <!-- 1. VISTA: ORGANIZADOR / DOCENTE / INSTRUCTOR                 -->
             <!-- ============================================================ -->
             <div v-if="isOrganizerOrTeacher && (user?.role !== 'admin' || activeDashboardTab === 'organizador')" class="space-y-8">
-                <!-- Grilla de Métricas Compacta y Responsiva -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-                    <!-- Métrica 1: Cursos Asignados -->
-                    <Card class="border border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-xs hover:shadow-md transition-all">
-                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
-                            <CardDescription class="text-[11px] sm:text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center justify-between">
-                                <span class="truncate">Mis Cursos</span>
-                                <div class="size-7 sm:size-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0">
-                                    <BookOpen class="size-3.5 sm:size-4" />
+                <!-- Grilla de Métricas: Granate, Dorado y Alto Contraste -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Métrica 1: Cursos Asignados (Granate Cusco) -->
+                    <Card class="border-2 border-rose-300 dark:border-rose-900 bg-rose-50/40 dark:bg-rose-950/20 shadow-sm hover:shadow-md transition-all">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="text-xs font-bold text-rose-950 dark:text-rose-300 flex items-center justify-between">
+                                <span>Cursos a mi Cargo</span>
+                                <div class="size-8 rounded-lg bg-rose-900 text-white flex items-center justify-center shadow-xs">
+                                    <BookOpen class="size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ metrics.taughtCount }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400">
-                            Cursos activos
+                        <CardContent class="text-xs font-bold text-slate-700 dark:text-slate-300">
+                            Capacitaciones asignadas activas
                         </CardContent>
                     </Card>
 
-                    <!-- Métrica 2: Inscripciones Abiertas -->
-                    <Card class="border border-teal-300 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20 shadow-xs hover:shadow-md transition-all">
-                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
-                            <CardDescription class="text-[11px] sm:text-xs font-bold text-teal-900 dark:text-teal-300 flex items-center justify-between">
-                                <span class="truncate">Convocatorias</span>
-                                <div class="size-7 sm:size-8 rounded-lg bg-teal-600 text-white flex items-center justify-center shadow-xs shrink-0">
-                                    <GraduationCap class="size-3.5 sm:size-4" />
+                    <!-- Métrica 2: Inscripciones Abiertas (Dorado Cusco) -->
+                    <Card class="border-2 border-amber-300 dark:border-amber-900 bg-amber-50/40 dark:bg-amber-950/20 shadow-sm hover:shadow-md transition-all">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="text-xs font-bold text-amber-950 dark:text-amber-300 flex items-center justify-between">
+                                <span>Inscripciones Abiertas</span>
+                                <div class="size-8 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs">
+                                    <GraduationCap class="size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ metrics.openCourses }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400">
-                            Con vacantes
+                        <CardContent class="text-xs font-bold text-slate-700 dark:text-slate-300">
+                            Recibiendo nuevos participantes
                         </CardContent>
                     </Card>
 
                     <!-- Métrica 3: Total Registrados -->
-                    <Card class="border border-indigo-300 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-xs hover:shadow-md transition-all">
-                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
-                            <CardDescription class="text-[11px] sm:text-xs font-bold text-indigo-900 dark:text-indigo-300 flex items-center justify-between">
-                                <span class="truncate">Total Cursos</span>
-                                <div class="size-7 sm:size-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs shrink-0">
-                                    <Award class="size-3.5 sm:size-4" />
+                    <Card class="border-2 border-indigo-300 dark:border-indigo-900 bg-indigo-50/40 dark:bg-indigo-950/20 shadow-sm hover:shadow-md transition-all">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="text-xs font-bold text-indigo-950 dark:text-indigo-300 flex items-center justify-between">
+                                <span>Total Capacitaciones</span>
+                                <div class="size-8 rounded-lg bg-indigo-700 text-white flex items-center justify-center shadow-xs">
+                                    <Award class="size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ metrics.totalCourses }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400">
-                            En catálogo
+                        <CardContent class="text-xs font-bold text-slate-700 dark:text-slate-300">
+                            Registradas en SIGC-CUSCO
                         </CardContent>
                     </Card>
 
                     <!-- Métrica 4: Asistencia QR Dinámica -->
-                    <Card class="border border-amber-300 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/20 shadow-xs hover:shadow-md transition-all">
-                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
-                            <CardDescription class="text-[11px] sm:text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center justify-between">
-                                <span class="truncate">Asistencia QR</span>
-                                <div class="size-7 sm:size-8 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs shrink-0">
-                                    <QrCode class="size-3.5 sm:size-4" />
+                    <Card class="border-2 border-rose-400 dark:border-rose-800 bg-rose-100/50 dark:bg-rose-950/30 shadow-sm hover:shadow-md transition-all">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="text-xs font-bold text-rose-950 dark:text-rose-200 flex items-center justify-between">
+                                <span>Asistencia QR en Vivo</span>
+                                <div class="size-8 rounded-lg bg-rose-950 text-white flex items-center justify-center shadow-xs">
+                                    <QrCode class="size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-sm sm:text-base font-extrabold text-amber-950 dark:text-amber-200 pt-1">
-                                QR en Vivo
+                            <CardTitle class="text-base font-black text-rose-950 dark:text-rose-200 pt-2">
+                                Proyección en Aula
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400">
-                            Proyección en aula
+                        <CardContent class="text-xs font-bold text-slate-700 dark:text-slate-300">
+                            Genera códigos QR dinámicos para tus clases
                         </CardContent>
                     </Card>
                 </div>
@@ -327,56 +321,56 @@ function roleBadgeData(role?: string) {
                 <div class="space-y-4">
                     <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                         <div>
-                            <h2 class="text-xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-                                <BookOpen class="size-5 text-emerald-600" />
+                            <h2 class="text-xl font-black tracking-tight text-slate-950 dark:text-white flex items-center gap-2">
+                                <BookOpen class="size-5 text-rose-800" />
                                 Mis Capacitaciones Asignadas
                             </h2>
                             <p class="text-xs font-semibold text-slate-700 dark:text-slate-300">
                                 Cursos donde figuras como docente responsable o administrador.
                             </p>
                         </div>
-                        <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 text-slate-800 hover:text-emerald-700">
+                        <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 text-slate-800 hover:text-rose-900">
                             <Link href="/courses">Ver Catálogo General →</Link>
                         </Button>
                     </div>
 
                     <!-- Estado Vacío -->
                     <div v-if="taughtCourses.length === 0" class="p-10 text-center border-2 border-dashed border-slate-300 rounded-2xl space-y-3 bg-white dark:bg-slate-900">
-                        <div class="size-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+                        <div class="size-16 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center mx-auto">
                             <BookOpen class="size-8" />
                         </div>
                         <h3 class="text-base font-bold text-slate-900 dark:text-white">No tienes cursos asignados actualmente</h3>
                         <p class="text-xs font-medium text-slate-600 max-w-md mx-auto">
                             Cuando seas asignado a un curso o registres uno nuevo como administrador, aparecerá en este panel.
                         </p>
-                        <Button v-if="user?.role === 'admin'" as-child size="sm" class="mt-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white">
+                        <Button v-if="user?.role === 'admin'" as-child size="sm" class="mt-2 text-xs font-bold bg-rose-900 hover:bg-rose-950 text-white">
                             <Link href="/courses/create">Crear Mi Primera Capacitación</Link>
                         </Button>
                     </div>
 
                     <!-- Lista de Cursos Asignados -->
                     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <Card v-for="course in taughtCourses" :key="course.id" class="border-2 border-slate-200 dark:border-slate-800 hover:border-emerald-500 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between rounded-xl bg-white dark:bg-slate-950">
+                        <Card v-for="course in taughtCourses" :key="course.id" class="border-2 border-slate-200 dark:border-slate-800 hover:border-rose-800 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between rounded-xl bg-white dark:bg-slate-950">
                             <CardHeader class="pb-3 space-y-2">
                                 <div class="flex items-center justify-between text-xs">
-                                    <span class="font-mono font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded border border-slate-300 dark:border-slate-700">
+                                    <span class="font-mono font-bold text-rose-950 bg-rose-100 dark:bg-rose-950 dark:text-rose-200 px-2.5 py-1 rounded border border-rose-200 dark:border-rose-800">
                                         {{ course.code }}
                                     </span>
-                                    <Badge class="text-[11px] font-extrabold uppercase px-2.5 py-0.5" :class="course.status === 'abierto' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' : 'bg-slate-100 text-slate-800'">
+                                    <Badge class="text-[11px] font-extrabold uppercase px-2.5 py-0.5" :class="course.status === 'abierto' ? 'bg-emerald-100 text-emerald-950 border border-emerald-300' : 'bg-slate-100 text-slate-800'">
                                         {{ course.status }}
                                     </Badge>
                                 </div>
-                                <CardTitle class="text-base font-black text-slate-900 dark:text-white line-clamp-2 leading-snug">
+                                <CardTitle class="text-base font-black text-slate-950 dark:text-white line-clamp-2 leading-snug">
                                     {{ course.title }}
                                 </CardTitle>
-                                <div v-if="course.institution" class="text-xs font-bold text-blue-700 dark:text-blue-400">
+                                <div v-if="course.institution" class="text-xs font-bold text-rose-800 dark:text-rose-400">
                                     {{ course.institution }}
                                 </div>
-                                <CardDescription class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 pt-1">
-                                    <Calendar class="size-3.5 text-emerald-600 shrink-0" />
+                                <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 pt-1">
+                                    <Calendar class="size-3.5 text-rose-800 shrink-0" />
                                     <span>Inicio: <strong>{{ formatDate(course.start_date, 'compact') }}</strong></span>
                                     <span>•</span>
-                                    <Clock class="size-3.5 text-blue-600 shrink-0" />
+                                    <Clock class="size-3.5 text-amber-600 shrink-0" />
                                     <span>{{ formatHours(course.hours) }}</span>
                                 </CardDescription>
                             </CardHeader>
@@ -384,24 +378,24 @@ function roleBadgeData(role?: string) {
                             <CardContent class="text-xs space-y-2.5">
                                 <div class="flex items-center justify-between text-xs font-bold">
                                     <span class="text-slate-700 dark:text-slate-300">Inscritos / Aforo:</span>
-                                    <span class="text-emerald-700 dark:text-emerald-400 font-extrabold">
+                                    <span class="text-rose-900 dark:text-rose-400 font-extrabold">
                                         {{ course.enrollments_count || 0 }} de {{ course.capacity }} vacantes
                                     </span>
                                 </div>
                                 <div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
                                     <div
-                                        class="h-full bg-emerald-600 rounded-full transition-all"
+                                        class="h-full bg-rose-900 rounded-full transition-all"
                                         :style="{ width: `${Math.min(100, ((course.enrollments_count || 0) / course.capacity) * 100)}%` }"
                                     />
                                 </div>
                             </CardContent>
 
                             <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 rounded-b-xl">
-                                <Button size="sm" variant="outline" class="text-xs font-bold border-emerald-600 text-emerald-800 hover:bg-emerald-50 h-9 flex-1 sm:flex-none" @click="openQrProjection(course)">
-                                    <QrCode class="size-4 mr-1.5 text-emerald-600" />
+                                <Button size="sm" variant="outline" class="text-xs font-bold border-rose-800 text-rose-900 hover:bg-rose-50 h-9" @click="openQrProjection(course)">
+                                    <QrCode class="size-4 mr-1.5 text-rose-800" />
                                     Proyectar QR
                                 </Button>
-                                <Button as-child size="sm" class="text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white h-9 flex-1 sm:flex-none">
+                                <Button as-child size="sm" class="text-xs font-bold bg-rose-900 hover:bg-rose-950 text-white h-9">
                                     <Link :href="`/courses/${course.id}`">
                                         Ver Alumnos →
                                     </Link>
@@ -416,56 +410,56 @@ function roleBadgeData(role?: string) {
             <!-- 2. VISTA: PARTICIPANTE / ALUMNO / ESTUDIANTE                 -->
             <!-- ============================================================ -->
             <div v-if="isStudentOrParticipant && (user?.role === 'participante' || activeDashboardTab === 'participante')" class="space-y-8" id="mis-cursos">
-                <!-- Métricas del Participante (3 columnas compactas y responsivas) -->
-                <div class="grid grid-cols-3 gap-2 sm:gap-4">
-                    <Card class="border border-blue-300 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 shadow-xs">
-                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
-                            <CardDescription class="text-[11px] sm:text-xs font-bold text-blue-900 dark:text-blue-300 flex items-center justify-between">
-                                <span class="truncate">Mis Cursos</span>
-                                <div class="size-7 sm:size-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
-                                    <GraduationCap class="size-3.5 sm:size-4" />
+                <!-- Métricas del Participante -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <Card class="border-2 border-rose-300 dark:border-rose-900 bg-rose-50/40 dark:bg-rose-950/20 shadow-sm">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="text-xs font-bold text-rose-950 dark:text-rose-300 flex items-center justify-between">
+                                <span>Mis Cursos Matriculados</span>
+                                <div class="size-8 rounded-lg bg-rose-900 text-white flex items-center justify-center shadow-xs">
+                                    <GraduationCap class="size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ metrics.enrolledCount }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400 truncate">
-                            Inscritos
+                        <CardContent class="text-xs font-bold text-slate-700 dark:text-slate-300">
+                            Capacitaciones activas en tu cuenta
                         </CardContent>
                     </Card>
 
-                    <Card class="border border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-xs">
-                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
-                            <CardDescription class="text-[11px] sm:text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center justify-between">
-                                <span class="truncate">Asistencias</span>
-                                <div class="size-7 sm:size-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0">
-                                    <QrCode class="size-3.5 sm:size-4" />
+                    <Card class="border-2 border-amber-300 dark:border-amber-900 bg-amber-50/40 dark:bg-amber-950/20 shadow-sm">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="text-xs font-bold text-amber-950 dark:text-amber-300 flex items-center justify-between">
+                                <span>Asistencias Marcadas</span>
+                                <div class="size-8 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs">
+                                    <QrCode class="size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ studentEnrollments.reduce((acc, curr) => acc + (curr.attended_sessions || 0), 0) }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400 truncate">
-                            Sesiones QR
+                        <CardContent class="text-xs font-bold text-slate-700 dark:text-slate-300">
+                            Sesiones validadas con código QR
                         </CardContent>
                     </Card>
 
-                    <Card class="border border-indigo-300 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-xs">
-                        <CardHeader class="p-3 sm:p-4 pb-1 sm:pb-2">
-                            <CardDescription class="text-[11px] sm:text-xs font-bold text-indigo-900 dark:text-indigo-300 flex items-center justify-between">
-                                <span class="truncate">Certificados</span>
-                                <div class="size-7 sm:size-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs shrink-0">
-                                    <Award class="size-3.5 sm:size-4" />
+                    <Card class="border-2 border-indigo-300 dark:border-indigo-900 bg-indigo-50/40 dark:bg-indigo-950/20 shadow-sm">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="text-xs font-bold text-indigo-950 dark:text-indigo-300 flex items-center justify-between">
+                                <span>Certificados Obtenidos</span>
+                                <div class="size-8 rounded-lg bg-indigo-700 text-white flex items-center justify-center shadow-xs">
+                                    <Award class="size-4" />
                                 </div>
                             </CardDescription>
-                            <CardTitle class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white pt-1">
+                            <CardTitle class="text-3xl font-black text-slate-900 dark:text-white pt-1">
                                 {{ studentEnrollments.filter(e => e.status === 'aprobado' || e.certificate_code).length }}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="p-3 sm:p-4 pt-0 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-400 truncate">
-                            Aprobados
+                        <CardContent class="text-xs font-bold text-slate-700 dark:text-slate-300">
+                            Diplomas oficiales con validez web
                         </CardContent>
                     </Card>
                 </div>
@@ -474,8 +468,8 @@ function roleBadgeData(role?: string) {
                 <div class="space-y-4">
                     <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                         <div>
-                            <h2 class="text-xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-                                <GraduationCap class="size-5 text-emerald-600" />
+                            <h2 class="text-xl font-black tracking-tight text-slate-950 dark:text-white flex items-center gap-2">
+                                <GraduationCap class="size-5 text-rose-800" />
                                 Mis Capacitaciones Inscritas
                             </h2>
                             <p class="text-xs font-semibold text-slate-700 dark:text-slate-300">
@@ -486,67 +480,67 @@ function roleBadgeData(role?: string) {
 
                     <!-- Estado Vacío -->
                     <div v-if="studentEnrollments.length === 0" class="p-10 text-center rounded-2xl border-2 border-dashed border-slate-300 space-y-3 bg-white dark:bg-slate-900">
-                        <div class="size-16 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center mx-auto">
+                        <div class="size-16 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center mx-auto">
                             <GraduationCap class="size-8" />
                         </div>
                         <h3 class="text-base font-bold text-slate-900 dark:text-white">Aún no estás matriculado en ninguna capacitación</h3>
                         <p class="text-xs font-medium text-slate-600 max-w-sm mx-auto">
                             Explora los cursos abiertos disponibles en la parte inferior e inscríbete con un solo clic.
                         </p>
-                        <Button as-child size="default" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold">
+                        <Button as-child size="default" class="bg-rose-900 hover:bg-rose-950 text-white text-xs font-bold">
                             <a href="#cursos-abiertos">Ver Cursos Abiertos</a>
                         </Button>
                     </div>
 
                     <!-- Tarjetas de Cursos Matriculados -->
                     <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <Card v-for="item in studentEnrollments" :key="item.id" class="border-2 border-slate-200 dark:border-slate-800 hover:border-blue-500 shadow-sm hover:shadow-lg transition-all overflow-hidden flex flex-col justify-between rounded-xl bg-white dark:bg-slate-950">
+                        <Card v-for="item in studentEnrollments" :key="item.id" class="border-2 border-slate-200 dark:border-slate-800 hover:border-rose-800 shadow-sm hover:shadow-lg transition-all overflow-hidden flex flex-col justify-between rounded-xl bg-white dark:bg-slate-950">
                             <CardHeader class="pb-3 space-y-2">
                                 <div class="flex items-center justify-between">
-                                    <span class="font-mono text-xs font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded border border-slate-300 dark:border-slate-700">
+                                    <span class="font-mono text-xs font-bold text-rose-950 bg-rose-100 dark:bg-rose-950 dark:text-rose-200 px-2.5 py-1 rounded border border-rose-200 dark:border-rose-800">
                                         {{ item.course?.code }}
                                     </span>
-                                    <Badge class="capitalize text-xs font-extrabold px-2.5 py-0.5" :class="item.status === 'aprobado' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' : 'bg-blue-100 text-blue-900 border border-blue-300'">
+                                    <Badge class="capitalize text-xs font-extrabold px-2.5 py-0.5" :class="item.status === 'aprobado' ? 'bg-emerald-100 text-emerald-950 border border-emerald-300' : 'bg-rose-100 text-rose-950 border border-rose-300'">
                                         {{ item.status }}
                                     </Badge>
                                 </div>
-                                <CardTitle class="text-base font-black text-slate-900 dark:text-white line-clamp-2 leading-snug">
+                                <CardTitle class="text-base font-black text-slate-950 dark:text-white line-clamp-2 leading-snug">
                                     {{ item.course?.title }}
                                 </CardTitle>
-                                <CardDescription class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300">
                                     Docente: {{ item.course?.instructor ? `${item.course.instructor.name} ${item.course.instructor.paterno || ''}` : 'Por asignar' }}
                                 </CardDescription>
                             </CardHeader>
 
                             <CardContent class="text-xs space-y-3">
-                                <div class="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-300 font-semibold bg-slate-50 dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800">
+                                <div class="grid grid-cols-2 gap-2 text-slate-800 dark:text-slate-200 font-bold bg-slate-50 dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800">
                                     <div class="flex items-center gap-1.5">
-                                        <Calendar class="size-3.5 text-emerald-600 shrink-0" />
+                                        <Calendar class="size-3.5 text-rose-800 shrink-0" />
                                         <span>Inicio: <strong>{{ formatDate(item.course?.start_date, 'compact') }}</strong></span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
-                                        <Clock class="size-3.5 text-blue-600 shrink-0" />
+                                        <Clock class="size-3.5 text-amber-600 shrink-0" />
                                         <span>{{ formatHours(item.course?.hours) }}</span>
                                     </div>
                                 </div>
-                                <div class="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs flex items-center justify-between font-bold">
-                                    <span class="text-emerald-950 dark:text-emerald-200">Asistencias acumuladas:</span>
-                                    <span class="text-emerald-700 dark:text-emerald-300 text-sm font-black">{{ item.attended_sessions }} sesiones</span>
+                                <div class="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs flex items-center justify-between font-bold">
+                                    <span class="text-rose-950 dark:text-rose-200">Asistencias acumuladas:</span>
+                                    <span class="text-rose-800 dark:text-rose-300 text-sm font-black">{{ item.attended_sessions }} sesiones</span>
                                 </div>
                             </CardContent>
 
                             <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 rounded-b-xl">
-                                <Button size="sm" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-9 shadow-xs" @click="openScanModal(item)">
+                                <Button size="sm" class="bg-rose-900 hover:bg-rose-950 text-white text-xs font-bold h-9 shadow-xs" @click="openScanModal(item)">
                                     <Camera class="size-4 mr-1.5" />
-                                    Escanear QR
+                                    Marcar Asistencia QR
                                 </Button>
-                                <Button v-if="item.status === 'aprobado' || item.certificate_code" size="sm" variant="outline" class="flex-1 text-xs font-bold h-9 border-indigo-300 text-indigo-800">
-                                    <Download class="size-4 mr-1.5 text-indigo-600" />
-                                    Certificado
+                                <Button v-if="item.status === 'aprobado' || item.certificate_code" size="sm" variant="outline" class="text-xs font-bold h-9 border-amber-400 text-amber-900">
+                                    <Download class="size-4 mr-1.5 text-amber-700" />
+                                    Certificado PDF
                                 </Button>
-                                <Button v-else as-child variant="outline" size="sm" class="flex-1 text-xs font-bold h-9 border-slate-300 text-slate-800">
+                                <Button v-else as-child variant="outline" size="sm" class="text-xs font-bold h-9 border-slate-300 text-slate-800">
                                     <Link :href="`/courses/${item.course_id}`">
-                                        Detalles
+                                        Detalles →
                                     </Link>
                                 </Button>
                             </div>
@@ -554,63 +548,63 @@ function roleBadgeData(role?: string) {
                     </div>
                 </div>
 
-                <!-- Sección: Descubre Nuevas Capacitaciones Abiertas -->
+                <!-- Sección: Convocatorias Abiertas -->
                 <div id="cursos-abiertos" class="space-y-4 pt-6 border-t border-slate-200 dark:border-slate-800">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h2 class="text-xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-                                <Sparkles class="size-5 text-amber-500" />
+                            <h2 class="text-xl font-black tracking-tight text-slate-950 dark:text-white flex items-center gap-2">
+                                <Sparkles class="size-5 text-amber-600" />
                                 Convocatorias Abiertas para Inscripción
                             </h2>
                             <p class="text-xs font-semibold text-slate-700 dark:text-slate-300">
                                 Puedes inscribirte directamente completando tu ficha oficial en línea.
                             </p>
                         </div>
-                        <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 text-slate-800 hover:text-emerald-700">
+                        <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 text-slate-800 hover:text-rose-900">
                             <Link href="/courses">Ver Catálogo Completo →</Link>
                         </Button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <Card v-for="course in openCourses" :key="course.id" class="border-2 border-slate-200 dark:border-slate-800 flex flex-col justify-between hover:border-emerald-500 shadow-sm hover:shadow-lg transition-all rounded-xl bg-white dark:bg-slate-950">
+                        <Card v-for="course in openCourses" :key="course.id" class="border-2 border-slate-200 dark:border-slate-800 flex flex-col justify-between hover:border-rose-800 shadow-sm hover:shadow-lg transition-all rounded-xl bg-white dark:bg-slate-950">
                             <CardHeader class="pb-3 space-y-1.5">
                                 <div class="flex items-center justify-between text-xs">
-                                    <span class="font-mono font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700">
+                                    <span class="font-mono font-bold text-rose-950 bg-rose-100 dark:bg-rose-950 dark:text-rose-200 px-2.5 py-0.5 rounded border border-rose-200 dark:border-rose-800">
                                         {{ course.code }}
                                     </span>
-                                    <Badge class="text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
+                                    <Badge class="text-[10px] font-bold bg-amber-100 text-amber-950 border border-amber-300">
                                         Inscripción Abierta
                                     </Badge>
                                 </div>
-                                <CardTitle class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white line-clamp-2 leading-snug">
+                                <CardTitle class="text-sm sm:text-base font-extrabold text-slate-950 dark:text-white line-clamp-2 leading-snug">
                                     {{ course.title }}
                                 </CardTitle>
-                                <div class="text-xs font-bold text-emerald-800 dark:text-emerald-400 truncate">
-                                    {{ course.institution || 'Entidad Organizadora' }}
+                                <div class="text-xs font-bold text-rose-900 dark:text-rose-400 truncate">
+                                    {{ course.institution || 'Universidad Nacional de San Antonio Abad del Cusco' }}
                                 </div>
-                                <CardDescription class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 pt-1">
-                                    <Calendar class="size-3.5 text-emerald-600 shrink-0" />
+                                <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 pt-1">
+                                    <Calendar class="size-3.5 text-rose-800 shrink-0" />
                                     <span>Inicio: <strong>{{ formatDate(course.start_date, 'compact') }}</strong></span>
                                     <span>•</span>
-                                    <Clock class="size-3.5 text-blue-600 shrink-0" />
+                                    <Clock class="size-3.5 text-amber-600 shrink-0" />
                                     <span>{{ formatHours(course.hours) }}</span>
                                 </CardDescription>
                             </CardHeader>
 
                             <CardContent class="text-xs">
-                                <div class="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800">
+                                <div class="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800">
                                     <span>Vacantes disponibles:</span>
-                                    <strong class="text-emerald-700 dark:text-emerald-400 text-sm font-black">
+                                    <strong class="text-rose-900 dark:text-rose-400 text-sm font-black">
                                         {{ Math.max(0, course.capacity - (course.enrollments_count || 0)) }} cupos
                                     </strong>
                                 </div>
                             </CardContent>
 
                             <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 rounded-b-xl">
-                                <Button as-child variant="outline" size="sm" class="flex-1 text-xs font-bold h-9 border-slate-300 text-slate-800 hover:text-slate-900">
-                                    <Link :href="`/courses/${course.id}`">Temario</Link>
+                                <Button as-child variant="ghost" size="sm" class="text-xs font-bold h-9 text-slate-700 hover:text-slate-900">
+                                    <Link :href="`/courses/${course.id}`">Ver Temario</Link>
                                 </Button>
-                                <Button size="sm" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold h-9 px-4 shadow-sm" @click="openEnroll(course)">
+                                <Button size="sm" class="bg-rose-900 hover:bg-rose-950 text-white text-xs font-black h-9 px-4 shadow-sm" @click="openEnroll(course)">
                                     <CheckCircle2 class="size-4 mr-1.5" />
                                     Inscribirme
                                 </Button>
@@ -620,15 +614,15 @@ function roleBadgeData(role?: string) {
                 </div>
             </div>
 
-            <!-- MODAL: PROYECCIÓN QR (PARA DOCENTE) - DIMENSIONES AMPLIAS -->
+            <!-- MODAL: PROYECCIÓN QR (PARA DOCENTE) -->
             <Dialog :open="isQrModalOpen" @update:open="isQrModalOpen = $event">
-                <DialogContent class="w-full sm:max-w-2xl md:max-w-3xl p-6 sm:p-8 rounded-2xl shadow-2xl border-2 border-emerald-500/40 text-center bg-white dark:bg-slate-900">
+                <DialogContent class="w-full sm:max-w-2xl md:max-w-3xl p-6 sm:p-8 rounded-2xl shadow-2xl border-4 border-rose-900 text-center bg-white dark:bg-slate-900">
                     <DialogHeader class="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-4">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold uppercase tracking-wider mx-auto">
-                            <QrCode class="size-4 text-emerald-700" />
-                            <span>Control de Asistencia Digital en Vivo</span>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-950 text-xs font-black uppercase tracking-wider mx-auto">
+                            <QrCode class="size-4 text-rose-800" />
+                            <span>Control de Asistencia Digital • UNSAAC</span>
                         </div>
-                        <DialogTitle class="text-2xl font-black text-slate-900 dark:text-white">
+                        <DialogTitle class="text-2xl font-black text-slate-950 dark:text-white">
                             {{ activeQrCourse?.title }}
                         </DialogTitle>
                         <DialogDescription class="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 max-w-lg mx-auto">
@@ -636,48 +630,48 @@ function roleBadgeData(role?: string) {
                         </DialogDescription>
                     </DialogHeader>
 
-                    <!-- QR Visualization Gigante y Claro -->
+                    <!-- QR Visualization Gigante -->
                     <div class="py-6 space-y-5">
-                        <div class="p-8 bg-white rounded-3xl border-4 border-emerald-500 inline-block shadow-xl">
+                        <div class="p-8 bg-white rounded-3xl border-4 border-rose-900 inline-block shadow-xl">
                             <QrCode class="size-60 sm:size-72 text-slate-950 mx-auto" />
                         </div>
                         <div class="space-y-2">
-                            <div class="inline-block text-sm sm:text-base font-mono font-extrabold tracking-widest text-emerald-900 bg-emerald-100 px-5 py-2 rounded-full border-2 border-emerald-300 shadow-sm">
+                            <div class="inline-block text-sm sm:text-base font-mono font-black tracking-widest text-rose-950 bg-rose-100 px-5 py-2 rounded-full border-2 border-rose-300 shadow-sm">
                                 CÓDIGO DE SESIÓN: {{ activeQrCourse?.code }}-{{ new Date().getDate() }}
                             </div>
-                            <p class="text-xs font-bold text-slate-600 dark:text-slate-400">
+                            <p class="text-xs font-bold text-slate-700 dark:text-slate-300">
                                 ⏳ Código de asistencia dinámico activo únicamente durante el horario de la clase de hoy.
                             </p>
                         </div>
                     </div>
 
-                    <Button @click="isQrModalOpen = false" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold h-11 text-sm shadow-md">
+                    <Button @click="isQrModalOpen = false" class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold h-11 text-sm shadow-md">
                         Finalizar y Cerrar Proyección
                     </Button>
                 </DialogContent>
             </Dialog>
 
-            <!-- MODAL: MARCAR ASISTENCIA (PARA ALUMNO) - DIMENSIONES AMPLIAS -->
+            <!-- MODAL: MARCAR ASISTENCIA (PARA ALUMNO) -->
             <Dialog :open="isScanQrModalOpen" @update:open="isScanQrModalOpen = $event">
                 <DialogContent class="w-full sm:max-w-xl p-6 sm:p-8 rounded-2xl shadow-2xl border border-slate-300 text-left bg-white dark:bg-slate-900">
                     <DialogHeader class="space-y-1 border-b border-slate-200 dark:border-slate-800 pb-4">
-                        <DialogTitle class="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                            <Camera class="size-6 text-emerald-600" />
+                        <DialogTitle class="text-xl font-black text-slate-950 dark:text-white flex items-center gap-2">
+                            <Camera class="size-6 text-rose-800" />
                             <span>Marcar Mi Asistencia Oficial</span>
                         </DialogTitle>
                         <DialogDescription class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
-                            Curso: <strong class="text-emerald-800 dark:text-emerald-400">{{ activeQrCourse?.title }}</strong>
+                            Curso: <strong class="text-rose-900 dark:text-rose-300">{{ activeQrCourse?.title }}</strong>
                         </DialogDescription>
                     </DialogHeader>
 
                     <div v-if="scanSuccessMessage" class="py-8 text-center space-y-4">
-                        <div class="size-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+                        <div class="size-16 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto">
                             <CheckCircle2 class="size-10" />
                         </div>
-                        <p class="text-base font-extrabold text-emerald-900 dark:text-emerald-300">
+                        <p class="text-base font-extrabold text-emerald-950 dark:text-emerald-300">
                             {{ scanSuccessMessage }}
                         </p>
-                        <Button @click="isScanQrModalOpen = false" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11 text-sm shadow-md">
+                        <Button @click="isScanQrModalOpen = false" class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold h-11 text-sm shadow-md">
                             Aceptar y Continuar
                         </Button>
                     </div>
@@ -685,7 +679,7 @@ function roleBadgeData(role?: string) {
                     <div v-else class="space-y-5 py-4">
                         <div class="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-xl text-left space-y-2 border border-slate-200 dark:border-slate-700">
                             <div class="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white">
-                                <QrCode class="size-5 text-emerald-600" />
+                                <QrCode class="size-5 text-rose-800" />
                                 <span>Instrucciones para validar asistencia</span>
                             </div>
                             <p class="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -705,7 +699,7 @@ function roleBadgeData(role?: string) {
                                     placeholder="Ej: UNS-AI-07"
                                     class="text-sm font-mono uppercase font-bold tracking-wider border-slate-300"
                                 />
-                                <Button size="default" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-5 shrink-0 shadow-xs" @click="simulateScan">
+                                <Button size="default" class="bg-rose-900 hover:bg-rose-950 text-white text-xs font-bold px-5 shrink-0 shadow-xs" @click="simulateScan">
                                     Validar Asistencia
                                 </Button>
                             </div>

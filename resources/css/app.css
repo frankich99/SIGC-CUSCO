@@ -59,16 +59,22 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    /* Paleta Institucional Cusco / UNSAAC Granate Imperial */
+    --color-granate: #800020;
+    --color-granate-50: #fff1f2;
+    --color-granate-100: #ffe4e6;
+    --color-granate-200: #fecdd3;
+    --color-granate-300: #fda4af;
+    --color-granate-600: #be123c;
+    --color-granate-700: #9f1239;
+    --color-granate-800: #881337;
+    --color-granate-900: #701a31;
+    --color-granate-950: #4c0519;
+    --color-cusco-gold: #d97706;
+    --color-cusco-gold-light: #fef3c7;
 }
 
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
 @layer base {
     *,
     ::after,
@@ -91,75 +97,93 @@
 
 :root {
     --background: hsl(0 0% 100%);
-    --foreground: hsl(0 0% 3.9%);
+    --foreground: hsl(222.2 84% 4.9%);
     --card: hsl(0 0% 100%);
-    --card-foreground: hsl(0 0% 3.9%);
+    --card-foreground: hsl(222.2 84% 4.9%);
     --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(0 0% 3.9%);
-    --primary: hsl(0 0% 9%);
-    --primary-foreground: hsl(0 0% 98%);
-    --secondary: hsl(0 0% 92.1%);
-    --secondary-foreground: hsl(0 0% 9%);
-    --muted: hsl(0 0% 96.1%);
-    --muted-foreground: hsl(0 0% 45.1%);
-    --accent: hsl(0 0% 96.1%);
-    --accent-foreground: hsl(0 0% 9%);
+    --popover-foreground: hsl(222.2 84% 4.9%);
+    
+    /* ROJO GRANATE IMPERIAL CUSCO (UNSAAC #7A0C2E) */
+    --primary: hsl(345 85% 26%);
+    --primary-foreground: hsl(0 0% 100%);
+    
+    --secondary: hsl(345 35% 96%);
+    --secondary-foreground: hsl(345 85% 22%);
+    
+    --muted: hsl(210 40% 96.1%);
+    --muted-foreground: hsl(215.4 16.3% 35%); /* Alto contraste, no gris muerto */
+    
+    --accent: hsl(345 40% 95%);
+    --accent-foreground: hsl(345 85% 20%);
+    
     --destructive: hsl(0 84.2% 60.2%);
     --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(0 0% 92.8%);
-    --input: hsl(0 0% 89.8%);
-    --ring: hsl(0 0% 3.9%);
-    --chart-1: hsl(12 76% 61%);
-    --chart-2: hsl(173 58% 39%);
+    
+    --border: hsl(214.3 31.8% 88%);
+    --input: hsl(214.3 31.8% 85%);
+    --ring: hsl(345 85% 26%);
+    
+    --chart-1: hsl(345 85% 35%);
+    --chart-2: hsl(38 92% 50%);
     --chart-3: hsl(197 37% 24%);
     --chart-4: hsl(43 74% 66%);
     --chart-5: hsl(27 87% 67%);
-    --radius: 0.5rem;
-    --sidebar-background: hsl(0 0% 98%);
-    --sidebar-foreground: hsl(240 5.3% 26.1%);
-    --sidebar-primary: hsl(0 0% 10%);
-    --sidebar-primary-foreground: hsl(0 0% 98%);
-    --sidebar-accent: hsl(0 0% 94%);
-    --sidebar-accent-foreground: hsl(0 0% 30%);
-    --sidebar-border: hsl(0 0% 91%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
-    --sidebar: hsl(0 0% 98%);
+    
+    --radius: 0.625rem;
+    
+    --sidebar-background: hsl(0 0% 99%);
+    --sidebar-foreground: hsl(240 5.3% 20%);
+    --sidebar-primary: hsl(345 85% 26%);
+    --sidebar-primary-foreground: hsl(0 0% 100%);
+    --sidebar-accent: hsl(345 30% 95%);
+    --sidebar-accent-foreground: hsl(345 85% 20%);
+    --sidebar-border: hsl(214.3 31.8% 90%);
+    --sidebar-ring: hsl(345 85% 26%);
+    --sidebar: hsl(0 0% 99%);
 }
 
 .dark {
-    --background: hsl(0 0% 3.9%);
-    --foreground: hsl(0 0% 98%);
-    --card: hsl(0 0% 3.9%);
-    --card-foreground: hsl(0 0% 98%);
-    --popover: hsl(0 0% 3.9%);
-    --popover-foreground: hsl(0 0% 98%);
-    --primary: hsl(0 0% 98%);
-    --primary-foreground: hsl(0 0% 9%);
-    --secondary: hsl(0 0% 14.9%);
+    --background: hsl(222.2 84% 4.9%);
+    --foreground: hsl(210 40% 98%);
+    --card: hsl(222.2 84% 6%);
+    --card-foreground: hsl(210 40% 98%);
+    --popover: hsl(222.2 84% 6%);
+    --popover-foreground: hsl(210 40% 98%);
+    
+    --primary: hsl(345 75% 45%);
+    --primary-foreground: hsl(0 0% 100%);
+    
+    --secondary: hsl(345 30% 16%);
     --secondary-foreground: hsl(0 0% 98%);
-    --muted: hsl(0 0% 16.08%);
-    --muted-foreground: hsl(0 0% 63.9%);
-    --accent: hsl(0 0% 14.9%);
+    
+    --muted: hsl(217.2 32.6% 17.5%);
+    --muted-foreground: hsl(215 20.2% 75%);
+    
+    --accent: hsl(345 30% 16%);
     --accent-foreground: hsl(0 0% 98%);
+    
     --destructive: hsl(0 84% 60%);
     --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(0 0% 14.9%);
-    --input: hsl(0 0% 14.9%);
-    --ring: hsl(0 0% 83.1%);
-    --chart-1: hsl(220 70% 50%);
-    --chart-2: hsl(160 60% 45%);
+    
+    --border: hsl(217.2 32.6% 22%);
+    --input: hsl(217.2 32.6% 22%);
+    --ring: hsl(345 75% 45%);
+    
+    --chart-1: hsl(345 75% 55%);
+    --chart-2: hsl(38 92% 55%);
     --chart-3: hsl(30 80% 55%);
     --chart-4: hsl(280 65% 60%);
     --chart-5: hsl(340 75% 55%);
-    --sidebar-background: hsl(0 0% 7%);
+    
+    --sidebar-background: hsl(222.2 84% 4.9%);
     --sidebar-foreground: hsl(0 0% 95.9%);
-    --sidebar-primary: hsl(360, 100%, 100%);
+    --sidebar-primary: hsl(345 75% 45%);
     --sidebar-primary-foreground: hsl(0 0% 100%);
-    --sidebar-accent: hsl(0 0% 15.9%);
+    --sidebar-accent: hsl(345 30% 16%);
     --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-    --sidebar-border: hsl(0 0% 15.9%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
-    --sidebar: hsl(240 5.9% 10%);
+    --sidebar-border: hsl(217.2 32.6% 20%);
+    --sidebar-ring: hsl(345 75% 45%);
+    --sidebar: hsl(222.2 84% 5.5%);
 }
 
 @layer base {

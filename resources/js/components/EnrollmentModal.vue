@@ -203,35 +203,35 @@ function closeModal() {
 
 <template>
     <Dialog :open="open" @update:open="emit('update:open', $event)">
-        <DialogContent class="w-full sm:max-w-xl md:max-w-2xl max-h-[92vh] overflow-y-auto p-4 sm:p-6 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800">
-            <!-- Header Compacto y Responsivo -->
+        <DialogContent class="w-full sm:max-w-xl md:max-w-2xl max-h-[92vh] overflow-y-auto p-4 sm:p-6 rounded-2xl shadow-xl border border-rose-200 dark:border-rose-900 bg-white dark:bg-slate-950">
+            <!-- Header Compacto y Responsivo - Granate Cusco -->
             <DialogHeader class="space-y-1.5 border-b pb-3">
                 <div class="flex flex-wrap items-center justify-between gap-1.5">
-                    <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200 border">
+                    <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-950 dark:bg-rose-950 dark:text-rose-200 border border-rose-200">
                         {{ course?.code }}
                     </span>
-                    <span v-if="course?.institution" class="text-xs font-semibold text-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded">
+                    <span v-if="course?.institution" class="text-xs font-bold text-rose-900 bg-rose-50 dark:bg-rose-950/60 dark:text-rose-200 border border-rose-200 dark:border-rose-800 px-2 py-0.5 rounded">
                         {{ course.institution }}
                     </span>
                 </div>
 
-                <DialogTitle class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-snug">
+                <DialogTitle class="text-lg sm:text-xl font-black text-slate-950 dark:text-white leading-snug">
                     {{ course?.title }}
                 </DialogTitle>
 
                 <!-- Resumen de Detalles en Fila Compacta -->
-                <div class="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-slate-600 dark:text-slate-400">
+                <div class="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-slate-700 dark:text-slate-300 font-semibold">
                     <span class="flex items-center gap-1">
-                        <Calendar class="size-3 text-emerald-600" />
+                        <Calendar class="size-3 text-rose-800" />
                         {{ formatDateRange(course?.start_date, course?.end_date, 'compact') }}
                     </span>
                     <span>•</span>
                     <span class="flex items-center gap-1">
-                        <Clock class="size-3 text-blue-600" />
+                        <Clock class="size-3 text-amber-600" />
                         {{ formatHours(course?.hours) }}
                     </span>
                     <span>•</span>
-                    <span class="flex items-center gap-1 font-semibold text-emerald-700 dark:text-emerald-400">
+                    <span class="flex items-center gap-1 font-bold text-rose-900 dark:text-rose-400">
                         <Users class="size-3" />
                         {{ course?.capacity ? `${course.capacity} vacantes` : 'Abierto' }}
                     </span>
@@ -240,37 +240,37 @@ function closeModal() {
 
             <!-- Success State -->
             <div v-if="submitSuccess" class="py-6 text-center space-y-4">
-                <div class="size-16 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 rounded-full flex items-center justify-center mx-auto shadow-inner ring-4 ring-emerald-50 dark:ring-emerald-900/30">
+                <div class="size-16 bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 rounded-full flex items-center justify-center mx-auto shadow-inner ring-4 ring-rose-50 dark:ring-rose-900/30">
                     <CheckCircle2 class="size-8" />
                 </div>
                 <div class="space-y-1">
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">¡Inscripción Confirmada!</h3>
-                    <p class="text-xs font-medium text-slate-600 dark:text-slate-300 max-w-md mx-auto">
-                        Has quedado registrado en <strong class="text-emerald-800 dark:text-emerald-300">{{ course?.title }}</strong>.
+                    <h3 class="text-xl font-black text-slate-950 dark:text-white">¡Inscripción Confirmada!</h3>
+                    <p class="text-xs font-semibold text-slate-700 dark:text-slate-300 max-w-md mx-auto">
+                        Has quedado registrado en <strong class="text-rose-900 dark:text-rose-300">{{ course?.title }}</strong>.
                     </p>
                 </div>
 
-                <div class="max-w-md mx-auto p-4 bg-emerald-50/80 dark:bg-emerald-950/40 rounded-xl text-xs text-slate-800 dark:text-slate-200 space-y-1.5 text-left border border-emerald-200 dark:border-emerald-800">
-                    <div class="flex justify-between border-b border-emerald-200/60 pb-1.5">
-                        <span class="text-neutral-500">Participante:</span>
-                        <strong class="text-slate-900 dark:text-white">{{ nombres }} {{ paterno }} {{ materno }}</strong>
+                <div class="max-w-md mx-auto p-4 bg-rose-50/80 dark:bg-rose-950/40 rounded-xl text-xs text-slate-900 dark:text-slate-200 space-y-1.5 text-left border border-rose-200 dark:border-rose-800 font-semibold">
+                    <div class="flex justify-between border-b border-rose-200/60 pb-1.5">
+                        <span class="text-slate-600">Participante:</span>
+                        <strong class="text-slate-950 dark:text-white">{{ nombres }} {{ paterno }} {{ materno }}</strong>
                     </div>
-                    <div class="flex justify-between border-b border-emerald-200/60 pb-1.5">
-                        <span class="text-neutral-500">DNI:</span>
-                        <strong class="font-mono text-slate-900 dark:text-white">{{ dni }}</strong>
+                    <div class="flex justify-between border-b border-rose-200/60 pb-1.5">
+                        <span class="text-slate-600">DNI:</span>
+                        <strong class="font-mono text-slate-950 dark:text-white">{{ dni }}</strong>
                     </div>
-                    <div class="flex justify-between border-b border-emerald-200/60 pb-1.5">
-                        <span class="text-neutral-500">Correo:</span>
-                        <span class="font-medium text-slate-900 dark:text-white">{{ email }}</span>
+                    <div class="flex justify-between border-b border-rose-200/60 pb-1.5">
+                        <span class="text-slate-600">Correo:</span>
+                        <span class="font-bold text-slate-950 dark:text-white">{{ email }}</span>
                     </div>
-                    <div class="flex items-center gap-1.5 pt-1.5 text-emerald-800 dark:text-emerald-300 font-semibold text-[11px]">
-                        <QrCode class="size-4 shrink-0 text-emerald-600" />
+                    <div class="flex items-center gap-1.5 pt-1.5 text-rose-900 dark:text-rose-300 font-bold text-[11px]">
+                        <QrCode class="size-4 shrink-0 text-rose-800" />
                         <span>Podrás marcar tu asistencia con código QR en cada clase.</span>
                     </div>
                 </div>
 
                 <div class="pt-2">
-                    <Button @click="closeModal" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 text-xs shadow-xs">
+                    <Button @click="closeModal" class="bg-rose-900 hover:bg-rose-950 text-white font-black px-6 text-xs shadow-xs">
                         Entendido / Cerrar
                     </Button>
                 </div>
@@ -279,8 +279,8 @@ function closeModal() {
             <!-- Form State (Compacto y Fluido) -->
             <form v-else @submit.prevent="submitEnrollment" class="space-y-4 pt-2">
                 <!-- Error Alert -->
-                <div v-if="submitError" class="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200 text-xs font-medium flex items-start gap-2">
-                    <AlertCircle class="size-4 shrink-0 mt-0.5 text-rose-600" />
+                <div v-if="submitError" class="p-2.5 rounded-lg bg-rose-100 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-900 text-rose-950 dark:text-rose-200 text-xs font-bold flex items-start gap-2">
+                    <AlertCircle class="size-4 shrink-0 mt-0.5 text-rose-800" />
                     <span>{{ submitError }}</span>
                 </div>
 
@@ -288,10 +288,10 @@ function closeModal() {
                 <div class="space-y-2 bg-slate-50/80 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
                     <div class="flex items-center justify-between">
                         <Label for="dni-input" class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <IdCard class="size-3.5 text-emerald-600" />
+                            <IdCard class="size-3.5 text-rose-800" />
                             DNI del Participante <span class="text-rose-600">*</span>
                         </Label>
-                        <span class="text-[10px] font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded">
+                        <span class="text-[10px] font-black text-rose-900 dark:text-rose-300 bg-rose-100 dark:bg-rose-950 px-2 py-0.5 rounded">
                             RENIEC
                         </span>
                     </div>
@@ -311,7 +311,7 @@ function closeModal() {
                             type="button"
                             :disabled="isLookingUpDni || dni.length !== 8 || dniLookupSuccess"
                             @click="lookupDni"
-                            class="shrink-0 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                            class="shrink-0 text-xs font-black bg-rose-900 hover:bg-rose-950 text-white shadow-xs"
                         >
                             <Loader2 v-if="isLookingUpDni" class="size-3.5 mr-1 animate-spin" />
                             <Search v-else class="size-3.5 mr-1" />
@@ -330,25 +330,25 @@ function closeModal() {
                     </div>
 
                     <!-- DNI Lookup Feedback -->
-                    <div v-if="dniLookupError" class="text-xs font-semibold text-rose-700 dark:text-rose-400 flex items-center gap-1 pt-1">
+                    <div v-if="dniLookupError" class="text-xs font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1 pt-1">
                         <AlertCircle class="size-3.5 text-rose-600 shrink-0" />
                         <span>{{ dniLookupError }}</span>
                     </div>
 
-                    <!-- Citizen Data Preview -->
+                    <!-- Citizen Data Preview con Granate Cusco -->
                     <div
                         v-if="dniLookupSuccess"
-                        class="p-2.5 bg-emerald-100/90 dark:bg-emerald-950/60 border border-emerald-400 dark:border-emerald-700 rounded-lg flex items-center gap-2.5 mt-2"
+                        class="p-2.5 bg-rose-100/90 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-700 rounded-lg flex items-center gap-2.5 mt-2"
                     >
-                        <div class="size-8 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        <div class="size-8 rounded-full bg-rose-900 text-white flex items-center justify-center font-black text-xs shrink-0">
                             <UserCheck class="size-4" />
                         </div>
                         <div class="min-w-0 flex-1 text-xs">
-                            <div class="font-bold text-slate-900 dark:text-white truncate">
+                            <div class="font-black text-slate-950 dark:text-white truncate">
                                 {{ nombres }} {{ paterno }} {{ materno }}
                             </div>
-                            <div class="text-[11px] font-medium text-emerald-800 dark:text-emerald-300">
-                                Identidad confirmada por DNI
+                            <div class="text-[11px] font-bold text-rose-900 dark:text-rose-300">
+                                Identidad confirmada oficialmente por DNI
                             </div>
                         </div>
                     </div>
@@ -357,7 +357,7 @@ function closeModal() {
                 <!-- Sección 2: Nombres y Apellidos en Grilla Responsiva -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="space-y-1">
-                        <Label for="nombres" class="text-xs font-semibold text-slate-900 dark:text-white">
+                        <Label for="nombres" class="text-xs font-bold text-slate-900 dark:text-white">
                             Nombres <span class="text-rose-600">*</span>
                         </Label>
                         <Input
@@ -365,12 +365,12 @@ function closeModal() {
                             v-model="nombres"
                             type="text"
                             placeholder="Nombres"
-                            class="text-xs"
+                            class="text-xs font-semibold"
                             required
                         />
                     </div>
                     <div class="space-y-1">
-                        <Label for="paterno" class="text-xs font-semibold text-slate-900 dark:text-white">
+                        <Label for="paterno" class="text-xs font-bold text-slate-900 dark:text-white">
                             Apellido Paterno <span class="text-rose-600">*</span>
                         </Label>
                         <Input
@@ -378,12 +378,12 @@ function closeModal() {
                             v-model="paterno"
                             type="text"
                             placeholder="Apellido paterno"
-                            class="text-xs"
+                            class="text-xs font-semibold"
                             required
                         />
                     </div>
                     <div class="space-y-1">
-                        <Label for="materno" class="text-xs font-semibold text-slate-900 dark:text-white">
+                        <Label for="materno" class="text-xs font-bold text-slate-900 dark:text-white">
                             Apellido Materno
                         </Label>
                         <Input
@@ -391,24 +391,24 @@ function closeModal() {
                             v-model="materno"
                             type="text"
                             placeholder="Apellido materno"
-                            class="text-xs"
+                            class="text-xs font-semibold"
                         />
                     </div>
                     <div class="space-y-1">
-                        <Label for="phone" class="text-xs font-semibold text-slate-900 dark:text-white flex items-center gap-1">
-                            <Phone class="size-3 text-emerald-600" />
-                            Celular
+                        <Label for="phone" class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                            <Phone class="size-3 text-rose-800" />
+                            Celular / WhatsApp
                         </Label>
                         <Input
                             id="phone"
                             v-model="phone"
                             type="tel"
                             placeholder="987654321"
-                            class="text-xs"
+                            class="text-xs font-semibold"
                         />
                     </div>
                     <div class="space-y-1 sm:col-span-2">
-                        <Label for="email" class="text-xs font-semibold text-slate-900 dark:text-white flex items-center gap-1">
+                        <Label for="email" class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1">
                             <Mail class="size-3 text-blue-600" />
                             Correo Electrónico <span class="text-rose-600">*</span>
                         </Label>
@@ -417,7 +417,7 @@ function closeModal() {
                             v-model="email"
                             type="email"
                             placeholder="ejemplo@correo.com"
-                            class="text-xs"
+                            class="text-xs font-semibold"
                             required
                         />
                     </div>
@@ -425,18 +425,18 @@ function closeModal() {
 
                 <!-- Botones de Acción Responsivos -->
                 <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-2 pt-3 border-t">
-                    <Button type="button" variant="outline" size="sm" @click="closeModal" :disabled="isSubmitting" class="w-full sm:w-auto text-xs">
+                    <Button type="button" variant="outline" size="sm" @click="closeModal" :disabled="isSubmitting" class="w-full sm:w-auto text-xs font-bold border-slate-300">
                         Cancelar
                     </Button>
                     <Button
                         type="submit"
                         size="sm"
-                        class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 shadow-xs"
+                        class="w-full sm:w-auto bg-rose-900 hover:bg-rose-950 text-white font-black text-xs px-5 shadow-xs"
                         :disabled="isSubmitting"
                     >
                         <Loader2 v-if="isSubmitting" class="size-3.5 mr-1.5 animate-spin" />
                         <CheckCircle2 v-else class="size-3.5 mr-1.5" />
-                        Confirmar Inscripción
+                        Confirmar Inscripción Oficial
                     </Button>
                 </div>
             </form>

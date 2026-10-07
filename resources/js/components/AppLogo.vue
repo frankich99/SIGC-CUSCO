@@ -2,18 +2,21 @@
 import { usePage } from '@inertiajs/vue3';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 
-const name = usePage().props.name;
+const name = usePage().props.name || 'SIGC-CUSCO';
 </script>
 
 <template>
-    <div
-        class="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"
-    >
-        <AppLogoIcon class="size-5 fill-current text-white dark:text-black" />
-    </div>
-    <div class="ml-1 grid flex-1 text-left text-sm">
-        <span class="mb-0.5 truncate leading-tight font-semibold">{{
-            name
-        }}</span>
+    <div class="flex items-center gap-2.5">
+        <div class="flex size-9 items-center justify-center rounded-xl bg-rose-900 text-white shadow-xs shrink-0 ring-1 ring-rose-950/20">
+            <AppLogoIcon class="size-5 fill-current text-white" />
+        </div>
+        <div class="flex flex-col text-left leading-tight shrink-0">
+            <span class="text-sm font-black tracking-tight text-slate-950 dark:text-white">
+                {{ name }}
+            </span>
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-600 dark:text-amber-400">
+                UNSAAC • Cusco
+            </span>
+        </div>
     </div>
 </template>

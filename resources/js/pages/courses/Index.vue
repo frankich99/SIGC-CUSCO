@@ -153,16 +153,16 @@ function instructorName(inst?: Instructor): string {
             <!-- Header Section -->
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b pb-5 dark:border-neutral-800">
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-                        <GraduationCap class="size-7 text-emerald-600" />
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-neutral-100 flex items-center gap-2">
+                        <GraduationCap class="size-7 text-rose-900 dark:text-rose-400" />
                         Capacitaciones y Cursos
                     </h1>
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+                    <p class="text-sm text-slate-600 dark:text-neutral-400 mt-1 font-medium">
                         Control del ciclo formativo: vacantes, docentes, código QR y certificaciones.
                     </p>
                 </div>
                 <div v-if="can.create">
-                    <Button as-child class="bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs">
+                    <Button as-child class="bg-rose-900 hover:bg-rose-950 text-white font-bold shadow-xs">
                         <Link href="/courses/create">
                             <Plus class="mr-1.5 size-4" />
                             Nueva Capacitación
@@ -176,11 +176,11 @@ function instructorName(inst?: Instructor): string {
                 <!-- Search and Status Bar -->
                 <div class="flex flex-col sm:flex-row gap-3">
                     <div class="relative flex-1">
-                        <Search class="absolute left-3 top-2.5 size-4 text-neutral-400" />
+                        <Search class="absolute left-3 top-2.5 size-4 text-slate-500" />
                         <Input
                             v-model="searchQuery"
                             placeholder="Buscar por título, código o contenido..."
-                            class="pl-9"
+                            class="pl-9 text-slate-900 font-medium"
                             @keydown.enter="applyFilters"
                         />
                     </div>
@@ -191,10 +191,10 @@ function instructorName(inst?: Instructor): string {
                             type="button"
                             @click="selectedStatus = st.value; applyFilters()"
                             :class="[
-                                'px-3 py-1.5 rounded-md text-xs font-medium transition-colors shrink-0',
+                                'px-3 py-1.5 rounded-md text-xs font-bold transition-colors shrink-0',
                                 selectedStatus === st.value
-                                    ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
-                                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-400'
+                                    ? 'bg-rose-900 text-white shadow-xs dark:bg-rose-800'
+                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300'
                             ]"
                         >
                             {{ st.label }}
@@ -207,14 +207,14 @@ function instructorName(inst?: Instructor): string {
                     <Card
                         v-for="course in courses.data"
                         :key="course.id"
-                        class="flex flex-col justify-between hover:border-emerald-400/80 transition-all hover:shadow-md"
+                        class="flex flex-col justify-between border-slate-200 dark:border-neutral-800 hover:border-rose-400/80 transition-all hover:shadow-md"
                     >
                         <CardHeader class="pb-3">
                             <div class="flex items-center justify-between gap-2 mb-2">
-                                <span class="font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                                <span class="font-mono text-xs font-bold text-rose-900 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800">
                                     {{ course.code }}
                                 </span>
-                                <span :class="['text-[11px] font-medium px-2 py-0.5 rounded-full border', getStatusBadge(course.status).class]">
+                                <span :class="['text-[11px] font-bold px-2 py-0.5 rounded-full border', getStatusBadge(course.status).class]">
                                     {{ getStatusBadge(course.status).label }}
                                 </span>
                             </div>
@@ -222,13 +222,13 @@ function instructorName(inst?: Instructor): string {
                             <!-- Organizing Entity / Institution -->
                             <div
                                 v-if="course.institution"
-                                class="flex items-center gap-1.5 text-xs font-medium text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-md border border-emerald-200/80 dark:border-emerald-800/60 mb-2"
+                                class="flex items-center gap-1.5 text-xs font-semibold text-rose-950 dark:text-rose-200 bg-rose-50/80 dark:bg-rose-950/40 px-2.5 py-1 rounded-md border border-rose-200/80 dark:border-rose-800/60 mb-2"
                             >
-                                <Building2 class="size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                <Building2 class="size-3.5 shrink-0 text-rose-800 dark:text-rose-400" />
                                 <span class="truncate">{{ course.institution }}</span>
                             </div>
 
-                            <CardTitle class="text-base font-semibold leading-snug line-clamp-2">
+                            <CardTitle class="text-base font-bold leading-snug line-clamp-2 text-slate-900 dark:text-white">
                                 {{ course.title }}
                             </CardTitle>
                             <CardDescription class="text-xs line-clamp-2 mt-1">
@@ -244,24 +244,24 @@ function instructorName(inst?: Instructor): string {
                                     {{ instructorName(course.instructor) }}
                                 </span>
                             </div>
-                            <div class="flex items-center gap-2 font-medium text-slate-800 dark:text-slate-200">
-                                <Calendar class="size-3.5 text-emerald-600 shrink-0" />
+                            <div class="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200">
+                                <Calendar class="size-3.5 text-rose-800 dark:text-rose-400 shrink-0" />
                                 <span>{{ formatDateRange(course.start_date, course.end_date, 'compact') }}</span>
                             </div>
                             <div class="flex items-center justify-between pt-1 text-[11px]">
                                 <span class="inline-flex items-center gap-1 font-bold text-slate-800 dark:text-slate-200">
-                                    <Clock class="size-3 text-blue-600" />
+                                    <Clock class="size-3 text-amber-700 dark:text-amber-400" />
                                     {{ formatHours(course.hours) }}
                                 </span>
-                                <span class="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400">
-                                    <Users class="size-3 text-emerald-600" />
+                                <span class="inline-flex items-center gap-1 font-bold text-rose-900 dark:text-rose-300">
+                                    <Users class="size-3 text-rose-800 dark:text-rose-400" />
                                     Cupo: {{ course.capacity }} vacantes
                                 </span>
                             </div>
                         </CardContent>
 
                         <CardFooter class="pt-3 border-t dark:border-neutral-800 flex items-center justify-between gap-2">
-                            <Button as-child variant="outline" size="sm" class="flex-1 text-xs">
+                            <Button as-child variant="outline" size="sm" class="flex-1 text-xs font-semibold">
                                 <Link :href="`/courses/${course.id}`">
                                     <Eye class="mr-1 size-3.5" />
                                     Ver curso
@@ -270,13 +270,13 @@ function instructorName(inst?: Instructor): string {
                             <Button
                                 v-if="course.status === 'abierto'"
                                 size="sm"
-                                class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs flex-1"
+                                class="bg-rose-900 hover:bg-rose-950 text-white text-xs flex-1 font-bold shadow-xs"
                                 @click="openEnroll(course)"
                             >
                                 Inscribirme
                             </Button>
                             <div v-if="can.create" class="flex items-center gap-1">
-                                <Button as-child variant="ghost" size="icon-sm" class="size-7 text-neutral-500 hover:text-neutral-900">
+                                <Button as-child variant="ghost" size="icon-sm" class="size-7 text-slate-600 hover:text-slate-900">
                                     <Link :href="`/courses/${course.id}/edit`">
                                         <Pencil class="size-3.5" />
                                     </Link>
@@ -284,7 +284,7 @@ function instructorName(inst?: Instructor): string {
                                 <Button
                                     variant="ghost"
                                     size="icon-sm"
-                                    class="size-7 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/40"
+                                    class="size-7 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950/40"
                                     @click="deleteCourse(course)"
                                 >
                                     <Trash2 class="size-3.5" />
@@ -295,12 +295,12 @@ function instructorName(inst?: Instructor): string {
                 </div>
 
                 <!-- Empty State -->
-                <div v-else class="text-center py-16 border rounded-xl bg-neutral-50/50 dark:bg-neutral-900/40 dark:border-neutral-800">
-                    <BookOpen class="mx-auto size-12 text-neutral-400" />
-                    <h3 class="mt-3 text-sm font-semibold text-neutral-900 dark:text-neutral-100">No se encontraron capacitaciones</h3>
-                    <p class="mt-1 text-xs text-neutral-500">Prueba ajustando los términos de búsqueda o el filtro de estado.</p>
+                <div v-else class="text-center py-16 border rounded-xl bg-slate-50/50 dark:bg-neutral-900/40 dark:border-neutral-800">
+                    <BookOpen class="mx-auto size-12 text-slate-400" />
+                    <h3 class="mt-3 text-sm font-bold text-slate-900 dark:text-neutral-100">No se encontraron capacitaciones</h3>
+                    <p class="mt-1 text-xs text-slate-600 font-medium">Prueba ajustando los términos de búsqueda o el filtro de estado.</p>
                     <div v-if="can.create" class="mt-4">
-                        <Button as-child size="sm" class="bg-emerald-600 hover:bg-emerald-700 text-white">
+                        <Button as-child size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold">
                             <Link href="/courses/create">Crear primera capacitación</Link>
                         </Button>
                     </div>
@@ -314,10 +314,10 @@ function instructorName(inst?: Instructor): string {
                                 v-if="link.url"
                                 :href="link.url"
                                 :class="[
-                                    'px-3 py-1.5 text-xs rounded-md border font-medium transition-colors',
+                                    'px-3 py-1.5 text-xs rounded-md border font-bold transition-colors',
                                     link.active
-                                        ? 'bg-emerald-600 text-white border-emerald-600'
-                                        : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300'
+                                        ? 'bg-rose-900 text-white border-rose-900'
+                                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300'
                                 ]"
                                 v-html="link.label"
                             />
