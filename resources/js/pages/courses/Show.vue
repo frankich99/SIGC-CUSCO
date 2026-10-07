@@ -665,22 +665,29 @@ onUnmounted(() => {
                 </div>
             </div>
 
-            <!-- NAVEGACIÓN POR 5 PESTAÑAS ACADÉMICAS OFICIALES -->
-            <div class="border-b border-slate-200 dark:border-slate-800">
-                <nav class="flex space-x-2 sm:space-x-4 overflow-x-auto pb-px" aria-label="Tabs">
+            <!-- NAVEGACIÓN POR 5 PESTAÑAS ACADÉMICAS (FLEX-WRAP SIN SCROLL HORIZONTAL) -->
+            <div class="border-b border-slate-200 dark:border-slate-800 pb-1">
+                <nav class="flex flex-wrap items-center gap-1.5 sm:gap-2" aria-label="Tabs">
                     <button
                         type="button"
                         @click="activeTab = 'matriculados'"
                         :class="[
-                            'whitespace-nowrap py-3 px-4 border-b-2 font-black text-xs sm:text-sm flex items-center gap-2 cursor-pointer transition-all',
+                            'py-2.5 px-3.5 rounded-xl font-black text-xs flex items-center gap-2 cursor-pointer transition-all',
                             activeTab === 'matriculados'
-                                ? 'border-rose-900 text-rose-900 dark:text-rose-300 dark:border-rose-500'
-                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                                ? 'bg-rose-900 text-white shadow-sm ring-1 ring-rose-950'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800'
                         ]"
                     >
-                        <Users class="size-4" />
-                        1. Padrón de Matriculados
-                        <span class="bg-rose-100 text-rose-950 dark:bg-rose-950 dark:text-rose-200 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                        <Users class="size-3.5" />
+                        <span>Matriculados</span>
+                        <span
+                            :class="[
+                                'text-[10px] px-1.5 py-0.2 rounded-full font-bold',
+                                activeTab === 'matriculados'
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200'
+                            ]"
+                        >
                             {{ totalEnrolled }}
                         </span>
                     </button>
@@ -689,44 +696,51 @@ onUnmounted(() => {
                         type="button"
                         @click="activeTab = 'asistencia'"
                         :class="[
-                            'whitespace-nowrap py-3 px-4 border-b-2 font-black text-xs sm:text-sm flex items-center gap-2 cursor-pointer transition-all',
+                            'py-2.5 px-3.5 rounded-xl font-black text-xs flex items-center gap-2 cursor-pointer transition-all',
                             activeTab === 'asistencia'
-                                ? 'border-rose-900 text-rose-900 dark:text-rose-300 dark:border-rose-500'
-                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                                ? 'bg-rose-900 text-white shadow-sm ring-1 ring-rose-950'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800'
                         ]"
                     >
-                        <QrCode class="size-4" />
-                        2. Asistencia de Sesiones
+                        <QrCode class="size-3.5" />
+                        <span>Asistencias</span>
                     </button>
 
                     <button
                         type="button"
                         @click="activeTab = 'notas'"
                         :class="[
-                            'whitespace-nowrap py-3 px-4 border-b-2 font-black text-xs sm:text-sm flex items-center gap-2 cursor-pointer transition-all',
+                            'py-2.5 px-3.5 rounded-xl font-black text-xs flex items-center gap-2 cursor-pointer transition-all',
                             activeTab === 'notas'
-                                ? 'border-rose-900 text-rose-900 dark:text-rose-300 dark:border-rose-500'
-                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                                ? 'bg-rose-900 text-white shadow-sm ring-1 ring-rose-950'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800'
                         ]"
                     >
-                        <FileText class="size-4" />
-                        3. Notas y Acta Oficial
-                        <span v-if="isActaClosed" class="size-2 rounded-full bg-emerald-600"></span>
+                        <FileText class="size-3.5" />
+                        <span>Notas y Acta</span>
+                        <span v-if="isActaClosed" class="size-2 rounded-full bg-emerald-400"></span>
                     </button>
 
                     <button
                         type="button"
                         @click="activeTab = 'certificados'"
                         :class="[
-                            'whitespace-nowrap py-3 px-4 border-b-2 font-black text-xs sm:text-sm flex items-center gap-2 cursor-pointer transition-all',
+                            'py-2.5 px-3.5 rounded-xl font-black text-xs flex items-center gap-2 cursor-pointer transition-all',
                             activeTab === 'certificados'
-                                ? 'border-rose-900 text-rose-900 dark:text-rose-300 dark:border-rose-500'
-                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                                ? 'bg-rose-900 text-white shadow-sm ring-1 ring-rose-950'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800'
                         ]"
                     >
-                        <Award class="size-4" />
-                        4. Emisión de Certificados
-                        <span class="bg-rose-100 text-rose-950 text-[10px] px-1.5 py-0.2 rounded-full font-bold">
+                        <Award class="size-3.5" />
+                        <span>Certificados</span>
+                        <span
+                            :class="[
+                                'text-[10px] px-1.5 py-0.2 rounded-full font-bold',
+                                activeTab === 'certificados'
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200'
+                            ]"
+                        >
                             {{ approvedStudents.length }}
                         </span>
                     </button>
@@ -735,14 +749,14 @@ onUnmounted(() => {
                         type="button"
                         @click="activeTab = 'reportes'"
                         :class="[
-                            'whitespace-nowrap py-3 px-4 border-b-2 font-black text-xs sm:text-sm flex items-center gap-2 cursor-pointer transition-all',
+                            'py-2.5 px-3.5 rounded-xl font-black text-xs flex items-center gap-2 cursor-pointer transition-all',
                             activeTab === 'reportes'
-                                ? 'border-rose-900 text-rose-900 dark:text-rose-300 dark:border-rose-500'
-                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                                ? 'bg-rose-900 text-white shadow-sm ring-1 ring-rose-950'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800'
                         ]"
                     >
-                        <FileSpreadsheet class="size-4" />
-                        5. Reportes y Estadísticas
+                        <FileSpreadsheet class="size-3.5" />
+                        <span>Reportes CSV</span>
                     </button>
                 </nav>
             </div>
@@ -902,35 +916,28 @@ onUnmounted(() => {
                         </div>
                     </div>
 
-                    <!-- Contenido de la Tabla -->
+                    <!-- Contenido de la Tabla Compacta (Sin Scroll Horizontal) -->
                     <CardContent class="p-0">
-                        <div class="overflow-x-auto">
+                        <div class="w-full">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
                                     <tr class="bg-slate-100/90 dark:bg-slate-900 border-b text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                        <th class="py-3 px-3 w-10 text-center">#</th>
-                                        <th class="py-3 px-3">DNI / Credencial</th>
-                                        <th class="py-3 px-3">Participante</th>
-                                        <th class="py-3 px-3">Contacto</th>
-                                        <th class="py-3 px-3 text-center">Asistencias</th>
-                                        <th class="py-3 px-3 text-center">Nota Final</th>
-                                        <th class="py-3 px-3 text-center">Estado</th>
-                                        <th v-if="can.manage_enrollments" class="py-3 px-3 text-right">Acciones (CRUD)</th>
+                                        <th class="py-2.5 px-3 text-left w-28">DNI</th>
+                                        <th class="py-2.5 px-3 text-left">Participante y Contacto</th>
+                                        <th class="py-2.5 px-2 text-center w-28">Asistencia</th>
+                                        <th class="py-2.5 px-2 text-center w-16">Nota</th>
+                                        <th class="py-2.5 px-2 text-center w-24">Estado</th>
+                                        <th v-if="can.manage_enrollments" class="py-2.5 px-3 text-right w-28">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-950">
                                     <tr
-                                        v-for="(enrollment, idx) in matriculadosFilteredEnrollments"
+                                        v-for="enrollment in matriculadosFilteredEnrollments"
                                         :key="enrollment.id"
                                         class="hover:bg-rose-50/40 dark:hover:bg-rose-950/20 transition-colors"
                                     >
-                                        <!-- # -->
-                                        <td class="py-3 px-3 text-center font-bold text-slate-400">
-                                            {{ idx + 1 }}
-                                        </td>
-
-                                        <!-- DNI / Credencial -->
-                                        <td class="py-3 px-3 whitespace-nowrap space-y-1">
+                                        <!-- DNI -->
+                                        <td class="py-2.5 px-3 whitespace-nowrap">
                                             <div class="flex items-center gap-1.5">
                                                 <span class="font-mono font-black text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700">
                                                     {{ enrollment.dni }}
@@ -938,60 +945,48 @@ onUnmounted(() => {
                                                 <button
                                                     type="button"
                                                     @click="viewCredential(enrollment)"
-                                                    title="Ver Credencial Digital y QR"
+                                                    title="Ver Credencial con QR"
                                                     class="text-rose-900 dark:text-rose-400 hover:text-rose-700 p-0.5 rounded hover:bg-rose-100 dark:hover:bg-rose-950/60 cursor-pointer"
                                                 >
                                                     <QrCode class="size-3.5" />
                                                 </button>
                                             </div>
-                                            <div v-if="enrollment.credential_code" class="text-[10px] text-slate-400 font-mono">
-                                                {{ enrollment.credential_code }}
-                                            </div>
                                         </td>
 
-                                        <!-- Participante -->
-                                        <td class="py-3 px-3">
-                                            <div class="font-black text-slate-950 dark:text-white leading-snug">
+                                        <!-- Participante y Contacto -->
+                                        <td class="py-2.5 px-3">
+                                            <div class="font-black text-slate-950 dark:text-white leading-tight">
                                                 {{ enrollment.paterno }} {{ enrollment.materno || '' }}, {{ enrollment.nombres }}
                                             </div>
-                                            <div v-if="enrollment.certificate_code" class="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1 mt-0.5">
-                                                <Award class="size-3" />
-                                                <span>{{ enrollment.certificate_code }}</span>
-                                            </div>
-                                        </td>
-
-                                        <!-- Contacto -->
-                                        <td class="py-3 px-3 whitespace-nowrap text-xs space-y-0.5">
-                                            <div class="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
-                                                <Mail class="size-3 text-slate-400 shrink-0" />
-                                                <a :href="`mailto:${enrollment.email}`" class="hover:underline hover:text-rose-900 font-medium truncate max-w-[180px] inline-block">
+                                            <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                                <a :href="`mailto:${enrollment.email}`" class="hover:underline hover:text-rose-900 truncate max-w-[190px]" :title="enrollment.email">
                                                     {{ enrollment.email }}
                                                 </a>
-                                            </div>
-                                            <div v-if="enrollment.phone" class="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 text-[11px]">
-                                                <Phone class="size-3 text-slate-400 shrink-0" />
-                                                <a :href="`https://wa.me/51${enrollment.phone}`" target="_blank" class="hover:underline hover:text-emerald-700 font-mono font-bold">
-                                                    {{ enrollment.phone }}
-                                                </a>
-                                            </div>
-                                        </td>
-
-                                        <!-- Asistencias -->
-                                        <td class="py-3 px-3 text-center whitespace-nowrap">
-                                            <div class="font-black text-slate-900 dark:text-white">
-                                                {{ enrollment.attended_sessions }} / {{ totalSessions }}
-                                            </div>
-                                            <div class="text-[10px] font-bold font-mono text-slate-500">
-                                                {{ enrollment.attendance_percentage }}%
+                                                <span v-if="enrollment.phone" class="font-mono text-emerald-700 dark:text-emerald-400 font-bold">
+                                                    · {{ enrollment.phone }}
+                                                </span>
+                                                <span v-if="enrollment.certificate_code" class="font-mono text-amber-700 dark:text-amber-400 font-bold">
+                                                    · 📜 {{ enrollment.certificate_code }}
+                                                </span>
                                             </div>
                                         </td>
 
-                                        <!-- Nota Final -->
-                                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                                        <!-- Asistencia -->
+                                        <td class="py-2.5 px-2 text-center whitespace-nowrap">
+                                            <span class="font-black text-slate-900 dark:text-white text-xs">
+                                                {{ enrollment.attended_sessions }}/{{ totalSessions }}
+                                            </span>
+                                            <span class="text-[10px] font-bold font-mono text-slate-500 ml-1">
+                                                ({{ enrollment.attendance_percentage }}%)
+                                            </span>
+                                        </td>
+
+                                        <!-- Nota -->
+                                        <td class="py-2.5 px-2 text-center whitespace-nowrap">
                                             <span
                                                 v-if="enrollment.final_grade !== null && enrollment.final_grade !== undefined"
                                                 :class="[
-                                                    'font-mono font-black text-xs px-2 py-0.5 rounded border',
+                                                    'font-mono font-black text-xs px-1.5 py-0.5 rounded border',
                                                     Number(enrollment.final_grade) >= 11
                                                         ? 'bg-rose-50 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800'
                                                         : 'bg-red-50 text-red-900 border-red-300 dark:bg-red-950 dark:text-red-200 dark:border-red-800'
@@ -1002,33 +997,30 @@ onUnmounted(() => {
                                             <span v-else class="text-slate-400 font-bold">-</span>
                                         </td>
 
-                                        <!-- Estado Oficial -->
-                                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                                        <!-- Estado -->
+                                        <td class="py-2.5 px-2 text-center whitespace-nowrap">
                                             <Badge
                                                 variant="outline"
-                                                :class="['text-[11px] font-black uppercase px-2 py-0.5', getStatusBadge(enrollment.status).classes]"
+                                                :class="['text-[10px] font-black uppercase px-2 py-0.5', getStatusBadge(enrollment.status).classes]"
                                             >
                                                 {{ getStatusBadge(enrollment.status).label }}
                                             </Badge>
                                         </td>
 
-                                        <!-- Acciones (CRUD) -->
-                                        <td v-if="can.manage_enrollments" class="py-3 px-3 text-right whitespace-nowrap">
-                                            <div class="flex items-center justify-end gap-1.5">
+                                        <!-- Acciones -->
+                                        <td v-if="can.manage_enrollments" class="py-2.5 px-3 text-right whitespace-nowrap">
+                                            <div class="flex items-center justify-end gap-1">
                                                 <!-- Asistencia Rápida (+1) -->
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    class="h-8 px-2 text-xs font-bold text-emerald-800 hover:text-emerald-950 hover:bg-emerald-50 dark:text-emerald-400"
+                                                    class="h-7 w-7 p-0 text-emerald-800 hover:text-emerald-950 hover:bg-emerald-50 dark:text-emerald-400"
                                                     title="Registrar +1 asistencia rápida"
                                                     :disabled="isRecordingQuickAttendance === enrollment.id"
                                                     @click="quickRecordAttendance(enrollment)"
                                                 >
-                                                    <Loader2 v-if="isRecordingQuickAttendance === enrollment.id" class="size-3.5 animate-spin" />
-                                                    <span v-else class="flex items-center gap-1">
-                                                        <Plus class="size-3" />
-                                                        <span class="hidden md:inline">Asist.</span>
-                                                    </span>
+                                                    <Loader2 v-if="isRecordingQuickAttendance === enrollment.id" class="size-3 animate-spin" />
+                                                    <Plus v-else class="size-3.5" />
                                                 </Button>
 
                                                 <!-- Emitir Certificado si califica y no lo tiene -->
@@ -1036,12 +1028,12 @@ onUnmounted(() => {
                                                     v-if="enrollment.status === 'aprobado' && !enrollment.certificate_code"
                                                     size="sm"
                                                     variant="ghost"
-                                                    class="h-8 px-2 text-xs font-bold text-amber-800 hover:text-amber-950 hover:bg-amber-50"
+                                                    class="h-7 w-7 p-0 text-amber-800 hover:text-amber-950 hover:bg-amber-50"
                                                     title="Emitir certificado oficial"
                                                     :disabled="isIssuingSingleCert === enrollment.id"
                                                     @click="issueSingleCertificate(enrollment)"
                                                 >
-                                                    <Loader2 v-if="isIssuingSingleCert === enrollment.id" class="size-3.5 animate-spin" />
+                                                    <Loader2 v-if="isIssuingSingleCert === enrollment.id" class="size-3 animate-spin" />
                                                     <Award v-else class="size-3.5" />
                                                 </Button>
 
@@ -1049,8 +1041,8 @@ onUnmounted(() => {
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    class="h-8 w-8 p-0 text-slate-700 hover:text-rose-950 hover:bg-rose-50 dark:text-slate-300"
-                                                    title="Editar datos de matrícula"
+                                                    class="h-7 w-7 p-0 text-slate-700 hover:text-rose-950 hover:bg-rose-50 dark:text-slate-300"
+                                                    title="Editar matrícula"
                                                     @click="openEditModal(enrollment)"
                                                 >
                                                     <Pencil class="size-3.5" />
@@ -1060,8 +1052,8 @@ onUnmounted(() => {
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    class="h-8 w-8 p-0 text-rose-700 hover:text-rose-950 hover:bg-rose-100 dark:text-rose-400"
-                                                    title="Eliminar o desmatricular participante"
+                                                    class="h-7 w-7 p-0 text-rose-700 hover:text-rose-950 hover:bg-rose-100 dark:text-rose-400"
+                                                    title="Desmatricular participante"
                                                     @click="openDeleteModal(enrollment)"
                                                 >
                                                     <Trash2 class="size-3.5" />
