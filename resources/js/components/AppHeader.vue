@@ -53,6 +53,10 @@ const isCoursesActive = computed(() => {
     return isCurrentUrl('/courses') || isCurrentUrl('/courses/*');
 });
 
+const isCertificatesActive = computed(() => {
+    return isCurrentUrl('/certificates') || isCurrentUrl('/certificates/*');
+});
+
 function roleBadge(role?: string) {
     switch (role) {
         case 'admin':
@@ -243,10 +247,11 @@ function roleBadge(role?: string) {
                     <DropdownMenuTrigger as-child>
                         <button
                             type="button"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
+                            :class="isCertificatesActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
                         >
-                            <Award class="size-4 text-amber-600" />
-                            <span>Certificados & QR</span>
+                            <Award class="size-4" :class="isCertificatesActive ? 'text-amber-300' : 'text-amber-600'" />
+                            <span>Certificados</span>
                             <ChevronDown class="size-3.5 opacity-70" />
                         </button>
                     </DropdownMenuTrigger>
@@ -259,7 +264,7 @@ function roleBadge(role?: string) {
                                 <Award class="size-4 text-amber-600 mt-0.5" />
                                 <div>
                                     <div class="text-xs font-bold text-slate-900 dark:text-white">Validar Certificados</div>
-                                    <div class="text-[11px] text-slate-600 dark:text-slate-400">Consulta por DNI o código</div>
+                                    <div class="text-[11px] text-slate-600 dark:text-slate-400">Consulta por DNI o archivo PDF</div>
                                 </div>
                             </Link>
                         </DropdownMenuItem>
@@ -267,21 +272,22 @@ function roleBadge(role?: string) {
                             <Link :href="dashboard()" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
                                 <QrCode class="size-4 text-rose-800 mt-0.5" />
                                 <div>
-                                    <div class="text-xs font-bold text-slate-900 dark:text-white">Asistencia con QR</div>
-                                    <div class="text-[11px] text-slate-600 dark:text-slate-400">Marcación y control en vivo</div>
+                                    <div class="text-xs font-bold text-slate-900 dark:text-white">Asistencia y Credencial QR</div>
+                                    <div class="text-[11px] text-slate-600 dark:text-slate-400">Control y marcación en aula</div>
                                 </div>
                             </Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                <!-- Portal Público -->
+                <!-- Ir al Portal Web (ÚNICA OPCIÓN QUE LLEVA A LA WEB PÚBLICA) -->
                 <Link
                     href="/"
                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900"
+                    title="Ir a la página principal pública de SIGC-CUSCO"
                 >
                     <Globe class="size-4 text-blue-600" />
-                    <span>Portal</span>
+                    <span>Portal Público</span>
                 </Link>
             </nav>
 

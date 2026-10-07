@@ -45,8 +45,6 @@ export interface CertificateRecord {
     instructor_name: string;
     student_name: string;
     status: string;
-    attended_sessions: number;
-    final_grade?: number | string | null;
     certificate_code: string;
     certificate_hash?: string | null;
     certificate_issued_at?: string | null;
@@ -482,7 +480,7 @@ function printOrDownloadCertificate(record: CertificateRecord) {
                         <!-- Acciones: Ver Diploma Oficial + Descargar PDF -->
                         <div class="pt-3 border-t border-slate-100 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-2">
                             <span class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium">
-                                Asistencia: <strong>{{ cert.attended_sessions }} ses.</strong>
+                                Expedición: <strong>{{ cert.certificate_issued_at || cert.end_date || 'Oficial' }}</strong>
                             </span>
 
                             <div class="flex items-center gap-2 w-full sm:w-auto">

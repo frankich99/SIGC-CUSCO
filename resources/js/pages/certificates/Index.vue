@@ -16,17 +16,17 @@ import {
     FileCheck,
     Copy,
     Check,
-    QrCode,
-    Sparkles,
     ShieldCheck,
     User,
     ArrowLeft,
     LogIn,
     UserPlus,
-    ExternalLink,
     Eye,
     ChevronRight,
+    Sparkles,
+    FileText,
 } from '@lucide/vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -43,9 +43,10 @@ import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import LoginModal from '@/components/auth/LoginModal.vue';
 import RegisterModal from '@/components/auth/RegisterModal.vue';
 import PdfIntegrityVerifier from '@/components/PdfIntegrityVerifier.vue';
-import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
+import { formatDateRange, formatHours } from '@/lib/formatters';
+import type { BreadcrumbItem } from '@/types';
 
-interface CertificateRecord {
+export interface CertificateRecord {
     id: number;
     course_code: string;
     course_title: string;
@@ -56,8 +57,6 @@ interface CertificateRecord {
     instructor_name: string;
     student_name: string;
     status: string;
-    attended_sessions: number;
-    final_grade?: number | string | null;
     certificate_code: string;
     certificate_hash?: string | null;
     certificate_issued_at?: string | null;
@@ -69,6 +68,14 @@ const props = defineProps<{
 
 const page = usePage();
 const authUser = computed(() => (page.props.auth as any)?.user);
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Panel Principal', href: '/dashboard' },
+    { title: 'Validación de Certificados', href: '/certificates' },
+];
+
+// Pestaña activa: 'dni' para consulta por documento | 'pdf' para validación de archivo PDF
+const activeTab = ref<'dni' | 'pdf'>('dni');
 
 const dniQuery = ref(props.initialDni || '');
 const loading = ref(false);
@@ -82,7 +89,7 @@ const selectedCert = ref<CertificateRecord | null>(null);
 const isCertModalOpen = ref(false);
 const copiedCode = ref(false);
 
-// Modales de Autenticación
+// Modales de Autenticación para invitados
 const isLoginModalOpen = ref(false);
 const isRegisterModalOpen = ref(false);
 
@@ -153,12 +160,12 @@ async function copyVerificationCode(code: string) {
             copiedCode.value = false;
         }, 2000);
     } catch {
-        // Fallback en caso de bloqueo del portapapeles
+        // Fallback
     }
 }
 
 /**
- * Impresión / Descarga a PDF fiable que no es bloqueada por bloqueadores de ventanas emergentes (popups)
+ * Impresión / Descarga a PDF fiable del Diploma Oficial
  */
 function printCertificate(record: CertificateRecord) {
     const html = `
@@ -251,52 +258,48 @@ function printCertificate(record: CertificateRecord) {
                     border-bottom: 2px solid #800020;
                     display: inline-block;
                     margin-bottom: 20px;
-                    letter-spacing: 1px;
                 }
                 .body-text {
                     font-size: 15px;
-                    line-height: 1.7;
-                    color: #334155;
-                    max-width: 780px;
-                    margin: 0 auto 25px auto;
+                    line-height: 1.8;
+                    color: #374151;
+                    max-width: 800px;
+                    margin: 0 auto 35px auto;
                 }
-                .course-title {
-                    font-size: 20px;
-                    font-weight: bold;
-                    color: #800020;
-                    margin: 8px 0;
-                    display: block;
+                .body-text strong {
+                    color: #0f172a;
                 }
                 .signatures {
-                    margin-top: 45px;
                     display: flex;
                     justify-content: space-around;
-                    align-items: flex-end;
-                    padding: 0 40px;
+                    margin-top: 40px;
+                    padding-top: 20px;
                 }
-                .sig-box {
-                    width: 240px;
-                    border-top: 1.5px solid #475569;
+                .sign-box {
+                    width: 220px;
+                    text-align: center;
+                    border-top: 1px solid #9ca3af;
                     padding-top: 8px;
-                    font-size: 12px;
-                    line-height: 1.4;
-                    color: #1e293b;
                 }
-                .sig-role {
+                .sign-name {
+                    font-weight: bold;
+                    font-size: 13px;
+                    color: #111827;
+                }
+                .sign-role {
                     font-size: 11px;
-                    color: #64748b;
+                    color: #6b7280;
                     text-transform: uppercase;
                 }
-                .verification-bar {
-                    margin-top: 40px;
-                    padding-top: 15px;
-                    border-top: 1px dashed #cbd5e1;
+                .footer-meta {
+                    margin-top: 30px;
                     display: flex;
                     justify-content: space-between;
-                    align-items: center;
+                    font-size: 10px;
                     font-family: monospace;
-                    font-size: 11px;
-                    color: #64748b;
+                    color: #6b7280;
+                    border-top: 1px dashed #e5e7eb;
+                    padding-top: 10px;
                 }
                 .badge-valid {
                     color: #800020;
@@ -306,38 +309,36 @@ function printCertificate(record: CertificateRecord) {
         </head>
         <body>
             <div class="cert-container">
-                <div class="header-inst">${record.institution || 'SIGC-CUSCO'}</div>
-                <div class="sub-inst">Sistema Integral de Gestión de Capacitaciones • Cusco, Perú</div>
-                
-                <h1 class="title-cert">Certificado Oficial</h1>
-                <div class="subtitle-cert">Acreditación Académica y Asistencia Digital</div>
+                <div class="header-inst">REPÚBLICA DEL PERÚ • REGIÓN CUSCO</div>
+                <div class="sub-inst">SISTEMA INTEGRAL DE GESTIÓN DE CAPACITACIONES (SIGC-CUSCO / UNSAAC)</div>
 
-                <div class="otorgado">Se otorga el presente reconocimiento a:</div>
+                <div class="title-cert">CERTIFICADO OFICIAL</div>
+                <div class="subtitle-cert">Por culminación académica satisfactoria y acreditación oficial</div>
+
+                <div class="otorgado">Conferido en testimonio de honor a:</div>
                 <div class="recipient-name">${record.student_name}</div>
 
                 <div class="body-text">
-                    Por haber participado y aprobado satisfactoriamente la capacitación especializada:
-                    <span class="course-title">"${record.course_title}"</span>
-                    con una duración de <strong>${formatHours(record.hours)}</strong> lectivas, desarrollada
-                    del <strong>${record.start_date || 'Fecha de inicio'}</strong> al <strong>${record.end_date || 'Fecha de término'}</strong>,
-                    habiendo cumplido con el registro de asistencia mediante código QR y las evaluaciones académicas institucionales.
+                    Por haber participado y completado satisfactoriamente el programa de capacitación oficial
+                    <strong>"${record.course_title}"</strong>, con un total de <strong>${formatHours(record.hours)}</strong> lectivas,
+                    desarrollado bajo las normas académicas oficiales de fe pública.
                 </div>
 
                 <div class="signatures">
-                    <div class="sig-box">
-                        <strong>${record.instructor_name}</strong><br>
-                        <span class="sig-role">Docente Instructor</span>
+                    <div class="sign-box">
+                        <div class="sign-name">${record.instructor_name}</div>
+                        <div class="sign-role">Ponente / Docente Responsable</div>
                     </div>
-                    <div class="sig-box">
-                        <strong>Dirección Académica</strong><br>
-                        <span class="sig-role">Coordinación SIGC-CUSCO</span>
+                    <div class="sign-box">
+                        <div class="sign-name">Dirección Académica</div>
+                        <div class="sign-role">Coordinación General SIGC-CUSCO</div>
                     </div>
                 </div>
 
-                <div class="verification-bar">
-                    <div>Código de Certificado: <strong>${record.certificate_code}</strong></div>
-                    <div class="badge-valid">VERIFICACIÓN OFICIAL VÁLIDA • CUSCO, PERÚ</div>
-                    <div>Horas: ${record.hours}h</div>
+                <div class="footer-meta">
+                    <span>Código de Registro: <strong>${record.certificate_code}</strong></span>
+                    <span>Fecha de Emisión: <strong>${record.certificate_issued_at || 'Oficial'}</strong></span>
+                    <span class="badge-valid">VÁLIDO OFICIALMENTE • CUSCO, PERÚ</span>
                 </div>
             </div>
         </body>
@@ -372,7 +373,6 @@ function printCertificate(record: CertificateRecord) {
 }
 
 onMounted(() => {
-    // Si viene con parámetro en la URL (?dni=...) o prop inicial
     const params = new URLSearchParams(window.location.search);
     const dniParam = params.get('dni') || props.initialDni;
     if (dniParam && /^\d{8}$/.test(dniParam.trim())) {
@@ -383,556 +383,707 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="min-h-screen flex flex-col justify-between bg-slate-50/70 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-rose-900 selection:text-white">
-        <Head title="Acreditación Digital Oficial • Consulta y Descarga de Certificados - SIGC-CUSCO" />
+    <!-- CASO 1: USUARIO AUTENTICADO (MANTIENE AL 100% SU NAVBAR VERIFICADO APPLAYOUT) -->
+    <AppLayout v-if="authUser" :breadcrumbs="breadcrumbs">
+        <Head title="Validación Oficial de Certificados - SIGC-CUSCO" />
 
-        <!-- TOP INSTITUTIONAL HEADER -->
-        <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md shadow-xs">
-            <div class="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-                <!-- Brand Logo & Retroceso Rápido -->
-                <div class="flex items-center gap-3">
-                    <Link href="/" class="flex items-center gap-3 group">
-                        <div class="size-10 rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] flex items-center justify-center text-white shadow-sm shadow-rose-900/20 group-hover:scale-105 transition-transform">
-                            <GraduationCap class="size-5 text-amber-300" />
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+            <!-- HEADER DE SECCIÓN ACADÉMICA -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/90 dark:border-slate-800 pb-5">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <div class="size-10 rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] text-white flex items-center justify-center shadow-sm shrink-0">
+                            <Award class="size-5 text-amber-300" />
                         </div>
                         <div>
-                            <div class="flex items-center gap-1.5 font-bold text-base tracking-tight text-slate-950 dark:text-white">
-                                <span>SIGC-CUSCO</span>
-                            </div>
-                            <p class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium hidden sm:block">
-                                Acreditación Digital Oficial • Cusco, Perú
+                            <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-950 dark:text-white">
+                                Consulta y Validación de Certificados
+                            </h1>
+                            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
+                                Acreditación oficial institucional, diplomas con firma digital y verificación criptográfica SHA-256.
                             </p>
                         </div>
-                    </Link>
+                    </div>
                 </div>
 
-                <!-- Navigation Links & Botón Retroceso -->
-                <nav class="hidden md:flex items-center gap-5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                    <Button as-child variant="ghost" size="sm" class="text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-rose-900 hover:bg-rose-50/80 dark:hover:bg-rose-950/40 gap-1.5 cursor-pointer">
-                        <Link href="/">
-                            <ArrowLeft class="size-3.5 text-rose-800 dark:text-rose-400" />
-                            <span>Volver a Inicio</span>
+                <div class="flex items-center gap-2">
+                    <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 hover:text-rose-900 cursor-pointer">
+                        <Link href="/dashboard">
+                            <ArrowLeft class="size-3.5 mr-1 text-rose-800" />
+                            Volver al Panel
                         </Link>
                     </Button>
+                </div>
+            </div>
 
-                    <Link href="/courses" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors flex items-center gap-1.5">
+            <!-- CONTENIDO MODULAR DE CERTIFICACIÓN -->
+            <div class="space-y-6">
+                <!-- SELECTOR DE MODALIDAD (TABS LIMPIOS) -->
+                <div class="flex items-center justify-center">
+                    <div class="inline-flex p-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+                        <button
+                            type="button"
+                            @click="activeTab = 'dni'"
+                            class="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer"
+                            :class="activeTab === 'dni' ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:text-rose-900'"
+                        >
+                            <Search class="size-3.5" />
+                            <span>Búsqueda Oficial por DNI</span>
+                        </button>
+                        <button
+                            type="button"
+                            @click="activeTab = 'pdf'"
+                            class="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer"
+                            :class="activeTab === 'pdf' ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:text-rose-900'"
+                        >
+                            <FileCheck class="size-3.5 text-amber-500" />
+                            <span>Comprobador de Archivo PDF (SHA-256)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VISTA 1: BÚSQUEDA POR DNI -->
+                <div v-if="activeTab === 'dni'" class="space-y-6">
+                    <!-- Tarjeta de Búsqueda -->
+                    <Card class="max-w-2xl mx-auto border border-rose-900/20 dark:border-rose-900/40 shadow-sm bg-white dark:bg-slate-900 overflow-hidden">
+                        <CardHeader class="bg-gradient-to-r from-rose-50/80 via-white to-amber-50/20 dark:from-rose-950/30 dark:to-slate-900 border-b pb-3.5">
+                            <div class="flex items-center gap-2 text-xs font-black text-rose-900 dark:text-rose-300 uppercase tracking-wider">
+                                <Search class="size-4 text-rose-800" />
+                                <span>Consulta Pública Oficial</span>
+                            </div>
+                            <CardTitle class="text-base sm:text-lg font-bold text-slate-950 dark:text-white">
+                                Ingrese el DNI del Participante
+                            </CardTitle>
+                            <CardDescription class="text-xs text-slate-600 dark:text-slate-400">
+                                Valida las capacitaciones concluidas y diplomas oficiales emitidos por el sistema.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent class="p-5 sm:p-6 space-y-4">
+                            <form @submit.prevent="searchCertificates" class="flex flex-col sm:flex-row gap-3">
+                                <div class="relative flex-1">
+                                    <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                                    <Input
+                                        :value="dniQuery"
+                                        @input="onDniInput"
+                                        type="text"
+                                        inputmode="numeric"
+                                        maxlength="8"
+                                        placeholder="Ingresa DNI (8 dígitos)"
+                                        class="pl-10 font-mono text-base tracking-widest font-bold text-slate-950 dark:text-white border-slate-300 focus-visible:ring-rose-900 h-11"
+                                        :disabled="loading"
+                                        autofocus
+                                    />
+                                    <div class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-slate-400">
+                                        {{ dniQuery.length }}/8
+                                    </div>
+                                </div>
+                                <Button
+                                    type="submit"
+                                    :disabled="loading || dniQuery.length !== 8"
+                                    class="bg-rose-900 hover:bg-rose-950 text-white font-bold h-11 px-6 shadow-xs shrink-0 text-xs sm:text-sm cursor-pointer"
+                                >
+                                    <Loader2 v-if="loading" class="size-4 mr-2 animate-spin" />
+                                    <Search v-else class="size-4 mr-2" />
+                                    <span>Consultar Acreditación</span>
+                                </Button>
+                            </form>
+
+                            <div v-if="error" class="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-200 text-xs font-bold flex items-center gap-2">
+                                <AlertCircle class="size-4 shrink-0 text-rose-700" />
+                                <span>{{ error }}</span>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <!-- Resultados de Búsqueda -->
+                    <div v-if="loading" class="max-w-3xl mx-auto py-10 text-center space-y-3">
+                        <Loader2 class="size-8 mx-auto animate-spin text-rose-900" />
+                        <p class="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300">
+                            Consultando certificados oficiales emitidos para el DNI {{ dniQuery }}...
+                        </p>
+                    </div>
+
+                    <div v-else-if="searched" class="max-w-3xl mx-auto space-y-5">
+                        <template v-if="records.length > 0">
+                            <!-- Titular Acreditado -->
+                            <div class="p-4 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="size-11 rounded-xl bg-rose-900 text-white flex items-center justify-center font-black shadow-xs shrink-0">
+                                        <User class="size-5 text-amber-300" />
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h2 class="text-base sm:text-lg font-black text-slate-950 dark:text-white uppercase tracking-tight">
+                                                {{ studentName }}
+                                            </h2>
+                                            <Badge class="bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 text-[10px] font-black">
+                                                <CheckCircle2 class="size-3 mr-1 text-emerald-700" />
+                                                Titular Oficial
+                                            </Badge>
+                                        </div>
+                                        <div class="text-xs font-mono text-slate-600 dark:text-slate-400 mt-0.5">
+                                            DNI: <strong class="text-slate-900 dark:text-white">{{ dniQuery }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <Badge variant="outline" class="border-rose-300 text-rose-900 dark:border-rose-800 dark:text-rose-300 font-bold text-xs py-1 px-3 bg-rose-50 dark:bg-rose-950">
+                                    <Award class="size-3.5 mr-1 text-rose-800" />
+                                    {{ records.length }} {{ records.length === 1 ? 'Certificado Oficial' : 'Certificados Oficiales' }}
+                                </Badge>
+                            </div>
+
+                            <!-- Lista de Certificados Oficiales -->
+                            <div class="space-y-4">
+                                <Card
+                                    v-for="record in records"
+                                    :key="record.id"
+                                    class="border border-slate-200 dark:border-slate-800 shadow-xs hover:border-rose-300 transition-all bg-white dark:bg-slate-900 overflow-hidden"
+                                >
+                                    <CardHeader class="p-4 sm:p-5 pb-3 bg-slate-50/70 dark:bg-slate-900/80 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-black font-mono px-2 py-0.5 rounded bg-rose-900 text-white">
+                                                {{ record.course_code }}
+                                            </span>
+                                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                                <Building2 class="size-3 text-slate-400" />
+                                                {{ record.institution || 'SIGC-CUSCO' }}
+                                            </span>
+                                        </div>
+                                        <Badge class="text-[11px] font-black bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200">
+                                            <CheckCircle2 class="size-3 mr-1 text-rose-800" />
+                                            Acreditado Oficialmente
+                                        </Badge>
+                                    </CardHeader>
+                                    <CardContent class="p-4 sm:p-5 space-y-3.5">
+                                        <h3 class="text-base sm:text-lg font-bold text-slate-950 dark:text-white leading-snug">
+                                            {{ record.course_title }}
+                                        </h3>
+
+                                        <!-- Datos Públicos Relevantes (SIN ASISTENCIA NI NOTAS INTERNAS) -->
+                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                                            <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
+                                                <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Ponente / Docente</div>
+                                                <div class="font-bold text-slate-900 dark:text-white truncate">
+                                                    {{ record.instructor_name }}
+                                                </div>
+                                            </div>
+                                            <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
+                                                <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Carga Lectiva</div>
+                                                <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                                                    <Clock class="size-3 text-amber-600" />
+                                                    {{ formatHours(record.hours) }}
+                                                </div>
+                                            </div>
+                                            <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
+                                                <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Período</div>
+                                                <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                                                    <Calendar class="size-3 text-rose-800" />
+                                                    {{ formatDateRange(record.start_date, record.end_date, 'short') }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Código, Fecha y Acciones -->
+                                        <div class="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800">
+                                            <div class="flex flex-col gap-0.5 text-xs font-mono text-slate-600 dark:text-slate-400">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-bold text-slate-900 dark:text-slate-200">Cód. Verificación:</span>
+                                                    <span class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded font-black text-rose-900 dark:text-rose-400 border border-slate-200 dark:border-slate-700">
+                                                        {{ record.certificate_code }}
+                                                    </span>
+                                                </div>
+                                                <div class="text-[10px] text-slate-500">
+                                                    Expedido: <strong>{{ record.certificate_issued_at || 'Oficial' }}</strong>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center gap-2">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    class="text-xs font-bold border-slate-300 hover:text-rose-900 hover:bg-rose-50 cursor-pointer h-9 px-3.5"
+                                                    @click="openCertificatePreview(record)"
+                                                >
+                                                    <Eye class="size-3.5 mr-1.5 text-slate-700" />
+                                                    Ver Diploma
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer h-9 px-3.5"
+                                                    @click="printCertificate(record)"
+                                                >
+                                                    <Download class="size-3.5 mr-1.5" />
+                                                    Descargar PDF
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        </template>
+
+                        <!-- Sin registros -->
+                        <div v-else class="p-8 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-3 shadow-xs">
+                            <div class="size-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center">
+                                <Award class="size-6" />
+                            </div>
+                            <h3 class="text-base font-bold text-slate-950 dark:text-white">
+                                No se registran certificados oficiales para el DNI {{ dniQuery }}
+                            </h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+                                Los certificados se publican una vez concluida la capacitación y cerrada el acta oficial de evaluación académica.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VISTA 2: VERIFICACIÓN CRIPTOGRÁFICA DE ARCHIVO PDF -->
+                <div v-else class="max-w-3xl mx-auto space-y-4">
+                    <PdfIntegrityVerifier :expected-hash="selectedCert?.certificate_hash || records[0]?.certificate_hash" />
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+
+    <!-- CASO 2: VISITANTE PÚBLICO (CABECERA INSTITUCIONAL LIMPIA Y ELEGANTE) -->
+    <div v-else class="min-h-screen flex flex-col justify-between bg-slate-50/70 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-rose-900 selection:text-white">
+        <Head title="Acreditación Digital Oficial • Consulta de Certificados - SIGC-CUSCO" />
+
+        <!-- TOP INSTITUTIONAL GUEST HEADER -->
+        <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md shadow-xs">
+            <div class="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+                <Link href="/" class="flex items-center gap-3 group">
+                    <div class="size-10 rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] flex items-center justify-center text-white shadow-sm shadow-rose-900/20 group-hover:scale-105 transition-transform">
+                        <GraduationCap class="size-5 text-amber-300" />
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5 font-bold text-base tracking-tight text-slate-950 dark:text-white">
+                            <span>SIGC-CUSCO</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium hidden sm:block">
+                            Acreditación Digital Oficial • Cusco, Perú
+                        </p>
+                    </div>
+                </Link>
+
+                <nav class="hidden md:flex items-center gap-5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                    <Button as-child variant="ghost" size="sm" class="text-xs font-bold text-slate-800 hover:text-rose-900 cursor-pointer">
+                        <Link href="/">
+                            <ArrowLeft class="size-3.5 mr-1 text-rose-800" />
+                            <span>Portal Principal</span>
+                        </Link>
+                    </Button>
+                    <Link href="/courses" class="hover:text-rose-900 transition-colors flex items-center gap-1.5">
                         <GraduationCap class="size-4 text-rose-800" />
                         <span>Capacitaciones</span>
                     </Link>
-
                     <span class="text-rose-900 dark:text-rose-300 flex items-center gap-1.5 border-b-2 border-rose-900 pb-1">
                         <Award class="size-4 text-amber-600" />
-                        <span>Certificados Oficiales</span>
+                        <span>Validar Certificados</span>
                     </span>
                 </nav>
 
-                <!-- Auth / Guest Actions -->
-                <div class="flex items-center gap-3">
-                    <template v-if="authUser">
-                        <Button as-child size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer">
-                            <Link href="/dashboard">
-                                <span>Mi Panel</span>
-                                <span class="ml-1.5 text-[10px] bg-rose-950 text-amber-300 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">
-                                    {{ authUser.role }}
-                                </span>
-                            </Link>
-                        </Button>
-                    </template>
-                    <template v-else>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            class="text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-rose-900 cursor-pointer"
-                            @click="isLoginModalOpen = true"
-                        >
-                            <LogIn class="size-3.5 mr-1 text-rose-900" />
-                            Ingresar
-                        </Button>
-                        <Button
-                            size="sm"
-                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer"
-                            @click="isRegisterModalOpen = true"
-                        >
-                            <UserPlus class="size-3.5 mr-1" />
-                            Registrarse
-                        </Button>
-                    </template>
+                <div class="flex items-center gap-2.5">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        class="text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-rose-900 cursor-pointer"
+                        @click="isLoginModalOpen = true"
+                    >
+                        <LogIn class="size-3.5 mr-1 text-rose-900" />
+                        Ingresar
+                    </Button>
+                    <Button
+                        size="sm"
+                        class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer"
+                        @click="isRegisterModalOpen = true"
+                    >
+                        <UserPlus class="size-3.5 mr-1" />
+                        Registrarse
+                    </Button>
                 </div>
             </div>
         </header>
 
-        <!-- MAIN CONTENT AREA: LANDING ÚNICA Y AMPLIA -->
-        <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
-            <!-- BARRA DE RETROCESO Y BREADCRUMB -->
-            <div class="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800 pb-4">
-                <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 hover:bg-rose-50 hover:text-rose-900 text-slate-800 dark:text-slate-200 cursor-pointer shadow-2xs">
-                    <Link href="/">
-                        <ArrowLeft class="size-3.5 mr-1.5 text-rose-800" />
-                        Volver al Portal de Capacitaciones
-                    </Link>
-                </Button>
-
-                <div class="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                    <Link href="/" class="hover:text-rose-900 transition-colors">Portal Principal</Link>
-                    <ChevronRight class="size-3" />
-                    <span class="text-rose-900 dark:text-rose-400 font-bold">Certificados Digitales</span>
+        <!-- MAIN CONTENT FOR GUEST -->
+        <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+            <div class="text-center max-w-2xl mx-auto space-y-3">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100/90 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 text-rose-950 dark:text-rose-200 text-xs font-black shadow-xs">
+                    <ShieldCheck class="size-3.5 text-rose-800" />
+                    <span>Fe Pública Oficial • UNSAAC / Cusco</span>
                 </div>
-            </div>
-
-            <!-- HERO HEADER OF THE PAGE (TEXTOS EXACTOS SOLICITADOS) -->
-            <div class="text-center max-w-3xl mx-auto space-y-4">
-                <!-- Tag Superior -->
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-100/90 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 text-rose-950 dark:text-rose-200 text-xs font-black shadow-xs">
-                    <Award class="size-4 text-rose-800 dark:text-rose-400" />
-                    <span>Acreditación Digital Oficial • Cusco, Perú</span>
-                </div>
-
-                <!-- Título Principal -->
-                <h1 class="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950 dark:text-white leading-tight">
-                    Consulta y Descarga de <span class="text-rose-900 dark:text-rose-400 underline decoration-amber-500 decoration-4 underline-offset-8">Certificados Oficiales</span>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-950 dark:text-white leading-tight">
+                    Consulta y Validación de <span class="text-rose-900 dark:text-rose-400">Certificados Digitales</span>
                 </h1>
-
-                <!-- Subtítulo -->
-                <p class="text-sm sm:text-base md:text-lg text-slate-700 dark:text-neutral-300 max-w-2xl mx-auto leading-relaxed font-semibold">
-                    Ingresa tu número de DNI para consultar las capacitaciones aprobadas y descargar tu diploma digital oficial con código de verificación.
+                <p class="text-xs sm:text-sm text-slate-700 dark:text-neutral-300 leading-relaxed font-semibold">
+                    Verifica la autenticidad e integridad de los diplomas oficiales expedidos en las capacitaciones académicas.
                 </p>
             </div>
 
-            <!-- BUSCADOR PRINCIPAL POR DNI (AMPLIO Y DESTACADO) -->
-            <Card class="max-w-2xl mx-auto border-2 border-rose-900/20 dark:border-rose-900/40 shadow-lg bg-white dark:bg-slate-900 overflow-hidden">
-                <CardHeader class="bg-gradient-to-r from-rose-50/90 via-amber-50/30 to-white dark:from-rose-950/40 dark:to-slate-900 border-b pb-4">
-                    <div class="flex items-center gap-2 text-xs font-black text-rose-900 dark:text-rose-300 uppercase tracking-wider">
-                        <Search class="size-4 text-rose-800" />
-                        <span>Búsqueda Oficial con DNI</span>
-                    </div>
-                    <CardTitle class="text-lg sm:text-xl font-bold text-slate-950 dark:text-white">
-                        Consulta Inmediata de Diplomas
-                    </CardTitle>
-                    <CardDescription class="text-xs text-slate-600 dark:text-slate-400 font-medium">
-                        Sistema sincronizado con el padrón de asistencias QR y actas de evaluación académica.
-                    </CardDescription>
-                </CardHeader>
-
-                <CardContent class="p-6">
-                    <form @submit.prevent="searchCertificates" class="flex flex-col sm:flex-row gap-3">
-                        <div class="relative flex-1">
-                            <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                            <Input
-                                :value="dniQuery"
-                                @input="onDniInput"
-                                type="text"
-                                inputmode="numeric"
-                                maxlength="8"
-                                placeholder="Ingresa tu DNI (8 dígitos)"
-                                class="pl-10 font-mono text-base tracking-widest font-bold text-slate-950 dark:text-white border-slate-300 focus-visible:ring-rose-900 h-12"
-                                :disabled="loading"
-                                autofocus
-                            />
-                            <div class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-slate-400">
-                                {{ dniQuery.length }}/8
-                            </div>
-                        </div>
-
-                        <Button
-                            type="submit"
-                            :disabled="loading || dniQuery.length !== 8"
-                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold h-12 px-7 shadow-md shadow-rose-900/20 shrink-0 text-sm cursor-pointer"
-                        >
-                            <Loader2 v-if="loading" class="size-4 mr-2 animate-spin" />
-                            <Search v-else class="size-4 mr-2" />
-                            <span>Consultar DNI</span>
-                        </Button>
-                    </form>
-
-                    <!-- Mensaje de Error -->
-                    <div v-if="error" class="mt-4 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-200 text-xs font-bold flex items-center gap-2.5">
-                        <AlertCircle class="size-4 shrink-0 text-rose-700" />
-                        <span>{{ error }}</span>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <!-- 3 PILARES INSTITUCIONALES (CARACTERÍSTICAS DE LA LANDING) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto pt-2">
-                <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/40 space-y-2.5 shadow-2xs">
-                    <div class="size-10 rounded-xl bg-rose-100 dark:bg-rose-950 text-rose-900 dark:text-rose-300 flex items-center justify-center font-bold">
-                        <ShieldCheck class="size-5" />
-                    </div>
-                    <h3 class="text-sm font-bold text-slate-950 dark:text-white">Validación con RENIEC</h3>
-                    <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                        Cruce de identidad en tiempo real para emisión con nombre oficial, garantizando cero adulteraciones.
-                    </p>
-                </div>
-
-                <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/40 space-y-2.5 shadow-2xs">
-                    <div class="size-10 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 flex items-center justify-center font-bold">
-                        <QrCode class="size-5" />
-                    </div>
-                    <h3 class="text-sm font-bold text-slate-950 dark:text-white">Asistencia QR Controlada</h3>
-                    <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                        Certificación expedida únicamente a quienes completaron las sesiones presenciales o virtuales con código QR.
-                    </p>
-                </div>
-
-                <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/40 space-y-2.5 shadow-2xs">
-                    <div class="size-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 flex items-center justify-center font-bold">
-                        <Download class="size-5 text-rose-900 dark:text-rose-400" />
-                    </div>
-                    <h3 class="text-sm font-bold text-slate-950 dark:text-white">Descarga Inmediata PDF</h3>
-                    <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                        Diploma oficial en alta resolución con código de verificación verificable desde cualquier dispositivo.
-                    </p>
+            <!-- SELECTOR DE MODALIDAD (TABS LIMPIOS) -->
+            <div class="flex items-center justify-center">
+                <div class="inline-flex p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs">
+                    <button
+                        type="button"
+                        @click="activeTab = 'dni'"
+                        class="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer"
+                        :class="activeTab === 'dni' ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:text-rose-900'"
+                    >
+                        <Search class="size-3.5" />
+                        <span>Búsqueda Oficial por DNI</span>
+                    </button>
+                    <button
+                        type="button"
+                        @click="activeTab = 'pdf'"
+                        class="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer"
+                        :class="activeTab === 'pdf' ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:text-rose-900'"
+                    >
+                        <FileCheck class="size-3.5 text-amber-500" />
+                        <span>Comprobador de Archivo PDF (SHA-256)</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- SECCIÓN DE RESULTADOS DE BÚSQUEDA -->
-            <div v-if="loading" class="max-w-4xl mx-auto py-12 text-center space-y-3">
-                <Loader2 class="size-8 mx-auto animate-spin text-rose-900" />
-                <p class="text-sm font-bold text-slate-800 dark:text-slate-200">
-                    Consultando capacitaciones y diplomas para el DNI {{ dniQuery }}...
-                </p>
-            </div>
-
-            <div v-else-if="searched" class="max-w-4xl mx-auto space-y-6">
-                <!-- SI SE ENCUENTRAN REGISTROS -->
-                <template v-if="records.length > 0">
-                    <!-- Tarjeta del Participante Titular -->
-                    <div class="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <div class="flex items-center gap-3.5">
-                            <div class="size-12 rounded-xl bg-rose-900 text-white flex items-center justify-center font-black shadow-xs">
-                                <User class="size-6 text-amber-300" />
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <h2 class="text-base sm:text-lg font-black text-slate-950 dark:text-white uppercase tracking-tight">
-                                        {{ studentName }}
-                                    </h2>
-                                    <Badge class="bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800 text-[10px] font-black">
-                                        <CheckCircle2 class="size-3 mr-1 text-rose-800" />
-                                        Validado
-                                    </Badge>
-                                </div>
-                                <div class="text-xs font-mono text-slate-600 dark:text-slate-400 font-semibold mt-0.5">
-                                    Documento Nacional de Identidad: <span class="font-bold text-slate-950 dark:text-white">{{ dniQuery }}</span>
-                                </div>
-                            </div>
+            <!-- VISTA 1: BÚSQUEDA POR DNI (GUEST) -->
+            <div v-if="activeTab === 'dni'" class="space-y-6">
+                <!-- Tarjeta de Búsqueda -->
+                <Card class="max-w-2xl mx-auto border-2 border-rose-900/20 dark:border-rose-900/40 shadow-sm bg-white dark:bg-slate-900 overflow-hidden">
+                    <CardHeader class="bg-gradient-to-r from-rose-50/80 via-white to-amber-50/20 dark:from-rose-950/30 dark:to-slate-900 border-b pb-3.5">
+                        <div class="flex items-center gap-2 text-xs font-black text-rose-900 dark:text-rose-300 uppercase tracking-wider">
+                            <Search class="size-4 text-rose-800" />
+                            <span>Búsqueda Oficial con DNI</span>
                         </div>
+                        <CardTitle class="text-base sm:text-lg font-bold text-slate-950 dark:text-white">
+                            Consulta Inmediata de Diplomas
+                        </CardTitle>
+                        <CardDescription class="text-xs text-slate-600 dark:text-slate-400">
+                            Ingresa el número de documento de identidad de 8 dígitos.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent class="p-5 sm:p-6 space-y-4">
+                        <form @submit.prevent="searchCertificates" class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative flex-1">
+                                <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                                <Input
+                                    :value="dniQuery"
+                                    @input="onDniInput"
+                                    type="text"
+                                    inputmode="numeric"
+                                    maxlength="8"
+                                    placeholder="Ingresa tu DNI (8 dígitos)"
+                                    class="pl-10 font-mono text-base tracking-widest font-bold text-slate-950 dark:text-white border-slate-300 focus-visible:ring-rose-900 h-11"
+                                    :disabled="loading"
+                                    autofocus
+                                />
+                                <div class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-slate-400">
+                                    {{ dniQuery.length }}/8
+                                </div>
+                            </div>
+                            <Button
+                                type="submit"
+                                :disabled="loading || dniQuery.length !== 8"
+                                class="bg-rose-900 hover:bg-rose-950 text-white font-bold h-11 px-6 shadow-xs shrink-0 text-xs sm:text-sm cursor-pointer"
+                            >
+                                <Loader2 v-if="loading" class="size-4 mr-2 animate-spin" />
+                                <Search v-else class="size-4 mr-2" />
+                                <span>Consultar DNI</span>
+                            </Button>
+                        </form>
 
-                        <div class="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+                        <div v-if="error" class="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-200 text-xs font-bold flex items-center gap-2">
+                            <AlertCircle class="size-4 shrink-0 text-rose-700" />
+                            <span>{{ error }}</span>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <!-- Resultados de Búsqueda -->
+                <div v-if="loading" class="max-w-3xl mx-auto py-10 text-center space-y-3">
+                    <Loader2 class="size-8 mx-auto animate-spin text-rose-900" />
+                    <p class="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300">
+                        Consultando capacitaciones y diplomas emitidos para el DNI {{ dniQuery }}...
+                    </p>
+                </div>
+
+                <div v-else-if="searched" class="max-w-3xl mx-auto space-y-5">
+                    <template v-if="records.length > 0">
+                        <!-- Titular Acreditado -->
+                        <div class="p-4 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="size-11 rounded-xl bg-rose-900 text-white flex items-center justify-center font-black shadow-xs shrink-0">
+                                    <User class="size-5 text-amber-300" />
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h2 class="text-base sm:text-lg font-black text-slate-950 dark:text-white uppercase tracking-tight">
+                                            {{ studentName }}
+                                        </h2>
+                                        <Badge class="bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 text-[10px] font-black">
+                                            <CheckCircle2 class="size-3 mr-1 text-emerald-700" />
+                                            Titular Oficial
+                                        </Badge>
+                                    </div>
+                                    <div class="text-xs font-mono text-slate-600 dark:text-slate-400 mt-0.5">
+                                        DNI: <strong class="text-slate-900 dark:text-white">{{ dniQuery }}</strong>
+                                    </div>
+                                </div>
+                            </div>
                             <Badge variant="outline" class="border-rose-300 text-rose-900 dark:border-rose-800 dark:text-rose-300 font-bold text-xs py-1 px-3 bg-rose-50 dark:bg-rose-950">
                                 <Award class="size-3.5 mr-1 text-rose-800" />
                                 {{ records.length }} {{ records.length === 1 ? 'Capacitación Aprobada' : 'Capacitaciones Aprobadas' }}
                             </Badge>
                         </div>
-                    </div>
 
-                    <!-- Grid de Certificados Encontrados -->
-                    <div class="space-y-4">
-                        <Card
-                            v-for="record in records"
-                            :key="record.id"
-                            class="border border-slate-200 dark:border-slate-800 shadow-sm hover:border-rose-300 transition-all bg-white dark:bg-slate-900 overflow-hidden"
-                        >
-                            <CardHeader class="p-5 pb-3 bg-slate-50/70 dark:bg-slate-900/80 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <span class="text-xs font-black font-mono px-2.5 py-0.5 rounded bg-rose-900 text-white">
-                                        {{ record.course_code }}
-                                    </span>
-                                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                                        <Building2 class="size-3 text-slate-400" />
-                                        {{ record.institution || 'SIGC-CUSCO' }}
-                                    </span>
-                                </div>
-
-                                <Badge
-                                    class="text-xs font-bold capitalize self-start sm:self-auto bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800"
-                                >
-                                    <CheckCircle2 class="size-3 mr-1 text-rose-800" />
-                                    {{ record.status }}
-                                </Badge>
-                            </CardHeader>
-
-                            <CardContent class="p-5 space-y-4">
-                                <h3 class="text-lg sm:text-xl font-bold text-slate-950 dark:text-white leading-snug">
-                                    {{ record.course_title }}
-                                </h3>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                                    <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
-                                        <div class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Docente Instructor</div>
-                                        <div class="font-bold text-slate-900 dark:text-white truncate">
-                                            {{ record.instructor_name }}
-                                        </div>
-                                    </div>
-
-                                    <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
-                                        <div class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Horas Lectivas</div>
-                                        <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1">
-                                            <Clock class="size-3 text-amber-600" />
-                                            {{ formatHours(record.hours) }}
-                                        </div>
-                                    </div>
-
-                                    <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
-                                        <div class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Período de Clases</div>
-                                        <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1">
-                                            <Calendar class="size-3 text-rose-800" />
-                                            {{ formatDateRange(record.start_date, record.end_date, 'short') }}
-                                        </div>
-                                    </div>
-
-                                    <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
-                                        <div class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Asistencia QR</div>
-                                        <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1">
-                                            <QrCode class="size-3 text-indigo-600" />
-                                            {{ record.attended_sessions }} sesiones marcadas
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800">
-                                    <div class="flex flex-col gap-1 text-xs font-mono text-slate-600 dark:text-slate-400">
-                                        <div class="flex items-center gap-2">
-                                            <span class="font-bold text-slate-900 dark:text-slate-200">Cód. Verificación:</span>
-                                            <span class="bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded font-black text-rose-900 dark:text-rose-400 border border-slate-200 dark:border-slate-700">
-                                                {{ record.certificate_code }}
-                                            </span>
-                                        </div>
-                                        <div v-if="record.certificate_hash" class="text-[10px] text-slate-500 flex items-center gap-1">
-                                            <span class="font-bold text-slate-700 dark:text-slate-300">SHA-256:</span>
-                                            <span class="truncate max-w-[220px] sm:max-w-xs font-mono select-all" :title="record.certificate_hash">{{ record.certificate_hash }}</span>
-                                        </div>
-                                    </div>
-
+                        <!-- Lista de Certificados Oficiales -->
+                        <div class="space-y-4">
+                            <Card
+                                v-for="record in records"
+                                :key="record.id"
+                                class="border border-slate-200 dark:border-slate-800 shadow-xs hover:border-rose-300 transition-all bg-white dark:bg-slate-900 overflow-hidden"
+                            >
+                                <CardHeader class="p-4 sm:p-5 pb-3 bg-slate-50/70 dark:bg-slate-900/80 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                     <div class="flex items-center gap-2">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            class="text-xs font-bold border-slate-300 hover:text-rose-900 hover:bg-rose-50 cursor-pointer h-9 px-4"
-                                            @click="openCertificatePreview(record)"
-                                        >
-                                            <Eye class="size-3.5 mr-1.5 text-slate-700" />
-                                            Ver Diploma
-                                        </Button>
-
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer h-9 px-4"
-                                            @click="printCertificate(record)"
-                                        >
-                                            <Download class="size-3.5 mr-1.5" />
-                                            Descargar Certificado PDF
-                                        </Button>
+                                        <span class="text-xs font-black font-mono px-2 py-0.5 rounded bg-rose-900 text-white">
+                                            {{ record.course_code }}
+                                        </span>
+                                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                            <Building2 class="size-3 text-slate-400" />
+                                            {{ record.institution || 'SIGC-CUSCO' }}
+                                        </span>
                                     </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </template>
+                                    <Badge class="text-[11px] font-black bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200">
+                                        <CheckCircle2 class="size-3 mr-1 text-rose-800" />
+                                        Acreditado Oficialmente
+                                    </Badge>
+                                </CardHeader>
+                                <CardContent class="p-4 sm:p-5 space-y-3.5">
+                                    <h3 class="text-base sm:text-lg font-bold text-slate-950 dark:text-white leading-snug">
+                                        {{ record.course_title }}
+                                    </h3>
 
-                <!-- SI NO SE ENCONTRARON REGISTROS -->
-                <div v-else class="p-8 sm:p-10 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-4 shadow-sm">
-                    <div class="size-14 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 mx-auto flex items-center justify-center">
-                        <Award class="size-7 text-slate-400" />
-                    </div>
-                    <div class="space-y-1">
-                        <h3 class="text-lg font-bold text-slate-950 dark:text-white">
-                            No se encontraron certificados para el DNI {{ dniQuery }}
+                                    <!-- Datos Públicos Relevantes -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                                        <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
+                                            <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Ponente / Docente</div>
+                                            <div class="font-bold text-slate-900 dark:text-white truncate">
+                                                {{ record.instructor_name }}
+                                            </div>
+                                        </div>
+                                        <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
+                                            <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Carga Lectiva</div>
+                                            <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                                                <Clock class="size-3 text-amber-600" />
+                                                {{ formatHours(record.hours) }}
+                                            </div>
+                                        </div>
+                                        <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
+                                            <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Período</div>
+                                            <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                                                <Calendar class="size-3 text-rose-800" />
+                                                {{ formatDateRange(record.start_date, record.end_date, 'short') }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Código, Fecha y Acciones -->
+                                    <div class="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800">
+                                        <div class="flex flex-col gap-0.5 text-xs font-mono text-slate-600 dark:text-slate-400">
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-slate-900 dark:text-slate-200">Cód. Verificación:</span>
+                                                <span class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded font-black text-rose-900 dark:text-rose-400 border border-slate-200 dark:border-slate-700">
+                                                    {{ record.certificate_code }}
+                                                </span>
+                                            </div>
+                                            <div class="text-[10px] text-slate-500">
+                                                Expedido: <strong>{{ record.certificate_issued_at || 'Oficial' }}</strong>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                class="text-xs font-bold border-slate-300 hover:text-rose-900 hover:bg-rose-50 cursor-pointer h-9 px-3.5"
+                                                @click="openCertificatePreview(record)"
+                                            >
+                                                <Eye class="size-3.5 mr-1.5 text-slate-700" />
+                                                Ver Diploma
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer h-9 px-3.5"
+                                                @click="printCertificate(record)"
+                                            >
+                                                <Download class="size-3.5 mr-1.5" />
+                                                Descargar PDF
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </template>
+
+                    <!-- Sin registros -->
+                    <div v-else class="p-8 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-3 shadow-xs">
+                        <div class="size-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center">
+                            <Award class="size-6" />
+                        </div>
+                        <h3 class="text-base font-bold text-slate-950 dark:text-white">
+                            No se registran certificados para el DNI {{ dniQuery }}
                         </h3>
-                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed font-medium">
-                            Verifica que los 8 dígitos numéricos sean correctos o inscríbete en una de nuestras capacitaciones oficiales abiertas para obtener tu certificación.
+                        <p class="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+                            Los certificados se generan una vez concluida la capacitación y cerrada el acta de evaluación oficial.
                         </p>
                     </div>
-
-                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 hover:bg-rose-50 hover:text-rose-900 cursor-pointer">
-                            <Link href="/courses">
-                                <GraduationCap class="size-3.5 mr-1 text-rose-900" />
-                                Ver Cursos Disponibles
-                            </Link>
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            class="text-xs font-bold text-slate-700 hover:text-rose-900 cursor-pointer"
-                            @click="dniQuery = ''; searched = false;"
-                        >
-                            Consultar con otro DNI
-                        </Button>
-                    </div>
                 </div>
             </div>
 
-            <!-- VERIFICADOR CRIPTOGRÁFICO DE DOCUMENTO PDF (SIGC-8) -->
-            <div class="max-w-4xl mx-auto pt-2">
+            <!-- VISTA 2: VERIFICACIÓN CRIPTOGRÁFICA DE ARCHIVO PDF (GUEST) -->
+            <div v-else class="max-w-3xl mx-auto space-y-4">
                 <PdfIntegrityVerifier :expected-hash="selectedCert?.certificate_hash || records[0]?.certificate_hash" />
-            </div>
-
-            <!-- BANNER INFORMATIVO FINAL -->
-            <div class="max-w-4xl mx-auto rounded-2xl bg-gradient-to-r from-rose-900 to-[#701a31] text-white p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md">
-                <div class="space-y-2 text-center md:text-left">
-                    <div class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-300">
-                        <Sparkles class="size-4" />
-                        <span>Acreditación Institucional Garantizada</span>
-                    </div>
-                    <h3 class="text-lg sm:text-xl font-black tracking-tight text-white">
-                        ¿Deseas participar en nuevas capacitaciones?
-                    </h3>
-                    <p class="text-xs sm:text-sm text-rose-100/90 max-w-lg leading-relaxed font-medium">
-                        Revisa la lista de cursos abiertos con aforo oficial e inscripción directa con DNI y control de asistencia QR.
-                    </p>
-                </div>
-
-                <div class="shrink-0 flex flex-col sm:flex-row gap-3">
-                    <Button as-child variant="secondary" size="sm" class="bg-white text-rose-950 hover:bg-rose-50 font-black text-xs shadow-xs cursor-pointer h-10 px-5">
-                        <Link href="/courses">
-                            Explorar Convocatorias
-                        </Link>
-                    </Button>
-                </div>
             </div>
         </main>
 
-        <!-- FOOTER INSTITUCIONAL -->
-        <footer class="border-t border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-950 py-6 text-xs text-slate-600 dark:text-neutral-400">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-2 font-medium">
+        <!-- FOOTER INSTITUCIONAL PARA INVITADO -->
+        <footer class="border-t border-slate-200/90 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 py-5 text-xs text-slate-600 dark:text-slate-400">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-200">
                     <GraduationCap class="size-4 text-rose-900" />
-                    <span class="font-bold text-slate-950 dark:text-white">
-                        SIGC-CUSCO
-                    </span>
-                    <span>— Sistema Integral de Gestión de Capacitaciones • Cusco</span>
+                    <span>SIGC-CUSCO • Acreditación Oficial</span>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center">
                     <PeruGeoBadge />
-                    <span class="font-medium text-slate-700 dark:text-slate-300 hidden md:inline">Cusco, Perú 2026</span>
                 </div>
             </div>
         </footer>
+    </div>
 
-        <!-- MODAL DE VISTA PREVIA DEL CERTIFICADO (DIPLOMA OFICIAL) -->
-        <Dialog v-model:open="isCertModalOpen">
-            <DialogContent class="w-[96vw] sm:max-w-3xl max-h-[90vh] flex flex-col p-0 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
-                <!-- Header Fijo Pinned -->
-                <div class="p-5 sm:p-6 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0 pr-12">
-                    <DialogHeader class="text-left space-y-1">
-                        <div class="flex items-center gap-2 text-xs font-black text-rose-900 dark:text-rose-400 uppercase tracking-wider">
-                            <Award class="size-4 text-rose-800" />
-                            <span>Vista Previa del Diploma Digital Oficial</span>
-                        </div>
-                        <DialogTitle class="text-lg font-black text-slate-950 dark:text-white">
-                            {{ selectedCert?.course_title }}
+    <!-- MODAL DE VISTA PREVIA DEL DIPLOMA OFICIAL (COMPARTIDO) -->
+    <Dialog v-model:open="isCertModalOpen">
+        <DialogContent class="max-w-3xl max-h-[90vh] flex flex-col p-0 overflow-hidden bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+            <DialogHeader class="p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50/80 dark:bg-slate-950/60">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <Award class="size-4 text-rose-800" />
+                        <DialogTitle class="text-sm font-bold text-slate-950 dark:text-white">
+                            Vista Previa de Diploma Oficial
                         </DialogTitle>
-                        <DialogDescription class="text-xs text-slate-600 dark:text-slate-400 font-medium">
-                            Acreditación académica válida para trámites profesionales y laborales.
-                        </DialogDescription>
-                    </DialogHeader>
+                    </div>
+                    <Badge variant="outline" class="font-mono text-[10px] font-bold border-rose-300 text-rose-900">
+                        {{ selectedCert?.certificate_code }}
+                    </Badge>
                 </div>
+                <DialogDescription class="text-[11px] text-slate-500">
+                    Documento con valor oficial emitido por SIGC-CUSCO bajo la normativa académica vigente.
+                </DialogDescription>
+            </DialogHeader>
 
-                <!-- Cuerpo Scrollable Interno con scrollbar sutil -->
-                <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-5 sm:p-6">
-                    <div v-if="selectedCert" class="space-y-6">
-                        <!-- Vista previa realista con doble marco Granate Imperial y acento dorado -->
-                        <div class="p-6 sm:p-8 bg-[#fdfbf7] dark:bg-slate-950 border-4 border-double border-[#800020] text-center space-y-4 rounded-xl shadow-inner relative">
-                            <div class="text-[11px] font-black tracking-widest text-[#800020] uppercase">
-                                {{ selectedCert.institution || 'SIGC-CUSCO' }}
+            <!-- Cuerpo del Diploma -->
+            <div v-if="selectedCert" class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-100/60 dark:bg-slate-900/60 flex items-center justify-center">
+                <div class="w-full bg-white dark:bg-slate-900 border-4 border-double border-[#800020] p-6 sm:p-8 relative text-center shadow-md">
+                    <div class="space-y-4">
+                        <div class="border-b border-[#800020]/20 pb-3">
+                            <div class="text-[10px] font-black tracking-widest text-[#800020] uppercase">
+                                REPÚBLICA DEL PERÚ • REGIÓN CUSCO
                             </div>
-                            <div class="text-[10px] tracking-wider text-slate-500 font-semibold uppercase">
-                                Sistema Integral de Gestión de Capacitaciones • Cusco, Perú
+                            <div class="text-[9px] text-slate-600 uppercase tracking-wider font-semibold">
+                                SISTEMA INTEGRAL DE GESTIÓN DE CAPACITACIONES (SIGC-CUSCO / UNSAAC)
                             </div>
+                        </div>
 
-                            <div class="pt-2">
-                                <h2 class="text-2xl font-black text-[#800020] uppercase tracking-wider">
-                                    Certificado Oficial
-                                </h2>
-                                <p class="text-xs text-slate-600 italic">
-                                    Por culminación académica satisfactoria y asistencia
-                                </p>
-                            </div>
+                        <div class="pt-1">
+                            <h2 class="text-xl sm:text-2xl font-black text-[#800020] uppercase tracking-wider">
+                                Certificado Oficial
+                            </h2>
+                            <p class="text-xs text-slate-600 italic">
+                                Por culminación académica satisfactoria y acreditación oficial
+                            </p>
+                        </div>
 
-                            <div class="pt-2">
-                                <p class="text-xs text-slate-500 uppercase tracking-wider">Otorgado a:</p>
-                                <div class="text-xl font-black text-slate-950 dark:text-white uppercase tracking-tight py-1 border-b-2 border-[#800020] inline-block px-4">
-                                    {{ selectedCert.student_name }}
-                                </div>
+                        <div class="pt-1">
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Otorgado a:</p>
+                            <div class="text-lg sm:text-xl font-black text-slate-950 dark:text-white uppercase tracking-tight py-1 border-b-2 border-[#800020] inline-block px-4">
+                                {{ selectedCert.student_name }}
                             </div>
+                        </div>
 
-                            <div class="text-xs text-slate-700 dark:text-slate-300 max-w-lg mx-auto leading-relaxed pt-1">
-                                Habiendo completado satisfactoriamente el curso
-                                <strong class="text-[#800020] block my-1 text-sm font-black">"{{ selectedCert.course_title }}"</strong>
-                                con un total de <strong>{{ formatHours(selectedCert.hours) }}</strong>, desarrollado
-                                del {{ selectedCert.start_date }} al {{ selectedCert.end_date }}, habiendo cumplido con
-                                las asistencias mediante código QR y las evaluaciones oficiales.
-                            </div>
+                        <div class="text-xs text-slate-700 dark:text-slate-300 max-w-lg mx-auto leading-relaxed pt-1">
+                            Habiendo completado satisfactoriamente el curso
+                            <strong class="text-[#800020] block my-1 text-sm font-black">"${selectedCert.course_title}"</strong>
+                            con un total de <strong>${formatHours(selectedCert.hours)}</strong> lectivas, desarrollado
+                            del ${selectedCert.start_date} al ${selectedCert.end_date}, habiendo cumplido con
+                            los requisitos institucionales de fe pública.
+                        </div>
 
-                            <div class="pt-6 grid grid-cols-2 gap-6 text-xs border-t border-slate-300 dark:border-slate-800">
-                                <div>
-                                    <div class="font-bold text-slate-900 dark:text-white">{{ selectedCert.instructor_name }}</div>
-                                    <div class="text-[10px] text-slate-500 uppercase">Docente Instructor</div>
-                                </div>
-                                <div>
-                                    <div class="font-bold text-slate-900 dark:text-white">Dirección Académica</div>
-                                    <div class="text-[10px] text-slate-500 uppercase">Coordinación SIGC-CUSCO</div>
-                                </div>
+                        <div class="pt-5 grid grid-cols-2 gap-6 text-xs border-t border-slate-300 dark:border-slate-800">
+                            <div>
+                                <div class="font-bold text-slate-900 dark:text-white">{{ selectedCert.instructor_name }}</div>
+                                <div class="text-[10px] text-slate-500 uppercase">Ponente / Docente</div>
                             </div>
+                            <div>
+                                <div class="font-bold text-slate-900 dark:text-white">Dirección Académica</div>
+                                <div class="text-[10px] text-slate-500 uppercase">Coordinación SIGC-CUSCO</div>
+                            </div>
+                        </div>
 
-                            <div class="pt-3 text-[10px] font-mono text-slate-500 flex justify-between items-center border-t border-dashed border-slate-300 dark:border-slate-800">
-                                <span>Código: <strong>{{ selectedCert.certificate_code }}</strong></span>
-                                <span class="text-[#800020] font-bold">VÁLIDO OFICIALMENTE • CUSCO</span>
-                            </div>
+                        <div class="pt-3 text-[10px] font-mono text-slate-500 flex justify-between items-center border-t border-dashed border-slate-300 dark:border-slate-800">
+                            <span>Código: <strong>{{ selectedCert.certificate_code }}</strong></span>
+                            <span class="text-[#800020] font-bold">VÁLIDO OFICIALMENTE • CUSCO</span>
+                        </div>
 
-                            <div v-if="selectedCert.certificate_hash" class="pt-2 text-[10px] font-mono text-slate-500 break-all text-left bg-slate-50 dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700">
-                                <span class="font-bold text-slate-700 dark:text-slate-300 block mb-0.5">Hash Criptográfico SHA-256 Oficial:</span>
-                                <span class="text-slate-600 dark:text-slate-400 select-all">{{ selectedCert.certificate_hash }}</span>
-                            </div>
+                        <div v-if="selectedCert.certificate_hash" class="pt-2 text-[10px] font-mono text-slate-500 break-all text-left bg-slate-50 dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700">
+                            <span class="font-bold text-slate-700 dark:text-slate-300 block mb-0.5">Hash Criptográfico SHA-256 Oficial:</span>
+                            <span class="text-slate-600 dark:text-slate-400 select-all">{{ selectedCert.certificate_hash }}</span>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Footer Fijo Pinned -->
-                <DialogFooter class="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50/80 dark:bg-slate-950/60">
-                    <div class="flex items-center gap-2">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            class="text-xs font-bold border-slate-300 cursor-pointer"
-                            @click="selectedCert && copyVerificationCode(selectedCert.certificate_code)"
-                        >
-                            <Check v-if="copiedCode" class="size-3.5 mr-1 text-rose-800" />
-                            <Copy v-else class="size-3.5 mr-1" />
-                            <span>{{ copiedCode ? '¡Código Copiado!' : 'Copiar Código' }}</span>
-                        </Button>
-                    </div>
+            <!-- Footer Fijo -->
+            <DialogFooter class="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50/80 dark:bg-slate-950/60">
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    class="text-xs font-bold border-slate-300 cursor-pointer"
+                    @click="selectedCert && copyVerificationCode(selectedCert.certificate_code)"
+                >
+                    <Check v-if="copiedCode" class="size-3.5 mr-1 text-rose-800" />
+                    <Copy v-else class="size-3.5 mr-1" />
+                    <span>{{ copiedCode ? '¡Código Copiado!' : 'Copiar Código' }}</span>
+                </Button>
 
-                    <div class="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" class="text-xs cursor-pointer" @click="isCertModalOpen = false">
-                            Cerrar
-                        </Button>
-                        <Button
-                            size="sm"
-                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer"
-                            @click="selectedCert && printCertificate(selectedCert)"
-                        >
-                            <Printer class="size-3.5 mr-1.5" />
-                            Imprimir / Guardar en PDF
-                        </Button>
-                    </div>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                <div class="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" class="text-xs cursor-pointer" @click="isCertModalOpen = false">
+                        Cerrar
+                    </Button>
+                    <Button
+                        size="sm"
+                        class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer"
+                        @click="selectedCert && printCertificate(selectedCert)"
+                    >
+                        <Printer class="size-3.5 mr-1.5" />
+                        Imprimir / Guardar en PDF
+                    </Button>
+                </div>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 
-        <!-- AUTH MODALS -->
+    <!-- AUTH MODALS (SOLO PARA INVITADOS) -->
+    <template v-if="!authUser">
         <LoginModal
             v-model:open="isLoginModalOpen"
             @switch-to-register="switchToRegister"
         />
-
         <RegisterModal
             v-model:open="isRegisterModalOpen"
             @switch-to-login="switchToLogin"
         />
-    </div>
+    </template>
 </template>

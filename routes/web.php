@@ -60,8 +60,15 @@ Route::get('api/certificates/lookup', function (Request $request) {
         ], 422);
     }
 
+    // Solo certificaciones aprobadas o con código de certificado emitido para consulta pública
     $enrollments = Enrollment::with(['course.instructor:id,name,paterno,materno'])
         ->where('dni', $dni)
+        ->where('status', '!=', 'cancelado')
+        ->where(function ($q) {
+            $q->where('status', 'aprobado')
+                ->orWhereNotNull('certificate_code')
+                ->orWhereNotNull('certificate_issued_at');
+        })
         ->latest('id')
         ->get();
 
@@ -80,14 +87,12 @@ Route::get('api/certificates/lookup', function (Request $request) {
                 'hours' => $e->course?->hours,
                 'start_date' => $formattedStart,
                 'end_date' => $formattedEnd,
-                'instructor_name' => $e->course?->instructor ? $e->course->instructor->name.' '.$e->course->instructor->paterno : ($e->course?->instructor_name ?? 'Ponente / Docente Asignado'),
+                'instructor_name' => $e->course?->instructor_display_name ?? 'Ponente / Docente Asignado',
                 'student_name' => $e->full_name,
                 'status' => $e->status,
-                'attended_sessions' => $e->attended_sessions,
-                'final_grade' => $e->final_grade,
-                'certificate_code' => $e->certificate_code ?? ('CERT-'.$e->course_id.'-'.$e->id),
+                'certificate_code' => $e->certificate_code ?? ('CERT-2026-UNSAAC-'.str_pad((string) $e->course_id, 3, '0', STR_PAD_LEFT).'-'.str_pad((string) $e->id, 4, '0', STR_PAD_LEFT)),
                 'certificate_hash' => $e->certificate_hash,
-                'certificate_issued_at' => $e->certificate_issued_at ? $e->certificate_issued_at->format('d/m/Y') : null,
+                'certificate_issued_at' => $e->certificate_issued_at ? $e->certificate_issued_at->format('d/m/Y') : ($formattedEnd ?? date('d/m/Y')),
             ];
         }),
     ]);
