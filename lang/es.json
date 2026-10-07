@@ -1,0 +1,23 @@
+{
+    "Dashboard": "Panel Principal",
+    "Profile": "Perfil",
+    "Settings": "Configuración",
+    "Log in": "Iniciar sesión",
+    "Log Out": "Cerrar sesión",
+    "Register": "Registrarse",
+    "Password": "Contraseña",
+    "Confirm Password": "Confirmar Contraseña",
+    "Email": "Correo electrónico",
+    "Remember me": "Recordarme",
+    "Forgot your password?": "¿Olvidaste tu contraseña?",
+    "Reset Password": "Restablecer contraseña",
+    "Email Password Reset Link": "Enviar enlace de recuperación",
+    "Already registered?": "¿Ya estás registrado?",
+    "Appearance": "Apariencia",
+    "Save": "Guardar",
+    "Saved.": "Guardado.",
+    "Cancel": "Cancelar",
+    "Delete Account": "Eliminar Cuenta",
+    "Security": "Seguridad",
+    "Two Factor Authentication": "Autenticación de dos factores"
+}

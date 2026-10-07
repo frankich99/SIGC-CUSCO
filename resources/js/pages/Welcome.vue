@@ -5,7 +5,7 @@ import { register } from '@/routes';
 </script>
 
 <template>
-    <Head title="Welcome">
+    <Head title="Bienvenido a SIGC-CUSCO">
         <link rel="preconnect" href="https://rsms.me/" />
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     </Head>
@@ -21,20 +21,20 @@ import { register } from '@/routes';
                     :href="dashboard()"
                     class="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                 >
-                    Dashboard
+                    Panel Principal
                 </Link>
                 <template v-else>
                     <Link
                         :href="login()"
                         class="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
                     >
-                        Log in
+                        Iniciar sesión
                     </Link>
                     <Link
                         :href="register()"
                         class="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                     >
-                        Register
+                        Registrarse
                     </Link>
                 </template>
             </nav>
@@ -48,12 +48,11 @@ import { register } from '@/routes';
                 <div
                     class="flex-1 rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"
                 >
-                    <h1 class="mb-1 font-medium">Let's get started</h1>
-                    <p class="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
-                        Laravel has an incredibly rich ecosystem. <br />We
-                        suggest starting with the following.
+                    <h1 class="mb-1 font-medium text-lg text-foreground">Bienvenido a SIGC-CUSCO</h1>
+                    <p class="mb-4 text-[#706f6c] dark:text-[#A1A09A]">
+                        Sistema Integrado de Gestión - UNSAAC. <br />Plataforma administrativa y de control de procesos.
                     </p>
-                    <ul class="mb-4 flex flex-col lg:mb-6">
+                    <ul class="mb-6 flex flex-col">
                         <li
                             class="relative flex items-center gap-4 py-2 before:absolute before:top-1/2 before:bottom-0 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]"
                         >
@@ -69,13 +68,13 @@ import { register } from '@/routes';
                                 </span>
                             </span>
                             <span>
-                                Read the
+                                Explora la
                                 <a
                                     href="https://laravel.com/docs"
                                     target="_blank"
                                     class="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
                                 >
-                                    <span>Documentation</span>
+                                    <span>Documentación oficial</span>
                                     <svg
                                         width="10"
                                         height="11"
@@ -108,13 +107,13 @@ import { register } from '@/routes';
                                 </span>
                             </span>
                             <span>
-                                Watch video tutorials at
+                                Código fuente en el
                                 <a
-                                    href="https://laracasts.com"
+                                    href="https://github.com/frankich99/SIGC-CUSCO"
                                     target="_blank"
                                     class="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
                                 >
-                                    <span>Laracasts</span>
+                                    <span>Repositorio GitHub</span>
                                     <svg
                                         width="10"
                                         height="11"
@@ -135,13 +134,12 @@ import { register } from '@/routes';
                     </ul>
                     <ul class="flex gap-3 text-sm leading-normal">
                         <li>
-                            <a
-                                href="https://cloud.laravel.com"
-                                target="_blank"
+                            <Link
+                                :href="login()"
                                 class="inline-block rounded-sm border border-black bg-[#1b1b18] px-5 py-1.5 text-sm leading-normal text-white hover:border-black hover:bg-black dark:border-[#eeeeec] dark:bg-[#eeeeec] dark:text-[#1C1C1A] dark:hover:border-white dark:hover:bg-white"
                             >
-                                Deploy now
-                            </a>
+                                Acceder al sistema
+                            </Link>
                         </li>
                     </ul>
                 </div>
