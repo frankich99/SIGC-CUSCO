@@ -5,6 +5,7 @@ import {
     GraduationCap,
     LayoutGrid,
     Menu,
+    Plus,
     PlusCircle,
     Globe,
     ChevronDown,
@@ -13,6 +14,7 @@ import {
 } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
+import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -57,6 +59,10 @@ const isCertificatesActive = computed(() => {
     return isCurrentUrl('/certificates') || isCurrentUrl('/certificates/*');
 });
 
+const canCreateCourse = computed(() => {
+    return user.value?.role === 'admin' || user.value?.role === 'docente';
+});
+
 function roleBadge(role?: string) {
     switch (role) {
         case 'admin':
@@ -81,9 +87,9 @@ function roleBadge(role?: string) {
 <template>
     <!-- CABECERA INSTITUCIONAL RESPONSIVE - GRANATE IMPERIAL CUSCO -->
     <header class="sticky top-0 z-40 w-full border-b border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md shadow-xs">
-        <div class="mx-auto flex h-16 items-center justify-between px-3 sm:px-6 max-w-7xl gap-2 sm:gap-4">
-            <!-- 1. Lado Izquierdo: Botón Móvil + Logo -->
-            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div class="mx-auto flex h-16 items-center justify-between px-3 sm:px-6 lg:px-8 max-w-7xl gap-3 sm:gap-4">
+            <!-- 1. GRUPO IZQUIERDO: BOTÓN MÓVIL + LOGO + NAVEGACIÓN DOCKING (alineada a la izquierda, no centrada) -->
+            <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0">
                 <!-- Mobile Trigger (< md) -->
                 <div class="md:hidden">
                     <Sheet>
@@ -104,6 +110,17 @@ function roleBadge(role?: string) {
 
                             <div class="flex flex-col h-full justify-between py-4 space-y-6">
                                 <nav class="space-y-4">
+                                    <!-- Botón de acción rápida en móvil si tiene permisos -->
+                                    <div v-if="canCreateCourse" class="pb-1">
+                                        <Link
+                                            href="/courses/create"
+                                            class="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-lg text-xs font-black bg-rose-900 text-white shadow-xs hover:bg-rose-950 transition-colors"
+                                        >
+                                            <Plus class="size-4 text-amber-300 stroke-[2.5]" />
+                                            <span>+ Agregar Curso</span>
+                                        </Link>
+                                    </div>
+
                                     <div class="space-y-1">
                                         <div class="text-[11px] font-extrabold uppercase tracking-wider text-rose-900 dark:text-rose-400 px-3">
                                             Navegación Principal
@@ -131,12 +148,12 @@ function roleBadge(role?: string) {
                                             <span>Catálogo de Cursos</span>
                                         </Link>
                                         <Link
-                                            v-if="user?.role === 'admin'"
+                                            v-if="canCreateCourse"
                                             href="/courses/create"
                                             class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40"
                                         >
                                             <PlusCircle class="size-4 text-amber-600" />
-                                            <span>Nueva Capacitación</span>
+                                            <span>Agregar Curso</span>
                                         </Link>
                                     </div>
 
@@ -175,124 +192,149 @@ function roleBadge(role?: string) {
                 </div>
 
                 <!-- Logotipo Principal -->
-                <Link :href="dashboard()" class="flex items-center gap-x-2 shrink-0">
+                <Link :href="dashboard()" class="flex items-center gap-x-2 shrink-0 hover:opacity-95 transition-opacity">
                     <AppLogo />
                 </Link>
-            </div>
 
-            <!-- 2. Centro: Navegación Jerárquica Desktop (Flexible, nunca desborda) -->
-            <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 shrink-0">
-                <!-- Panel -->
-                <Link
-                    :href="dashboard()"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all"
-                    :class="isCurrentUrl(dashboard()) ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
-                >
-                    <LayoutGrid class="size-4" />
-                    <span>Panel</span>
-                </Link>
+                <!-- Separador vertical sutil institucional -->
+                <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden md:block shrink-0 mx-1" />
 
-                <!-- Capacitaciones Dropdown -->
-                <DropdownMenu>
-                    <DropdownMenuTrigger as-child>
-                        <button
-                            type="button"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
-                            :class="isCoursesActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
-                        >
-                            <GraduationCap class="size-4 text-amber-600" />
-                            <span>Capacitaciones</span>
-                            <ChevronDown class="size-3.5 opacity-70" />
-                        </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" class="w-64 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl">
-                        <DropdownMenuLabel class="text-[11px] font-black text-rose-900 dark:text-rose-400 uppercase tracking-wider px-2">
-                            Gestión Académica
-                        </DropdownMenuLabel>
-                        <DropdownMenuItem as-child>
-                            <Link href="/courses" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
-                                <GraduationCap class="size-4 text-rose-800 mt-0.5" />
-                                <div>
-                                    <div class="text-xs font-bold text-slate-900 dark:text-white">Catálogo de Cursos</div>
-                                    <div class="text-[11px] text-slate-600 dark:text-slate-400">Ver temarios y vacantes</div>
-                                </div>
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem as-child>
-                            <Link :href="`${dashboard()}#mis-cursos`" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
-                                <BookOpen class="size-4 text-amber-700 mt-0.5" />
-                                <div>
-                                    <div class="text-xs font-bold text-slate-900 dark:text-white">Mis Cursos</div>
-                                    <div class="text-[11px] text-slate-600 dark:text-slate-400">Asignados o matriculados</div>
-                                </div>
-                            </Link>
-                        </DropdownMenuItem>
-                        <template v-if="user?.role === 'admin'">
-                            <DropdownMenuSeparator class="my-1 border-slate-200 dark:border-slate-800" />
+                <!-- Navegación Jerárquica Desktop (alineada a la izquierda junto al logo) -->
+                <nav class="hidden md:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
+                    <!-- Panel -->
+                    <Link
+                        :href="dashboard()"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all"
+                        :class="isCurrentUrl(dashboard()) ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
+                    >
+                        <LayoutGrid class="size-4" />
+                        <span>Panel</span>
+                    </Link>
+
+                    <!-- Capacitaciones Dropdown -->
+                    <DropdownMenu>
+                        <DropdownMenuTrigger as-child>
+                            <button
+                                type="button"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
+                                :class="isCoursesActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
+                            >
+                                <GraduationCap class="size-4 text-amber-600" />
+                                <span>Capacitaciones</span>
+                                <ChevronDown class="size-3.5 opacity-70" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" class="w-64 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl">
+                            <DropdownMenuLabel class="text-[11px] font-black text-rose-900 dark:text-rose-400 uppercase tracking-wider px-2">
+                                Gestión Académica
+                            </DropdownMenuLabel>
                             <DropdownMenuItem as-child>
-                                <Link href="/courses/create" class="flex items-start gap-2.5 p-2 rounded-lg bg-rose-50/80 dark:bg-rose-950/40 hover:bg-rose-100 cursor-pointer">
-                                    <PlusCircle class="size-4 text-rose-800 mt-0.5" />
+                                <Link href="/courses" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
+                                    <GraduationCap class="size-4 text-rose-800 mt-0.5" />
                                     <div>
-                                        <div class="text-xs font-black text-rose-900 dark:text-rose-300">Nueva Capacitación</div>
-                                        <div class="text-[11px] text-rose-700 dark:text-rose-400">Crear curso institucional</div>
+                                        <div class="text-xs font-bold text-slate-900 dark:text-white">Catálogo de Cursos</div>
+                                        <div class="text-[11px] text-slate-600 dark:text-slate-400">Ver temarios y vacantes</div>
                                     </div>
                                 </Link>
                             </DropdownMenuItem>
-                        </template>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                            <DropdownMenuItem as-child>
+                                <Link :href="`${dashboard()}#mis-cursos`" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
+                                    <BookOpen class="size-4 text-amber-700 mt-0.5" />
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900 dark:text-white">Mis Cursos</div>
+                                        <div class="text-[11px] text-slate-600 dark:text-slate-400">Asignados o matriculados</div>
+                                    </div>
+                                </Link>
+                            </DropdownMenuItem>
+                            <template v-if="canCreateCourse">
+                                <DropdownMenuSeparator class="my-1 border-slate-200 dark:border-slate-800" />
+                                <DropdownMenuItem as-child>
+                                    <Link href="/courses/create" class="flex items-start gap-2.5 p-2 rounded-lg bg-rose-50/80 dark:bg-rose-950/40 hover:bg-rose-100 cursor-pointer">
+                                        <PlusCircle class="size-4 text-rose-800 mt-0.5" />
+                                        <div>
+                                            <div class="text-xs font-black text-rose-900 dark:text-rose-300">Agregar Curso</div>
+                                            <div class="text-[11px] text-rose-700 dark:text-rose-400">Registrar curso institucional</div>
+                                        </div>
+                                    </Link>
+                                </DropdownMenuItem>
+                            </template>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
-                <!-- Certificados Dropdown -->
-                <DropdownMenu>
-                    <DropdownMenuTrigger as-child>
-                        <button
-                            type="button"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
-                            :class="isCertificatesActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
-                        >
-                            <Award class="size-4" :class="isCertificatesActive ? 'text-amber-300' : 'text-amber-600'" />
-                            <span>Certificados</span>
-                            <ChevronDown class="size-3.5 opacity-70" />
-                        </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" class="w-64 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl">
-                        <DropdownMenuLabel class="text-[11px] font-black text-rose-900 dark:text-rose-400 uppercase tracking-wider px-2">
-                            Acreditación Digital
-                        </DropdownMenuLabel>
-                        <DropdownMenuItem as-child>
-                            <Link href="/certificates" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
-                                <Award class="size-4 text-amber-600 mt-0.5" />
-                                <div>
-                                    <div class="text-xs font-bold text-slate-900 dark:text-white">Validar Certificados</div>
-                                    <div class="text-[11px] text-slate-600 dark:text-slate-400">Consulta por DNI o archivo PDF</div>
-                                </div>
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem as-child>
-                            <Link :href="dashboard()" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
-                                <QrCode class="size-4 text-rose-800 mt-0.5" />
-                                <div>
-                                    <div class="text-xs font-bold text-slate-900 dark:text-white">Asistencia y Credencial QR</div>
-                                    <div class="text-[11px] text-slate-600 dark:text-slate-400">Control y marcación en aula</div>
-                                </div>
-                            </Link>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                    <!-- Certificados Dropdown -->
+                    <DropdownMenu>
+                        <DropdownMenuTrigger as-child>
+                            <button
+                                type="button"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
+                                :class="isCertificatesActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
+                            >
+                                <Award class="size-4" :class="isCertificatesActive ? 'text-amber-300' : 'text-amber-600'" />
+                                <span>Certificados</span>
+                                <ChevronDown class="size-3.5 opacity-70" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" class="w-64 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl">
+                            <DropdownMenuLabel class="text-[11px] font-black text-rose-900 dark:text-rose-400 uppercase tracking-wider px-2">
+                                Acreditación Digital
+                            </DropdownMenuLabel>
+                            <DropdownMenuItem as-child>
+                                <Link href="/certificates" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
+                                    <Award class="size-4 text-amber-600 mt-0.5" />
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900 dark:text-white">Validar Certificados</div>
+                                        <div class="text-[11px] text-slate-600 dark:text-slate-400">Consulta por DNI o archivo PDF</div>
+                                    </div>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem as-child>
+                                <Link :href="dashboard()" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
+                                    <QrCode class="size-4 text-rose-800 mt-0.5" />
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900 dark:text-white">Asistencia y Credencial QR</div>
+                                        <div class="text-[11px] text-slate-600 dark:text-slate-400">Control y marcación en aula</div>
+                                    </div>
+                                </Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
-                <!-- Ir al Portal Web (ÚNICA OPCIÓN QUE LLEVA A LA WEB PÚBLICA) -->
-                <Link
-                    href="/"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900"
-                    title="Ir a la página principal pública de SIGC-CUSCO"
-                >
-                    <Globe class="size-4 text-blue-600" />
-                    <span>Portal Público</span>
-                </Link>
-            </nav>
+                    <!-- Ir al Portal Web (ÚNICA OPCIÓN QUE LLEVA A LA WEB PÚBLICA) -->
+                    <Link
+                        href="/"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900"
+                        title="Ir a la página principal pública de SIGC-CUSCO"
+                    >
+                        <Globe class="size-4 text-blue-600" />
+                        <span>Portal Público</span>
+                    </Link>
+                </nav>
+            </div>
 
-            <!-- 3. Lado Derecho: Rol + Avatar (o Login si es Invitado) -->
+            <!-- 2. GRUPO DERECHO: ACCIÓN DESTACADA (+ AGREGAR CURSO) + ROL + AVATAR -->
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <!-- Botón de Acción Directo: Agregar Curso (Visible para admin y docente) -->
+                <Button
+                    v-if="canCreateCourse"
+                    as-child
+                    size="sm"
+                    class="bg-rose-900 hover:bg-rose-950 text-white font-extrabold text-xs shadow-xs px-3 sm:px-3.5 py-1.5 h-9 rounded-lg border border-rose-800 flex items-center gap-1.5 transition-all cursor-pointer hover:shadow-sm"
+                >
+                    <Link href="/courses/create">
+                        <Plus class="size-4 text-amber-300 stroke-[2.5]" />
+                        <span class="hidden sm:inline">Agregar Curso</span>
+                        <span class="sm:hidden">Curso</span>
+                    </Link>
+                </Button>
+
+                <!-- Divisor vertical si hay botón -->
+                <div v-if="canCreateCourse" class="h-5 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block shrink-0" />
+
+                <!-- Geobadge en pantallas amplias -->
+                <div class="hidden xl:block">
+                    <PeruGeoBadge />
+                </div>
+
                 <template v-if="auth.user">
                     <!-- Rol del Usuario con Granate Imperial -->
                     <div class="hidden sm:flex flex-col items-end text-right">

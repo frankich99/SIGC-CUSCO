@@ -19,6 +19,7 @@ import {
     Building2,
     LogIn,
     UserPlus,
+    Plus,
 } from '@lucide/vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,6 +63,7 @@ const props = defineProps<{
 
 const page = usePage();
 const authUser = computed(() => page.props.auth?.user);
+const canCreateCourse = computed(() => authUser.value?.role === 'admin' || authUser.value?.role === 'docente');
 
 // Search & Filter state
 const searchQuery = ref('');
@@ -144,42 +146,60 @@ function statusBadgeInfo(status: string) {
     <div class="min-h-screen bg-slate-50/50 dark:bg-neutral-950 text-slate-900 dark:text-neutral-100 antialiased selection:bg-rose-900 selection:text-white">
         <!-- TOP NAVBAR (PÚBLICA) -->
         <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-neutral-800 bg-white/95 dark:bg-neutral-900/90 backdrop-blur-md">
-            <div class="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-                <!-- Brand Logo -->
-                <Link href="/" class="flex items-center gap-3 group">
-                    <div class="size-10 rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] flex items-center justify-center text-white shadow-sm shadow-rose-900/20 group-hover:scale-105 transition-transform">
-                        <GraduationCap class="size-5 text-amber-300" />
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-1.5 font-bold text-base tracking-tight text-slate-900 dark:text-white">
-                            <span>SIGC-CUSCO</span>
+            <div class="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
+                <!-- Lado Izquierdo: Brand Logo + Divisor + Navegación Acoplada a la Izquierda -->
+                <div class="flex items-center gap-4 lg:gap-6 min-w-0">
+                    <Link href="/" class="flex items-center gap-3 group shrink-0">
+                        <div class="size-10 rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] flex items-center justify-center text-white shadow-sm shadow-rose-900/20 group-hover:scale-105 transition-transform">
+                            <GraduationCap class="size-5 text-amber-300" />
                         </div>
-                        <p class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium hidden sm:block">
-                            Plataforma Oficial de Capacitaciones • Cusco
-                        </p>
-                    </div>
-                </Link>
-
-                <!-- Desktop Navigation Links -->
-                <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-700 dark:text-neutral-300">
-                    <a href="#cursos" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
-                        Capacitaciones
-                    </a>
-                    <Link href="/certificates" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
-                        Certificados Digitales
+                        <div>
+                            <div class="flex items-center gap-1.5 font-bold text-base tracking-tight text-slate-900 dark:text-white">
+                                <span>SIGC-CUSCO</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium hidden sm:block">
+                                Plataforma Oficial de Capacitaciones • Cusco
+                            </p>
+                        </div>
                     </Link>
-                    <a href="#beneficios" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
-                        Características
-                    </a>
-                </nav>
 
-                <!-- Auth Actions (MODALS) -->
-                <div class="hidden sm:flex items-center gap-2">
+                    <!-- Divisor vertical institucional -->
+                    <div class="h-6 w-px bg-slate-200 dark:bg-neutral-800 hidden md:block shrink-0" />
+
+                    <!-- Desktop Navigation Links (Alineados a la izquierda junto al logo) -->
+                    <nav class="hidden md:flex items-center gap-5 text-sm font-semibold text-slate-700 dark:text-neutral-300 shrink-0">
+                        <a href="#cursos" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
+                            Capacitaciones
+                        </a>
+                        <Link href="/certificates" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
+                            Certificados Digitales
+                        </Link>
+                        <a href="#beneficios" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
+                            Características
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Lado Derecho: Acciones (Agregar Curso, Mi Panel o Iniciar Sesión / Registro) -->
+                <div class="hidden sm:flex items-center gap-2.5 shrink-0">
                     <template v-if="authUser">
-                        <Button as-child size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold shadow-xs text-xs">
-                            <Link href="/dashboard">
+                        <!-- Botón Rápido Agregar Curso para Admin o Docente -->
+                        <Button
+                            v-if="canCreateCourse"
+                            as-child
+                            size="sm"
+                            class="bg-rose-900 hover:bg-rose-950 text-white font-extrabold text-xs shadow-xs px-3 h-8.5 rounded-lg border border-rose-800"
+                        >
+                            <Link href="/courses/create" class="flex items-center gap-1.5">
+                                <Plus class="size-3.5 text-amber-300 stroke-[2.5]" />
+                                <span>Agregar Curso</span>
+                            </Link>
+                        </Button>
+
+                        <Button as-child size="sm" variant="outline" class="border-slate-300 dark:border-neutral-700 text-slate-800 dark:text-white hover:text-rose-900 font-bold text-xs h-8.5">
+                            <Link href="/dashboard" class="flex items-center gap-1.5">
                                 <span>Mi Panel</span>
-                                <span class="ml-1.5 text-[10px] bg-rose-950 text-amber-300 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">
+                                <span class="text-[10px] bg-rose-900 text-white px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">
                                     {{ authUser.role }}
                                 </span>
                             </Link>
@@ -208,6 +228,17 @@ function statusBadgeInfo(status: string) {
 
             <!-- Mobile Dropdown -->
             <div v-if="mobileMenuOpen" class="md:hidden border-b border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 pt-2 pb-4 space-y-3">
+                <div v-if="canCreateCourse" class="pb-1">
+                    <Link
+                        href="/courses/create"
+                        class="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-lg text-xs font-black bg-rose-900 text-white shadow-xs hover:bg-rose-950 transition-colors"
+                        @click="mobileMenuOpen = false"
+                    >
+                        <Plus class="size-4 text-amber-300 stroke-[2.5]" />
+                        <span>+ Agregar Curso</span>
+                    </Link>
+                </div>
+
                 <a href="#cursos" @click="mobileMenuOpen = false" class="block py-1.5 text-sm font-semibold text-slate-800 dark:text-neutral-200">
                     Capacitaciones Disponibles
                 </a>

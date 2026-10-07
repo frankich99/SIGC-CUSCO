@@ -164,10 +164,10 @@ function instructorName(inst?: Instructor): string {
                     </p>
                 </div>
                 <div v-if="can.create">
-                    <Button as-child class="bg-rose-900 hover:bg-rose-950 text-white font-bold shadow-xs">
-                        <Link href="/courses/create">
-                            <Plus class="mr-1.5 size-4" />
-                            Nueva Capacitación
+                    <Button as-child class="bg-rose-900 hover:bg-rose-950 text-white font-black text-xs shadow-xs px-4 h-9">
+                        <Link href="/courses/create" class="flex items-center gap-1.5">
+                            <Plus class="size-4 text-amber-300 stroke-[2.5]" />
+                            <span>Agregar Curso</span>
                         </Link>
                     </Button>
                 </div>
@@ -302,8 +302,11 @@ function instructorName(inst?: Instructor): string {
                     <h3 class="mt-3 text-sm font-bold text-slate-900 dark:text-neutral-100">No se encontraron capacitaciones</h3>
                     <p class="mt-1 text-xs text-slate-600 font-medium">Prueba ajustando los términos de búsqueda o el filtro de estado.</p>
                     <div v-if="can.create" class="mt-4">
-                        <Button as-child size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold">
-                            <Link href="/courses/create">Crear primera capacitación</Link>
+                        <Button as-child size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs">
+                            <Link href="/courses/create" class="flex items-center gap-1.5">
+                                <Plus class="size-3.5 text-amber-300 stroke-[2.5]" />
+                                <span>Agregar Curso</span>
+                            </Link>
                         </Button>
                     </div>
                 </div>

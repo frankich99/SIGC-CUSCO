@@ -665,7 +665,88 @@ onUnmounted(() => {
                 </div>
             </div>
 
-            <!-- NAVEGACIÓN POR 5 PESTAÑAS ACADÉMICAS (FLEX-WRAP SIN SCROLL HORIZONTAL) -->
+            <!-- 4 TARJETAS DE MÉTRICAS GLOBALES DEL CURSO (POSICIÓN FIJA Y ESTABLE PARA TODAS LAS PESTAÑAS) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Total Matriculados -->
+                <Card class="border-2 border-rose-300 dark:border-rose-900 bg-rose-50/50 dark:bg-rose-950/20 shadow-xs">
+                    <CardHeader class="pb-2">
+                        <CardDescription class="text-xs font-bold text-rose-950 dark:text-rose-300 flex items-center justify-between">
+                            <span>Total Inscritos</span>
+                            <div class="size-7 rounded-lg bg-rose-900 text-white flex items-center justify-center shadow-xs">
+                                <Users class="size-3.5" />
+                            </div>
+                        </CardDescription>
+                        <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1 flex items-baseline gap-2">
+                            <span>{{ totalEnrolled }}</span>
+                            <span class="text-xs font-semibold text-slate-500">/ {{ course.capacity }} vacantes</span>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="text-xs text-slate-600 dark:text-slate-400">
+                        <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
+                            <div
+                                class="h-full bg-rose-900 rounded-full transition-all"
+                                :style="{ width: `${Math.min(100, (totalEnrolled / (course.capacity || 1)) * 100)}%` }"
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <!-- En Curso -->
+                <Card class="border-2 border-amber-300 dark:border-amber-900 bg-amber-50/50 dark:bg-amber-950/20 shadow-xs">
+                    <CardHeader class="pb-2">
+                        <CardDescription class="text-xs font-bold text-amber-950 dark:text-amber-300 flex items-center justify-between">
+                            <span>Alumnos En Curso</span>
+                            <div class="size-7 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs">
+                                <Calendar class="size-3.5" />
+                            </div>
+                        </CardDescription>
+                        <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1">
+                            {{ inProgressStudents.length }}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="text-xs font-semibold text-amber-800 dark:text-amber-300">
+                        Asistiendo regularmente a clases
+                    </CardContent>
+                </Card>
+
+                <!-- Aprobados -->
+                <Card class="border-2 border-emerald-300 dark:border-emerald-900 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-xs">
+                    <CardHeader class="pb-2">
+                        <CardDescription class="text-xs font-bold text-emerald-950 dark:text-emerald-300 flex items-center justify-between">
+                            <span>Aprobados / Aptos</span>
+                            <div class="size-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center shadow-xs">
+                                <Award class="size-3.5" />
+                            </div>
+                        </CardDescription>
+                        <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1">
+                            {{ approvedStudents.length }}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                        Nota >= 11 y asistencia >= {{ course.min_attendance_percentage }}%
+                    </CardContent>
+                </Card>
+
+                <!-- Vacantes Disponibles -->
+                <Card class="border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+                    <CardHeader class="pb-2">
+                        <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                            <span>Vacantes Libres</span>
+                            <div class="size-7 rounded-lg bg-slate-800 text-white flex items-center justify-center shadow-xs">
+                                <CheckCircle2 class="size-3.5" />
+                            </div>
+                        </CardDescription>
+                        <CardTitle class="text-2xl font-black text-rose-900 dark:text-rose-400 pt-1">
+                            {{ availableSpots }}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                        Cupos disponibles para inscripción
+                    </CardContent>
+                </Card>
+            </div>
+
+            <!-- NAVEGACIÓN POR 5 PESTAÑAS ACADÉMICAS (POSICIÓN ESTABLE Y FIJA) -->
             <div class="border-b border-slate-200 dark:border-slate-800 pb-1">
                 <nav class="flex flex-wrap items-center gap-1.5 sm:gap-2" aria-label="Tabs">
                     <button
@@ -765,88 +846,7 @@ onUnmounted(() => {
             <!-- CONTENIDO DE LA PESTAÑA 1: PADRÓN DE MATRICULADOS (CRUD)     -->
             <!-- ============================================================ -->
             <div v-if="activeTab === 'matriculados'" class="space-y-6">
-                <!-- 4 Tarjetas de Métricas del Padrón -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- Total Matriculados -->
-                    <Card class="border-2 border-rose-300 dark:border-rose-900 bg-rose-50/50 dark:bg-rose-950/20 shadow-xs">
-                        <CardHeader class="pb-2">
-                            <CardDescription class="text-xs font-bold text-rose-950 dark:text-rose-300 flex items-center justify-between">
-                                <span>Total Inscritos</span>
-                                <div class="size-7 rounded-lg bg-rose-900 text-white flex items-center justify-center shadow-xs">
-                                    <Users class="size-3.5" />
-                                </div>
-                            </CardDescription>
-                            <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1 flex items-baseline gap-2">
-                                <span>{{ totalEnrolled }}</span>
-                                <span class="text-xs font-semibold text-slate-500">/ {{ course.capacity }} vacantes</span>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent class="text-xs text-slate-600 dark:text-slate-400">
-                            <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
-                                <div
-                                    class="h-full bg-rose-900 rounded-full transition-all"
-                                    :style="{ width: `${Math.min(100, (totalEnrolled / (course.capacity || 1)) * 100)}%` }"
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <!-- En Curso -->
-                    <Card class="border-2 border-amber-300 dark:border-amber-900 bg-amber-50/50 dark:bg-amber-950/20 shadow-xs">
-                        <CardHeader class="pb-2">
-                            <CardDescription class="text-xs font-bold text-amber-950 dark:text-amber-300 flex items-center justify-between">
-                                <span>Alumnos En Curso</span>
-                                <div class="size-7 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs">
-                                    <Calendar class="size-3.5" />
-                                </div>
-                            </CardDescription>
-                            <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1">
-                                {{ inProgressStudents.length }}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent class="text-xs font-semibold text-amber-800 dark:text-amber-300">
-                            Asistiendo regularmente a clases
-                        </CardContent>
-                    </Card>
-
-                    <!-- Aprobados -->
-                    <Card class="border-2 border-emerald-300 dark:border-emerald-900 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-xs">
-                        <CardHeader class="pb-2">
-                            <CardDescription class="text-xs font-bold text-emerald-950 dark:text-emerald-300 flex items-center justify-between">
-                                <span>Aprobados / Aptos</span>
-                                <div class="size-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center shadow-xs">
-                                    <Award class="size-3.5" />
-                                </div>
-                            </CardDescription>
-                            <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1">
-                                {{ approvedStudents.length }}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent class="text-xs font-semibold text-emerald-800 dark:text-emerald-300">
-                            Cumplen nota >= 11 y asistencia >= {{ course.min_attendance_percentage }}%
-                        </CardContent>
-                    </Card>
-
-                    <!-- Vacantes Disponibles -->
-                    <Card class="border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-                        <CardHeader class="pb-2">
-                            <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                                <span>Vacantes Libres</span>
-                                <div class="size-7 rounded-lg bg-slate-800 text-white flex items-center justify-center shadow-xs">
-                                    <CheckCircle2 class="size-3.5" />
-                                </div>
-                            </CardDescription>
-                            <CardTitle class="text-2xl font-black text-rose-900 dark:text-rose-400 pt-1">
-                                {{ availableSpots }}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent class="text-xs font-semibold text-slate-600 dark:text-slate-400">
-                            Cupos disponibles para inscripción
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <!-- Card Principal: Tabla Padrón de Matriculados -->
+                <!-- Card Principal: Tabla Padrón de Matriculados (Misma Dimensión y Borde) -->
                 <Card class="border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                     <CardHeader class="p-4 sm:p-5 border-b bg-slate-50/80 dark:bg-slate-900/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div>
@@ -1109,173 +1109,177 @@ onUnmounted(() => {
                 </Card>
             </div>
 
-            <!-- CONTENIDO DE LA PESTAÑA 2: ASISTENCIA DE SESIONES (SIGC-4 / SIGC-12) -->
+            <!-- ============================================================ -->
+            <!-- CONTENIDO DE LA PESTAÑA 2: ASISTENCIA DE SESIONES            -->
+            <!-- ============================================================ -->
             <div v-if="activeTab === 'asistencia'" class="space-y-6">
-                <Card class="border-slate-200 dark:border-slate-800 shadow-sm">
-                    <CardHeader class="pb-3 border-b bg-slate-50/60 dark:bg-slate-900/60">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                            <div>
-                                <CardTitle class="text-base font-black flex items-center gap-2">
-                                    <QrCode class="size-4 text-rose-900" />
-                                    Control de Asistencia por Sesión
-                                </CardTitle>
-                                <CardDescription class="text-xs">
-                                    Seleccione la sesión activa para proyectar el código QR o registrar asistencia manual por DNI.
-                                </CardDescription>
-                            </div>
-
-                            <Button
-                                size="sm"
-                                :class="[THEME_BUTTONS.primary, 'text-xs font-black shadow-xs']"
-                                @click="isQrProjectorOpen = true"
-                            >
-                                <Maximize2 class="mr-1.5 size-3.5" />
-                                Proyectar QR de la Sesión {{ selectedSession }}
-                            </Button>
-                        </div>
-                    </CardHeader>
-
-                    <CardContent class="pt-4 space-y-4">
+                <!-- Barra de Sesión Activa y Registro Manual Rápido -->
+                <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xs space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b pb-3 border-slate-100 dark:border-slate-800">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-xs font-bold text-slate-600 mr-2">Sesión Activa:</span>
-                            <Button
-                                v-for="num in totalSessions"
-                                :key="num"
-                                size="sm"
-                                :variant="selectedSession === num ? 'default' : 'outline'"
-                                :class="selectedSession === num ? 'bg-rose-900 text-white font-black' : 'font-bold text-xs'"
-                                @click="selectedSession = num"
-                            >
-                                Sesión {{ num }}
-                            </Button>
-                        </div>
-
-                        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-3">
-                            <div class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                                Registro Manual Rápido (Sesión {{ selectedSession }})
-                            </div>
-
-                            <form @submit.prevent="registerManualAttendance" class="flex flex-col sm:flex-row gap-2">
-                                <div class="relative flex-1">
-                                    <Input
-                                        v-model="manualIdentifier"
-                                        type="text"
-                                        placeholder="Ingrese DNI (8 dígitos) o código de credencial INS-..."
-                                        class="text-xs font-bold h-9 pl-3"
-                                        :disabled="isSubmittingAttendance"
-                                    />
-                                </div>
-
-                                <select
-                                    v-model="manualStatus"
-                                    class="h-9 px-3 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800"
-                                >
-                                    <option value="presente">Presente</option>
-                                    <option value="tardanza">Tardanza</option>
-                                </select>
-
+                            <span class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                                Sesión de Control Activa:
+                            </span>
+                            <div class="flex flex-wrap items-center gap-1.5">
                                 <Button
-                                    type="submit"
+                                    v-for="num in totalSessions"
+                                    :key="num"
                                     size="sm"
-                                    :disabled="!manualIdentifier.trim() || isSubmittingAttendance"
-                                    :class="[THEME_BUTTONS.primary, 'text-xs font-black h-9 px-4']"
+                                    :variant="selectedSession === num ? 'default' : 'outline'"
+                                    :class="selectedSession === num ? 'bg-rose-900 text-white font-black h-7 text-xs px-2.5' : 'font-bold text-xs h-7 px-2.5'"
+                                    @click="selectedSession = num"
                                 >
-                                    <Loader2 v-if="isSubmittingAttendance" class="size-3.5 mr-1.5 animate-spin" />
-                                    <UserCheck v-else class="size-3.5 mr-1.5" />
-                                    Registrar
+                                    S{{ num }}
                                 </Button>
-                            </form>
-
-                            <div v-if="attendanceFeedback" :class="[
-                                'p-2.5 rounded-lg text-xs font-bold flex items-center gap-2',
-                                attendanceFeedback.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
-                                attendanceFeedback.type === 'warning' ? 'bg-amber-50 text-amber-900 border border-amber-200' :
-                                'bg-red-50 text-red-800 border border-red-200'
-                            ]">
-                                <AlertCircle class="size-4 shrink-0" />
-                                <span>{{ attendanceFeedback.text }}</span>
                             </div>
                         </div>
-                    </CardContent>
-                </Card>
 
-                <!-- MATRIZ OFICIAL DE ASISTENCIAS (S1..SN) -->
+                        <Button
+                            size="sm"
+                            :class="[THEME_BUTTONS.primary, 'text-xs font-black shadow-xs shrink-0 h-8']"
+                            @click="isQrProjectorOpen = true"
+                        >
+                            <Maximize2 class="mr-1.5 size-3.5" />
+                            Proyectar QR (Sesión {{ selectedSession }})
+                        </Button>
+                    </div>
+
+                    <!-- Formulario de Registro Manual Rápido -->
+                    <form @submit.prevent="registerManualAttendance" class="flex flex-col sm:flex-row gap-2">
+                        <div class="relative flex-1">
+                            <Input
+                                v-model="manualIdentifier"
+                                type="text"
+                                placeholder="Ingresar DNI (8 dígitos) o código de credencial para registrar..."
+                                class="text-xs font-bold h-9 pl-3"
+                                :disabled="isSubmittingAttendance"
+                            />
+                        </div>
+
+                        <select
+                            v-model="manualStatus"
+                            class="h-9 px-3 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200"
+                        >
+                            <option value="presente">Presente</option>
+                            <option value="tardanza">Tardanza</option>
+                        </select>
+
+                        <Button
+                            type="submit"
+                            size="sm"
+                            :disabled="!manualIdentifier.trim() || isSubmittingAttendance"
+                            :class="[THEME_BUTTONS.primary, 'text-xs font-black h-9 px-4 shrink-0']"
+                        >
+                            <Loader2 v-if="isSubmittingAttendance" class="size-3.5 mr-1.5 animate-spin" />
+                            <UserCheck v-else class="size-3.5 mr-1.5" />
+                            Registrar en Sesión {{ selectedSession }}
+                        </Button>
+                    </form>
+
+                    <div v-if="attendanceFeedback" :class="[
+                        'p-2.5 rounded-lg text-xs font-bold flex items-center gap-2',
+                        attendanceFeedback.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
+                        attendanceFeedback.type === 'warning' ? 'bg-amber-50 text-amber-900 border border-amber-200' :
+                        'bg-red-50 text-red-800 border border-red-200'
+                    ]">
+                        <AlertCircle class="size-4 shrink-0" />
+                        <span>{{ attendanceFeedback.text }}</span>
+                    </div>
+                </div>
+
+                <!-- Card de la Matriz Integral de Asistencias (Misma Dimensión y Borde que las demás pestañas) -->
                 <Card class="border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                    <CardHeader class="p-4 border-b bg-slate-50/80 dark:bg-slate-900/80 flex flex-row items-center justify-between">
+                    <CardHeader class="p-4 sm:p-5 border-b bg-slate-50/80 dark:bg-slate-900/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div>
-                            <CardTitle class="text-sm font-black">Matriz Integral de Asistencia por Participante</CardTitle>
-                            <CardDescription class="text-xs">Registro histórico sesión por sesión (Mínimo aprobatorio: {{ course.min_attendance_percentage }}%)</CardDescription>
+                            <CardTitle class="text-base font-black flex items-center gap-2">
+                                <QrCode class="size-4 text-rose-900" />
+                                Matriz Integral de Asistencia por Participante
+                            </CardTitle>
+                            <CardDescription class="text-xs mt-0.5">
+                                Registro histórico sesión por sesión (Mínimo exigido: {{ course.min_attendance_percentage }}% de asistencia).
+                            </CardDescription>
                         </div>
-                        <div class="relative w-64">
-                            <Search class="size-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                            <Input v-model="searchQuery" placeholder="Buscar por DNI o nombres..." class="h-8 pl-8 text-xs font-semibold" />
-                        </div>
+                        <Button
+                            as-child
+                            variant="outline"
+                            size="sm"
+                            class="text-xs font-bold border-slate-300 hover:text-rose-900"
+                        >
+                            <a :href="`/courses/${course.id}/reports/attendance-csv`" target="_blank">
+                                <FileSpreadsheet class="mr-1.5 size-3.5 text-emerald-700" />
+                                Descargar Matriz CSV
+                            </a>
+                        </Button>
                     </CardHeader>
 
+                    <!-- Barra de Búsqueda -->
+                    <div class="p-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+                        <div class="relative w-full sm:w-80">
+                            <Search class="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            <Input
+                                v-model="searchQuery"
+                                type="text"
+                                placeholder="Buscar por DNI o nombres..."
+                                class="h-9 pl-9 text-xs font-medium"
+                            />
+                        </div>
+                        <span class="text-xs font-bold text-slate-500 whitespace-nowrap">
+                            Total: {{ filteredEnrollments.length }} registros
+                        </span>
+                    </div>
+
+                    <!-- Tabla de Matriz de Asistencias -->
                     <CardContent class="p-0">
-                        <div class="overflow-x-auto">
+                        <div class="w-full overflow-x-auto">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-100/80 dark:bg-slate-900/90 border-b text-[11px] font-black uppercase tracking-wider text-slate-700">
-                                        <th class="py-3 px-3 w-10 text-center">#</th>
-                                        <th class="py-3 px-3">DNI / Credencial</th>
-                                        <th class="py-3 px-3">Participante</th>
-                                        <th v-for="s in totalSessions" :key="s" class="py-3 px-2 text-center w-12">
+                                    <tr class="bg-slate-100/90 dark:bg-slate-900 border-b text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                        <th class="py-2.5 px-3 text-left w-28">DNI</th>
+                                        <th class="py-2.5 px-3 text-left">Participante</th>
+                                        <th v-for="s in totalSessions" :key="s" class="py-2.5 px-1.5 text-center w-9">
                                             S{{ s }}
                                         </th>
-                                        <th class="py-3 px-3 text-center">Asistidas</th>
-                                        <th class="py-3 px-3 text-center">% Asist.</th>
-                                        <th class="py-3 px-3 text-center">Cumple Req.</th>
+                                        <th class="py-2.5 px-2 text-center w-20">Asistidas</th>
+                                        <th class="py-2.5 px-2 text-center w-16">% Asist.</th>
+                                        <th class="py-2.5 px-3 text-right w-24">Condición</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-950">
-                                    <tr v-for="(enrollment, idx) in filteredEnrollments" :key="enrollment.id" class="hover:bg-rose-50/30">
-                                        <td class="py-2.5 px-3 text-center font-bold text-slate-400">{{ idx + 1 }}</td>
-                                        <td class="py-2.5 px-3 whitespace-nowrap">
-                                            <span class="font-mono font-black text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-900 border">
-                                                {{ enrollment.dni }}
-                                            </span>
-                                            <div v-if="enrollment.credential_code" class="text-[10px] text-slate-400 font-mono mt-0.5">
-                                                {{ enrollment.credential_code }}
-                                            </div>
+                                    <tr v-for="enrollment in filteredEnrollments" :key="enrollment.id" class="hover:bg-rose-50/40 dark:hover:bg-rose-950/20 transition-colors">
+                                        <td class="py-2.5 px-3 whitespace-nowrap font-mono font-bold text-xs">
+                                            {{ enrollment.dni }}
                                         </td>
                                         <td class="py-2.5 px-3 font-black text-slate-950 dark:text-white">
                                             {{ enrollment.paterno }} {{ enrollment.materno || '' }}, {{ enrollment.nombres }}
                                         </td>
-                                        <td v-for="s in totalSessions" :key="s" class="py-2.5 px-2 text-center">
+                                        <td v-for="s in totalSessions" :key="s" class="py-2 px-1 text-center">
                                             <span
                                                 v-if="enrollment.attendance_records?.some(r => r.session_number === s && r.status === 'presente')"
-                                                class="size-6 inline-flex items-center justify-center rounded-full bg-emerald-100 text-emerald-800 font-black text-xs"
+                                                class="size-5 inline-flex items-center justify-center rounded-full bg-emerald-100 text-emerald-800 font-black text-[11px]"
                                                 title="Presente"
-                                            >
-                                                ✓
-                                            </span>
+                                            >✓</span>
                                             <span
                                                 v-else-if="enrollment.attendance_records?.some(r => r.session_number === s && r.status === 'tardanza')"
-                                                class="size-6 inline-flex items-center justify-center rounded-full bg-amber-100 text-amber-800 font-black text-xs"
+                                                class="size-5 inline-flex items-center justify-center rounded-full bg-amber-100 text-amber-800 font-black text-[11px]"
                                                 title="Tardanza"
-                                            >
-                                                T
-                                            </span>
-                                            <span v-else class="size-6 inline-flex items-center justify-center rounded-full bg-slate-100 text-slate-400 text-xs font-bold">
-                                                -
-                                            </span>
+                                            >T</span>
+                                            <span v-else class="size-5 inline-flex items-center justify-center rounded-full bg-slate-100 text-slate-400 text-[10px]">·</span>
                                         </td>
-                                        <td class="py-2.5 px-3 text-center font-black">
-                                            {{ enrollment.attended_sessions }} / {{ totalSessions }}
+                                        <td class="py-2.5 px-2 text-center font-bold text-xs">
+                                            {{ enrollment.attended_sessions }}/{{ totalSessions }}
                                         </td>
-                                        <td class="py-2.5 px-3 text-center font-black font-mono">
+                                        <td class="py-2.5 px-2 text-center font-black font-mono text-xs">
                                             {{ enrollment.attendance_percentage }}%
                                         </td>
-                                        <td class="py-2.5 px-3 text-center">
+                                        <td class="py-2.5 px-3 text-right whitespace-nowrap">
                                             <Badge
                                                 v-if="(enrollment.attendance_percentage || 0) >= (course.min_attendance_percentage || 75)"
-                                                class="bg-emerald-100 text-emerald-900 border-emerald-300 font-black text-[10px]"
+                                                class="bg-emerald-600 text-white font-black text-[10px]"
                                             >
                                                 CUMPLE
                                             </Badge>
                                             <Badge v-else variant="outline" class="text-rose-900 border-rose-300 font-bold text-[10px]">
-                                                INSUFICIENTE
+                                                FALTA
                                             </Badge>
                                         </td>
                                     </tr>
@@ -1286,83 +1290,109 @@ onUnmounted(() => {
                 </Card>
             </div>
 
-            <!-- CONTENIDO DE LA PESTAÑA 2: NOTAS Y ACTA OFICIAL (SIGC-5) -->
+            <!-- ============================================================ -->
+            <!-- CONTENIDO DE LA PESTAÑA 3: NOTAS Y ACTA OFICIAL              -->
+            <!-- ============================================================ -->
             <div v-if="activeTab === 'notas'" class="space-y-6">
-                <div class="p-4 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50/60 dark:bg-rose-950/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2 text-rose-950 dark:text-rose-200 font-black text-sm">
-                            <ShieldCheck class="size-5 text-rose-800" />
-                            Reglamento Oficial de Evaluación y Acreditación UNSAAC
-                        </div>
-                        <p class="text-xs text-rose-900/80 dark:text-rose-300">
-                            Condición de Aprobación: <strong>Nota Final vigesimal >= 11.00</strong> Y <strong>Asistencia >= {{ course.min_attendance_percentage }}%</strong>.
-                        </p>
-                    </div>
-
-                    <div v-if="can.manage_enrollments">
-                        <Button
-                            v-if="!isActaClosed"
-                            size="sm"
-                            :class="[THEME_BUTTONS.primary, 'text-xs font-black shadow-xs']"
-                            @click="isCloseActaModalOpen = true"
-                        >
-                            <Lock class="mr-1.5 size-3.5" />
-                            Cerrar Acta del Curso
-                        </Button>
-                        <div v-else class="text-xs font-bold text-emerald-800 flex items-center gap-1.5 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
-                            <CheckCheck class="size-4" />
-                            <span>Acta cerrada oficialmente. Notas bloqueadas.</span>
-                        </div>
-                    </div>
-                </div>
-
+                <!-- Card Principal con Misma Dimensión y Borde -->
                 <Card class="border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                    <CardHeader class="p-4 border-b bg-slate-50/80 dark:bg-slate-900/80 flex flex-row items-center justify-between">
+                    <CardHeader class="p-4 sm:p-5 border-b bg-slate-50/80 dark:bg-slate-900/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div>
-                            <CardTitle class="text-sm font-black">Nómina de Calificaciones Vigesimales (0 - 20)</CardTitle>
-                            <CardDescription class="text-xs">Haga clic en el lápiz para ingresar o ajustar notas antes de cerrar el acta.</CardDescription>
+                            <CardTitle class="text-base font-black flex items-center gap-2">
+                                <FileText class="size-4 text-rose-900" />
+                                Nómina Oficial de Calificaciones Vigesimales (0 - 20)
+                            </CardTitle>
+                            <CardDescription class="text-xs mt-0.5">
+                                Reglamento UNSAAC: Aprobación con Nota vigesimal >= 11.00 y Asistencia >= {{ course.min_attendance_percentage }}%.
+                            </CardDescription>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <Button
+                                v-if="can.manage_enrollments && !isActaClosed"
+                                size="sm"
+                                :class="[THEME_BUTTONS.primary, 'text-xs font-black shadow-xs']"
+                                @click="isCloseActaModalOpen = true"
+                            >
+                                <Lock class="mr-1.5 size-3.5" />
+                                Cerrar Acta Oficial del Curso
+                            </Button>
+                            <Badge v-else-if="isActaClosed" class="bg-emerald-700 text-white font-bold text-xs py-1 px-2.5">
+                                <Lock class="size-3 mr-1" />
+                                Acta Cerrada Oficialmente
+                            </Badge>
+                            <Button
+                                as-child
+                                variant="outline"
+                                size="sm"
+                                class="text-xs font-bold border-slate-300 hover:text-rose-900"
+                            >
+                                <a :href="`/courses/${course.id}/reports/acta-csv`" target="_blank">
+                                    <FileSpreadsheet class="mr-1.5 size-3.5 text-emerald-700" />
+                                    Descargar Acta CSV
+                                </a>
+                            </Button>
                         </div>
                     </CardHeader>
 
+                    <!-- Barra de Búsqueda y Filtros -->
+                    <div class="p-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div class="relative w-full sm:w-80">
+                            <Search class="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            <Input
+                                v-model="searchQuery"
+                                type="text"
+                                placeholder="Buscar por DNI o nombres..."
+                                class="h-9 pl-9 text-xs font-medium"
+                            />
+                        </div>
+                        <div class="flex items-center gap-2 text-xs font-bold">
+                            <span class="text-emerald-700">Aprobados: {{ approvedStudents.length }}</span>
+                            <span class="text-slate-300">|</span>
+                            <span class="text-rose-700">Reprobados: {{ failedStudents.length }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Notas -->
                     <CardContent class="p-0">
-                        <div class="overflow-x-auto">
+                        <div class="w-full">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-100/80 dark:bg-slate-900/90 border-b text-[11px] font-black uppercase tracking-wider text-slate-700">
-                                        <th class="py-3 px-3 w-10 text-center">#</th>
-                                        <th class="py-3 px-3">DNI</th>
-                                        <th class="py-3 px-3">Apellidos y Nombres</th>
-                                        <th class="py-3 px-3 text-center">Asistencia %</th>
-                                        <th class="py-3 px-3 text-center">Nota Final (0-20)</th>
-                                        <th class="py-3 px-3 text-center">Condición Oficial</th>
-                                        <th v-if="!isActaClosed" class="py-3 px-3 text-right">Editar</th>
+                                    <tr class="bg-slate-100/90 dark:bg-slate-900 border-b text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                        <th class="py-2.5 px-3 text-left w-28">DNI</th>
+                                        <th class="py-2.5 px-3 text-left">Participante</th>
+                                        <th class="py-2.5 px-2 text-center w-24">Asistencia %</th>
+                                        <th class="py-2.5 px-2 text-center w-24">Nota (0-20)</th>
+                                        <th class="py-2.5 px-2 text-center w-28">Condición</th>
+                                        <th v-if="!isActaClosed && can.manage_enrollments" class="py-2.5 px-3 text-right w-20">Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-950">
-                                    <tr v-for="(enrollment, idx) in filteredEnrollments" :key="enrollment.id" class="hover:bg-rose-50/30">
-                                        <td class="py-2.5 px-3 text-center font-bold text-slate-400">{{ idx + 1 }}</td>
-                                        <td class="py-2.5 px-3 font-mono font-black text-xs">{{ enrollment.dni }}</td>
+                                    <tr v-for="enrollment in filteredEnrollments" :key="enrollment.id" class="hover:bg-rose-50/40 dark:hover:bg-rose-950/20 transition-colors">
+                                        <td class="py-2.5 px-3 whitespace-nowrap font-mono font-bold text-xs">
+                                            {{ enrollment.dni }}
+                                        </td>
                                         <td class="py-2.5 px-3 font-black text-slate-950 dark:text-white">
                                             {{ enrollment.paterno }} {{ enrollment.materno || '' }}, {{ enrollment.nombres }}
                                         </td>
-                                        <td class="py-2.5 px-3 text-center font-black font-mono">
+                                        <td class="py-2.5 px-2 text-center font-mono font-bold text-xs">
                                             {{ enrollment.attendance_percentage }}%
                                         </td>
-                                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                                        <td class="py-2.5 px-2 text-center whitespace-nowrap">
                                             <span
                                                 v-if="enrollment.final_grade !== null && enrollment.final_grade !== undefined"
                                                 :class="[
-                                                    'font-mono font-black text-xs px-2.5 py-0.5 rounded border',
+                                                    'font-mono font-black text-xs px-2 py-0.5 rounded border',
                                                     Number(enrollment.final_grade) >= 11
-                                                        ? 'bg-rose-50 text-rose-950 border-rose-300'
-                                                        : 'bg-red-50 text-red-900 border-red-300'
+                                                        ? 'bg-rose-50 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800'
+                                                        : 'bg-red-50 text-red-900 border-red-300 dark:bg-red-950 dark:text-red-200 dark:border-red-800'
                                                 ]"
                                             >
                                                 {{ Number(enrollment.final_grade).toFixed(1) }}
                                             </span>
                                             <span v-else class="text-slate-400 font-bold">-</span>
                                         </td>
-                                        <td class="py-2.5 px-3 text-center">
+                                        <td class="py-2.5 px-2 text-center whitespace-nowrap">
                                             <Badge
                                                 v-if="enrollment.status === 'aprobado'"
                                                 class="bg-emerald-600 text-white font-black text-[10px]"
@@ -1374,17 +1404,18 @@ onUnmounted(() => {
                                                 variant="destructive"
                                                 class="font-black text-[10px]"
                                             >
-                                                DESAPROBADO
+                                                REPROBADO
                                             </Badge>
-                                            <Badge v-else variant="outline" class="font-bold text-[10px]">
-                                                {{ enrollment.status.toUpperCase() }}
+                                            <Badge v-else variant="outline" class="text-[10px] font-bold text-slate-600">
+                                                {{ (enrollment.status || 'EN CURSO').toUpperCase() }}
                                             </Badge>
                                         </td>
-                                        <td v-if="!isActaClosed" class="py-2.5 px-3 text-right">
+                                        <td v-if="!isActaClosed && can.manage_enrollments" class="py-2.5 px-3 text-right whitespace-nowrap">
                                             <Button
                                                 size="sm"
                                                 variant="ghost"
-                                                class="h-7 w-7 p-0 text-slate-700 hover:text-rose-950"
+                                                class="h-7 w-7 p-0 text-slate-700 hover:text-rose-950 hover:bg-rose-50"
+                                                title="Editar calificación"
                                                 @click="openEditModal(enrollment)"
                                             >
                                                 <Pencil class="size-3.5" />
@@ -1398,71 +1429,111 @@ onUnmounted(() => {
                 </Card>
             </div>
 
-            <!-- CONTENIDO DE LA PESTAÑA 3: EMISIÓN DE CERTIFICADOS (SIGC-6) -->
+            <!-- ============================================================ -->
+            <!-- CONTENIDO DE LA PESTAÑA 4: CERTIFICADOS DIGITALES OFICIALES  -->
+            <!-- ============================================================ -->
             <div v-if="activeTab === 'certificados'" class="space-y-6">
-                <div v-if="!isActaClosed" class="p-6 rounded-2xl border border-amber-300 bg-amber-50 dark:bg-amber-950/30 text-amber-950 dark:text-amber-200 space-y-2">
-                    <div class="flex items-center gap-2 font-black text-sm">
-                        <Lock class="size-5 text-amber-700" />
-                        Emisión Bloqueada: El Acta Oficial aún no ha sido cerrada
-                    </div>
-                    <p class="text-xs">
-                        Para garantizar la validez legal y académica de los certificados oficiales, primero debe cerrar el acta en la pestaña <strong>"2. Notas y Acta Oficial"</strong>.
-                    </p>
-                </div>
-
-                <div v-else class="space-y-6">
-                    <div class="p-5 rounded-2xl border border-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div class="space-y-1">
-                            <div class="font-black text-sm text-emerald-950 dark:text-emerald-200 flex items-center gap-2">
-                                <Award class="size-5 text-emerald-700" />
-                                {{ approvedStudents.length }} Participantes Aprobados Listos para Certificación Digital
-                            </div>
-                            <p class="text-xs text-emerald-800 dark:text-emerald-300">
-                                Los certificados generados contienen código verificable QR y firma criptográfica SHA-256 única.
-                            </p>
+                <Card class="border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <CardHeader class="p-4 sm:p-5 border-b bg-slate-50/80 dark:bg-slate-900/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <div>
+                            <CardTitle class="text-base font-black flex items-center gap-2">
+                                <Award class="size-4 text-rose-900" />
+                                Registro y Emisión de Certificados Digitales
+                            </CardTitle>
+                            <CardDescription class="text-xs mt-0.5">
+                                Diplomas oficiales con código QR y verificación criptográfica SHA-256 única.
+                            </CardDescription>
                         </div>
 
-                        <Button
-                            size="sm"
-                            :disabled="isIssuingCertificates || approvedStudents.length === 0"
-                            :class="[THEME_BUTTONS.primary, 'text-xs font-black shadow-xs shrink-0']"
-                            @click="bulkIssueCertificates"
-                        >
-                            <Loader2 v-if="isIssuingCertificates" class="size-3.5 mr-1.5 animate-spin" />
-                            <Award v-else class="size-3.5 mr-1.5" />
-                            Emitir Certificados de {{ approvedStudents.length }} Aprobados
-                        </Button>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <Button
+                                v-if="isActaClosed && can.manage_enrollments"
+                                size="sm"
+                                :disabled="isIssuingCertificates || approvedStudents.length === 0"
+                                :class="[THEME_BUTTONS.primary, 'text-xs font-black shadow-xs']"
+                                @click="bulkIssueCertificates"
+                            >
+                                <Loader2 v-if="isIssuingCertificates" class="size-3.5 mr-1.5 animate-spin" />
+                                <Award v-else class="size-3.5 mr-1.5" />
+                                Emitir Certificados ({{ approvedStudents.length }} Aprobados)
+                            </Button>
+                            <Badge v-else-if="!isActaClosed" variant="outline" class="text-amber-800 border-amber-300 bg-amber-50 font-bold text-xs py-1 px-2.5">
+                                <Lock class="size-3 mr-1" />
+                                Requiere Cierre de Acta
+                            </Badge>
+                        </div>
+                    </CardHeader>
+
+                    <!-- Si el acta NO está cerrada, mostramos mensaje explicativo ordenado -->
+                    <div v-if="!isActaClosed" class="p-12 text-center space-y-3 bg-white dark:bg-slate-950">
+                        <div class="size-14 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center mx-auto">
+                            <Lock class="size-7" />
+                        </div>
+                        <h4 class="text-base font-black text-slate-900 dark:text-white">
+                            Emisión Bloqueada: El Acta Oficial aún no ha sido cerrada
+                        </h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+                            Para garantizar la validez legal y académica de los certificados oficiales UNSAAC, primero debe cerrar el acta oficial en la pestaña <strong>"Notas y Acta"</strong>.
+                        </p>
+                        <div class="pt-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                class="text-xs font-bold border-rose-900 text-rose-900 hover:bg-rose-50"
+                                @click="activeTab = 'notas'"
+                            >
+                                <FileText class="mr-1.5 size-3.5" />
+                                Ir a Notas y Acta Oficial
+                            </Button>
+                        </div>
                     </div>
 
-                    <Card class="border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                        <CardHeader class="p-4 border-b bg-slate-50/80">
-                            <CardTitle class="text-sm font-black">Registro Oficial de Certificados Emitidos</CardTitle>
-                        </CardHeader>
+                    <!-- Si el acta ESTÁ cerrada, mostramos la tabla de certificados -->
+                    <div v-else>
+                        <!-- Barra de Búsqueda -->
+                        <div class="p-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+                            <div class="relative w-full sm:w-80">
+                                <Search class="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                <Input
+                                    v-model="searchQuery"
+                                    type="text"
+                                    placeholder="Buscar participante aprobado..."
+                                    class="h-9 pl-9 text-xs font-medium"
+                                />
+                            </div>
+                            <span class="text-xs font-bold text-emerald-700 whitespace-nowrap">
+                                {{ approvedStudents.length }} Participantes Certificados / Aptos
+                            </span>
+                        </div>
+
+                        <!-- Tabla de Certificados -->
                         <CardContent class="p-0">
-                            <div class="overflow-x-auto">
+                            <div class="w-full">
                                 <table class="w-full text-left text-xs border-collapse">
                                     <thead>
-                                        <tr class="bg-slate-100 border-b text-[11px] font-black uppercase text-slate-700">
-                                            <th class="py-3 px-3 w-10 text-center">#</th>
-                                            <th class="py-3 px-3">DNI</th>
-                                            <th class="py-3 px-3">Participante</th>
-                                            <th class="py-3 px-3">Código Oficial</th>
-                                            <th class="py-3 px-3">Firma Digital SHA-256</th>
-                                            <th class="py-3 px-3 text-right">Verificación</th>
+                                        <tr class="bg-slate-100/90 dark:bg-slate-900 border-b text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                            <th class="py-2.5 px-3 text-left w-28">DNI</th>
+                                            <th class="py-2.5 px-3 text-left">Participante</th>
+                                            <th class="py-2.5 px-2 text-center w-36">Código Oficial</th>
+                                            <th class="py-2.5 px-2 text-left hidden sm:table-cell">Firma SHA-256</th>
+                                            <th class="py-2.5 px-3 text-right w-28">Verificación</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-slate-200 bg-white">
-                                        <tr v-for="(enrollment, idx) in approvedStudents" :key="enrollment.id">
-                                            <td class="py-2.5 px-3 text-center font-bold text-slate-400">{{ idx + 1 }}</td>
-                                            <td class="py-2.5 px-3 font-mono font-bold">{{ enrollment.dni }}</td>
-                                            <td class="py-2.5 px-3 font-black">{{ enrollment.paterno }} {{ enrollment.materno || '' }}, {{ enrollment.nombres }}</td>
-                                            <td class="py-2.5 px-3 font-mono font-black text-rose-950">
+                                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-950">
+                                        <tr v-for="enrollment in approvedStudents" :key="enrollment.id" class="hover:bg-rose-50/40 dark:hover:bg-rose-950/20 transition-colors">
+                                            <td class="py-2.5 px-3 whitespace-nowrap font-mono font-bold text-xs">
+                                                {{ enrollment.dni }}
+                                            </td>
+                                            <td class="py-2.5 px-3 font-black text-slate-950 dark:text-white">
+                                                {{ enrollment.paterno }} {{ enrollment.materno || '' }}, {{ enrollment.nombres }}
+                                            </td>
+                                            <td class="py-2.5 px-2 text-center whitespace-nowrap font-mono font-black text-rose-950 dark:text-rose-200">
                                                 {{ enrollment.certificate_code || 'En proceso' }}
                                             </td>
-                                            <td class="py-2.5 px-3 font-mono text-[10px] text-slate-500 max-w-xs truncate">
-                                                {{ enrollment.certificate_hash || 'Pendiente de emisión' }}
+                                            <td class="py-2.5 px-2 hidden sm:table-cell font-mono text-[10px] text-slate-500 max-w-[200px] truncate">
+                                                {{ enrollment.certificate_hash || 'Pendiente' }}
                                             </td>
-                                            <td class="py-2.5 px-3 text-right">
+                                            <td class="py-2.5 px-3 text-right whitespace-nowrap">
                                                 <Button as-child size="sm" variant="ghost" class="h-7 text-xs font-bold text-rose-900">
                                                     <Link :href="`/certificates?dni=${enrollment.dni}`" target="_blank">
                                                         <ExternalLink class="size-3.5 mr-1" />
@@ -1475,55 +1546,70 @@ onUnmounted(() => {
                                 </table>
                             </div>
                         </CardContent>
-                    </Card>
-                </div>
+                    </div>
+                </Card>
             </div>
 
-            <!-- CONTENIDO DE LA PESTAÑA 4: REPORTES Y ESTADÍSTICAS (SIGC-10) -->
+            <!-- ============================================================ -->
+            <!-- CONTENIDO DE LA PESTAÑA 5: REPORTES CSV Y ESTADÍSTICAS       -->
+            <!-- ============================================================ -->
             <div v-if="activeTab === 'reportes'" class="space-y-6">
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div class="p-4 rounded-xl border bg-white dark:bg-slate-900 shadow-xs">
-                        <div class="text-[11px] font-bold text-slate-500 uppercase">Matrícula Total</div>
-                        <div class="text-2xl font-black text-slate-900 dark:text-white mt-1">{{ totalEnrolled }}</div>
-                    </div>
-                    <div class="p-4 rounded-xl border bg-white dark:bg-slate-900 shadow-xs">
-                        <div class="text-[11px] font-bold text-slate-500 uppercase">Asistencia Promedio</div>
-                        <div class="text-2xl font-black text-amber-700 mt-1">{{ averageAttendance }}%</div>
-                    </div>
-                    <div class="p-4 rounded-xl border bg-white dark:bg-slate-900 shadow-xs">
-                        <div class="text-[11px] font-bold text-slate-500 uppercase">Aprobados</div>
-                        <div class="text-2xl font-black text-rose-900 mt-1">{{ approvedStudents.length }}</div>
-                    </div>
-                    <div class="p-4 rounded-xl border bg-white dark:bg-slate-900 shadow-xs">
-                        <div class="text-[11px] font-bold text-slate-500 uppercase">Desaprobados</div>
-                        <div class="text-2xl font-black text-red-600 mt-1">{{ failedStudents.length }}</div>
-                    </div>
-                </div>
-
-                <Card class="border-slate-200 dark:border-slate-800 shadow-sm">
-                    <CardHeader class="pb-3 border-b">
-                        <CardTitle class="text-base font-black flex items-center gap-2">
-                            <FileSpreadsheet class="size-4 text-rose-900" />
-                            Exportación de Archivos Oficiales para Excel / Trámites UNSAAC
-                        </CardTitle>
-                        <CardDescription class="text-xs">
-                            Descargue las sábanas de datos en formato CSV con codificación UTF-8 compatible con Microsoft Excel.
-                        </CardDescription>
+                <Card class="border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <CardHeader class="p-4 sm:p-5 border-b bg-slate-50/80 dark:bg-slate-900/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <div>
+                            <CardTitle class="text-base font-black flex items-center gap-2">
+                                <FileSpreadsheet class="size-4 text-rose-900" />
+                                Centro Oficial de Reportes Académicos CSV
+                            </CardTitle>
+                            <CardDescription class="text-xs mt-0.5">
+                                Archivos descargables con codificación UTF-8 e inclusión de firmas para Microsoft Excel.
+                            </CardDescription>
+                        </div>
+                        <span class="text-xs font-bold text-slate-500">
+                            Total Matriculados: <strong>{{ totalEnrolled }}</strong>
+                        </span>
                     </CardHeader>
-                    <CardContent class="pt-4 flex flex-col sm:flex-row gap-3">
-                        <Button as-child size="sm" variant="outline" class="text-xs font-bold border-rose-300 text-rose-950">
-                            <a :href="`/courses/${course.id}/reports/attendance-csv`" download>
-                                <FileSpreadsheet class="size-3.5 mr-1.5" />
-                                Exportar Matriz de Asistencia (.CSV)
-                            </a>
-                        </Button>
 
-                        <Button as-child size="sm" variant="outline" class="text-xs font-bold border-rose-300 text-rose-950">
-                            <a :href="`/courses/${course.id}/reports/acta-csv`" download>
-                                <FileText class="size-3.5 mr-1.5" />
-                                Exportar Acta Oficial de Notas (.CSV)
-                            </a>
-                        </Button>
+                    <CardContent class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Reporte 1: Matriz de Asistencias -->
+                            <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col justify-between space-y-4">
+                                <div class="space-y-1.5">
+                                    <div class="flex items-center gap-2 font-black text-sm text-slate-900 dark:text-white">
+                                        <QrCode class="size-4 text-rose-900" />
+                                        Matriz Integral de Asistencia
+                                    </div>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                                        Detalle de todas las sesiones programadas (S1..S{{ totalSessions }}), total de asistencias acumuladas y porcentaje oficial de asistencia.
+                                    </p>
+                                </div>
+                                <Button as-child size="sm" :class="[THEME_BUTTONS.primary, 'text-xs font-black w-full']">
+                                    <a :href="`/courses/${course.id}/reports/attendance-csv`" download>
+                                        <FileSpreadsheet class="size-3.5 mr-1.5" />
+                                        Descargar Matriz CSV
+                                    </a>
+                                </Button>
+                            </div>
+
+                            <!-- Reporte 2: Acta Oficial de Notas -->
+                            <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col justify-between space-y-4">
+                                <div class="space-y-1.5">
+                                    <div class="flex items-center gap-2 font-black text-sm text-slate-900 dark:text-white">
+                                        <FileText class="size-4 text-rose-900" />
+                                        Acta Oficial de Calificaciones Vigesimales
+                                    </div>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                                        Nómina con DNI, nombres completos, notas vigesimales (0-20), condición final (Aprobado/Reprobado) y código de certificación emitido.
+                                    </p>
+                                </div>
+                                <Button as-child size="sm" variant="outline" class="text-xs font-bold border-rose-300 text-rose-950 w-full hover:bg-rose-50">
+                                    <a :href="`/courses/${course.id}/reports/acta-csv`" download>
+                                        <FileText class="size-3.5 mr-1.5" />
+                                        Descargar Acta Oficial CSV
+                                    </a>
+                                </Button>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

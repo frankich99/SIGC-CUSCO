@@ -219,9 +219,9 @@ function roleBadgeData(role?: string) {
                     <!-- Botones de Acción Primarios Granate y Dorado -->
                     <div class="flex flex-wrap items-center gap-3">
                         <Button v-if="user?.role === 'admin' || user?.role === 'docente'" as-child size="default" class="bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shadow-md">
-                            <Link href="/courses/create">
-                                <Plus class="mr-1.5 size-4" />
-                                Nueva Capacitación
+                            <Link href="/courses/create" class="flex items-center gap-1.5">
+                                <Plus class="size-4 text-white stroke-[2.5]" />
+                                <span>Agregar Curso</span>
                             </Link>
                         </Button>
                         <Button as-child size="default" variant="secondary" class="bg-white hover:bg-rose-50 text-rose-950 font-bold text-xs shadow-md">
@@ -358,10 +358,13 @@ function roleBadgeData(role?: string) {
                         </div>
                         <h3 class="text-base font-bold text-slate-900 dark:text-white">No tienes cursos asignados actualmente</h3>
                         <p class="text-xs font-medium text-slate-600 max-w-md mx-auto">
-                            Cuando seas asignado a un curso o registres uno nuevo como administrador, aparecerá en este panel.
+                            Cuando seas asignado a un curso o registres uno nuevo como administrador o docente, aparecerá en este panel.
                         </p>
-                        <Button v-if="user?.role === 'admin'" as-child size="sm" class="mt-2 text-xs font-bold bg-rose-900 hover:bg-rose-950 text-white">
-                            <Link href="/courses/create">Crear Mi Primera Capacitación</Link>
+                        <Button v-if="user?.role === 'admin' || user?.role === 'docente'" as-child size="sm" class="mt-2 text-xs font-bold bg-rose-900 hover:bg-rose-950 text-white">
+                            <Link href="/courses/create" class="flex items-center gap-1.5">
+                                <Plus class="size-3.5 text-amber-300 stroke-[2.5]" />
+                                <span>Agregar Curso</span>
+                            </Link>
                         </Button>
                     </div>
 

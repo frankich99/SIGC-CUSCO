@@ -653,37 +653,41 @@ onMounted(() => {
 
         <!-- TOP INSTITUTIONAL GUEST HEADER -->
         <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md shadow-xs">
-            <div class="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-                <Link href="/" class="flex items-center gap-3 group">
-                    <div class="size-10 rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] flex items-center justify-center text-white shadow-sm shadow-rose-900/20 group-hover:scale-105 transition-transform">
-                        <GraduationCap class="size-5 text-amber-300" />
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-1.5 font-bold text-base tracking-tight text-slate-950 dark:text-white">
-                            <span>SIGC-CUSCO</span>
+            <div class="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
+                <div class="flex items-center gap-4 lg:gap-6 min-w-0">
+                    <Link href="/" class="flex items-center gap-3 group shrink-0">
+                        <div class="size-10 rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] flex items-center justify-center text-white shadow-sm shadow-rose-900/20 group-hover:scale-105 transition-transform">
+                            <GraduationCap class="size-5 text-amber-300" />
                         </div>
-                        <p class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium hidden sm:block">
-                            Acreditación Digital Oficial • Cusco, Perú
-                        </p>
-                    </div>
-                </Link>
-
-                <nav class="hidden md:flex items-center gap-5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                    <Button as-child variant="ghost" size="sm" class="text-xs font-bold text-slate-800 hover:text-rose-900 cursor-pointer">
-                        <Link href="/">
-                            <ArrowLeft class="size-3.5 mr-1 text-rose-800" />
-                            <span>Portal Principal</span>
-                        </Link>
-                    </Button>
-                    <Link href="/courses" class="hover:text-rose-900 transition-colors flex items-center gap-1.5">
-                        <GraduationCap class="size-4 text-rose-800" />
-                        <span>Capacitaciones</span>
+                        <div>
+                            <div class="flex items-center gap-1.5 font-bold text-base tracking-tight text-slate-950 dark:text-white">
+                                <span>SIGC-CUSCO</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium hidden sm:block">
+                                Acreditación Digital Oficial • Cusco, Perú
+                            </p>
+                        </div>
                     </Link>
-                    <span class="text-rose-900 dark:text-rose-300 flex items-center gap-1.5 border-b-2 border-rose-900 pb-1">
-                        <Award class="size-4 text-amber-600" />
-                        <span>Validar Certificados</span>
-                    </span>
-                </nav>
+
+                    <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden md:block shrink-0" />
+
+                    <nav class="hidden md:flex items-center gap-4 text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0">
+                        <Button as-child variant="ghost" size="sm" class="text-xs font-bold text-slate-800 hover:text-rose-900 cursor-pointer">
+                            <Link href="/">
+                                <ArrowLeft class="size-3.5 mr-1 text-rose-800" />
+                                <span>Portal Principal</span>
+                            </Link>
+                        </Button>
+                        <Link href="/courses" class="hover:text-rose-900 transition-colors flex items-center gap-1.5">
+                            <GraduationCap class="size-4 text-rose-800" />
+                            <span>Capacitaciones</span>
+                        </Link>
+                        <span class="text-rose-900 dark:text-rose-300 flex items-center gap-1.5 border-b-2 border-rose-900 pb-1">
+                            <Award class="size-4 text-amber-600" />
+                            <span>Validar Certificados</span>
+                        </span>
+                    </nav>
+                </div>
 
                 <div class="flex items-center gap-2.5">
                     <Button
