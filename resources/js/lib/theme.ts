@@ -58,10 +58,12 @@ export const THEME_BADGES = {
  * Standardized Slim & Responsive Modal Layout Configurations
  */
 export const THEME_MODAL = {
-    // Narrow & slim auth modal dialog (Login / Register)
+    // Narrow & slim auth modal dialog (Login / Register permanecen compactos)
     authDialog: 'w-[92vw] sm:max-w-sm max-h-[90vh] overflow-y-auto p-4 sm:p-5 rounded-2xl shadow-xl border border-rose-200 dark:border-rose-900 bg-white dark:bg-slate-950',
-    // Focused & slim form dialog (Enrollment / Confirmation)
-    formDialog: 'w-[94vw] sm:max-w-md md:max-w-lg max-h-[88vh] overflow-y-auto p-4 sm:p-5 rounded-2xl shadow-xl border border-rose-200 dark:border-rose-900 bg-white dark:bg-slate-950',
+    // Modal amplio, espacioso y estructurado para formularios complejos (Inscripción / Matrícula)
+    enrollmentDialog: 'w-[96vw] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl max-h-[92vh] overflow-y-auto p-5 sm:p-7 lg:p-8 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950',
+    // Fallback genérico para formularios
+    formDialog: 'w-[96vw] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl max-h-[92vh] overflow-y-auto p-5 sm:p-7 lg:p-8 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950',
 } as const;
 
 /**
