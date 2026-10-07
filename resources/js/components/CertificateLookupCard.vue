@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
 import { THEME_BUTTONS } from '@/lib/theme';
+import PdfIntegrityVerifier from '@/components/PdfIntegrityVerifier.vue';
 import {
     Award,
     Search,
@@ -47,6 +48,8 @@ export interface CertificateRecord {
     attended_sessions: number;
     final_grade?: number | string | null;
     certificate_code: string;
+    certificate_hash?: string | null;
+    certificate_issued_at?: string | null;
 }
 
 const dniQuery = ref('');
@@ -414,7 +417,8 @@ function printOrDownloadCertificate(record: CertificateRecord) {
             </div>
 
             <!-- Records Results -->
-            <div v-else-if="records.length > 0" class="space-y-4">
+            <div v-else-if="records.length > 0" class="space-y-6">
+                <PdfIntegrityVerifier :expected-hash="selectedCert?.certificate_hash || records[0]?.certificate_hash" />
                 <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-neutral-800">
                     <div class="text-xs flex items-center gap-2">
                         <span class="text-slate-600 dark:text-neutral-400 font-medium">Participante Titular:</span>

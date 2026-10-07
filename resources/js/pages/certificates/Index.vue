@@ -42,6 +42,7 @@ import {
 import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import LoginModal from '@/components/auth/LoginModal.vue';
 import RegisterModal from '@/components/auth/RegisterModal.vue';
+import PdfIntegrityVerifier from '@/components/PdfIntegrityVerifier.vue';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
 
 interface CertificateRecord {
@@ -58,6 +59,8 @@ interface CertificateRecord {
     attended_sessions: number;
     final_grade?: number | string | null;
     certificate_code: string;
+    certificate_hash?: string | null;
+    certificate_issued_at?: string | null;
 }
 
 const props = defineProps<{
@@ -688,11 +691,17 @@ onMounted(() => {
                                 </div>
 
                                 <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800">
-                                    <div class="flex items-center gap-2 text-xs font-mono text-slate-600 dark:text-slate-400">
-                                        <span class="font-bold text-slate-900 dark:text-slate-200">Cód. Verificación:</span>
-                                        <span class="bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded font-black text-rose-900 dark:text-rose-400 border border-slate-200 dark:border-slate-700">
-                                            {{ record.certificate_code }}
-                                        </span>
+                                    <div class="flex flex-col gap-1 text-xs font-mono text-slate-600 dark:text-slate-400">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-slate-900 dark:text-slate-200">Cód. Verificación:</span>
+                                            <span class="bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded font-black text-rose-900 dark:text-rose-400 border border-slate-200 dark:border-slate-700">
+                                                {{ record.certificate_code }}
+                                            </span>
+                                        </div>
+                                        <div v-if="record.certificate_hash" class="text-[10px] text-slate-500 flex items-center gap-1">
+                                            <span class="font-bold text-slate-700 dark:text-slate-300">SHA-256:</span>
+                                            <span class="truncate max-w-[220px] sm:max-w-xs font-mono select-all" :title="record.certificate_hash">{{ record.certificate_hash }}</span>
+                                        </div>
                                     </div>
 
                                     <div class="flex items-center gap-2">
@@ -754,6 +763,11 @@ onMounted(() => {
                         </Button>
                     </div>
                 </div>
+            </div>
+
+            <!-- VERIFICADOR CRIPTOGRÁFICO DE DOCUMENTO PDF (SIGC-8) -->
+            <div class="max-w-4xl mx-auto pt-2">
+                <PdfIntegrityVerifier :expected-hash="selectedCert?.certificate_hash || records[0]?.certificate_hash" />
             </div>
 
             <!-- BANNER INFORMATIVO FINAL -->
@@ -867,6 +881,11 @@ onMounted(() => {
                             <div class="pt-3 text-[10px] font-mono text-slate-500 flex justify-between items-center border-t border-dashed border-slate-300 dark:border-slate-800">
                                 <span>Código: <strong>{{ selectedCert.certificate_code }}</strong></span>
                                 <span class="text-[#800020] font-bold">VÁLIDO OFICIALMENTE • CUSCO</span>
+                            </div>
+
+                            <div v-if="selectedCert.certificate_hash" class="pt-2 text-[10px] font-mono text-slate-500 break-all text-left bg-slate-50 dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700">
+                                <span class="font-bold text-slate-700 dark:text-slate-300 block mb-0.5">Hash Criptográfico SHA-256 Oficial:</span>
+                                <span class="text-slate-600 dark:text-slate-400 select-all">{{ selectedCert.certificate_hash }}</span>
                             </div>
                         </div>
                     </div>

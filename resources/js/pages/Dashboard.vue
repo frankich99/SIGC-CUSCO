@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
+import { generateQrSvg } from '@/lib/qr';
 import {
     GraduationCap,
     Users,
@@ -61,6 +62,8 @@ interface CourseItem {
 interface EnrollmentItem {
     id: number;
     course_id: number;
+    credential_code?: string | null;
+    attendance_percentage?: number;
     dni: string;
     nombres: string;
     paterno: string;
@@ -117,6 +120,20 @@ const isEnrollModalOpen = ref(false);
 const isQrModalOpen = ref(false);
 const activeQrCourse = ref<CourseItem | null>(null);
 const isScanQrModalOpen = ref(false);
+const isCredentialModalOpen = ref(false);
+const activeCredentialEnrollment = ref<EnrollmentItem | null>(null);
+
+function openCredentialModal(enrollment: EnrollmentItem) {
+    activeCredentialEnrollment.value = enrollment;
+    isCredentialModalOpen.value = true;
+}
+
+const activeCredentialQrSvg = computed(() => {
+    if (!activeCredentialEnrollment.value) return '';
+    const code = activeCredentialEnrollment.value.credential_code || `INS-${activeCredentialEnrollment.value.course_id}-${activeCredentialEnrollment.value.dni.slice(-4)}`;
+    return generateQrSvg(code, 260, '#800020');
+});
+
 const scanCodeInput = ref('');
 const scanSuccessMessage = ref<string | null>(null);
 
@@ -523,16 +540,54 @@ function roleBadgeData(role?: string) {
                                         <span>{{ formatHours(item.course?.hours) }}</span>
                                     </div>
                                 </div>
-                                <div class="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs flex items-center justify-between font-bold">
-                                    <span class="text-rose-950 dark:text-rose-200">Asistencias acumuladas:</span>
-                                    <span class="text-rose-800 dark:text-rose-300 text-sm font-black">{{ item.attended_sessions }} sesiones</span>
+                                <!-- Barra de Asistencia Oficial (Mínimo 75%) -->
+                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                                    <div class="flex justify-between items-center text-xs font-bold">
+                                        <span class="text-slate-700 dark:text-slate-300">Asistencia:</span>
+                                        <span class="text-rose-900 dark:text-rose-300 font-black">
+                                            {{ item.attended_sessions }} de {{ item.course?.total_sessions || 4 }} sesiones ({{ item.attendance_percentage || 0 }}%)
+                                        </span>
+                                    </div>
+                                    <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                                        <div
+                                            class="bg-rose-800 h-2 rounded-full transition-all duration-500"
+                                            :style="{ width: `${Math.min(100, Math.round(((item.attended_sessions || 0) / (item.course?.total_sessions || 4)) * 100))}%` }"
+                                        />
+                                    </div>
+                                    <div class="flex justify-between items-center text-[11px] text-slate-500">
+                                        <span>Meta para certificar: <strong>75%</strong></span>
+                                        <span v-if="(item.attendance_percentage || 0) >= 75" class="text-emerald-700 dark:text-emerald-400 font-bold">✓ Cumple requisito</span>
+                                        <span v-else class="text-amber-700 dark:text-amber-400 font-bold">Faltan sesiones</span>
+                                    </div>
+                                </div>
+
+                                <!-- Calificación y Estado de Certificado -->
+                                <div class="grid grid-cols-2 gap-2 text-[11px] font-bold">
+                                    <div class="p-2 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                                        <span class="text-slate-500 block text-[10px]">Nota Final:</span>
+                                        <span v-if="item.final_grade !== null && item.final_grade !== undefined" class="text-slate-950 dark:text-white font-mono font-black text-sm">
+                                            {{ Number(item.final_grade).toFixed(1) }} / 20
+                                        </span>
+                                        <span v-else class="text-slate-400">Aún sin nota</span>
+                                    </div>
+                                    <div class="p-2 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                                        <span class="text-slate-500 block text-[10px]">Certificado:</span>
+                                        <span v-if="item.status === 'aprobado' || item.certificate_code" class="text-emerald-700 dark:text-emerald-400 font-bold">
+                                            Disponible
+                                        </span>
+                                        <span v-else class="text-slate-400">Al cerrar acta</span>
+                                    </div>
                                 </div>
                             </CardContent>
 
                             <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 rounded-b-xl">
+                                <Button size="sm" variant="outline" class="flex-1 text-xs font-bold h-9 border-rose-300 text-rose-950 hover:bg-rose-50" @click="openCredentialModal(item)">
+                                    <QrCode class="size-4 mr-1.5 text-rose-800" />
+                                    Mi Credencial QR
+                                </Button>
                                 <Button size="sm" class="flex-1 bg-rose-900 hover:bg-rose-950 text-white text-xs font-bold h-9 shadow-xs" @click="openScanModal(item)">
                                     <Camera class="size-4 mr-1.5" />
-                                    Escanear QR
+                                    Escanear
                                 </Button>
                                 <Button v-if="item.status === 'aprobado' || item.certificate_code" size="sm" variant="outline" class="flex-1 text-xs font-bold h-9 border-amber-400 text-amber-900">
                                     <Download class="size-4 mr-1.5 text-amber-700" />
@@ -723,5 +778,41 @@ function roleBadgeData(role?: string) {
                 @enrolled="isEnrollModalOpen = false"
             />
         </div>
+    
+        <!-- MODAL CREDENCIAL QR DEL PARTICIPANTE (SIGC-6) -->
+        <Dialog :open="isCredentialModalOpen" @update:open="isCredentialModalOpen = $event">
+            <DialogContent class="w-[94vw] sm:max-w-md p-0 rounded-3xl border border-rose-200 bg-white dark:bg-slate-950 overflow-hidden shadow-2xl">
+                <div class="p-6 bg-gradient-to-br from-rose-950 via-rose-900 to-rose-950 text-white text-center space-y-1">
+                    <Badge variant="outline" class="border-amber-400 text-amber-300 text-[10px] font-black uppercase">
+                        Credencial Oficial de Asistencia
+                    </Badge>
+                    <h3 class="text-xl font-black pt-1">
+                        {{ activeCredentialEnrollment?.nombres }} {{ activeCredentialEnrollment?.paterno }}
+                    </h3>
+                    <p class="text-xs text-rose-200 font-mono">
+                        DNI: {{ activeCredentialEnrollment?.dni }}
+                    </p>
+                </div>
+
+                <div class="p-6 flex flex-col items-center justify-center space-y-4 text-center">
+                    <div class="p-3 bg-white rounded-2xl border-4 border-rose-950/20 shadow-md" v-html="activeCredentialQrSvg"></div>
+
+                    <div class="space-y-1">
+                        <div class="text-[11px] font-bold text-slate-500 uppercase">Código Único de Matrícula</div>
+                        <div class="font-mono text-lg font-black text-rose-950 bg-rose-50 px-4 py-1 rounded-lg border border-rose-200 tracking-wider">
+                            {{ activeCredentialEnrollment?.credential_code || ('INS-' + activeCredentialEnrollment?.course_id + '-' + activeCredentialEnrollment?.dni?.slice(-4)) }}
+                        </div>
+                        <p class="text-[11px] text-slate-500 pt-1">
+                            Presenta este código al ingresar a la clase para registrar tu asistencia.
+                        </p>
+                    </div>
+
+                    <Button variant="outline" size="sm" class="text-xs font-bold" @click="isCredentialModalOpen = false">
+                        Cerrar Credencial
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+
     </AppLayout>
 </template>
