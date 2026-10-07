@@ -103,7 +103,7 @@ class CourseController extends Controller
     public function show(Request $request, Course $course): Response
     {
         $course->load([
-            'instructor:id,name,paterno,materno,email,role',
+            'instructor:id,name,paterno,materno,email,role,dni',
             'enrollments' => function ($query) {
                 $query->orderBy('paterno')->orderBy('nombres');
             },
