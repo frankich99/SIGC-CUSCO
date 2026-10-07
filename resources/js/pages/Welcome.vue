@@ -155,7 +155,7 @@ function statusBadgeInfo(status: string) {
                             <span>SIGC-CUSCO</span>
                         </div>
                         <p class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium hidden sm:block">
-                            UNSAAC • Sistema Integral de Capacitaciones
+                            Plataforma Oficial de Capacitaciones • Cusco
                         </p>
                     </div>
                 </Link>
@@ -455,6 +455,12 @@ function statusBadgeInfo(status: string) {
             </div>
         </section>
 
+        <!-- SECCIÓN PÚBLICA: CONSULTA Y DESCARGA DE CERTIFICADOS POR DNI -->
+        <section id="certificados" class="py-12 md:py-20 border-t border-slate-200/80 dark:border-neutral-800 bg-slate-50/80 dark:bg-neutral-950">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+                <CertificateLookupCard />
+            </div>
+        </section>
 
         <!-- SYSTEM FEATURES / BENEFITS -->
         <section id="beneficios" class="py-12 md:py-20 border-t border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900/60">

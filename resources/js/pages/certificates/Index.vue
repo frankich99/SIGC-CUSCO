@@ -154,10 +154,7 @@ async function copyVerificationCode(code: string) {
 }
 
 function printCertificate(record: CertificateRecord) {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-
-    printWindow.document.write(`
+    const html = `
         <!DOCTYPE html>
         <html lang="es">
         <head>
@@ -175,7 +172,7 @@ function printCertificate(record: CertificateRecord) {
                 }
                 body {
                     font-family: 'Times New Roman', serif;
-                    background: #fdfdfd;
+                    background: #ffffff;
                     color: #1a1a1a;
                     padding: 20px;
                     display: flex;
@@ -190,7 +187,6 @@ function printCertificate(record: CertificateRecord) {
                     border: 8px double #800020;
                     padding: 40px 50px;
                     position: relative;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
                     text-align: center;
                 }
                 .cert-container::before {
@@ -200,7 +196,7 @@ function printCertificate(record: CertificateRecord) {
                     left: 8px;
                     right: 8px;
                     bottom: 8px;
-                    border: 1px solid #d97706;
+                    border: 1.5px solid #d97706;
                     pointer-events: none;
                 }
                 .header-inst {
@@ -299,22 +295,12 @@ function printCertificate(record: CertificateRecord) {
                     color: #800020;
                     font-weight: bold;
                 }
-                @media print {
-                    body {
-                        padding: 0;
-                        background: #fff;
-                    }
-                    .cert-container {
-                        box-shadow: none;
-                        max-width: 100%;
-                    }
-                }
             </style>
         </head>
         <body>
             <div class="cert-container">
-                <div class="header-inst">Universidad Nacional de San Antonio Abad del Cusco</div>
-                <div class="sub-inst">Sistema Integral de Gestión de Capacitaciones • SIGC-CUSCO</div>
+                <div class="header-inst">${record.institution || 'SIGC-CUSCO'}</div>
+                <div class="sub-inst">Sistema Integral de Gestión de Capacitaciones • Cusco, Perú</div>
                 
                 <h1 class="title-cert">Certificado Oficial</h1>
                 <div class="subtitle-cert">Acreditación Académica y Asistencia Digital</div>
@@ -323,9 +309,9 @@ function printCertificate(record: CertificateRecord) {
                 <div class="recipient-name">${record.student_name}</div>
 
                 <div class="body-text">
-                    Por haber participado y aprobado satisfactoriamente el curso especializado:
+                    Por haber participado y aprobado satisfactoriamente la capacitación especializada:
                     <span class="course-title">"${record.course_title}"</span>
-                    con una duración de <strong>${formatHours(record.hours)}</strong> lectivas, desarrollado
+                    con una duración de <strong>${formatHours(record.hours)}</strong> lectivas, desarrollada
                     del <strong>${record.start_date || 'Fecha de inicio'}</strong> al <strong>${record.end_date || 'Fecha de término'}</strong>,
                     habiendo cumplido con el registro de asistencia mediante código QR y las evaluaciones académicas institucionales.
                 </div>
@@ -347,15 +333,35 @@ function printCertificate(record: CertificateRecord) {
                     <div>Horas: ${record.hours}h</div>
                 </div>
             </div>
-            <script>
-                window.onload = function() {
-                    window.print();
-                };
-            <\/script>
         </body>
         </html>
-    `);
-    printWindow.document.close();
+    `;
+
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow?.document;
+    if (!doc) return;
+
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    setTimeout(() => {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+        setTimeout(() => {
+            if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+            }
+        }, 3000);
+    }, 350);
 }
 
 onMounted(() => {
