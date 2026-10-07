@@ -5,25 +5,18 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
+import EnrollmentModal from '@/components/EnrollmentModal.vue';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
 import {
     Calendar,
     Clock,
-    GraduationCap,
     Users,
-    User,
     ArrowLeft,
     Pencil,
     Trash2,
     CheckCircle2,
     QrCode,
     Award,
-    FileCheck,
-    Search,
-    AlertCircle,
     UserCheck,
     Building2,
 } from '@lucide/vue';
@@ -66,49 +59,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: props.course.title, href: `/courses/${props.course.id}` },
 ];
 
-// Interactive DNI enrollment simulation
-const enrollDni = ref('');
-const validatingDni = ref(false);
-const dniError = ref<string | null>(null);
-const enrolledPerson = ref<{
-    dni: string;
-    nombre_completo: string;
-    codigo_verificacion?: string;
-} | null>(null);
-const enrollmentSuccess = ref(false);
+const isEnrollModalOpen = ref(false);
 
-async function consultAndEnroll() {
-    dniError.value = null;
-    enrolledPerson.value = null;
-    enrollmentSuccess.value = false;
-
-    const clean = enrollDni.value.trim();
-    if (!/^\d{8}$/.test(clean)) {
-        dniError.value = 'El DNI debe tener exactamente 8 dígitos numéricos.';
-        return;
-    }
-
-    validatingDni.value = true;
-    try {
-        const response = await fetch(`/api/dni/${clean}`, {
-            headers: { Accept: 'application/json' },
-        });
-        const data = await response.json();
-
-        if (response.ok && data.success && data.data) {
-            enrolledPerson.value = data.data;
-        } else {
-            dniError.value = data.message || 'No se encontró el DNI en RENIEC.';
-        }
-    } catch {
-        dniError.value = 'Error al consultar servicio de DNI.';
-    } finally {
-        validatingDni.value = false;
-    }
-}
-
-function confirmEnrollment() {
-    enrollmentSuccess.value = true;
+function handleEnrolled() {
+    router.reload();
 }
 
 function deleteCourse() {
@@ -322,83 +276,57 @@ function instructorName(inst?: Instructor): string {
                         </CardContent>
                     </Card>
 
-                    <!-- Inscripción con DNI (RENIEC API) -->
-                    <Card class="border-emerald-300 dark:border-emerald-800 bg-gradient-to-br from-emerald-50/50 to-transparent dark:from-emerald-950/20">
+                    <!-- Inscripción Oficial con DNI -->
+                    <Card class="border-2 border-emerald-300 dark:border-emerald-800 bg-gradient-to-br from-emerald-50/50 to-transparent dark:from-emerald-950/20 shadow-sm rounded-xl">
                         <CardHeader class="pb-3">
                             <div class="flex items-center justify-between">
-                                <CardTitle class="text-base font-semibold flex items-center gap-2">
-                                    <UserCheck class="size-5 text-emerald-600" />
-                                    Inscripción con DNI
+                                <CardTitle class="text-sm sm:text-base font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                                    <UserCheck class="size-4 text-emerald-600" />
+                                    Inscripción en Línea
                                 </CardTitle>
-                                <Badge variant="outline" class="text-[10px] border-emerald-400 text-emerald-700">
+                                <Badge variant="outline" class="text-[10px] font-bold border-emerald-400 text-emerald-700 bg-emerald-50 dark:bg-emerald-950">
                                     RENIEC API
                                 </Badge>
                             </div>
-                            <CardDescription class="text-xs">
-                                Ingresa tu DNI para validar tus datos y reservar una vacante.
+                            <CardDescription class="text-xs text-slate-600 dark:text-slate-400">
+                                Reserva tu vacante con validación DNI y registro oficial.
                             </CardDescription>
                         </CardHeader>
                         <CardContent class="space-y-3">
-                            <div class="flex gap-2">
-                                <Input
-                                    v-model="enrollDni"
-                                    placeholder="DNI (8 dígitos)..."
-                                    maxlength="8"
-                                    class="font-mono text-sm tracking-wider"
-                                    @keydown.enter.prevent="consultAndEnroll"
-                                />
-                                <Button
-                                    size="sm"
-                                    :disabled="validatingDni || enrollDni.trim().length !== 8"
-                                    @click="consultAndEnroll"
-                                    class="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
-                                >
-                                    <Spinner v-if="validatingDni" class="size-3.5 mr-1" />
-                                    <Search v-else class="size-3.5 mr-1" />
-                                    Validar
-                                </Button>
+                            <div class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 text-xs space-y-1.5">
+                                <div class="flex justify-between font-medium text-slate-600 dark:text-slate-400">
+                                    <span>Capacidad:</span>
+                                    <span class="font-bold text-slate-900 dark:text-white">{{ course.capacity }} vacantes</span>
+                                </div>
+                                <div class="flex justify-between font-medium text-slate-600 dark:text-slate-400">
+                                    <span>Horas:</span>
+                                    <span class="font-bold text-slate-900 dark:text-white">{{ course.hours }} hrs académicas</span>
+                                </div>
                             </div>
-
-                            <div v-if="dniError" class="flex items-center gap-1.5 p-2 rounded-md bg-red-50 text-xs text-red-700 border border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800">
-                                <AlertCircle class="size-3.5 shrink-0" />
-                                <span>{{ dniError }}</span>
-                            </div>
-
-                            <!-- Validated Citizen Result -->
-                            <div v-if="enrolledPerson && !enrollmentSuccess" class="rounded-lg border border-emerald-200 bg-white p-3 dark:border-emerald-800 dark:bg-neutral-900 space-y-2 text-xs">
-                                <div class="flex items-center gap-1.5 text-emerald-600 font-medium">
-                                    <CheckCircle2 class="size-4" />
-                                    <span>Identidad confirmada en RENIEC</span>
-                                </div>
-                                <div class="font-semibold text-neutral-900 dark:text-neutral-100 text-sm">
-                                    {{ enrolledPerson.nombre_completo }}
-                                </div>
-                                <div class="text-neutral-500">
-                                    DNI: <span class="font-mono font-medium">{{ enrolledPerson.dni }}</span>
-                                </div>
-                                <Button
-                                    size="sm"
-                                    @click="confirmEnrollment"
-                                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium mt-2"
-                                >
-                                    Confirmar Matrícula en este Curso
-                                </Button>
-                            </div>
-
-                            <!-- Enrollment Success State -->
-                            <div v-if="enrollmentSuccess" class="rounded-lg border border-emerald-300 bg-emerald-50 p-3.5 text-center dark:border-emerald-800 dark:bg-emerald-950/50 space-y-1">
-                                <CheckCircle2 class="size-6 text-emerald-600 mx-auto" />
-                                <div class="text-xs font-bold text-emerald-800 dark:text-emerald-300">
-                                    ¡Matrícula Registrada con Éxito!
-                                </div>
-                                <p class="text-[11px] text-emerald-700 dark:text-emerald-400">
-                                    Tu vacante ha sido asegurada. Podrás marcar asistencia en cada clase con tu código QR.
-                                </p>
+                            <Button
+                                v-if="course.status === 'abierto'"
+                                size="lg"
+                                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm h-10 shadow-sm"
+                                @click="isEnrollModalOpen = true"
+                            >
+                                <CheckCircle2 class="size-4 mr-2" />
+                                Inscribirme
+                            </Button>
+                            <div v-else class="text-center py-2 text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                                Convocatoria Cerrada
                             </div>
                         </CardContent>
                     </Card>
                 </div>
             </div>
         </div>
+
+        <!-- MODAL DE INSCRIPCIÓN OFICIAL -->
+        <EnrollmentModal
+            :course="course"
+            :open="isEnrollModalOpen"
+            @update:open="isEnrollModalOpen = $event"
+            @enrolled="handleEnrolled"
+        />
     </AppLayout>
 </template>

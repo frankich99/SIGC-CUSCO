@@ -536,17 +536,17 @@ function roleBadgeData(role?: string) {
                             </CardContent>
 
                             <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 rounded-b-xl">
-                                <Button size="sm" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-9 shadow-xs" @click="openScanModal(item)">
+                                <Button size="sm" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-9 shadow-xs" @click="openScanModal(item)">
                                     <Camera class="size-4 mr-1.5" />
-                                    Marcar Asistencia QR
+                                    Escanear QR
                                 </Button>
-                                <Button v-if="item.status === 'aprobado' || item.certificate_code" size="sm" variant="outline" class="text-xs font-bold h-9 border-indigo-300 text-indigo-800">
+                                <Button v-if="item.status === 'aprobado' || item.certificate_code" size="sm" variant="outline" class="flex-1 text-xs font-bold h-9 border-indigo-300 text-indigo-800">
                                     <Download class="size-4 mr-1.5 text-indigo-600" />
-                                    Certificado PDF
+                                    Certificado
                                 </Button>
-                                <Button v-else as-child variant="outline" size="sm" class="text-xs font-bold h-9 border-slate-300 text-slate-800">
+                                <Button v-else as-child variant="outline" size="sm" class="flex-1 text-xs font-bold h-9 border-slate-300 text-slate-800">
                                     <Link :href="`/courses/${item.course_id}`">
-                                        Detalles →
+                                        Detalles
                                     </Link>
                                 </Button>
                             </div>
@@ -586,7 +586,7 @@ function roleBadgeData(role?: string) {
                                     {{ course.title }}
                                 </CardTitle>
                                 <div class="text-xs font-bold text-emerald-800 dark:text-emerald-400 truncate">
-                                    {{ course.institution || 'Universidad Nacional de San Antonio Abad del Cusco' }}
+                                    {{ course.institution || 'Entidad Organizadora' }}
                                 </div>
                                 <CardDescription class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 pt-1">
                                     <Calendar class="size-3.5 text-emerald-600 shrink-0" />
@@ -607,10 +607,10 @@ function roleBadgeData(role?: string) {
                             </CardContent>
 
                             <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 rounded-b-xl">
-                                <Button as-child variant="ghost" size="sm" class="text-xs font-bold h-9 text-slate-700 hover:text-slate-900">
-                                    <Link :href="`/courses/${course.id}`">Ver Temario</Link>
+                                <Button as-child variant="outline" size="sm" class="flex-1 text-xs font-bold h-9 border-slate-300 text-slate-800 hover:text-slate-900">
+                                    <Link :href="`/courses/${course.id}`">Temario</Link>
                                 </Button>
-                                <Button size="sm" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold h-9 px-4 shadow-sm" @click="openEnroll(course)">
+                                <Button size="sm" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold h-9 px-4 shadow-sm" @click="openEnroll(course)">
                                     <CheckCircle2 class="size-4 mr-1.5" />
                                     Inscribirme
                                 </Button>
