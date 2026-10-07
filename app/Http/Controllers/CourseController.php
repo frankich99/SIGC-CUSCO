@@ -111,7 +111,7 @@ class CourseController extends Controller
         $course->load([
             'instructor:id,name,paterno,materno,email,role,dni',
             'enrollments' => function ($query) {
-                $query->orderBy('paterno')->orderBy('nombres');
+                $query->with('attendanceRecords')->orderBy('paterno')->orderBy('nombres');
             },
         ]);
 

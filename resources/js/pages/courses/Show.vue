@@ -33,6 +33,11 @@ import {
     Building2,
     Search,
     Plus,
+    UserPlus,
+    Phone,
+    Mail,
+    Filter,
+    Sparkles,
     ExternalLink,
     AlertCircle,
     UserX,
@@ -130,8 +135,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: props.course.title, href: `/courses/${props.course.id}` },
 ];
 
-type AcademicTab = 'asistencia' | 'notas' | 'certificados' | 'reportes';
-const activeTab = ref<AcademicTab>('asistencia');
+type AcademicTab = 'matriculados' | 'asistencia' | 'notas' | 'certificados' | 'reportes';
+const activeTab = ref<AcademicTab>('matriculados');
 
 const selectedSession = ref<number>(1);
 const totalSessions = computed(() => props.course.total_sessions || 4);
@@ -326,10 +331,15 @@ function bulkIssueCertificates() {
 }
 
 const searchQuery = ref('');
+const statusFilter = ref<'todos' | 'inscrito' | 'en_curso' | 'aprobado' | 'reprobado' | 'cancelado'>('todos');
+
 const enrollmentsList = computed(() => props.course.enrollments || []);
 const totalEnrolled = computed(() => enrollmentsList.value.length);
+const registeredStudents = computed(() => enrollmentsList.value.filter((e) => e.status === 'inscrito'));
+const inProgressStudents = computed(() => enrollmentsList.value.filter((e) => e.status === 'en_curso'));
 const approvedStudents = computed(() => enrollmentsList.value.filter((e) => e.status === 'aprobado'));
 const failedStudents = computed(() => enrollmentsList.value.filter((e) => e.status === 'reprobado'));
+const cancelledStudents = computed(() => enrollmentsList.value.filter((e) => e.status === 'cancelado'));
 const availableSpots = computed(() => Math.max(0, props.course.capacity - totalEnrolled.value));
 
 const averageAttendance = computed(() => {
@@ -340,17 +350,35 @@ const averageAttendance = computed(() => {
 
 const isActaClosed = computed(() => Boolean(props.course.acta_closed_at));
 
+// Filtro general por búsqueda (usado en matriz de asistencias y actas)
 const filteredEnrollments = computed(() => {
     if (!searchQuery.value.trim()) return enrollmentsList.value;
     const q = searchQuery.value.toLowerCase().trim();
     return enrollmentsList.value.filter((e) => {
         const full = `${e.nombres} ${e.paterno} ${e.materno || ''}`.toLowerCase();
-        return full.includes(q) || (e.dni || '').includes(q) || (e.credential_code || '').toLowerCase().includes(q);
+        return (
+            full.includes(q) ||
+            (e.dni || '').includes(q) ||
+            (e.email || '').toLowerCase().includes(q) ||
+            (e.phone || '').includes(q) ||
+            (e.credential_code || '').toLowerCase().includes(q)
+        );
     });
 });
 
+// Filtro específico para el Padrón de Matriculados con Selector de Estado
+const matriculadosFilteredEnrollments = computed(() => {
+    let list = filteredEnrollments.value;
+    if (statusFilter.value !== 'todos') {
+        list = list.filter((e) => e.status === statusFilter.value);
+    }
+    return list;
+});
+
+// Modal de Inscripción Rápida
 const isEnrollModalOpen = ref(false);
 
+// Modal y CRUD: Editar Matrícula
 const isEditModalOpen = ref(false);
 const editingEnrollment = ref<EnrollmentItem | null>(null);
 const editForm = ref({
@@ -358,6 +386,8 @@ const editForm = ref({
     attended_sessions: 0,
     final_grade: '' as string | number,
     certificate_code: '',
+    email: '',
+    phone: '',
 });
 const isSaving = ref(false);
 const editError = ref<string | null>(null);
@@ -369,6 +399,8 @@ function openEditModal(enrollment: EnrollmentItem) {
         attended_sessions: enrollment.attended_sessions,
         final_grade: enrollment.final_grade !== null && enrollment.final_grade !== undefined ? enrollment.final_grade : '',
         certificate_code: enrollment.certificate_code || '',
+        email: enrollment.email || '',
+        phone: enrollment.phone || '',
     };
     editError.value = null;
     isEditModalOpen.value = true;
@@ -386,6 +418,8 @@ function saveEnrollment() {
             attended_sessions: Number(editForm.value.attended_sessions) || 0,
             final_grade: editForm.value.final_grade === '' ? null : Number(editForm.value.final_grade),
             certificate_code: editForm.value.certificate_code.trim() || null,
+            email: editForm.value.email.trim() || null,
+            phone: editForm.value.phone.trim() || null,
         },
         {
             preserveScroll: true,
@@ -395,10 +429,124 @@ function saveEnrollment() {
             },
             onError: (errs) => {
                 isSaving.value = false;
-                editError.value = Object.values(errs)[0] as string || 'Error al actualizar.';
+                editError.value = Object.values(errs)[0] as string || 'Error al actualizar la matrícula.';
             },
         }
     );
+}
+
+// Asistencia Rápida (+1 sesión)
+const isRecordingQuickAttendance = ref<number | null>(null);
+function quickRecordAttendance(enrollment: EnrollmentItem) {
+    isRecordingQuickAttendance.value = enrollment.id;
+    router.post(
+        `/enrollments/${enrollment.id}/attendance`,
+        {},
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                isRecordingQuickAttendance.value = null;
+            },
+        }
+    );
+}
+
+// Emitir Certificado Individual para participante aprobado
+const isIssuingSingleCert = ref<number | null>(null);
+function issueSingleCertificate(enrollment: EnrollmentItem) {
+    if (!confirm(`¿Emitir certificado oficial con código único para ${enrollment.nombres} ${enrollment.paterno}?`)) return;
+    isIssuingSingleCert.value = enrollment.id;
+    router.post(
+        `/enrollments/${enrollment.id}/certificate`,
+        {},
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                isIssuingSingleCert.value = null;
+            },
+        }
+    );
+}
+
+// Modal y CRUD: Eliminar / Desmatricular Participante
+const isDeleteModalOpen = ref(false);
+const enrollmentToDelete = ref<EnrollmentItem | null>(null);
+const isDeletingEnrollment = ref(false);
+
+function openDeleteModal(enrollment: EnrollmentItem) {
+    enrollmentToDelete.value = enrollment;
+    isDeleteModalOpen.value = true;
+}
+
+function confirmDeleteEnrollment() {
+    if (!enrollmentToDelete.value) return;
+    isDeletingEnrollment.value = true;
+    router.delete(
+        `/enrollments/${enrollmentToDelete.value.id}`,
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                isDeletingEnrollment.value = false;
+                isDeleteModalOpen.value = false;
+                enrollmentToDelete.value = null;
+            },
+            onError: () => {
+                isDeletingEnrollment.value = false;
+                alert('No se pudo eliminar la matrícula.');
+            },
+        }
+    );
+}
+
+// Modal: Ver Credencial Digital con Código QR
+const isCredentialModalOpen = ref(false);
+const credentialEnrollment = ref<EnrollmentItem | null>(null);
+
+function viewCredential(enrollment: EnrollmentItem) {
+    credentialEnrollment.value = enrollment;
+    isCredentialModalOpen.value = true;
+}
+
+const credentialQrSvg = computed(() => {
+    if (!credentialEnrollment.value) return '';
+    const code = credentialEnrollment.value.credential_code || `INS-${credentialEnrollment.value.course_id}-${credentialEnrollment.value.dni.slice(-4)}`;
+    return generateQrSvg(code, 260, '#800020');
+});
+
+// Estilo de Badges de Estado
+function getStatusBadge(status: string) {
+    switch (status) {
+        case 'inscrito':
+            return {
+                label: 'Inscrito',
+                classes: 'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950 dark:text-blue-200 dark:border-blue-800',
+            };
+        case 'en_curso':
+            return {
+                label: 'En Curso',
+                classes: 'bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800',
+            };
+        case 'aprobado':
+            return {
+                label: 'Aprobado',
+                classes: 'bg-emerald-100 text-emerald-950 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-800',
+            };
+        case 'reprobado':
+            return {
+                label: 'Reprobado',
+                classes: 'bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800',
+            };
+        case 'cancelado':
+            return {
+                label: 'Cancelado',
+                classes: 'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+            };
+        default:
+            return {
+                label: (status || '').toUpperCase(),
+                classes: 'bg-slate-100 text-slate-800 border-slate-300',
+            };
+    }
 }
 
 onMounted(() => {
@@ -517,9 +665,26 @@ onUnmounted(() => {
                 </div>
             </div>
 
-            <!-- NAVEGACIÓN POR 4 PESTAÑAS ACADÉMICAS OFICIALES -->
+            <!-- NAVEGACIÓN POR 5 PESTAÑAS ACADÉMICAS OFICIALES -->
             <div class="border-b border-slate-200 dark:border-slate-800">
                 <nav class="flex space-x-2 sm:space-x-4 overflow-x-auto pb-px" aria-label="Tabs">
+                    <button
+                        type="button"
+                        @click="activeTab = 'matriculados'"
+                        :class="[
+                            'whitespace-nowrap py-3 px-4 border-b-2 font-black text-xs sm:text-sm flex items-center gap-2 cursor-pointer transition-all',
+                            activeTab === 'matriculados'
+                                ? 'border-rose-900 text-rose-900 dark:text-rose-300 dark:border-rose-500'
+                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                        ]"
+                    >
+                        <Users class="size-4" />
+                        1. Padrón de Matriculados
+                        <span class="bg-rose-100 text-rose-950 dark:bg-rose-950 dark:text-rose-200 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                            {{ totalEnrolled }}
+                        </span>
+                    </button>
+
                     <button
                         type="button"
                         @click="activeTab = 'asistencia'"
@@ -531,7 +696,7 @@ onUnmounted(() => {
                         ]"
                     >
                         <QrCode class="size-4" />
-                        1. Asistencia de Sesiones
+                        2. Asistencia de Sesiones
                     </button>
 
                     <button
@@ -545,7 +710,7 @@ onUnmounted(() => {
                         ]"
                     >
                         <FileText class="size-4" />
-                        2. Notas y Acta Oficial
+                        3. Notas y Acta Oficial
                         <span v-if="isActaClosed" class="size-2 rounded-full bg-emerald-600"></span>
                     </button>
 
@@ -560,7 +725,7 @@ onUnmounted(() => {
                         ]"
                     >
                         <Award class="size-4" />
-                        3. Emisión de Certificados
+                        4. Emisión de Certificados
                         <span class="bg-rose-100 text-rose-950 text-[10px] px-1.5 py-0.2 rounded-full font-bold">
                             {{ approvedStudents.length }}
                         </span>
@@ -577,12 +742,382 @@ onUnmounted(() => {
                         ]"
                     >
                         <FileSpreadsheet class="size-4" />
-                        4. Reportes y Estadísticas
+                        5. Reportes y Estadísticas
                     </button>
                 </nav>
             </div>
 
-            <!-- CONTENIDO DE LA PESTAÑA 1: ASISTENCIA DE SESIONES (SIGC-4 / SIGC-12) -->
+            <!-- ============================================================ -->
+            <!-- CONTENIDO DE LA PESTAÑA 1: PADRÓN DE MATRICULADOS (CRUD)     -->
+            <!-- ============================================================ -->
+            <div v-if="activeTab === 'matriculados'" class="space-y-6">
+                <!-- 4 Tarjetas de Métricas del Padrón -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Total Matriculados -->
+                    <Card class="border-2 border-rose-300 dark:border-rose-900 bg-rose-50/50 dark:bg-rose-950/20 shadow-xs">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="text-xs font-bold text-rose-950 dark:text-rose-300 flex items-center justify-between">
+                                <span>Total Inscritos</span>
+                                <div class="size-7 rounded-lg bg-rose-900 text-white flex items-center justify-center shadow-xs">
+                                    <Users class="size-3.5" />
+                                </div>
+                            </CardDescription>
+                            <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1 flex items-baseline gap-2">
+                                <span>{{ totalEnrolled }}</span>
+                                <span class="text-xs font-semibold text-slate-500">/ {{ course.capacity }} vacantes</span>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent class="text-xs text-slate-600 dark:text-slate-400">
+                            <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
+                                <div
+                                    class="h-full bg-rose-900 rounded-full transition-all"
+                                    :style="{ width: `${Math.min(100, (totalEnrolled / (course.capacity || 1)) * 100)}%` }"
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <!-- En Curso -->
+                    <Card class="border-2 border-amber-300 dark:border-amber-900 bg-amber-50/50 dark:bg-amber-950/20 shadow-xs">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="text-xs font-bold text-amber-950 dark:text-amber-300 flex items-center justify-between">
+                                <span>Alumnos En Curso</span>
+                                <div class="size-7 rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs">
+                                    <Calendar class="size-3.5" />
+                                </div>
+                            </CardDescription>
+                            <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1">
+                                {{ inProgressStudents.length }}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent class="text-xs font-semibold text-amber-800 dark:text-amber-300">
+                            Asistiendo regularmente a clases
+                        </CardContent>
+                    </Card>
+
+                    <!-- Aprobados -->
+                    <Card class="border-2 border-emerald-300 dark:border-emerald-900 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-xs">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="text-xs font-bold text-emerald-950 dark:text-emerald-300 flex items-center justify-between">
+                                <span>Aprobados / Aptos</span>
+                                <div class="size-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center shadow-xs">
+                                    <Award class="size-3.5" />
+                                </div>
+                            </CardDescription>
+                            <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1">
+                                {{ approvedStudents.length }}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent class="text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                            Cumplen nota >= 11 y asistencia >= {{ course.min_attendance_percentage }}%
+                        </CardContent>
+                    </Card>
+
+                    <!-- Vacantes Disponibles -->
+                    <Card class="border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                                <span>Vacantes Libres</span>
+                                <div class="size-7 rounded-lg bg-slate-800 text-white flex items-center justify-center shadow-xs">
+                                    <CheckCircle2 class="size-3.5" />
+                                </div>
+                            </CardDescription>
+                            <CardTitle class="text-2xl font-black text-rose-900 dark:text-rose-400 pt-1">
+                                {{ availableSpots }}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent class="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                            Cupos disponibles para inscripción
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <!-- Card Principal: Tabla Padrón de Matriculados -->
+                <Card class="border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <CardHeader class="p-4 sm:p-5 border-b bg-slate-50/80 dark:bg-slate-900/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <div>
+                            <CardTitle class="text-base font-black flex items-center gap-2">
+                                <Users class="size-4 text-rose-900" />
+                                Padrón de Participantes Inscritos (CRUD Oficial)
+                            </CardTitle>
+                            <CardDescription class="text-xs mt-0.5">
+                                Lista nominal de personas matriculadas con control de asistencia, notas y acciones de gestión académica.
+                            </CardDescription>
+                        </div>
+
+                        <!-- Botones de Acción de Cabecera -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <Button
+                                v-if="can.manage_enrollments"
+                                size="sm"
+                                :class="[THEME_BUTTONS.primary, 'text-xs font-black shadow-xs']"
+                                @click="isEnrollModalOpen = true"
+                            >
+                                <UserPlus class="mr-1.5 size-3.5" />
+                                + Inscribir Participante
+                            </Button>
+                            <Button
+                                as-child
+                                variant="outline"
+                                size="sm"
+                                class="text-xs font-bold border-slate-300 hover:text-rose-900"
+                            >
+                                <a :href="`/courses/${course.id}/reports/attendance-csv`" target="_blank">
+                                    <FileSpreadsheet class="mr-1.5 size-3.5 text-emerald-700" />
+                                    Descargar CSV
+                                </a>
+                            </Button>
+                        </div>
+                    </CardHeader>
+
+                    <!-- Barra de Búsqueda y Filtros de Estado -->
+                    <div class="p-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div class="relative w-full sm:w-80">
+                            <Search class="size-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            <Input
+                                v-model="searchQuery"
+                                type="text"
+                                placeholder="Buscar por DNI, nombres, email o teléfono..."
+                                class="h-9 pl-9 text-xs font-medium"
+                            />
+                        </div>
+
+                        <!-- Selector de Filtro de Estado -->
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <span class="text-xs font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap flex items-center gap-1">
+                                <Filter class="size-3.5" />
+                                Estado:
+                            </span>
+                            <select
+                                v-model="statusFilter"
+                                class="h-9 px-3 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer w-full sm:w-auto"
+                            >
+                                <option value="todos">Todos los Estados ({{ totalEnrolled }})</option>
+                                <option value="inscrito">Inscritos ({{ registeredStudents.length }})</option>
+                                <option value="en_curso">En Curso ({{ inProgressStudents.length }})</option>
+                                <option value="aprobado">Aprobados ({{ approvedStudents.length }})</option>
+                                <option value="reprobado">Reprobados ({{ failedStudents.length }})</option>
+                                <option value="cancelado">Cancelados ({{ cancelledStudents.length }})</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Contenido de la Tabla -->
+                    <CardContent class="p-0">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100/90 dark:bg-slate-900 border-b text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                        <th class="py-3 px-3 w-10 text-center">#</th>
+                                        <th class="py-3 px-3">DNI / Credencial</th>
+                                        <th class="py-3 px-3">Participante</th>
+                                        <th class="py-3 px-3">Contacto</th>
+                                        <th class="py-3 px-3 text-center">Asistencias</th>
+                                        <th class="py-3 px-3 text-center">Nota Final</th>
+                                        <th class="py-3 px-3 text-center">Estado</th>
+                                        <th v-if="can.manage_enrollments" class="py-3 px-3 text-right">Acciones (CRUD)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-950">
+                                    <tr
+                                        v-for="(enrollment, idx) in matriculadosFilteredEnrollments"
+                                        :key="enrollment.id"
+                                        class="hover:bg-rose-50/40 dark:hover:bg-rose-950/20 transition-colors"
+                                    >
+                                        <!-- # -->
+                                        <td class="py-3 px-3 text-center font-bold text-slate-400">
+                                            {{ idx + 1 }}
+                                        </td>
+
+                                        <!-- DNI / Credencial -->
+                                        <td class="py-3 px-3 whitespace-nowrap space-y-1">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="font-mono font-black text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700">
+                                                    {{ enrollment.dni }}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    @click="viewCredential(enrollment)"
+                                                    title="Ver Credencial Digital y QR"
+                                                    class="text-rose-900 dark:text-rose-400 hover:text-rose-700 p-0.5 rounded hover:bg-rose-100 dark:hover:bg-rose-950/60 cursor-pointer"
+                                                >
+                                                    <QrCode class="size-3.5" />
+                                                </button>
+                                            </div>
+                                            <div v-if="enrollment.credential_code" class="text-[10px] text-slate-400 font-mono">
+                                                {{ enrollment.credential_code }}
+                                            </div>
+                                        </td>
+
+                                        <!-- Participante -->
+                                        <td class="py-3 px-3">
+                                            <div class="font-black text-slate-950 dark:text-white leading-snug">
+                                                {{ enrollment.paterno }} {{ enrollment.materno || '' }}, {{ enrollment.nombres }}
+                                            </div>
+                                            <div v-if="enrollment.certificate_code" class="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1 mt-0.5">
+                                                <Award class="size-3" />
+                                                <span>{{ enrollment.certificate_code }}</span>
+                                            </div>
+                                        </td>
+
+                                        <!-- Contacto -->
+                                        <td class="py-3 px-3 whitespace-nowrap text-xs space-y-0.5">
+                                            <div class="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                                                <Mail class="size-3 text-slate-400 shrink-0" />
+                                                <a :href="`mailto:${enrollment.email}`" class="hover:underline hover:text-rose-900 font-medium truncate max-w-[180px] inline-block">
+                                                    {{ enrollment.email }}
+                                                </a>
+                                            </div>
+                                            <div v-if="enrollment.phone" class="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 text-[11px]">
+                                                <Phone class="size-3 text-slate-400 shrink-0" />
+                                                <a :href="`https://wa.me/51${enrollment.phone}`" target="_blank" class="hover:underline hover:text-emerald-700 font-mono font-bold">
+                                                    {{ enrollment.phone }}
+                                                </a>
+                                            </div>
+                                        </td>
+
+                                        <!-- Asistencias -->
+                                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                                            <div class="font-black text-slate-900 dark:text-white">
+                                                {{ enrollment.attended_sessions }} / {{ totalSessions }}
+                                            </div>
+                                            <div class="text-[10px] font-bold font-mono text-slate-500">
+                                                {{ enrollment.attendance_percentage }}%
+                                            </div>
+                                        </td>
+
+                                        <!-- Nota Final -->
+                                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                                            <span
+                                                v-if="enrollment.final_grade !== null && enrollment.final_grade !== undefined"
+                                                :class="[
+                                                    'font-mono font-black text-xs px-2 py-0.5 rounded border',
+                                                    Number(enrollment.final_grade) >= 11
+                                                        ? 'bg-rose-50 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800'
+                                                        : 'bg-red-50 text-red-900 border-red-300 dark:bg-red-950 dark:text-red-200 dark:border-red-800'
+                                                ]"
+                                            >
+                                                {{ Number(enrollment.final_grade).toFixed(1) }}
+                                            </span>
+                                            <span v-else class="text-slate-400 font-bold">-</span>
+                                        </td>
+
+                                        <!-- Estado Oficial -->
+                                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                                            <Badge
+                                                variant="outline"
+                                                :class="['text-[11px] font-black uppercase px-2 py-0.5', getStatusBadge(enrollment.status).classes]"
+                                            >
+                                                {{ getStatusBadge(enrollment.status).label }}
+                                            </Badge>
+                                        </td>
+
+                                        <!-- Acciones (CRUD) -->
+                                        <td v-if="can.manage_enrollments" class="py-3 px-3 text-right whitespace-nowrap">
+                                            <div class="flex items-center justify-end gap-1.5">
+                                                <!-- Asistencia Rápida (+1) -->
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    class="h-8 px-2 text-xs font-bold text-emerald-800 hover:text-emerald-950 hover:bg-emerald-50 dark:text-emerald-400"
+                                                    title="Registrar +1 asistencia rápida"
+                                                    :disabled="isRecordingQuickAttendance === enrollment.id"
+                                                    @click="quickRecordAttendance(enrollment)"
+                                                >
+                                                    <Loader2 v-if="isRecordingQuickAttendance === enrollment.id" class="size-3.5 animate-spin" />
+                                                    <span v-else class="flex items-center gap-1">
+                                                        <Plus class="size-3" />
+                                                        <span class="hidden md:inline">Asist.</span>
+                                                    </span>
+                                                </Button>
+
+                                                <!-- Emitir Certificado si califica y no lo tiene -->
+                                                <Button
+                                                    v-if="enrollment.status === 'aprobado' && !enrollment.certificate_code"
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    class="h-8 px-2 text-xs font-bold text-amber-800 hover:text-amber-950 hover:bg-amber-50"
+                                                    title="Emitir certificado oficial"
+                                                    :disabled="isIssuingSingleCert === enrollment.id"
+                                                    @click="issueSingleCertificate(enrollment)"
+                                                >
+                                                    <Loader2 v-if="isIssuingSingleCert === enrollment.id" class="size-3.5 animate-spin" />
+                                                    <Award v-else class="size-3.5" />
+                                                </Button>
+
+                                                <!-- Editar Matrícula -->
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    class="h-8 w-8 p-0 text-slate-700 hover:text-rose-950 hover:bg-rose-50 dark:text-slate-300"
+                                                    title="Editar datos de matrícula"
+                                                    @click="openEditModal(enrollment)"
+                                                >
+                                                    <Pencil class="size-3.5" />
+                                                </Button>
+
+                                                <!-- Eliminar Matrícula -->
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    class="h-8 w-8 p-0 text-rose-700 hover:text-rose-950 hover:bg-rose-100 dark:text-rose-400"
+                                                    title="Eliminar o desmatricular participante"
+                                                    @click="openDeleteModal(enrollment)"
+                                                >
+                                                    <Trash2 class="size-3.5" />
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Estado Vacío Si no hay participantes filtrados -->
+                            <div
+                                v-if="matriculadosFilteredEnrollments.length === 0"
+                                class="p-10 text-center space-y-3 bg-white dark:bg-slate-950"
+                            >
+                                <div class="size-14 rounded-full bg-rose-50 dark:bg-rose-950 text-rose-900 dark:text-rose-300 flex items-center justify-center mx-auto">
+                                    <Users class="size-7" />
+                                </div>
+                                <h4 class="text-sm font-black text-slate-900 dark:text-white">
+                                    No se encontraron participantes inscritos
+                                </h4>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 max-w-sm mx-auto">
+                                    <span v-if="searchQuery || statusFilter !== 'todos'">
+                                        No hay participantes que coincidan con la búsqueda o el filtro seleccionado.
+                                    </span>
+                                    <span v-else>
+                                        Aún no hay inscripciones registradas en esta capacitación. Puedes inscribir al primer alumno haciendo clic abajo.
+                                    </span>
+                                </p>
+                                <div class="pt-2 flex items-center justify-center gap-2">
+                                    <Button
+                                        v-if="searchQuery || statusFilter !== 'todos'"
+                                        variant="outline"
+                                        size="sm"
+                                        class="text-xs font-bold"
+                                        @click="searchQuery = ''; statusFilter = 'todos'"
+                                    >
+                                        Limpiar Filtros
+                                    </Button>
+                                    <Button
+                                        v-if="can.manage_enrollments"
+                                        size="sm"
+                                        :class="[THEME_BUTTONS.primary, 'text-xs font-black']"
+                                        @click="isEnrollModalOpen = true"
+                                    >
+                                        <UserPlus class="mr-1.5 size-3.5" />
+                                        Inscribir Primer Alumno
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <!-- CONTENIDO DE LA PESTAÑA 2: ASISTENCIA DE SESIONES (SIGC-4 / SIGC-12) -->
             <div v-if="activeTab === 'asistencia'" class="space-y-6">
                 <Card class="border-slate-200 dark:border-slate-800 shadow-sm">
                     <CardHeader class="pb-3 border-b bg-slate-50/60 dark:bg-slate-900/60">
@@ -1117,6 +1652,17 @@ onUnmounted(() => {
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1.5">
+                            <Label for="edit-email" class="font-bold">Correo Electrónico</Label>
+                            <Input id="edit-email" v-model="editForm.email" type="email" placeholder="correo@ejemplo.com" class="h-9 text-xs font-medium" />
+                        </div>
+                        <div class="space-y-1.5">
+                            <Label for="edit-phone" class="font-bold">Teléfono / WhatsApp</Label>
+                            <Input id="edit-phone" v-model="editForm.phone" type="text" maxlength="9" placeholder="9XXXXXXXX" class="h-9 text-xs font-medium font-mono" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1.5">
                             <Label for="edit-sessions" class="font-bold">Sesiones Asistidas</Label>
                             <Input id="edit-sessions" v-model.number="editForm.attended_sessions" type="number" min="0" max="100" class="h-9 text-xs font-bold" />
                         </div>
@@ -1140,6 +1686,96 @@ onUnmounted(() => {
                         </Button>
                     </DialogFooter>
                 </form>
+            </DialogContent>
+        </Dialog>
+
+        <!-- MODAL CRUD ELIMINAR / DESMATRICULAR PARTICIPANTE -->
+        <Dialog :open="isDeleteModalOpen" @update:open="isDeleteModalOpen = $event">
+            <DialogContent class="w-[94vw] sm:max-w-md p-6 rounded-2xl shadow-2xl border bg-white dark:bg-slate-950">
+                <DialogHeader class="text-left space-y-2">
+                    <div class="size-12 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-900 dark:text-rose-200 flex items-center justify-center mx-auto shadow-inner">
+                        <Trash2 class="size-6" />
+                    </div>
+                    <DialogTitle class="text-lg font-black text-center text-slate-950 dark:text-white">
+                        ¿Desmatricular Participante?
+                    </DialogTitle>
+                    <DialogDescription class="text-xs text-center text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Se dará de baja la matrícula de <strong class="text-slate-950 dark:text-white">{{ enrollmentToDelete?.nombres }} {{ enrollmentToDelete?.paterno }}</strong> (DNI: {{ enrollmentToDelete?.dni }}). Esta acción liberará una vacante en el aforo oficial.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <DialogFooter class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-2">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        class="w-full sm:w-auto text-xs font-bold"
+                        @click="isDeleteModalOpen = false"
+                        :disabled="isDeletingEnrollment"
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        class="w-full sm:w-auto text-xs font-black bg-rose-900 hover:bg-rose-950 text-white shadow-md"
+                        :disabled="isDeletingEnrollment"
+                        @click="confirmDeleteEnrollment"
+                    >
+                        <Loader2 v-if="isDeletingEnrollment" class="size-3.5 mr-1.5 animate-spin" />
+                        <Trash2 v-else class="size-3.5 mr-1.5" />
+                        Sí, Desmatricular
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
+        <!-- MODAL VER CREDENCIAL DIGITAL / QR DEL PARTICIPANTE -->
+        <Dialog :open="isCredentialModalOpen" @update:open="isCredentialModalOpen = $event">
+            <DialogContent class="w-[94vw] sm:max-w-md p-0 rounded-3xl shadow-2xl border border-rose-200 bg-white dark:bg-slate-950 overflow-hidden">
+                <div class="p-6 bg-gradient-to-br from-rose-950 via-rose-900 to-rose-950 text-white text-center space-y-1.5">
+                    <span class="text-[10px] font-black uppercase tracking-wider bg-white/20 px-3 py-0.5 rounded-full inline-block">
+                        SIGC-CUSCO • Acreditación Digital
+                    </span>
+                    <h3 class="text-lg font-black pt-1">Credencial Oficial de Alumno</h3>
+                    <p class="text-xs text-rose-200 line-clamp-1">
+                        {{ course.title }}
+                    </p>
+                </div>
+
+                <div class="p-6 text-center space-y-4">
+                    <div class="p-4 bg-white rounded-2xl border-2 border-dashed border-rose-200 inline-block shadow-inner mx-auto">
+                        <div v-html="credentialQrSvg" class="flex justify-center" />
+                        <div class="font-mono text-xs font-black text-rose-950 mt-2">
+                            {{ credentialEnrollment?.credential_code }}
+                        </div>
+                    </div>
+
+                    <div class="text-xs space-y-1 text-slate-800 dark:text-slate-200">
+                        <div class="font-black text-base text-slate-950 dark:text-white">
+                            {{ credentialEnrollment?.nombres }} {{ credentialEnrollment?.paterno }} {{ credentialEnrollment?.materno || '' }}
+                        </div>
+                        <div>
+                            DNI: <strong class="font-mono text-sm">{{ credentialEnrollment?.dni }}</strong>
+                        </div>
+                        <div v-if="credentialEnrollment?.email" class="text-slate-500 font-medium">
+                            {{ credentialEnrollment?.email }}
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            class="text-xs font-bold w-full"
+                            @click="isCredentialModalOpen = false"
+                        >
+                            Cerrar Credencial
+                        </Button>
+                    </div>
+                </div>
             </DialogContent>
         </Dialog>
 

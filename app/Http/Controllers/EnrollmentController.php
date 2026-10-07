@@ -119,6 +119,8 @@ class EnrollmentController extends Controller
             'attended_sessions' => ['required', 'integer', 'min:0'],
             'final_grade' => ['nullable', 'numeric', 'min:0', 'max:20'],
             'certificate_code' => ['nullable', 'string', 'max:100'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:20'],
         ]);
 
         // Si se aprueba y no tiene código de certificado, se genera automáticamente
