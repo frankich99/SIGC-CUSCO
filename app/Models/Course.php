@@ -15,20 +15,26 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $code
  * @property string $title
+ * @property string|null $institution
  * @property string|null $description
  * @property int|null $instructor_id
  * @property string|null $instructor_name
  * @property Carbon $start_date
  * @property Carbon $end_date
  * @property int $hours
+ * @property int $total_sessions
+ * @property int $min_attendance_percentage
  * @property int $capacity
  * @property CourseStatus|string $status
+ * @property Carbon|null $acta_closed_at
+ * @property int|null $acta_closed_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User|null $instructor
+ * @property-read User|null $actaCloser
  * @property-read string $instructor_display_name
  */
-#[Fillable(['code', 'title', 'institution', 'description', 'instructor_id', 'instructor_name', 'start_date', 'end_date', 'hours', 'capacity', 'status'])]
+#[Fillable(['code', 'title', 'institution', 'description', 'instructor_id', 'instructor_name', 'start_date', 'end_date', 'hours', 'total_sessions', 'min_attendance_percentage', 'capacity', 'status', 'acta_closed_at', 'acta_closed_by'])]
 class Course extends Model
 {
     use HasFactory;
@@ -51,8 +57,11 @@ class Course extends Model
             'start_date' => 'date:Y-m-d',
             'end_date' => 'date:Y-m-d',
             'hours' => 'integer',
+            'total_sessions' => 'integer',
+            'min_attendance_percentage' => 'integer',
             'capacity' => 'integer',
             'status' => CourseStatus::class,
+            'acta_closed_at' => 'datetime',
         ];
     }
 
@@ -64,6 +73,24 @@ class Course extends Model
     public function instructor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'instructor_id');
+    }
+
+    /**
+     * Usuario que cerró oficialmente el acta.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function actaCloser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'acta_closed_by');
+    }
+
+    /**
+     * Verifica si el acta oficial está cerrada.
+     */
+    public function isActaClosed(): bool
+    {
+        return ! is_null($this->acta_closed_at);
     }
 
     /**
@@ -88,6 +115,16 @@ class Course extends Model
     public function enrollments(): HasMany
     {
         return $this->hasMany(Enrollment::class);
+    }
+
+    /**
+     * Registros de asistencia por sesión.
+     *
+     * @return HasMany<AttendanceRecord, $this>
+     */
+    public function attendanceRecords(): HasMany
+    {
+        return $this->hasMany(AttendanceRecord::class);
     }
 
     /**

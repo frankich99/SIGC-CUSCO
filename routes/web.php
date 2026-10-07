@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CourseAcademicController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DniController;
 use App\Http\Controllers\EnrollmentController;
@@ -85,6 +86,8 @@ Route::get('api/certificates/lookup', function (Request $request) {
                 'attended_sessions' => $e->attended_sessions,
                 'final_grade' => $e->final_grade,
                 'certificate_code' => $e->certificate_code ?? ('CERT-'.$e->course_id.'-'.$e->id),
+                'certificate_hash' => $e->certificate_hash,
+                'certificate_issued_at' => $e->certificate_issued_at ? $e->certificate_issued_at->format('d/m/Y') : null,
             ];
         }),
     ]);
@@ -146,6 +149,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('enrollments/{enrollment}', [EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
     Route::post('enrollments/{enrollment}/attendance', [EnrollmentController::class, 'recordAttendance'])->name('enrollments.attendance');
     Route::post('enrollments/{enrollment}/certificate', [EnrollmentController::class, 'generateCertificate'])->name('enrollments.certificate');
+
+    // Módulo Académico Oficial SIGC (Asistencia, Actas, Certificados en Lote, Reportes)
+    Route::post('courses/{course}/sessions/{session}/attendance', [CourseAcademicController::class, 'recordSessionAttendance'])->name('courses.sessions.attendance');
+    Route::post('courses/{course}/attendance/sync', [CourseAcademicController::class, 'syncOfflineAttendance'])->name('courses.attendance.sync');
+    Route::post('courses/{course}/acta/close', [CourseAcademicController::class, 'closeActa'])->name('courses.acta.close');
+    Route::post('courses/{course}/certificates/bulk-issue', [CourseAcademicController::class, 'bulkIssueCertificates'])->name('courses.certificates.bulk-issue');
+    Route::get('courses/{course}/reports/attendance-csv', [CourseAcademicController::class, 'exportAttendanceCsv'])->name('courses.reports.attendance-csv');
+    Route::get('courses/{course}/reports/acta-csv', [CourseAcademicController::class, 'exportActaCsv'])->name('courses.reports.acta-csv');
 });
 
 require __DIR__.'/settings.php';
