@@ -35,7 +35,6 @@ function submitLogin() {
         onSuccess: () => {
             emit('update:open', false);
             form.reset('password');
-            router.visit('/dashboard');
         },
     });
 }
@@ -55,7 +54,7 @@ function submitLogin() {
                         Iniciar Sesión
                     </DialogTitle>
                     <DialogDescription class="text-xs text-slate-600 dark:text-slate-400">
-                        Ingresa con tu correo y contraseña para acceder a tus capacitaciones.
+                        Ingresa con tu correo o DNI y contraseña para acceder a tus capacitaciones.
                     </DialogDescription>
                 </DialogHeader>
             </div>
@@ -70,12 +69,12 @@ function submitLogin() {
                     </div>
 
                     <div class="space-y-1">
-                        <Label for="login-modal-email" class="text-xs font-bold text-slate-900 dark:text-white">Correo Electrónico</Label>
+                        <Label for="login-modal-email" class="text-xs font-bold text-slate-900 dark:text-white">Correo Electrónico o DNI</Label>
                         <Input
                             id="login-modal-email"
                             v-model="form.email"
-                            type="email"
-                            placeholder="correo@ejemplo.com"
+                            type="text"
+                            placeholder="correo@ejemplo.com o DNI"
                             class="text-xs h-9 font-medium"
                             required
                             autofocus

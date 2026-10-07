@@ -48,17 +48,17 @@ defineProps<{
         <div class="grid gap-5">
             <div class="grid gap-1.5">
                 <Label for="email" class="text-xs font-bold text-slate-800 dark:text-slate-200">
-                    Correo electrónico
+                    Correo electrónico o DNI
                 </Label>
                 <Input
                     id="email"
-                    type="email"
+                    type="text"
                     name="email"
                     required
                     v-focus
                     :tabindex="1"
-                    autocomplete="email"
-                    placeholder="correo@ejemplo.com"
+                    autocomplete="username"
+                    placeholder="correo@ejemplo.com o DNI"
                     class="text-xs text-slate-900 font-medium"
                 />
                 <InputError :message="errors.email" />

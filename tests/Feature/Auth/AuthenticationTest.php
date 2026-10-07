@@ -75,3 +75,18 @@ test('users are rate limited', function () {
 
     $response->assertTooManyRequests();
 });
+
+test('users can authenticate using their dni instead of email', function () {
+    $user = User::factory()->create([
+        'dni' => '13396200',
+        'password' => 'password',
+    ]);
+
+    $response = $this->post(route('login.store'), [
+        'email' => '13396200',
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticatedAs($user);
+    $response->assertRedirect(route('dashboard', absolute: false));
+});
