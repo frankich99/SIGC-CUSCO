@@ -1,0 +1,29 @@
+\section{Roles, responsabilidades y forma de coordinación}
+
+El equipo está formado por tres estudiantes con funciones claras para no duplicar esfuerzos:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{P{4.2cm} P{4.2cm} Y}
+\toprule
+\textbf{Integrante} & \textbf{Rol principal} & \textbf{Responsabilidades directas} \\
+\midrule
+\textbf{Choquenaira Quispe, Noe Franklin} \newline \textit{(133962)} & Líder Técnico y Desarrollador Full-Stack & Diseña la arquitectura en Laravel 13 con PHP 8.4, programa las rutas, controladores y la seguridad de roles (RBAC). Administra el repositorio en GitHub y aprueba los Pull Requests. \\
+\addlinespace
+\textbf{Yaranga Achahui, Aldo} \newline \textit{(103179)} & Base de Datos y Facilitador Jira & Modela las tablas y migraciones en MySQL 8.0, organiza el backlog en Jira y cuida que se respeten los límites de tareas en el tablero. \\
+\addlinespace
+\textbf{Ccama Enriquez, Carolay} \newline \textit{(210921)} & Calidad (QA) y Frontend & Diseña las pantallas con Blade y Tailwind CSS, escribe las pruebas automáticas en PHPUnit y revisa que cada tarea cumpla lo prometido. \\
+\bottomrule
+\end{tabularx}
+\caption{Roles y responsabilidades de los integrantes del equipo.}
+\label{tab:roles}
+\end{table}
+
+\subsection{Forma de coordinación}
+
+\begin{itemize}[nosep]
+    \item \textbf{Seguimiento en Jira y GitHub:} Cada cambio se trabaja en una rama de Git ligada a su ticket de Jira. No se inicia ninguna tarea sin tenerla registrada en el tablero.
+    \item \textbf{Reunión diaria de 10 minutos:} Revisión rápida del tablero Jira para saber qué se terminó, qué está en desarrollo y si alguien tiene alguna traba técnica.
+    \item \textbf{Revisión de código obligatoria:} Ningún integrante puede subir código directamente a la rama principal (\texttt{main}); siempre se requiere la aprobación de otro compañero en GitHub.
+\end{itemize}

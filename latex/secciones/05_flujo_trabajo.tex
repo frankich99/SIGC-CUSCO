@@ -1,0 +1,42 @@
+\section{Flujo de trabajo del equipo}
+
+El avance de las tareas se controla con un tablero ágil en \textbf{Jira Software}:
+
+\subsection{Estados del tablero}
+
+\begin{enumerate}[nosep]
+    \item \textbf{Backlog:} Lista de requerimientos pendientes ordenados por prioridad.
+    \item \textbf{To Do (Por hacer):} Tareas elegidas para el sprint que ya tienen criterios de aceptación claros (\textit{Dado / Cuando / Entonces}).
+    \item \textbf{In Progress (En desarrollo):} Tarea en construcción activa dentro de una rama de Git (\texttt{feature/SIGC-XX}).
+    \item \textbf{In Review / QA (En revisión):} Pull Request abierto en GitHub para que otro compañero revise el código y las pruebas.
+    \item \textbf{Done (Hecho):} Tarea terminada, probada y fusionada en la rama principal (\texttt{main}).
+\end{enumerate}
+
+\subsection{Límites de Trabajo en Progreso (Límites WIP)}
+
+Para que el equipo termine tareas antes de abrir otras nuevas, se definieron dos límites fijos:
+\begin{itemize}[nosep]
+    \item \textbf{En desarrollo (\textit{In Progress}):} Máximo \textbf{2 tareas al mismo tiempo} para los 3 integrantes.
+    \item \textbf{En revisión (\textit{In Review}):} Máximo \textbf{2 tareas al mismo tiempo}.
+\end{itemize}
+\textbf{Regla del flujo:} Si la columna de revisión llega a 2 tareas, se prohíbe jalar tareas nuevas desde \textit{To Do}. Todo el equipo apoya en revisar y aprobar para liberar la columna.
+
+\subsection{Política de bloqueo}
+
+Si una tarea no puede continuar por un problema técnico o duda del requerimiento:
+\begin{itemize}[nosep]
+    \item Se marca en Jira con bandera roja (\texttt{Flagged}) y se anota el motivo en un comentario.
+    \item La tarea sigue ocupando espacio en el límite WIP para que el problema no se ignore.
+    \item Si el bloqueo dura más de 24 horas, el equipo se reúne para resolverlo de inmediato.
+\end{itemize}
+
+\subsection{Definición de hecho (Definition of Done - DoD)}
+
+Una tarea solo se pasa a \textbf{Done} si cumple lo siguiente:
+\begin{enumerate}[nosep]
+    \item Cumple los criterios de aceptación acordados.
+    \item Las migraciones de MySQL corren sin fallar (\texttt{php artisan migrate:fresh}).
+    \item Las pruebas automatizadas con PHPUnit pasan en verde.
+    \item El Pull Request fue revisado y aprobado por otro integrante en GitHub.
+    \item El cambio está integrado en la rama principal (\texttt{main}) y probado localmente.
+\end{enumerate}

@@ -1,0 +1,61 @@
+% ==============================================================================
+% DOCUMENTO PRINCIPAL - LATEX
+% Proyecto: SIGC-CUSCO | Proceso de Desarrollo e Incremento 1
+% Asignatura: Ingeniería de Software I - UNSAAC
+% ==============================================================================
+
+\documentclass[12pt,a4paper]{article}
+
+\input{config/packages.tex}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+
+% 1. Portada Oficial UNSAAC
+\input{secciones/00_portada.tex}
+
+% 2. Tabla de Contenidos
+\newpage
+\hypersetup{pageanchor=true}
+\pagenumbering{roman}
+{
+    \hypersetup{linkcolor=black}
+    \begin{spacing}{0.95}
+    \tableofcontents
+    \end{spacing}
+}
+\newpage
+\pagenumbering{arabic}
+
+% 1. Datos generales del proyecto
+\input{secciones/01_datos_generales.tex}
+\vspace{0.3cm}
+
+% 2. Contexto del proyecto y restricciones
+\input{secciones/02_contexto_restricciones.tex}
+\vspace{0.3cm}
+
+% 3. Enfoque de desarrollo seleccionado y justificación
+\input{secciones/03_enfoque_desarrollo.tex}
+\vspace{0.3cm}
+
+% 4. Roles, responsabilidades y forma de coordinación
+\input{secciones/04_roles_coordinacion.tex}
+\vspace{0.3cm}
+
+% 5. Flujo de trabajo del equipo
+\input{secciones/05_flujo_trabajo.tex}
+\vspace{0.3cm}
+
+% 6. Incrementos presentados del proyecto
+\input{secciones/06_incrementos_proyecto.tex}
+\vspace{0.3cm}
+
+% 7. Política de uso de IA y registro de uso
+\input{secciones/07_politica_registro_ia.tex}
+\vspace{0.15cm}
+
+% 8. Conclusiones
+\input{secciones/08_conclusiones.tex}
+
+\end{document}

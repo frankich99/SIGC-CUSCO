@@ -1,0 +1,93 @@
+\section{Incrementos presentados del proyecto}
+
+El desarrollo se realiza mediante entregas periódicas de software utilizable. A continuación se reporta el primer incremento concluido:
+
+\subsection{Incremento 1: Autenticación RBAC y Gestión de Capacitaciones}
+
+El objetivo de este primer ciclo fue montar la base técnica del sistema en Laravel 13, conectar la base de datos MySQL 8.0 y permitir que los administradores gestionen cursos de forma segura.
+
+\subsubsection{Funcionalidad desarrollada}
+\begin{itemize}[nosep]
+    \item \textbf{Estructura base:} Proyecto Laravel 13 con tablas y migraciones vinculadas en MySQL 8.0.
+    \item \textbf{Seguridad y roles (RBAC):} Inicio de sesión con permisos diferenciados para Administrador, Docente y Participante.
+    \item \textbf{Gestión de cursos:} Formulario para crear cursos con título, fechas de inicio/fin, horas, límite de vacantes y docente asignado.
+    \item \textbf{Catálogo de cursos:} Tabla con buscador y filtro por estado (Abierto, En curso, Concluido).
+\end{itemize}
+
+\subsubsection{Evidencia de funcionamiento}
+La plataforma ya funciona en el entorno local, permitiendo iniciar sesión y crear capacitaciones.
+
+\begin{cajaevidencia}{Capturas de pantalla del sistema}
+    \textbf{¿Qué debe ingresar aquí?:}
+    Capturas de pantalla de la aplicación web: formulario de login, formulario para crear una capacitación y tabla de cursos guardados en la base de datos.
+    \vspace{0.15cm}
+    \textbf{Ejemplo sugerido:}
+    Pegar una o dos imágenes mostrando la pantalla de login y el listado de capacitaciones activas en \texttt{http://localhost:8000/cursos}.
+\end{cajaevidencia}
+
+\subsubsection{Pruebas o validaciones realizadas}
+Se escribieron pruebas automáticas con PHPUnit para comprobar que el sistema responda bien ante errores y accesos indebidos:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{P{1.8cm} P{4.8cm} P{4.5cm} Y}
+\toprule
+\textbf{Código} & \textbf{Prueba realizada} & \textbf{Resultado esperado} & \textbf{Estado} \\
+\midrule
+\textbf{CP-01} & Alumno intenta entrar a la pantalla de crear cursos. & Acceso denegado (Error HTTP 403). & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-02} & Se intenta guardar un curso con vacantes en 0 o negativo. & Formulario bloquea y muestra mensaje de alerta. & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-03} & Se ingresa una fecha de fin menor a la fecha de inicio. & Error de validación por fechas incoherentes. & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-04} & Se completa el formulario con datos válidos y docente. & Curso guardado en MySQL y visible en la lista. & \textbf{Aprobado} \\
+\bottomrule
+\end{tabularx}
+\caption{Pruebas automáticas ejecutadas en el Incremento 1.}
+\label{tab:pruebas_inc1}
+\end{table}
+
+\begin{cajaevidencia}{Consola de pruebas PHPUnit}
+    \textbf{¿Qué debe ingresar aquí?:}
+    Captura o texto de la terminal ejecutando el comando de pruebas (\texttt{php artisan test}).
+    \vspace{0.15cm}
+    \textbf{Ejemplo sugerido de salida:}
+    \begin{quote}
+        \texttt{\$ php artisan test --filter=CourseTest} \\
+        \texttt{PASS Tests\textbackslash Feature\textbackslash CourseTest} \\
+        \texttt{[OK] non admin cannot create courses \hfill 0.08s} \\
+        \texttt{[OK] capacity must be positive \hfill 0.06s} \\
+        \texttt{[OK] course stores in mysql \hfill 0.11s} \\
+        \texttt{Tests: 3 passed (9 assertions)}
+    \end{quote}
+\end{cajaevidencia}
+
+\subsubsection{Cambios realizados respecto al avance anterior}
+\begin{itemize}[nosep]
+    \item \textbf{Uso formal de Jira:} Se abandonaron notas externas para controlar cada tarea con tickets de Jira (\texttt{SIGC-XX}).
+    \item \textbf{Tablas ordenadas en MySQL:} Se separaron las tablas de usuarios, roles y cursos para no duplicar datos y asegurar relaciones limpias.
+    \item \textbf{Validación estricta en Laravel:} Se configuraron reglas automáticas para impedir que se ingresen cupos negativos o fechas erróneas.
+\end{itemize}
+
+\subsubsection{Métricas y seguimiento del proceso}
+\begin{itemize}[nosep]
+    \item \textbf{Tiempo por tarea (\textit{Cycle Time}):} En promedio, cada historia tomó 2 días desde que se empezó a programar hasta que se aprobó.
+    \item \textbf{Control de tareas en curso:} Se respetó el tope de 2 tareas simultáneas, evitando amontonar trabajo sin terminar.
+    \item \textbf{Cumplimiento:} Se terminaron al 100\% las dos historias comprometidas (\texttt{SIGC-1} y \texttt{SIGC-2}).
+\end{itemize}
+
+\begin{cajaevidencia}{Captura del tablero Jira}
+    \textbf{¿Qué debe ingresar aquí?:}
+    Captura de pantalla de Jira mostrando las tarjetas en la columna \textbf{Done} (Hecho).
+    \vspace{0.15cm}
+    \textbf{Ejemplo sugerido:}
+    Pegar imagen del tablero mostrando los tickets \texttt{SIGC-1} (Roles) y \texttt{SIGC-2} (Cursos) en la columna \textbf{Done}.
+\end{cajaevidencia}
+
+\subsubsection{Acuerdos de mejora para el siguiente incremento}
+\begin{enumerate}[nosep]
+    \item \textbf{Revisión rápida de código:} Atender los Pull Requests en menos de 24 horas para no frenar a los compañeros.
+    \item \textbf{Escribir pruebas antes del código:} Aplicar TDD para la matrícula de alumnos y control de aforo antes de diseñar la pantalla.
+    \item \textbf{Alistar la lectura de QR:} Probar la librería de escaneo con cámara antes de empezar el segundo incremento.
+\end{enumerate}

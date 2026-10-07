@@ -1,0 +1,37 @@
+\section{Contexto del proyecto y restricciones}
+
+El proyecto cuenta con un plazo estricto de \textbf{dos semanas} de desarrollo (iniciado el 22 de octubre de 2026), trabajado por tres estudiantes de la UNSAAC a tiempo parcial. Para cumplir con el tiempo, se seleccionaron herramientas estables y un flujo de trabajo ágil y ordenado.
+
+\subsection{Tecnologías utilizadas}
+
+\begin{itemize}[nosep]
+    \item \textbf{Backend:} \textbf{Laravel 13} con \textbf{PHP 8.4}. Se usa para el manejo de rutas, controladores, validación de datos en formularios y el ORM Eloquent para comunicarse con la base de datos.
+    \item \textbf{Base de Datos:} \textbf{MySQL 8.0} (motor InnoDB). Garantiza que los cupos no se dupliquen y mantiene la relación entre usuarios, cursos y notas mediante claves foráneas.
+    \item \textbf{Frontend:} Plantillas \textbf{Blade} y estilos con \textbf{Tailwind CSS}, asegurando que la interfaz funcione bien tanto en computadoras como en celulares.
+    \item \textbf{Gestión del proyecto:} \textbf{Jira Software}. Tablero ágil para organizar el backlog, asignar tareas y medir el avance del equipo.
+    \item \textbf{Control de versiones y pruebas:} \textbf{GitHub} para el control de cambios mediante Pull Requests y \textbf{PHPUnit} para ejecutar pruebas automáticas.
+\end{itemize}
+
+\subsection{Stakeholders (Involucrados en el sistema)}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{P{3.8cm} Y}
+\toprule
+\textbf{Involucrado} & \textbf{¿Qué hace o qué necesita en el sistema?} \\
+\midrule
+\textbf{Empresas / Instituciones} & Convocan a las capacitaciones y revisan los reportes finales de asistencia y aprobados. \\
+\addlinespace
+\textbf{Administrador} & Crea los cursos, asigna docentes, supervisa las vacantes y autoriza la emisión de certificados. \\
+\addlinespace
+\textbf{Docente / Instructor} & Dicta las clases, proyecta el código QR para la asistencia y sube las notas de los alumnos. \\
+\addlinespace
+\textbf{Participante / Alumno} & Se inscribe con su DNI, marca su asistencia escaneando el QR con su celular y descarga su certificado PDF. \\
+\addlinespace
+\textbf{Verificador externo} & Cualquier persona o empresa que escanea el código QR para comprobar si el certificado es original. \\
+\bottomrule
+\end{tabularx}
+\caption{Principales involucrados en el sistema SIGC-CUSCO.}
+\label{tab:stakeholders}
+\end{table}

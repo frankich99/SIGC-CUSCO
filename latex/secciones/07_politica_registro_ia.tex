@@ -1,0 +1,37 @@
+\section{Política de uso de IA y registro de uso}
+
+En SIGC-CUSCO la Inteligencia Artificial se utiliza como una herramienta de apoyo para consultas técnicas. La autoría y responsabilidad del software es 100\% del equipo de estudiantes.
+
+\subsection{Política de uso de IA}
+
+\begin{itemize}[nosep]
+    \item \textbf{Uso permitido:} Ayuda para ordenar historias de usuario, consultas puntuales de sintaxis en Laravel 13 y sugerencias de casos de prueba para PHPUnit.
+    \item \textbf{Uso prohibido:} Copiar y pegar código sin revisarlo; dejar que la IA decida la estructura del sistema o la base de datos; y subir datos privados o contraseñas a herramientas públicas.
+    \item \textbf{Regla obligatoria:} Toda ayuda de la IA debe probarse con PHPUnit y revisarse en equipo antes de integrarla al proyecto.
+\end{itemize}
+
+\subsection{Registro de uso de IA (Bitácora)}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{P{2.2cm} P{2.6cm} P{4.2cm} Y}
+\toprule
+\textbf{Fecha / Ticket} & \textbf{Herramienta} & \textbf{¿Qué se consultó?} & \textbf{¿Cómo se revisó y aprobó?} \\
+\midrule
+\textbf{28/09/2026} \newline \texttt{SIGC-1} & Claude 3.5 Sonnet & Mejorar redacción de historias de usuario para roles en formato Gherkin. & Se quitaron supuestos que no pedía el docente y se subieron a Jira. \textit{Revisó: N. Choquenaira.} \\
+\addlinespace
+\textbf{02/10/2026} \newline \texttt{SIGC-2} & ChatGPT (GPT-4o) & Sintaxis de validación en Laravel para que la fecha final no sea antes del inicio. & Se usó la regla nativa de Laravel y se probó con el caso CP-03. \textit{Revisó: C. Ccama.} \\
+\bottomrule
+\end{tabularx}
+\caption{Bitácora de consultas técnicas a Inteligencia Artificial.}
+\label{tab:registro_ia}
+\end{table}
+
+\begin{cajaevidencia}{Registro adicional de IA}
+    \textbf{¿Qué debe ingresar aquí?:}
+    Anotar una consulta real que el equipo haya hecho a la IA durante el desarrollo.
+    \vspace{0.15cm}
+    \textbf{Ejemplo sugerido:}
+    Añadir a la Tabla \ref{tab:registro_ia}: Fecha (04/10/2026), Ticket (SIGC-2), Herramienta (GitHub Copilot), Consulta (Creación de datos de prueba para cursos en MySQL), y Revisión (Se verificó con \texttt{php artisan db:seed}. Revisó: A. Yaranga).
+\end{cajaevidencia}
