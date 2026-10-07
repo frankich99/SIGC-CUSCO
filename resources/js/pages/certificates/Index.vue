@@ -24,11 +24,13 @@ import {
     LogIn,
     UserPlus,
     ExternalLink,
+    Eye,
+    ChevronRight,
 } from '@lucide/vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Dialog,
     DialogContent,
@@ -38,7 +40,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
-import AppLogo from '@/components/AppLogo.vue';
 import LoginModal from '@/components/auth/LoginModal.vue';
 import RegisterModal from '@/components/auth/RegisterModal.vue';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
@@ -73,12 +74,12 @@ const error = ref<string | null>(null);
 const studentName = ref<string | null>(null);
 const records = ref<CertificateRecord[]>([]);
 
-// Certificate Modal Preview
+// Modal de Vista Previa del Diploma
 const selectedCert = ref<CertificateRecord | null>(null);
 const isCertModalOpen = ref(false);
 const copiedCode = ref(false);
 
-// Auth Modals
+// Modales de Autenticación
 const isLoginModalOpen = ref(false);
 const isRegisterModalOpen = ref(false);
 
@@ -149,10 +150,13 @@ async function copyVerificationCode(code: string) {
             copiedCode.value = false;
         }, 2000);
     } catch {
-        // Fallback
+        // Fallback en caso de bloqueo del portapapeles
     }
 }
 
+/**
+ * Impresión / Descarga a PDF fiable que no es bloqueada por bloqueadores de ventanas emergentes (popups)
+ */
 function printCertificate(record: CertificateRecord) {
     const html = `
         <!DOCTYPE html>
@@ -365,7 +369,11 @@ function printCertificate(record: CertificateRecord) {
 }
 
 onMounted(() => {
-    if (dniQuery.value && /^\d{8}$/.test(dniQuery.value.trim())) {
+    // Si viene con parámetro en la URL (?dni=...) o prop inicial
+    const params = new URLSearchParams(window.location.search);
+    const dniParam = params.get('dni') || props.initialDni;
+    if (dniParam && /^\d{8}$/.test(dniParam.trim())) {
+        dniQuery.value = dniParam.trim();
         searchCertificates();
     }
 });
@@ -373,12 +381,12 @@ onMounted(() => {
 
 <template>
     <div class="min-h-screen flex flex-col justify-between bg-slate-50/70 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-rose-900 selection:text-white">
-        <Head title="Consulta y Descarga de Certificados Digitales - SIGC-CUSCO" />
+        <Head title="Acreditación Digital Oficial • Consulta y Descarga de Certificados - SIGC-CUSCO" />
 
         <!-- TOP INSTITUTIONAL HEADER -->
         <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md shadow-xs">
             <div class="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-                <!-- Brand Logo -->
+                <!-- Brand Logo & Retroceso Rápido -->
                 <div class="flex items-center gap-3">
                     <Link href="/" class="flex items-center gap-3 group">
                         <div class="size-10 rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] flex items-center justify-center text-white shadow-sm shadow-rose-900/20 group-hover:scale-105 transition-transform">
@@ -389,25 +397,29 @@ onMounted(() => {
                                 <span>SIGC-CUSCO</span>
                             </div>
                             <p class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium hidden sm:block">
-                                UNSAAC • Verificación de Diplomas Oficiales
+                                Acreditación Digital Oficial • Cusco, Perú
                             </p>
                         </div>
                     </Link>
                 </div>
 
-                <!-- Navigation Links -->
-                <nav class="hidden md:flex items-center gap-6 text-xs font-bold text-slate-700 dark:text-slate-300">
-                    <Link href="/" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors flex items-center gap-1.5">
-                        <ArrowLeft class="size-3.5 text-rose-800" />
-                        <span>Inicio</span>
-                    </Link>
+                <!-- Navigation Links & Botón Retroceso -->
+                <nav class="hidden md:flex items-center gap-5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                    <Button as-child variant="ghost" size="sm" class="text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-rose-900 hover:bg-rose-50/80 dark:hover:bg-rose-950/40 gap-1.5 cursor-pointer">
+                        <Link href="/">
+                            <ArrowLeft class="size-3.5 text-rose-800 dark:text-rose-400" />
+                            <span>Volver a Inicio</span>
+                        </Link>
+                    </Button>
+
                     <Link href="/courses" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors flex items-center gap-1.5">
                         <GraduationCap class="size-4 text-rose-800" />
                         <span>Capacitaciones</span>
                     </Link>
-                    <span class="text-rose-900 dark:text-rose-400 flex items-center gap-1.5 border-b-2 border-rose-900 pb-1">
+
+                    <span class="text-rose-900 dark:text-rose-300 flex items-center gap-1.5 border-b-2 border-rose-900 pb-1">
                         <Award class="size-4 text-amber-600" />
-                        <span>Certificados Digitales</span>
+                        <span>Certificados Oficiales</span>
                     </span>
                 </nav>
 
@@ -418,7 +430,7 @@ onMounted(() => {
                     </div>
 
                     <template v-if="authUser">
-                        <Button as-child size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs">
+                        <Button as-child size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer">
                             <Link href="/dashboard">
                                 <span>Mi Panel</span>
                                 <span class="ml-1.5 text-[10px] bg-rose-950 text-amber-300 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">
@@ -431,7 +443,7 @@ onMounted(() => {
                         <Button
                             variant="ghost"
                             size="sm"
-                            class="text-xs font-bold text-slate-800 hover:text-rose-900"
+                            class="text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-rose-900 cursor-pointer"
                             @click="isLoginModalOpen = true"
                         >
                             <LogIn class="size-3.5 mr-1 text-rose-900" />
@@ -439,7 +451,7 @@ onMounted(() => {
                         </Button>
                         <Button
                             size="sm"
-                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs"
+                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer"
                             @click="isRegisterModalOpen = true"
                         >
                             <UserPlus class="size-3.5 mr-1" />
@@ -450,36 +462,55 @@ onMounted(() => {
             </div>
         </header>
 
-        <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
-            <!-- HERO HEADER OF THE PAGE -->
+        <!-- MAIN CONTENT AREA: LANDING ÚNICA Y AMPLIA -->
+        <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
+            <!-- BARRA DE RETROCESO Y BREADCRUMB -->
+            <div class="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800 pb-4">
+                <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 hover:bg-rose-50 hover:text-rose-900 text-slate-800 dark:text-slate-200 cursor-pointer shadow-2xs">
+                    <Link href="/">
+                        <ArrowLeft class="size-3.5 mr-1.5 text-rose-800" />
+                        Volver al Portal de Capacitaciones
+                    </Link>
+                </Button>
+
+                <div class="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                    <Link href="/" class="hover:text-rose-900 transition-colors">Portal Principal</Link>
+                    <ChevronRight class="size-3" />
+                    <span class="text-rose-900 dark:text-rose-400 font-bold">Certificados Digitales</span>
+                </div>
+            </div>
+
+            <!-- HERO HEADER OF THE PAGE (TEXTOS EXACTOS SOLICITADOS) -->
             <div class="text-center max-w-3xl mx-auto space-y-4">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-rose-100/90 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 text-rose-950 dark:text-rose-200 text-xs font-bold shadow-xs">
-                    <ShieldCheck class="size-4 text-rose-800 dark:text-rose-400" />
-                    <span>Validación Oficial UNSAAC / Perú</span>
+                <!-- Tag Superior -->
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-100/90 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 text-rose-950 dark:text-rose-200 text-xs font-black shadow-xs">
+                    <Award class="size-4 text-rose-800 dark:text-rose-400" />
+                    <span>Acreditación Digital Oficial • Cusco, Perú</span>
                 </div>
 
+                <!-- Título Principal -->
                 <h1 class="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950 dark:text-white leading-tight">
-                    Consulta y Descarga de <span class="text-rose-900 dark:text-rose-400 underline decoration-amber-500 decoration-4 underline-offset-4">Certificados Digitales</span>
+                    Consulta y Descarga de <span class="text-rose-900 dark:text-rose-400 underline decoration-amber-500 decoration-4 underline-offset-8">Certificados Oficiales</span>
                 </h1>
 
-                <p class="text-sm sm:text-base text-slate-700 dark:text-neutral-300 max-w-2xl mx-auto leading-relaxed font-medium">
-                    Ingresa tu número de DNI para verificar en tiempo real tus cursos aprobados, registrar horas académicas acreditadas y descargar tus diplomas oficiales en formato PDF.
+                <!-- Subtítulo -->
+                <p class="text-sm sm:text-base md:text-lg text-slate-700 dark:text-neutral-300 max-w-2xl mx-auto leading-relaxed font-semibold">
+                    Ingresa tu número de DNI para consultar las capacitaciones aprobadas y descargar tu diploma digital oficial con código de verificación.
                 </p>
             </div>
 
-            <!-- SEARCH CARD -->
-            <Card class="max-w-2xl mx-auto border-2 border-rose-900/20 dark:border-rose-900/40 shadow-md bg-white dark:bg-slate-900 overflow-hidden">
+            <!-- BUSCADOR PRINCIPAL POR DNI (AMPLIO Y DESTACADO) -->
+            <Card class="max-w-2xl mx-auto border-2 border-rose-900/20 dark:border-rose-900/40 shadow-lg bg-white dark:bg-slate-900 overflow-hidden">
                 <CardHeader class="bg-gradient-to-r from-rose-50/90 via-amber-50/30 to-white dark:from-rose-950/40 dark:to-slate-900 border-b pb-4">
                     <div class="flex items-center gap-2 text-xs font-black text-rose-900 dark:text-rose-300 uppercase tracking-wider">
                         <Search class="size-4 text-rose-800" />
-                        <span>Búsqueda por Documento Nacional de Identidad</span>
+                        <span>Búsqueda Oficial con DNI</span>
                     </div>
-                    <CardTitle class="text-lg font-bold text-slate-950 dark:text-white">
-                        Consulta Inmediata con DNI
+                    <CardTitle class="text-lg sm:text-xl font-bold text-slate-950 dark:text-white">
+                        Consulta Inmediata de Diplomas
                     </CardTitle>
                     <CardDescription class="text-xs text-slate-600 dark:text-slate-400 font-medium">
-                        Sistema conectado al padrón institucional de matrículas y control de asistencia QR.
+                        Sistema sincronizado con el padrón de asistencias QR y actas de evaluación académica.
                     </CardDescription>
                 </CardHeader>
 
@@ -494,11 +525,11 @@ onMounted(() => {
                                 inputmode="numeric"
                                 maxlength="8"
                                 placeholder="Ingresa tu DNI (8 dígitos)"
-                                class="pl-10 font-mono text-base tracking-widest font-bold text-slate-950 border-slate-300 focus-visible:ring-rose-900 h-11"
+                                class="pl-10 font-mono text-base tracking-widest font-bold text-slate-950 dark:text-white border-slate-300 focus-visible:ring-rose-900 h-12"
                                 :disabled="loading"
                                 autofocus
                             />
-                            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-slate-400">
+                            <div class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-slate-400">
                                 {{ dniQuery.length }}/8
                             </div>
                         </div>
@@ -506,35 +537,68 @@ onMounted(() => {
                         <Button
                             type="submit"
                             :disabled="loading || dniQuery.length !== 8"
-                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold h-11 px-6 shadow-sm shadow-rose-900/20 shrink-0 text-sm"
+                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold h-12 px-7 shadow-md shadow-rose-900/20 shrink-0 text-sm cursor-pointer"
                         >
                             <Loader2 v-if="loading" class="size-4 mr-2 animate-spin" />
-                            <Award v-else class="size-4 mr-2 text-amber-300" />
-                            <span>Consultar Certificados</span>
+                            <Search v-else class="size-4 mr-2" />
+                            <span>Consultar DNI</span>
                         </Button>
                     </form>
 
-                    <!-- Feedback error -->
-                    <div v-if="error" class="mt-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-900 text-xs font-semibold flex items-center gap-2">
+                    <!-- Mensaje de Error -->
+                    <div v-if="error" class="mt-4 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-200 text-xs font-bold flex items-center gap-2.5">
                         <AlertCircle class="size-4 shrink-0 text-rose-700" />
                         <span>{{ error }}</span>
                     </div>
                 </CardContent>
             </Card>
 
-            <!-- RESULTS SECTION -->
+            <!-- 3 PILARES INSTITUCIONALES (CARACTERÍSTICAS DE LA LANDING) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto pt-2">
+                <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/40 space-y-2.5 shadow-2xs">
+                    <div class="size-10 rounded-xl bg-rose-100 dark:bg-rose-950 text-rose-900 dark:text-rose-300 flex items-center justify-center font-bold">
+                        <ShieldCheck class="size-5" />
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-950 dark:text-white">Validación con RENIEC</h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                        Cruce de identidad en tiempo real para emisión con nombre oficial, garantizando cero adulteraciones.
+                    </p>
+                </div>
+
+                <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/40 space-y-2.5 shadow-2xs">
+                    <div class="size-10 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 flex items-center justify-center font-bold">
+                        <QrCode class="size-5" />
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-950 dark:text-white">Asistencia QR Controlada</h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                        Certificación expedida únicamente a quienes completaron las sesiones presenciales o virtuales con código QR.
+                    </p>
+                </div>
+
+                <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/40 space-y-2.5 shadow-2xs">
+                    <div class="size-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 flex items-center justify-center font-bold">
+                        <Download class="size-5 text-rose-900 dark:text-rose-400" />
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-950 dark:text-white">Descarga Inmediata PDF</h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                        Diploma oficial en alta resolución con código de verificación verificable desde cualquier dispositivo.
+                    </p>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DE RESULTADOS DE BÚSQUEDA -->
             <div v-if="loading" class="max-w-4xl mx-auto py-12 text-center space-y-3">
                 <Loader2 class="size-8 mx-auto animate-spin text-rose-900" />
-                <p class="text-sm font-bold text-slate-800">
-                    Buscando registros y validaciones para el DNI {{ dniQuery }}...
+                <p class="text-sm font-bold text-slate-800 dark:text-slate-200">
+                    Consultando capacitaciones y diplomas para el DNI {{ dniQuery }}...
                 </p>
             </div>
 
             <div v-else-if="searched" class="max-w-4xl mx-auto space-y-6">
-                <!-- If records found -->
+                <!-- SI SE ENCUENTRAN REGISTROS -->
                 <template v-if="records.length > 0">
-                    <!-- Participant Verified Profile Header -->
-                    <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <!-- Tarjeta del Participante Titular -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div class="flex items-center gap-3.5">
                             <div class="size-12 rounded-xl bg-rose-900 text-white flex items-center justify-center font-black shadow-xs">
                                 <User class="size-6 text-amber-300" />
@@ -556,34 +620,33 @@ onMounted(() => {
                         </div>
 
                         <div class="flex items-center gap-2 self-stretch sm:self-auto justify-end">
-                            <Badge variant="outline" class="border-rose-300 text-rose-900 font-bold text-xs py-1 px-3">
+                            <Badge variant="outline" class="border-rose-300 text-rose-900 dark:border-rose-800 dark:text-rose-300 font-bold text-xs py-1 px-3 bg-rose-50 dark:bg-rose-950">
                                 <Award class="size-3.5 mr-1 text-rose-800" />
-                                {{ records.length }} {{ records.length === 1 ? 'Capacitación Encontrada' : 'Capacitaciones Encontradas' }}
+                                {{ records.length }} {{ records.length === 1 ? 'Capacitación Aprobada' : 'Capacitaciones Aprobadas' }}
                             </Badge>
                         </div>
                     </div>
 
-                    <!-- Courses Cards Grid -->
+                    <!-- Grid de Certificados Encontrados -->
                     <div class="space-y-4">
                         <Card
                             v-for="record in records"
                             :key="record.id"
-                            class="border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-slate-900 overflow-hidden"
+                            class="border border-slate-200 dark:border-slate-800 shadow-sm hover:border-rose-300 transition-all bg-white dark:bg-slate-900 overflow-hidden"
                         >
-                            <CardHeader class="p-5 pb-3 bg-slate-50/60 dark:bg-slate-900/80 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <CardHeader class="p-5 pb-3 bg-slate-50/70 dark:bg-slate-900/80 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="text-xs font-black font-mono px-2 py-0.5 rounded bg-rose-900 text-white">
+                                    <span class="text-xs font-black font-mono px-2.5 py-0.5 rounded bg-rose-900 text-white">
                                         {{ record.course_code }}
                                     </span>
                                     <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
                                         <Building2 class="size-3 text-slate-400" />
-                                        {{ record.institution }}
+                                        {{ record.institution || 'SIGC-CUSCO' }}
                                     </span>
                                 </div>
 
                                 <Badge
-                                    :class="record.status === 'aprobado' ? 'bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800' : 'bg-sky-100 text-sky-900 border-sky-300 dark:bg-sky-950 dark:text-sky-200'"
-                                    class="text-xs font-bold capitalize self-start sm:self-auto"
+                                    class="text-xs font-bold capitalize self-start sm:self-auto bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800"
                                 >
                                     <CheckCircle2 class="size-3 mr-1 text-rose-800" />
                                     {{ record.status }}
@@ -631,28 +694,30 @@ onMounted(() => {
                                 <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800">
                                     <div class="flex items-center gap-2 text-xs font-mono text-slate-600 dark:text-slate-400">
                                         <span class="font-bold text-slate-900 dark:text-slate-200">Cód. Verificación:</span>
-                                        <span class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded font-black text-rose-900 dark:text-rose-400">
+                                        <span class="bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded font-black text-rose-900 dark:text-rose-400 border border-slate-200 dark:border-slate-700">
                                             {{ record.certificate_code }}
                                         </span>
                                     </div>
 
                                     <div class="flex items-center gap-2">
                                         <Button
+                                            type="button"
                                             variant="outline"
                                             size="sm"
-                                            class="text-xs font-bold border-slate-300 hover:text-rose-900 hover:bg-rose-50"
+                                            class="text-xs font-bold border-slate-300 hover:text-rose-900 hover:bg-rose-50 cursor-pointer h-9 px-4"
                                             @click="openCertificatePreview(record)"
                                         >
-                                            <FileCheck class="size-3.5 mr-1 text-slate-700" />
-                                            Vista Previa
+                                            <Eye class="size-3.5 mr-1.5 text-slate-700" />
+                                            Ver Diploma
                                         </Button>
 
                                         <Button
+                                            type="button"
                                             size="sm"
-                                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs"
+                                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer h-9 px-4"
                                             @click="printCertificate(record)"
                                         >
-                                            <Download class="size-3.5 mr-1" />
+                                            <Download class="size-3.5 mr-1.5" />
                                             Descargar Certificado PDF
                                         </Button>
                                     </div>
@@ -662,22 +727,22 @@ onMounted(() => {
                     </div>
                 </template>
 
-                <!-- If NO records found for DNI -->
-                <div v-else class="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-4">
-                    <div class="size-14 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 mx-auto flex items-center justify-center">
-                        <AlertCircle class="size-7" />
+                <!-- SI NO SE ENCONTRARON REGISTROS -->
+                <div v-else class="p-8 sm:p-10 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-4 shadow-sm">
+                    <div class="size-14 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 mx-auto flex items-center justify-center">
+                        <Award class="size-7 text-slate-400" />
                     </div>
                     <div class="space-y-1">
                         <h3 class="text-lg font-bold text-slate-950 dark:text-white">
-                            No se encontraron cursos concluidos para el DNI {{ dniQuery }}
+                            No se encontraron certificados para el DNI {{ dniQuery }}
                         </h3>
-                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-                            Es posible que aún te encuentres en proceso de capacitación o que tu asistencia esté pendiente de cierre por la coordinación académica.
+                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed font-medium">
+                            Verifica que los 8 dígitos numéricos sean correctos o inscríbete en una de nuestras capacitaciones oficiales abiertas para obtener tu certificación.
                         </p>
                     </div>
 
                     <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300">
+                        <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 hover:bg-rose-50 hover:text-rose-900 cursor-pointer">
                             <Link href="/courses">
                                 <GraduationCap class="size-3.5 mr-1 text-rose-900" />
                                 Ver Cursos Disponibles
@@ -686,7 +751,7 @@ onMounted(() => {
                         <Button
                             variant="ghost"
                             size="sm"
-                            class="text-xs font-bold text-slate-700 hover:text-rose-900"
+                            class="text-xs font-bold text-slate-700 hover:text-rose-900 cursor-pointer"
                             @click="dniQuery = ''; searched = false;"
                         >
                             Consultar con otro DNI
@@ -695,7 +760,7 @@ onMounted(() => {
                 </div>
             </div>
 
-            <!-- INFORMATIONAL FOOTER BANNER -->
+            <!-- BANNER INFORMATIVO FINAL -->
             <div class="max-w-4xl mx-auto rounded-2xl bg-gradient-to-r from-rose-900 to-[#701a31] text-white p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md">
                 <div class="space-y-2 text-center md:text-left">
                     <div class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-300">
@@ -703,15 +768,15 @@ onMounted(() => {
                         <span>Acreditación Institucional Garantizada</span>
                     </div>
                     <h3 class="text-lg sm:text-xl font-black tracking-tight text-white">
-                        ¿Requieres validar un código impreso?
+                        ¿Deseas participar en nuevas capacitaciones?
                     </h3>
-                    <p class="text-xs sm:text-sm text-rose-100/90 max-w-lg leading-relaxed">
-                        Cada certificado cuenta con un código digital intransferible y control biométrico mediante cruce de datos con RENIEC Perú y registro de QR.
+                    <p class="text-xs sm:text-sm text-rose-100/90 max-w-lg leading-relaxed font-medium">
+                        Revisa la lista de cursos abiertos con aforo oficial e inscripción directa con DNI y control de asistencia QR.
                     </p>
                 </div>
 
                 <div class="shrink-0 flex flex-col sm:flex-row gap-3">
-                    <Button as-child variant="secondary" size="sm" class="bg-white text-rose-950 hover:bg-rose-50 font-black text-xs shadow-xs">
+                    <Button as-child variant="secondary" size="sm" class="bg-white text-rose-950 hover:bg-rose-50 font-black text-xs shadow-xs cursor-pointer h-10 px-5">
                         <Link href="/courses">
                             Explorar Convocatorias
                         </Link>
@@ -720,7 +785,7 @@ onMounted(() => {
             </div>
         </main>
 
-        <!-- FOOTER -->
+        <!-- FOOTER INSTITUCIONAL -->
         <footer class="border-t border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-950 py-8 text-xs text-slate-600 dark:text-neutral-400">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-2 font-medium">
@@ -728,41 +793,43 @@ onMounted(() => {
                     <span class="font-bold text-slate-950 dark:text-white">
                         SIGC-CUSCO
                     </span>
-                    <span>— Sistema Integral de Gestión de Capacitaciones • UNSAAC</span>
+                    <span>— Sistema Integral de Gestión de Capacitaciones • Cusco</span>
                 </div>
                 <div class="font-medium text-slate-700 dark:text-slate-300">
-                    Portal Oficial de Verificación de Diplomas • Cusco, Perú 2026
+                    Portal Oficial de Acreditación y Diplomas • Cusco, Perú 2026
                 </div>
             </div>
         </footer>
 
-        <!-- MODAL DE VISTA PREVIA DEL CERTIFICADO -->
+        <!-- MODAL DE VISTA PREVIA DEL CERTIFICADO (DIPLOMA OFICIAL) -->
         <Dialog v-model:open="isCertModalOpen">
             <DialogContent class="w-[96vw] sm:max-w-3xl max-h-[90vh] flex flex-col p-0 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+                <!-- Header Fijo Pinned -->
                 <div class="p-5 sm:p-6 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0 pr-12">
                     <DialogHeader class="text-left space-y-1">
                         <div class="flex items-center gap-2 text-xs font-black text-rose-900 dark:text-rose-400 uppercase tracking-wider">
                             <Award class="size-4 text-rose-800" />
-                            <span>Vista Previa del Diploma Digital</span>
+                            <span>Vista Previa del Diploma Digital Oficial</span>
                         </div>
                         <DialogTitle class="text-lg font-black text-slate-950 dark:text-white">
                             {{ selectedCert?.course_title }}
                         </DialogTitle>
                         <DialogDescription class="text-xs text-slate-600 dark:text-slate-400 font-medium">
-                            Certificado oficial emitido bajo supervisión académica institucional.
+                            Acreditación académica válida para trámites profesionales y laborales.
                         </DialogDescription>
                     </DialogHeader>
                 </div>
 
+                <!-- Cuerpo Scrollable Interno con scrollbar sutil -->
                 <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-5 sm:p-6">
                     <div v-if="selectedCert" class="space-y-6">
-                        <!-- Vista previa realista con doble marco Granate Imperial -->
-                        <div class="p-6 sm:p-8 bg-[#fdfbf7] dark:bg-slate-950 border-4 border-double border-[#800020] text-center space-y-4 rounded-lg shadow-inner relative">
+                        <!-- Vista previa realista con doble marco Granate Imperial y acento dorado -->
+                        <div class="p-6 sm:p-8 bg-[#fdfbf7] dark:bg-slate-950 border-4 border-double border-[#800020] text-center space-y-4 rounded-xl shadow-inner relative">
                             <div class="text-[11px] font-black tracking-widest text-[#800020] uppercase">
-                                Universidad Nacional de San Antonio Abad del Cusco
+                                {{ selectedCert.institution || 'SIGC-CUSCO' }}
                             </div>
                             <div class="text-[10px] tracking-wider text-slate-500 font-semibold uppercase">
-                                Sistema Integral de Gestión de Capacitaciones (SIGC-CUSCO)
+                                Sistema Integral de Gestión de Capacitaciones • Cusco, Perú
                             </div>
 
                             <div class="pt-2">
@@ -785,8 +852,8 @@ onMounted(() => {
                                 Habiendo completado satisfactoriamente el curso
                                 <strong class="text-[#800020] block my-1 text-sm font-black">"{{ selectedCert.course_title }}"</strong>
                                 con un total de <strong>{{ formatHours(selectedCert.hours) }}</strong>, desarrollado
-                                del {{ selectedCert.start_date }} al {{ selectedCert.end_date }}, cumpliendo con
-                                las asistencias por QR y las evaluaciones oficiales.
+                                del {{ selectedCert.start_date }} al {{ selectedCert.end_date }}, habiendo cumplido con
+                                las asistencias mediante código QR y las evaluaciones oficiales.
                             </div>
 
                             <div class="pt-6 grid grid-cols-2 gap-6 text-xs border-t border-slate-300 dark:border-slate-800">
@@ -796,24 +863,26 @@ onMounted(() => {
                                 </div>
                                 <div>
                                     <div class="font-bold text-slate-900 dark:text-white">Dirección Académica</div>
-                                    <div class="text-[10px] text-slate-500 uppercase">SIGC-CUSCO</div>
+                                    <div class="text-[10px] text-slate-500 uppercase">Coordinación SIGC-CUSCO</div>
                                 </div>
                             </div>
 
                             <div class="pt-3 text-[10px] font-mono text-slate-500 flex justify-between items-center border-t border-dashed border-slate-300 dark:border-slate-800">
                                 <span>Código: <strong>{{ selectedCert.certificate_code }}</strong></span>
-                                <span class="text-[#800020] font-bold">VÁLIDO OFICIALMENTE</span>
+                                <span class="text-[#800020] font-bold">VÁLIDO OFICIALMENTE • CUSCO</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Footer Fijo Pinned -->
                 <DialogFooter class="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50/80 dark:bg-slate-950/60">
                     <div class="flex items-center gap-2">
                         <Button
+                            type="button"
                             variant="outline"
                             size="sm"
-                            class="text-xs font-bold"
+                            class="text-xs font-bold border-slate-300 cursor-pointer"
                             @click="selectedCert && copyVerificationCode(selectedCert.certificate_code)"
                         >
                             <Check v-if="copiedCode" class="size-3.5 mr-1 text-rose-800" />
@@ -823,15 +892,15 @@ onMounted(() => {
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" class="text-xs" @click="isCertModalOpen = false">
+                        <Button variant="ghost" size="sm" class="text-xs cursor-pointer" @click="isCertModalOpen = false">
                             Cerrar
                         </Button>
                         <Button
                             size="sm"
-                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs"
+                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer"
                             @click="selectedCert && printCertificate(selectedCert)"
                         >
-                            <Printer class="size-3.5 mr-1" />
+                            <Printer class="size-3.5 mr-1.5" />
                             Imprimir / Guardar en PDF
                         </Button>
                     </div>

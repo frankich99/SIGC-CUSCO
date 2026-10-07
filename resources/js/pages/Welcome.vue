@@ -25,7 +25,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
-import CertificateLookupCard from '@/components/CertificateLookupCard.vue';
 import LoginModal from '@/components/auth/LoginModal.vue';
 import RegisterModal from '@/components/auth/RegisterModal.vue';
 import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
@@ -165,9 +164,9 @@ function statusBadgeInfo(status: string) {
                     <a href="#cursos" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
                         Capacitaciones
                     </a>
-                    <a href="#certificados" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
+                    <Link href="/certificates" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
                         Certificados Digitales
-                    </a>
+                    </Link>
                     <a href="#beneficios" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
                         Características
                     </a>
@@ -211,9 +210,9 @@ function statusBadgeInfo(status: string) {
                 <a href="#cursos" @click="mobileMenuOpen = false" class="block py-1.5 text-sm font-semibold text-slate-800 dark:text-neutral-200">
                     Capacitaciones Disponibles
                 </a>
-                <a href="#certificados" @click="mobileMenuOpen = false" class="block py-1.5 text-sm font-semibold text-slate-800 dark:text-neutral-200">
+                <Link href="/certificates" @click="mobileMenuOpen = false" class="block py-1.5 text-sm font-semibold text-slate-800 dark:text-neutral-200">
                     Consultar Certificados por DNI
-                </a>
+                </Link>
                 <a href="#beneficios" @click="mobileMenuOpen = false" class="block py-1.5 text-sm font-semibold text-slate-800 dark:text-neutral-200">
                     Características del Sistema
                 </a>
@@ -266,10 +265,10 @@ function statusBadgeInfo(status: string) {
                         </a>
                     </Button>
                     <Button as-child variant="outline" size="lg" class="w-full sm:w-auto text-sm sm:text-base font-bold text-slate-900 hover:text-rose-900 hover:bg-rose-50 border-slate-300 px-7 py-6">
-                        <a href="#certificados">
+                        <Link href="/certificates">
                             <Award class="mr-2 size-5 text-rose-800" />
                             Consultar Certificado por DNI
-                        </a>
+                        </Link>
                     </Button>
                 </div>
             </div>
@@ -455,12 +454,6 @@ function statusBadgeInfo(status: string) {
             </div>
         </section>
 
-        <!-- SECCIÓN PÚBLICA: CONSULTA Y DESCARGA DE CERTIFICADOS POR DNI -->
-        <section id="certificados" class="py-12 md:py-20 border-t border-slate-200/80 dark:border-neutral-800 bg-slate-50/80 dark:bg-neutral-950">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-                <CertificateLookupCard />
-            </div>
-        </section>
 
         <!-- SYSTEM FEATURES / BENEFITS -->
         <section id="beneficios" class="py-12 md:py-20 border-t border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900/60">

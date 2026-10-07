@@ -10,11 +10,9 @@ import {
     ChevronDown,
     Award,
     QrCode,
-    Sparkles,
 } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
-import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -78,7 +76,7 @@ function roleBadge(role?: string) {
 
 <template>
     <!-- CABECERA INSTITUCIONAL RESPONSIVE - GRANATE IMPERIAL CUSCO -->
-    <header class="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md shadow-xs">
+    <header class="sticky top-0 z-40 w-full border-b border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md shadow-xs">
         <div class="mx-auto flex h-16 items-center justify-between px-3 sm:px-6 max-w-7xl gap-2 sm:gap-4">
             <!-- 1. Lado Izquierdo: Botón Móvil + Logo -->
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -159,10 +157,12 @@ function roleBadge(role?: string) {
                                     </div>
                                 </nav>
 
-                                <div class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
-                                    <PeruGeoBadge />
-                                    <div class="text-xs text-slate-700 dark:text-slate-300 font-semibold px-2">
-                                        Usuario: {{ user?.name }}
+                                <div class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1 px-2">
+                                    <div class="text-xs text-slate-700 dark:text-slate-300 font-bold truncate">
+                                        Usuario: {{ user?.name || 'Invitado' }}
+                                    </div>
+                                    <div v-if="user?.role" class="text-[10px] uppercase font-bold text-rose-900 dark:text-rose-400">
+                                        Rol: {{ roleBadge(user.role).label }}
                                     </div>
                                 </div>
                             </div>
@@ -177,7 +177,7 @@ function roleBadge(role?: string) {
             </div>
 
             <!-- 2. Centro: Navegación Jerárquica Desktop (Flexible, nunca desborda) -->
-            <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+            <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 shrink-0">
                 <!-- Panel -->
                 <Link
                     :href="dashboard()"
@@ -285,21 +285,16 @@ function roleBadge(role?: string) {
                 </Link>
             </nav>
 
-            <!-- 3. Lado Derecho: Geobadge + Rol + Avatar (o Login si es Invitado) -->
+            <!-- 3. Lado Derecho: Rol + Avatar (o Login si es Invitado) -->
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                <!-- Geobadge visible en desktop -->
-                <div class="hidden lg:block">
-                    <PeruGeoBadge />
-                </div>
-
                 <template v-if="auth.user">
                     <!-- Rol del Usuario con Granate Imperial -->
                     <div class="hidden sm:flex flex-col items-end text-right">
-                        <span class="text-xs font-black text-slate-950 dark:text-white leading-tight">
+                        <span class="text-xs font-black text-slate-950 dark:text-white leading-tight max-w-[130px] lg:max-w-[180px] truncate">
                             {{ auth.user.name }}
                         </span>
                         <span
-                            class="text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full mt-0.5 shadow-2xs"
+                            class="text-[10px] uppercase font-black px-2 py-0.5 rounded-full mt-0.5 shadow-2xs"
                             :class="roleBadge(auth.user.role).class"
                         >
                             {{ roleBadge(auth.user.role).label }}
