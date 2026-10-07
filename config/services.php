@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'perudevs' => [
+        'key' => env('PERUDEVS_API_KEY'),
+        'base_url' => env('PERUDEVS_BASE_URL', 'https://api.perudevs.com/api/v1'),
+    ],
+
 ];

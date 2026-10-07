@@ -5,11 +5,12 @@ El proyecto cuenta con un plazo estricto de \textbf{dos semanas} de desarrollo (
 \subsection{Tecnologías utilizadas}
 
 \begin{itemize}[nosep]
-    \item \textbf{Backend:} \textbf{Laravel 13} con \textbf{PHP 8.4}. Se usa para el manejo de rutas, controladores, validación de datos en formularios y el ORM Eloquent para comunicarse con la base de datos.
-    \item \textbf{Base de Datos:} \textbf{MySQL 8.0} (motor InnoDB). Garantiza que los cupos no se dupliquen y mantiene la relación entre usuarios, cursos y notas mediante claves foráneas.
-    \item \textbf{Frontend:} Plantillas \textbf{Blade} y estilos con \textbf{Tailwind CSS}, asegurando que la interfaz funcione bien tanto en computadoras como en celulares.
-    \item \textbf{Gestión del proyecto:} \textbf{Jira Software}. Tablero ágil para organizar el backlog, asignar tareas y medir el avance del equipo.
-    \item \textbf{Control de versiones y pruebas:} \textbf{GitHub} para el control de cambios mediante Pull Requests y \textbf{PHPUnit} para ejecutar pruebas automáticas.
+    \item \textbf{Backend:} \textbf{Laravel 13} con \textbf{PHP 8.3}. Manejo modular de rutas, controladores, Form Requests tipados, políticas de autorización (RBAC) y el ORM Eloquent sobre MySQL.
+    \item \textbf{Base de Datos:} \textbf{MySQL 8.0} (motor InnoDB, cotejamiento \texttt{utf8mb4\_unicode\_ci}). Integridad referencial con claves foráneas e índices únicos para control estricto de cupos y matrículas.
+    \item \textbf{Frontend SPA:} \textbf{Inertia.js v3} con \textbf{Vue 3 (TypeScript)} y \textbf{Tailwind CSS}, ofreciendo una experiencia de aplicación de una sola página reactiva y fluida.
+    \item \textbf{Servicios externos de identidad:} \textbf{API REST PeruDevs}, desacoplada mediante la interfaz \texttt{DniLookupService} para validación oficial de DNI ante el Registro Nacional de Identificación y Estado Civil (RENIEC).
+    \item \textbf{Gestión del proyecto:} \textbf{Jira Software}. Tablero ágil para organizar el backlog de historias (\texttt{SIGC-XX}), limitar el trabajo en curso (WIP) y medir el avance del equipo.
+    \item \textbf{Control de versiones y pruebas:} \textbf{GitHub} con flujo de ramas por desarrollador (\texttt{ramaFRANKI}), Pull Requests y suite de pruebas automatizadas con \textbf{Pest PHP} y \textbf{PHPUnit}.
 \end{itemize}
 
 \subsection{Stakeholders (Involucrados en el sistema)}

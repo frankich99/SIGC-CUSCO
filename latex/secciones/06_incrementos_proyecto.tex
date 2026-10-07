@@ -9,13 +9,42 @@ El objetivo de este primer ciclo fue montar la base técnica del sistema en Lara
 \subsubsection{Funcionalidad desarrollada}
 \begin{itemize}[nosep]
     \item \textbf{Estructura base:} Proyecto Laravel 13 con tablas y migraciones vinculadas en MySQL 8.0.
-    \item \textbf{Seguridad y roles (RBAC):} Inicio de sesión con permisos diferenciados para Administrador, Docente y Participante.
-    \item \textbf{Gestión de cursos:} Formulario para crear cursos con título, fechas de inicio/fin, horas, límite de vacantes y docente asignado.
-    \item \textbf{Catálogo de cursos:} Tabla con buscador y filtro por estado (Abierto, En curso, Concluido).
+    \item \textbf{Seguridad y roles (RBAC):} Inicio de sesión con permisos diferenciados para Administrador, Docente y Participante mediante políticas (\texttt{CoursePolicy}).
+    \item \textbf{Gestión de cursos:} Formulario para crear y editar cursos con código único, título, fechas de inicio/fin, horas académicas, límite de vacantes y docente asignado.
+    \item \textbf{Catálogo de cursos:} Interfaz con buscador reactivo y filtros por estado (Abierto, En curso, Concluido, Cancelado).
+    \item \textbf{Integración con API RENIEC / PeruDevs:} Servicio desacoplado \texttt{DniLookupService} y controlador REST que consulta en tiempo real nombres y apellidos ante PeruDevs, con caché local de 30 días para evitar latencia y consumo reiterativo.
+    \item \textbf{Frontend SPA Reactivo (Inertia.js v3 + Vue 3):} Vistas dinámicas con Tailwind CSS, navegación fluida sin recargas y componente de consulta DNI en tiempo real.
+\end{itemize}
+
+\subsubsection{Arquitectura unificada del servicio de consulta DNI}
+Para garantizar que la verificación de ciudadanos sea reutilizable en todos los módulos (registro, matrícula y emisión de certificados) sin duplicar código, se implementó el patrón de inversión de dependencias:
+\begin{itemize}[nosep]
+    \item \textbf{Objeto de Transferencia (\texttt{DniPerson}):} DTO inmutable con tipado estricto que encapsula los datos retornados por la API oficial (DNI, nombres, apellidos paterno/materno, género y código verificador).
+    \item \textbf{Contrato (\texttt{DniLookupService}):} Interfaz en \texttt{app/Contracts/} que desacopla la lógica de negocio del proveedor externo.
+    \item \textbf{Implementación con Resiliencia (\texttt{PeruDevsDniService}):} Servicio en \texttt{app/Services/Dni/} que pre-valida el formato de 8 dígitos, aplica un tiempo de espera controlado (15 segundos) y almacena en la caché de Laravel los resultados válidos por 30 días.
+    \item \textbf{Controlador REST y Componente Vue:} Endpoint \texttt{GET /api/dni/\{dni\}} consumido asíncronamente por el componente \texttt{DniSearchCard.vue} integrado en el catálogo de capacitaciones y el panel de control.
 \end{itemize}
 
 \subsubsection{Evidencia de funcionamiento}
 La plataforma ya funciona en el entorno local, permitiendo iniciar sesión y crear capacitaciones.
+
+\paragraph{Verificación de correo electrónico.}
+Como parte del flujo de autenticación, el sistema envía al usuario un correo
+con un enlace temporal para confirmar su dirección de correo electrónico.
+Esta evidencia demuestra que la verificación de cuentas se encuentra integrada
+en el primer incremento.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{captura-verificacion-correo.png}
+    \caption{Correo de verificación enviado por SIGC-CUSCO.}
+    \label{fig:correo-verificacion}
+\end{figure}
+
+En la \cref{fig:correo-verificacion} se observa el botón \enquote{Verify Email
+Address} y el enlace alternativo que puede copiarse en el navegador. El enlace
+se genera de forma temporal para evitar que la confirmación permanezca válida
+indefinidamente.
 
 \begin{cajaevidencia}{Capturas de pantalla del sistema}
     \textbf{¿Qué debe ingresar aquí?:}
@@ -26,7 +55,7 @@ La plataforma ya funciona en el entorno local, permitiendo iniciar sesión y cre
 \end{cajaevidencia}
 
 \subsubsection{Pruebas o validaciones realizadas}
-Se escribieron pruebas automáticas con PHPUnit para comprobar que el sistema responda bien ante errores y accesos indebidos:
+Se implementó una suite integral de pruebas automáticas con Pest PHP y PHPUnit sobre una base de datos MySQL dedicada (\texttt{SIGC\_testing}), garantizando el aislamiento del entorno de producción y desarrollo:
 
 \begin{table}[H]
 \centering
@@ -35,33 +64,39 @@ Se escribieron pruebas automáticas con PHPUnit para comprobar que el sistema re
 \toprule
 \textbf{Código} & \textbf{Prueba realizada} & \textbf{Resultado esperado} & \textbf{Estado} \\
 \midrule
-\textbf{CP-01} & Alumno intenta entrar a la pantalla de crear cursos. & Acceso denegado (Error HTTP 403). & \textbf{Aprobado} \\
+\textbf{CP-01} & Alumno intenta entrar a la pantalla de crear cursos. & Acceso denegado (Error HTTP 403 vía \texttt{CoursePolicy}). & \textbf{Aprobado} \\
 \addlinespace
-\textbf{CP-02} & Se intenta guardar un curso con vacantes en 0 o negativo. & Formulario bloquea y muestra mensaje de alerta. & \textbf{Aprobado} \\
+\textbf{CP-02} & Se intenta guardar un curso con vacantes en 0 o negativo. & Formulario bloquea y muestra mensaje de alerta en español. & \textbf{Aprobado} \\
 \addlinespace
-\textbf{CP-03} & Se ingresa una fecha de fin menor a la fecha de inicio. & Error de validación por fechas incoherentes. & \textbf{Aprobado} \\
+\textbf{CP-03} & Se ingresa una fecha de fin menor a la fecha de inicio. & Error de validación por fechas incoherentes (\texttt{after\_or\_equal}). & \textbf{Aprobado} \\
 \addlinespace
-\textbf{CP-04} & Se completa el formulario con datos válidos y docente. & Curso guardado en MySQL y visible en la lista. & \textbf{Aprobado} \\
+\textbf{CP-04} & Se completa el formulario con datos válidos y docente. & Curso persistido en base de datos MySQL y visible en catálogo. & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-05} & Consulta de DNI mediante servicio externo PeruDevs. & Retorna objeto estructurado \texttt{DniPerson} y almacena en caché 30 días. & \textbf{Aprobado} \\
 \bottomrule
 \end{tabularx}
 \caption{Pruebas automáticas ejecutadas en el Incremento 1.}
 \label{tab:pruebas_inc1}
 \end{table}
 
-\begin{cajaevidencia}{Consola de pruebas PHPUnit}
-    \textbf{¿Qué debe ingresar aquí?:}
-    Captura o texto de la terminal ejecutando el comando de pruebas (\texttt{php artisan test}).
-    \vspace{0.15cm}
-    \textbf{Ejemplo sugerido de salida:}
-    \begin{quote}
-        \texttt{\$ php artisan test --filter=CourseTest} \\
-        \texttt{PASS Tests\textbackslash Feature\textbackslash CourseTest} \\
-        \texttt{[OK] non admin cannot create courses \hfill 0.08s} \\
-        \texttt{[OK] capacity must be positive \hfill 0.06s} \\
-        \texttt{[OK] course stores in mysql \hfill 0.11s} \\
-        \texttt{Tests: 3 passed (9 assertions)}
-    \end{quote}
-\end{cajaevidencia}
+\paragraph{Resultado de ejecución de la suite de pruebas.}
+A continuación se reporta la ejecución de la batería completa de pruebas automatizadas:
+
+\begin{quote}
+    \texttt{\$ php artisan test} \\
+    \texttt{Tests\textbackslash Feature\textbackslash Auth\textbackslash RegistrationTest ................. PASS} \\
+    \texttt{Tests\textbackslash Feature\textbackslash CourseTest ................................... PASS} \\
+    \texttt{  [OK] no autenticado o no admin no puede acceder a crear cursos} \\
+    \texttt{  [OK] capacidad debe ser un entero positivo} \\
+    \texttt{  [OK] fecha de fin debe ser posterior o igual a fecha de inicio} \\
+    \texttt{  [OK] admin puede registrar curso valido en mysql} \\
+    \texttt{  [OK] endpoint dni retorna 422 para dni invalido} \\
+    \texttt{Tests\textbackslash Feature\textbackslash Services\textbackslash DniLookupServiceTest ............ PASS} \\
+    \texttt{  [OK] consulta exitosa retorna DniPerson estructurado} \\
+    \texttt{  [OK] respuesta exitosa se almacena en cache 30 dias} \\
+    \texttt{\textbf{Tests: 50 passed (166 assertions)}} \\
+    \texttt{Duration: 2.50s}
+\end{quote}
 
 \subsubsection{Cambios realizados respecto al avance anterior}
 \begin{itemize}[nosep]

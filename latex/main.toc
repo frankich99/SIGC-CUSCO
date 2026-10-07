@@ -22,12 +22,15 @@
 \contentsline {section}{\numberline {6}Incrementos presentados del proyecto}{5}{section.6}%
 \contentsline {subsection}{\numberline {6.1}Incremento 1: Autenticación RBAC y Gestión de Capacitaciones}{6}{subsection.6.1}%
 \contentsline {subsubsection}{\numberline {6.1.1}Funcionalidad desarrollada}{6}{subsubsection.6.1.1}%
-\contentsline {subsubsection}{\numberline {6.1.2}Evidencia de funcionamiento}{6}{subsubsection.6.1.2}%
-\contentsline {subsubsection}{\numberline {6.1.3}Pruebas o validaciones realizadas}{6}{subsubsection.6.1.3}%
-\contentsline {subsubsection}{\numberline {6.1.4}Cambios realizados respecto al avance anterior}{7}{subsubsection.6.1.4}%
-\contentsline {subsubsection}{\numberline {6.1.5}Métricas y seguimiento del proceso}{8}{subsubsection.6.1.5}%
-\contentsline {subsubsection}{\numberline {6.1.6}Acuerdos de mejora para el siguiente incremento}{8}{subsubsection.6.1.6}%
-\contentsline {section}{\numberline {7}Política de uso de IA y registro de uso}{8}{section.7}%
-\contentsline {subsection}{\numberline {7.1}Política de uso de IA}{8}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Registro de uso de IA (Bitácora)}{9}{subsection.7.2}%
-\contentsline {section}{\numberline {8}Conclusiones}{9}{section.8}%
+\contentsline {subsubsection}{\numberline {6.1.2}Arquitectura unificada del servicio de consulta DNI}{6}{subsubsection.6.1.2}%
+\contentsline {subsubsection}{\numberline {6.1.3}Evidencia de funcionamiento}{7}{subsubsection.6.1.3}%
+\contentsline {paragraph}{Verificación de correo electrónico.}{7}{section*.8}%
+\contentsline {subsubsection}{\numberline {6.1.4}Pruebas o validaciones realizadas}{8}{subsubsection.6.1.4}%
+\contentsline {paragraph}{Resultado de ejecución de la suite de pruebas.}{8}{section*.11}%
+\contentsline {subsubsection}{\numberline {6.1.5}Cambios realizados respecto al avance anterior}{9}{subsubsection.6.1.5}%
+\contentsline {subsubsection}{\numberline {6.1.6}Métricas y seguimiento del proceso}{9}{subsubsection.6.1.6}%
+\contentsline {subsubsection}{\numberline {6.1.7}Acuerdos de mejora para el siguiente incremento}{10}{subsubsection.6.1.7}%
+\contentsline {section}{\numberline {7}Política de uso de IA y registro de uso}{10}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Política de uso de IA}{10}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Registro de uso de IA (Bitácora)}{11}{subsection.7.2}%
+\contentsline {section}{\numberline {8}Conclusiones}{11}{section.8}%
