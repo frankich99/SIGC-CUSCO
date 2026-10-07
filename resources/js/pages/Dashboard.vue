@@ -616,22 +616,24 @@ function roleBadgeData(role?: string) {
 
             <!-- MODAL: PROYECCIÓN QR (PARA DOCENTE) -->
             <Dialog :open="isQrModalOpen" @update:open="isQrModalOpen = $event">
-                <DialogContent class="w-full sm:max-w-2xl md:max-w-3xl p-6 sm:p-8 rounded-2xl shadow-2xl border-4 border-rose-900 text-center bg-white dark:bg-slate-900">
-                    <DialogHeader class="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-4">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-950 text-xs font-black uppercase tracking-wider mx-auto">
-                            <QrCode class="size-4 text-rose-800" />
-                            <span>Control de Asistencia Digital</span>
-                        </div>
-                        <DialogTitle class="text-2xl font-black text-slate-950 dark:text-white">
-                            {{ activeQrCourse?.title }}
-                        </DialogTitle>
-                        <DialogDescription class="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 max-w-lg mx-auto">
-                            Proyecta esta pantalla en el aula para que los alumnos escaneen el código desde sus teléfonos celulares.
-                        </DialogDescription>
-                    </DialogHeader>
+                <DialogContent class="w-[96vw] sm:max-w-2xl md:max-w-3xl max-h-[92vh] flex flex-col p-0 rounded-2xl shadow-2xl border-4 border-rose-900 text-center bg-white dark:bg-slate-900 overflow-hidden">
+                    <div class="p-6 pb-4 border-b border-slate-200 dark:border-slate-800 shrink-0 pr-12">
+                        <DialogHeader class="space-y-2">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-950 text-xs font-black uppercase tracking-wider mx-auto">
+                                <QrCode class="size-4 text-rose-800" />
+                                <span>Control de Asistencia Digital</span>
+                            </div>
+                            <DialogTitle class="text-2xl font-black text-slate-950 dark:text-white">
+                                {{ activeQrCourse?.title }}
+                            </DialogTitle>
+                            <DialogDescription class="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 max-w-lg mx-auto">
+                                Proyecta esta pantalla en el aula para que los alumnos escaneen el código desde sus teléfonos celulares.
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
 
                     <!-- QR Visualization Gigante -->
-                    <div class="py-6 space-y-5">
+                    <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-6 space-y-5">
                         <div class="p-8 bg-white rounded-3xl border-4 border-rose-900 inline-block shadow-xl">
                             <QrCode class="size-60 sm:size-72 text-slate-950 mx-auto" />
                         </div>
@@ -643,65 +645,71 @@ function roleBadgeData(role?: string) {
                                 ⏳ Código de asistencia dinámico activo únicamente durante el horario de la clase de hoy.
                             </p>
                         </div>
-                    </div>
 
-                    <Button @click="isQrModalOpen = false" class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold h-11 text-sm shadow-md">
-                        Finalizar y Cerrar Proyección
-                    </Button>
+                        <div class="pt-2">
+                            <Button @click="isQrModalOpen = false" class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold h-11 text-sm shadow-md">
+                                Finalizar y Cerrar Proyección
+                            </Button>
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
 
             <!-- MODAL: MARCAR ASISTENCIA (PARA ALUMNO) -->
             <Dialog :open="isScanQrModalOpen" @update:open="isScanQrModalOpen = $event">
-                <DialogContent class="w-[94vw] sm:max-w-md p-4 sm:p-6 rounded-2xl shadow-xl border border-rose-200 dark:border-rose-900 text-left bg-white dark:bg-slate-950">
-                    <DialogHeader class="space-y-1 border-b border-slate-200 dark:border-slate-800 pb-3">
-                        <DialogTitle class="text-lg font-black text-slate-950 dark:text-white flex items-center gap-2">
-                            <Camera class="size-5 text-rose-800" />
-                            <span>Marcar Mi Asistencia Oficial</span>
-                        </DialogTitle>
-                        <DialogDescription class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
-                            Curso: <strong class="text-rose-900 dark:text-rose-300">{{ activeQrCourse?.title }}</strong>
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div v-if="scanSuccessMessage" class="py-6 text-center space-y-3">
-                        <div class="size-14 rounded-full bg-rose-100 text-rose-900 flex items-center justify-center mx-auto">
-                            <CheckCircle2 class="size-8" />
-                        </div>
-                        <p class="text-sm font-extrabold text-rose-950 dark:text-rose-200">
-                            {{ scanSuccessMessage }}
-                        </p>
-                        <Button @click="isScanQrModalOpen = false" class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold h-10 text-xs shadow-md">
-                            Aceptar y Continuar
-                        </Button>
+                <DialogContent class="w-[94vw] sm:max-w-md max-h-[90vh] flex flex-col p-0 rounded-2xl shadow-xl border border-rose-200 dark:border-rose-900 text-left bg-white dark:bg-slate-950 overflow-hidden">
+                    <div class="p-5 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0 pr-12">
+                        <DialogHeader class="space-y-1">
+                            <DialogTitle class="text-lg font-black text-slate-950 dark:text-white flex items-center gap-2">
+                                <Camera class="size-5 text-rose-800" />
+                                <span>Marcar Mi Asistencia Oficial</span>
+                            </DialogTitle>
+                            <DialogDescription class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                Curso: <strong class="text-rose-900 dark:text-rose-300">{{ activeQrCourse?.title }}</strong>
+                            </DialogDescription>
+                        </DialogHeader>
                     </div>
 
-                    <div v-else class="space-y-5 py-4">
-                        <div class="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-xl text-left space-y-2 border border-slate-200 dark:border-slate-700">
-                            <div class="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white">
-                                <QrCode class="size-5 text-rose-800" />
-                                <span>Instrucciones para validar asistencia</span>
+                    <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-5 space-y-4">
+                        <div v-if="scanSuccessMessage" class="py-6 text-center space-y-3">
+                            <div class="size-14 rounded-full bg-rose-100 text-rose-900 flex items-center justify-center mx-auto">
+                                <CheckCircle2 class="size-8" />
                             </div>
-                            <p class="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                                Escanea con la cámara de tu smartphone el código QR que proyecta tu docente en clase, o copia el código numérico de sesión.
+                            <p class="text-sm font-extrabold text-rose-950 dark:text-rose-200">
+                                {{ scanSuccessMessage }}
                             </p>
+                            <Button @click="isScanQrModalOpen = false" class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold h-10 text-xs shadow-md">
+                                Aceptar y Continuar
+                            </Button>
                         </div>
 
-                        <div class="space-y-2">
-                            <Label for="qr-code-text" class="text-xs font-bold text-slate-900 dark:text-white">
-                                Ingrese Código de Sesión del Docente
-                            </Label>
-                            <div class="flex gap-2">
-                                <Input
-                                    id="qr-code-text"
-                                    v-model="scanCodeInput"
-                                    type="text"
-                                    placeholder="Ej: UNS-AI-07"
-                                    class="text-sm font-mono uppercase font-bold tracking-wider border-slate-300"
-                                />
-                                <Button size="default" class="bg-rose-900 hover:bg-rose-950 text-white text-xs font-bold px-5 shrink-0 shadow-xs" @click="simulateScan">
-                                    Validar Asistencia
-                                </Button>
+                        <div v-else class="space-y-4">
+                            <div class="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-xl text-left space-y-2 border border-slate-200 dark:border-slate-700">
+                                <div class="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white">
+                                    <QrCode class="size-5 text-rose-800" />
+                                    <span>Instrucciones para validar asistencia</span>
+                                </div>
+                                <p class="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    Escanea con la cámara de tu smartphone el código QR que proyecta tu docente en clase, o copia el código numérico de sesión.
+                                </p>
+                            </div>
+
+                            <div class="space-y-2">
+                                <Label for="qr-code-text" class="text-xs font-bold text-slate-900 dark:text-white">
+                                    Ingrese Código de Sesión del Docente
+                                </Label>
+                                <div class="flex gap-2">
+                                    <Input
+                                        id="qr-code-text"
+                                        v-model="scanCodeInput"
+                                        type="text"
+                                        placeholder="Ej: UNS-AI-07"
+                                        class="text-sm font-mono uppercase font-bold tracking-wider border-slate-300"
+                                    />
+                                    <Button size="default" class="bg-rose-900 hover:bg-rose-950 text-white text-xs font-bold px-5 shrink-0 shadow-xs" @click="simulateScan">
+                                        Validar Asistencia
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>

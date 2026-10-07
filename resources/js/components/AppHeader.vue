@@ -143,7 +143,7 @@ function roleBadge(role?: string) {
                                             Servicios al Ciudadano
                                         </div>
                                         <Link
-                                            href="/#consulta-certificados"
+                                            href="/certificates"
                                             class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
                                         >
                                             <Award class="size-4 text-amber-600" />
@@ -255,7 +255,7 @@ function roleBadge(role?: string) {
                             Acreditación Digital
                         </DropdownMenuLabel>
                         <DropdownMenuItem as-child>
-                            <Link href="/#consulta-certificados" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
+                            <Link href="/certificates" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
                                 <Award class="size-4 text-amber-600 mt-0.5" />
                                 <div>
                                     <div class="text-xs font-bold text-slate-900 dark:text-white">Validar Certificados</div>
@@ -285,49 +285,61 @@ function roleBadge(role?: string) {
                 </Link>
             </nav>
 
-            <!-- 3. Lado Derecho: Geobadge + Rol + Avatar -->
+            <!-- 3. Lado Derecho: Geobadge + Rol + Avatar (o Login si es Invitado) -->
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
                 <!-- Geobadge visible en desktop -->
                 <div class="hidden lg:block">
                     <PeruGeoBadge />
                 </div>
 
-                <!-- Rol del Usuario con Granate Imperial -->
-                <div class="hidden sm:flex flex-col items-end text-right">
-                    <span class="text-xs font-black text-slate-950 dark:text-white leading-tight">
-                        {{ auth.user?.name }}
-                    </span>
-                    <span
-                        class="text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full mt-0.5 shadow-2xs"
-                        :class="roleBadge(auth.user?.role).class"
-                    >
-                        {{ roleBadge(auth.user?.role).label }}
-                    </span>
-                </div>
-
-                <!-- Avatar Dropdown Menu -->
-                <DropdownMenu>
-                    <DropdownMenuTrigger as-child>
-                        <button
-                            type="button"
-                            class="relative size-10 rounded-full ring-2 ring-rose-900/40 hover:ring-rose-900 transition-all p-0.5 cursor-pointer"
+                <template v-if="auth.user">
+                    <!-- Rol del Usuario con Granate Imperial -->
+                    <div class="hidden sm:flex flex-col items-end text-right">
+                        <span class="text-xs font-black text-slate-950 dark:text-white leading-tight">
+                            {{ auth.user.name }}
+                        </span>
+                        <span
+                            class="text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full mt-0.5 shadow-2xs"
+                            :class="roleBadge(auth.user.role).class"
                         >
-                            <Avatar class="size-full overflow-hidden rounded-full">
-                                <AvatarImage
-                                    v-if="auth.user?.avatar"
-                                    :src="auth.user.avatar"
-                                    :alt="auth.user.name"
-                                />
-                                <AvatarFallback class="bg-rose-900 text-white font-black text-xs">
-                                    {{ getInitials(auth.user?.name) }}
-                                </AvatarFallback>
-                            </Avatar>
-                        </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" class="w-60 p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl">
-                        <UserMenuContent :user="auth.user" />
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                            {{ roleBadge(auth.user.role).label }}
+                        </span>
+                    </div>
+
+                    <!-- Avatar Dropdown Menu -->
+                    <DropdownMenu>
+                        <DropdownMenuTrigger as-child>
+                            <button
+                                type="button"
+                                class="relative size-10 rounded-full ring-2 ring-rose-900/40 hover:ring-rose-900 transition-all p-0.5 cursor-pointer"
+                            >
+                                <Avatar class="size-full overflow-hidden rounded-full">
+                                    <AvatarImage
+                                        v-if="auth.user.avatar"
+                                        :src="auth.user.avatar"
+                                        :alt="auth.user.name"
+                                    />
+                                    <AvatarFallback class="bg-rose-900 text-white font-black text-xs">
+                                        {{ getInitials(auth.user.name) }}
+                                    </AvatarFallback>
+                                </Avatar>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" class="w-60 p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl">
+                            <UserMenuContent :user="auth.user" />
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </template>
+                <template v-else>
+                    <div class="flex items-center gap-2">
+                        <Button as-child variant="ghost" size="sm" class="text-xs font-bold text-slate-800 hover:text-rose-900">
+                            <Link href="/login">Iniciar Sesión</Link>
+                        </Button>
+                        <Button as-child size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs">
+                            <Link href="/register">Registrarse</Link>
+                        </Button>
+                    </div>
+                </template>
             </div>
         </div>
     </header>

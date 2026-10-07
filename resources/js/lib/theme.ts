@@ -59,11 +59,11 @@ export const THEME_BADGES = {
  */
 export const THEME_MODAL = {
     // Narrow & slim auth modal dialog (Login / Register permanecen compactos)
-    authDialog: 'w-[92vw] sm:max-w-sm max-h-[90vh] overflow-y-auto p-4 sm:p-5 rounded-2xl shadow-xl border border-rose-200 dark:border-rose-900 bg-white dark:bg-slate-950',
+    authDialog: 'w-[92vw] sm:max-w-sm max-h-[92vh] flex flex-col p-0 rounded-2xl shadow-2xl border border-rose-200 dark:border-rose-900 bg-white dark:bg-slate-950 overflow-hidden',
     // Modal amplio, espacioso y estructurado para formularios complejos (Inscripción / Matrícula)
-    enrollmentDialog: 'w-[96vw] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl max-h-[92vh] overflow-y-auto p-5 sm:p-7 lg:p-8 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950',
+    enrollmentDialog: 'w-[96vw] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl max-h-[90vh] flex flex-col p-0 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 overflow-hidden',
     // Fallback genérico para formularios
-    formDialog: 'w-[96vw] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl max-h-[92vh] overflow-y-auto p-5 sm:p-7 lg:p-8 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950',
+    formDialog: 'w-[96vw] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl max-h-[90vh] flex flex-col p-0 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 overflow-hidden',
 } as const;
 
 /**

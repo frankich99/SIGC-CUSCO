@@ -258,34 +258,38 @@ function closeModal() {
     <Dialog :open="open" @update:open="emit('update:open', $event)">
         <!-- MODAL AMPLIO Y ESPACIOSO (THEME_MODAL.enrollmentDialog) -->
         <DialogContent :class="THEME_MODAL.enrollmentDialog">
-            <!-- Header Superior del Modal -->
-            <DialogHeader class="border-b border-slate-200 dark:border-slate-800 pb-4 space-y-1">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex items-center gap-2">
-                        <span class="font-mono text-xs font-black px-2.5 py-0.5 rounded bg-rose-100 text-rose-950 dark:bg-rose-950 dark:text-rose-200 border border-rose-300 dark:border-rose-800">
-                            {{ course?.code }}
-                        </span>
-                        <span v-if="course?.institution" class="text-xs font-bold text-rose-900 bg-rose-50 dark:bg-rose-950/60 dark:text-rose-200 border border-rose-200 dark:border-rose-800 px-2.5 py-0.5 rounded">
-                            {{ course.institution }}
-                        </span>
+            <!-- Header Superior del Modal (FIJO / PINNED) -->
+            <div class="p-5 sm:px-7 sm:py-5 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-950 pr-12">
+                <DialogHeader class="space-y-1.5 text-left">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-xs font-black px-2.5 py-0.5 rounded bg-rose-100 text-rose-950 dark:bg-rose-950 dark:text-rose-200 border border-rose-300 dark:border-rose-800">
+                                {{ course?.code }}
+                            </span>
+                            <span v-if="course?.institution" class="text-xs font-bold text-rose-900 bg-rose-50 dark:bg-rose-950/60 dark:text-rose-200 border border-rose-200 dark:border-rose-800 px-2.5 py-0.5 rounded">
+                                {{ course.institution }}
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 text-xs font-black text-rose-900 dark:text-rose-300 bg-rose-50 dark:bg-rose-950 px-3 py-1 rounded-full border border-rose-200 dark:border-rose-800">
+                            <ShieldCheck class="size-4 text-rose-800" />
+                            <span>Inscripción Oficial con Validación RENIEC</span>
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-1.5 text-xs font-black text-rose-900 dark:text-rose-300 bg-rose-50 dark:bg-rose-950 px-3 py-1 rounded-full border border-rose-200 dark:border-rose-800">
-                        <ShieldCheck class="size-4 text-rose-800" />
-                        <span>Inscripción Oficial con Validación RENIEC</span>
-                    </div>
-                </div>
+                    <DialogTitle class="text-xl sm:text-2xl font-black text-slate-950 dark:text-white pt-1 leading-snug">
+                        Ficha de Inscripción: {{ course?.title }}
+                    </DialogTitle>
+                    <DialogDescription class="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                        Completa la verificación de tu DNI para reservar tu vacante oficial en el sistema académico.
+                    </DialogDescription>
+                </DialogHeader>
+            </div>
 
-                <DialogTitle class="text-xl sm:text-2xl font-black text-slate-950 dark:text-white pt-1 leading-snug">
-                    Ficha de Inscripción: {{ course?.title }}
-                </DialogTitle>
-                <DialogDescription class="text-xs text-slate-600 dark:text-slate-400 font-medium">
-                    Completa la verificación de tu DNI para reservar tu vacante oficial en el sistema académico.
-                </DialogDescription>
-            </DialogHeader>
-
-            <!-- Success State -->
-            <div v-if="submitSuccess" class="py-8 text-center space-y-6">
+            <!-- Contenedor Scrollable Interno con scrollbar redondeado y limpio -->
+            <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-5 sm:p-7">
+                <!-- Success State -->
+                <div v-if="submitSuccess" class="py-6 text-center space-y-6">
                 <div class="size-20 bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 rounded-full flex items-center justify-center mx-auto shadow-inner ring-8 ring-rose-50 dark:ring-rose-900/40">
                     <CheckCircle2 class="size-10" />
                 </div>
@@ -649,6 +653,7 @@ function closeModal() {
                     </div>
                 </div>
             </form>
+            </div>
         </DialogContent>
     </Dialog>
 </template>

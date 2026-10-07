@@ -247,58 +247,30 @@ function statusBadgeInfo(status: string) {
                     <PeruGeoBadge />
                 </div>
 
-                <!-- Headline -->
-                <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-950 dark:text-white max-w-3xl mx-auto leading-tight">
-                    Capacitaciones con <span class="text-rose-900 dark:text-rose-400 underline decoration-amber-500 decoration-2">Asistencia QR</span> y Certificación Oficial
+                <!-- Headline Ampliado, Proporcional y de Alto Impacto -->
+                <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-950 dark:text-white max-w-4xl mx-auto leading-[1.12]">
+                    Capacitaciones con <span class="text-rose-900 dark:text-rose-400 underline decoration-amber-500 decoration-4 underline-offset-8">Asistencia QR</span> y Certificación Oficial
                 </h1>
 
                 <!-- Subtitle -->
-                <p class="text-sm sm:text-base text-slate-700 dark:text-neutral-300 max-w-2xl mx-auto leading-relaxed font-medium">
+                <p class="text-base sm:text-lg md:text-xl text-slate-700 dark:text-neutral-300 max-w-3xl mx-auto leading-relaxed font-semibold">
                     Inscripción inmediata con DNI, control de asistencia por código QR y diplomas digitales con validación web institucional.
                 </p>
 
                 <!-- CTA Buttons -->
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                    <Button as-child size="lg" class="w-full sm:w-auto bg-rose-900 hover:bg-rose-950 text-white font-bold shadow-md shadow-rose-900/20 px-6 text-xs sm:text-sm">
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3">
+                    <Button as-child size="lg" class="w-full sm:w-auto bg-rose-900 hover:bg-rose-950 text-white font-bold shadow-md shadow-rose-900/20 px-7 py-6 text-sm sm:text-base">
                         <a href="#cursos">
-                            <GraduationCap class="mr-2 size-4 text-amber-300" />
+                            <GraduationCap class="mr-2 size-5 text-amber-300" />
                             Ver Cursos Disponibles
                         </a>
                     </Button>
-                    <Button as-child variant="outline" size="lg" class="w-full sm:w-auto text-xs sm:text-sm font-bold text-slate-800 hover:text-rose-900 hover:bg-rose-50 border-slate-300">
+                    <Button as-child variant="outline" size="lg" class="w-full sm:w-auto text-sm sm:text-base font-bold text-slate-900 hover:text-rose-900 hover:bg-rose-50 border-slate-300 px-7 py-6">
                         <a href="#certificados">
-                            <Award class="mr-2 size-4 text-rose-800" />
+                            <Award class="mr-2 size-5 text-rose-800" />
                             Consultar Certificado por DNI
                         </a>
                     </Button>
-                </div>
-
-                <!-- Stats Bar (3 columnas compactas en mobile y desktop) -->
-                <div class="pt-6 max-w-3xl mx-auto grid grid-cols-3 gap-2 sm:gap-4">
-                    <div class="p-3 sm:p-4 rounded-xl bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 shadow-xs">
-                        <div class="text-xl sm:text-3xl font-extrabold text-rose-900 dark:text-rose-400">
-                            {{ stats.totalCourses }}
-                        </div>
-                        <div class="text-[11px] sm:text-xs text-slate-600 dark:text-neutral-400 font-semibold mt-0.5 truncate">
-                            Cursos Registrados
-                        </div>
-                    </div>
-                    <div class="p-3 sm:p-4 rounded-xl bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 shadow-xs">
-                        <div class="text-xl sm:text-3xl font-extrabold text-amber-700 dark:text-amber-400">
-                            {{ stats.openCourses }}
-                        </div>
-                        <div class="text-[11px] sm:text-xs text-slate-600 dark:text-neutral-400 font-semibold mt-0.5 truncate">
-                            Convocatorias
-                        </div>
-                    </div>
-                    <div class="p-3 sm:p-4 rounded-xl bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 shadow-xs">
-                        <div class="text-xl sm:text-3xl font-extrabold text-slate-900 dark:text-neutral-200">
-                            {{ stats.totalEnrolled }}
-                        </div>
-                        <div class="text-[11px] sm:text-xs text-slate-600 dark:text-neutral-400 font-semibold mt-0.5 truncate">
-                            Inscritos
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -483,13 +455,6 @@ function statusBadgeInfo(status: string) {
             </div>
         </section>
 
-        <!-- VERIFICACIÓN Y DESCARGA DE CERTIFICADOS POR DNI -->
-        <section id="certificados" class="py-12 md:py-20 border-t border-slate-200/80 dark:border-neutral-800 bg-slate-50/80 dark:bg-neutral-950">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-                <!-- Reusable Certificate Lookup Card -->
-                <CertificateLookupCard />
-            </div>
-        </section>
 
         <!-- SYSTEM FEATURES / BENEFITS -->
         <section id="beneficios" class="py-12 md:py-20 border-t border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900/60">

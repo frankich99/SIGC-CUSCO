@@ -56,7 +56,7 @@ const mobileMenuOpen = ref(false);
                         <span>Capacitaciones</span>
                     </Link>
                     <Link
-                        href="/#certificados"
+                        href="/certificates"
                         class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors flex items-center gap-1.5"
                     >
                         <Award class="size-4 text-amber-600" />
@@ -106,7 +106,7 @@ const mobileMenuOpen = ref(false);
                                     <span>Capacitaciones</span>
                                 </Link>
                                 <Link
-                                    href="/#certificados"
+                                    href="/certificates"
                                     class="flex items-center gap-2.5 py-2 px-3 rounded-lg hover:bg-rose-50 text-slate-800"
                                     @click="mobileMenuOpen = false"
                                 >

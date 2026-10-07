@@ -185,7 +185,7 @@ function instructorName(inst?: Instructor): string {
                             @keydown.enter="applyFilters"
                         />
                     </div>
-                    <div class="flex gap-2 items-center overflow-x-auto pb-1 sm:pb-0">
+                    <div class="flex gap-2 items-center overflow-x-auto pb-1 sm:pb-0 custom-scrollbar">
                         <button
                             v-for="st in [{ value: 'all', label: 'Todos' }, ...statuses]"
                             :key="st.value"
