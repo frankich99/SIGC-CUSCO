@@ -28,7 +28,7 @@ class CoursePolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isDocente();
     }
 
     /**
@@ -36,7 +36,7 @@ class CoursePolicy
      */
     public function update(User $user, Course $course): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || ($user->isDocente() && $course->instructor_id === $user->id);
     }
 
     /**

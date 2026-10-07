@@ -121,24 +121,136 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 6. Matrículas de ejemplo
+        // 6. Matrículas de ejemplo y certificados oficiales
+        $course1 = Course::where('code', 'SIGC-2026-001')->first();
+
+        // 6.1 Franki Choquenaira (Admin matriculado y aprobado con 20)
         Enrollment::firstOrCreate(
             [
-                'course_id' => Course::where('code', 'SIGC-2026-001')->first()->id,
+                'course_id' => $course1->id,
+                'dni' => '13396200',
+            ],
+            [
+                'user_id' => $admin->id,
+                'nombres' => 'FRANKI',
+                'paterno' => 'CHOQUENAIRA',
+                'materno' => 'QUISPE',
+                'email' => 'heall2099@gmail.com',
+                'phone' => '984123456',
+                'status' => 'aprobado',
+                'attended_sessions' => 12,
+                'final_grade' => 20.00,
+                'certificate_code' => 'CERT-2026-13396200',
+            ]
+        );
+
+        // 6.2 Juan Carlos Pérez (Participante aprobado con 18)
+        Enrollment::firstOrCreate(
+            [
+                'course_id' => $course1->id,
                 'dni' => '70123456',
             ],
             [
                 'user_id' => User::where('email', 'alumno@sigc.unsaac.edu.pe')->first()->id,
-                'nombres' => 'JUAN',
+                'nombres' => 'JUAN CARLOS',
                 'paterno' => 'PEREZ',
                 'materno' => 'CONDORI',
                 'email' => 'alumno@sigc.unsaac.edu.pe',
                 'phone' => '984000111',
-                'status' => 'inscrito',
-                'attended_sessions' => 2,
+                'status' => 'aprobado',
+                'attended_sessions' => 10,
+                'final_grade' => 18.00,
+                'certificate_code' => 'CERT-2026-70123456',
             ]
         );
 
+        // 6.3 María Elena Quispe
+        $mariaUser = User::firstOrCreate(
+            ['dni' => '45678901'],
+            [
+                'name' => 'María Elena',
+                'paterno' => 'Quispe',
+                'materno' => 'Mamani',
+                'email' => 'mquispe@unsaac.edu.pe',
+                'role' => UserRole::Participante,
+                'password' => 'password',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        Enrollment::firstOrCreate(
+            [
+                'course_id' => $course1->id,
+                'dni' => '45678901',
+            ],
+            [
+                'user_id' => $mariaUser->id,
+                'nombres' => 'MARIA ELENA',
+                'paterno' => 'QUISPE',
+                'materno' => 'MAMANI',
+                'email' => 'mquispe@unsaac.edu.pe',
+                'phone' => '984555888',
+                'status' => 'aprobado',
+                'attended_sessions' => 11,
+                'final_grade' => 19.00,
+                'certificate_code' => 'CERT-2026-45678901',
+            ]
+        );
+
+        // 6.4 Rosa Luz Huamán
+        $rosaUser = User::firstOrCreate(
+            ['dni' => '48920134'],
+            [
+                'name' => 'Rosa Luz',
+                'paterno' => 'Huamán',
+                'materno' => 'Flores',
+                'email' => 'rhuaman@unsaac.edu.pe',
+                'role' => UserRole::Participante,
+                'password' => 'password',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        Enrollment::firstOrCreate(
+            [
+                'course_id' => $course1->id,
+                'dni' => '48920134',
+            ],
+            [
+                'user_id' => $rosaUser->id,
+                'nombres' => 'ROSA LUZ',
+                'paterno' => 'HUAMAN',
+                'materno' => 'FLORES',
+                'email' => 'rhuaman@unsaac.edu.pe',
+                'phone' => '984333222',
+                'status' => 'aprobado',
+                'attended_sessions' => 10,
+                'final_grade' => 17.50,
+                'certificate_code' => 'CERT-2026-48920134',
+            ]
+        );
+
+        // 6.5 Carlos Alberto Mendoza (Inscrito activo)
+        Enrollment::firstOrCreate(
+            [
+                'course_id' => $course1->id,
+                'dni' => '41239876',
+            ],
+            [
+                'user_id' => null,
+                'nombres' => 'CARLOS ALBERTO',
+                'paterno' => 'MENDOZA',
+                'materno' => 'PAREDES',
+                'email' => 'cmendoza@gmail.com',
+                'phone' => '984999111',
+                'status' => 'inscrito',
+                'attended_sessions' => 3,
+                'final_grade' => null,
+                'certificate_code' => null,
+            ]
+        );
+
+        // 6.6 Inscripción en Curso 3
         Enrollment::firstOrCreate(
             [
                 'course_id' => $course3->id,
@@ -146,7 +258,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'user_id' => User::where('email', 'alumno@sigc.unsaac.edu.pe')->first()->id,
-                'nombres' => 'JUAN',
+                'nombres' => 'JUAN CARLOS',
                 'paterno' => 'PEREZ',
                 'materno' => 'CONDORI',
                 'email' => 'alumno@sigc.unsaac.edu.pe',

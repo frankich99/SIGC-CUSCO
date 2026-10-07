@@ -201,7 +201,7 @@ function roleBadgeData(role?: string) {
 
                     <!-- Botones de Acción Primarios Granate y Dorado -->
                     <div class="flex flex-wrap items-center gap-3">
-                        <Button v-if="user?.role === 'admin'" as-child size="default" class="bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shadow-md">
+                        <Button v-if="user?.role === 'admin' || user?.role === 'docente'" as-child size="default" class="bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shadow-md">
                             <Link href="/courses/create">
                                 <Plus class="mr-1.5 size-4" />
                                 Nueva Capacitación

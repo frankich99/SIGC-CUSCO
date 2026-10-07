@@ -43,7 +43,7 @@ class CourseController extends Controller
             'filters' => $filters,
             'statuses' => $statuses,
             'can' => [
-                'create' => $request->user()?->isAdmin() ?? false,
+                'create' => $request->user() ? ($request->user()->isAdmin() || $request->user()->isDocente()) : true,
             ],
         ]);
     }
@@ -51,8 +51,12 @@ class CourseController extends Controller
     /**
      * Show the form for creating a new course.
      */
-    public function create(Request $request): Response
+    public function create(Request $request): Response|RedirectResponse
     {
+        if (! $request->user()) {
+            return redirect()->route('login')->with('warning', 'Inicie sesión como Administrador o Docente para registrar una capacitación.');
+        }
+
         Gate::authorize('create', Course::class);
 
         $instructors = User::query()
