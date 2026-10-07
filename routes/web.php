@@ -79,7 +79,7 @@ Route::get('api/certificates/lookup', function (Request $request) {
                 'hours' => $e->course?->hours,
                 'start_date' => $formattedStart,
                 'end_date' => $formattedEnd,
-                'instructor_name' => $e->course?->instructor ? $e->course->instructor->name.' '.$e->course->instructor->paterno : 'Docente Asignado',
+                'instructor_name' => $e->course?->instructor ? $e->course->instructor->name.' '.$e->course->instructor->paterno : ($e->course?->instructor_name ?? 'Ponente / Docente Asignado'),
                 'student_name' => $e->full_name,
                 'status' => $e->status,
                 'attended_sessions' => $e->attended_sessions,
@@ -141,6 +141,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'openCourses' => $openCourses,
         ]);
     })->name('dashboard');
+
+    Route::put('enrollments/{enrollment}', [EnrollmentController::class, 'update'])->name('enrollments.update');
+    Route::delete('enrollments/{enrollment}', [EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
+    Route::post('enrollments/{enrollment}/attendance', [EnrollmentController::class, 'recordAttendance'])->name('enrollments.attendance');
+    Route::post('enrollments/{enrollment}/certificate', [EnrollmentController::class, 'generateCertificate'])->name('enrollments.certificate');
 });
 
 require __DIR__.'/settings.php';

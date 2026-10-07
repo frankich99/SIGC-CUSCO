@@ -301,7 +301,7 @@ function generateCertificateHtml(record: CertificateRecord): string {
         <div class="signatures">
             <div class="sig-box">
                 <strong>${record.instructor_name}</strong><br>
-                <span class="sig-role">Docente Instructor</span>
+                <span class="sig-role">Ponente / Docente</span>
             </div>
             <div class="sig-box">
                 <strong>Dirección Académica</strong><br>
@@ -470,7 +470,7 @@ function printOrDownloadCertificate(record: CertificateRecord) {
                             </div>
 
                             <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] space-y-1 font-mono text-slate-800 dark:text-slate-200">
-                                <div>Docente: <strong class="text-slate-950 dark:text-white">{{ cert.instructor_name }}</strong></div>
+                                <div>Ponente / Docente: <strong class="text-slate-950 dark:text-white">{{ cert.instructor_name }}</strong></div>
                                 <div>Código Verif.: <strong class="text-rose-900 dark:text-rose-300 font-black">{{ cert.certificate_code }}</strong></div>
                             </div>
                         </div>
@@ -567,7 +567,7 @@ function printOrDownloadCertificate(record: CertificateRecord) {
                         <div class="pt-6 grid grid-cols-2 gap-6 text-xs border-t border-slate-300 dark:border-slate-800">
                             <div>
                                 <div class="font-bold text-slate-900 dark:text-white">{{ selectedCert.instructor_name }}</div>
-                                <div class="text-[10px] text-slate-500 uppercase">Docente Instructor</div>
+                                <div class="text-[10px] text-slate-500 uppercase">Ponente / Docente</div>
                             </div>
                             <div>
                                 <div class="font-bold text-slate-900 dark:text-white">Dirección Académica</div>

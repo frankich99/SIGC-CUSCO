@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,9 @@ import {
     Sparkles,
     CheckCircle2,
     Info,
+    Copy,
+    Search,
+    X,
 } from '@lucide/vue';
 import { THEME_BUTTONS, THEME_BADGES } from '@/lib/theme';
 import { formatDateRange, formatHours } from '@/lib/formatters';
@@ -49,17 +52,110 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Nueva Capacitación', href: '/courses/create' },
 ];
 
+function instructorName(inst: Instructor): string {
+    const parts = [inst.name, inst.paterno, inst.materno].filter(Boolean);
+    return parts.length > 0 ? parts.join(' ') : inst.name;
+}
+
+const defaultInst = props.instructors[0];
+const defaultName = defaultInst ? instructorName(defaultInst) : '';
+
 const form = useForm({
     code: props.suggestedCode,
     title: '',
     institution: '',
     description: '',
-    instructor_id: props.instructors[0]?.id || '',
+    instructor_id: defaultInst ? defaultInst.id : ('' as string | number),
+    instructor_name: defaultName,
     start_date: '',
     end_date: '',
     hours: 30,
     capacity: 30,
     status: 'abierto',
+});
+
+const instructorQuery = ref(defaultName);
+const isDropdownOpen = ref(false);
+const copiedInstructor = ref(false);
+
+const filteredInstructors = computed(() => {
+    const q = instructorQuery.value.trim().toLowerCase();
+    if (!q) return props.instructors;
+    return props.instructors.filter((inst) => {
+        const full = instructorName(inst).toLowerCase();
+        const email = inst.email.toLowerCase();
+        return full.includes(q) || email.includes(q);
+    });
+});
+
+const selectedInstructor = computed(() => {
+    if (!form.instructor_id) return null;
+    return props.instructors.find((i) => i.id === Number(form.instructor_id));
+});
+
+function onInstructorInput(e: Event) {
+    const val = (e.target as HTMLInputElement).value;
+    instructorQuery.value = val;
+    form.instructor_name = val;
+    isDropdownOpen.value = true;
+
+    // Verificar si coincide exactamente con un docente registrado
+    const match = props.instructors.find(
+        (i) => instructorName(i).toLowerCase() === val.trim().toLowerCase()
+    );
+    if (match) {
+        form.instructor_id = match.id;
+    } else {
+        form.instructor_id = '';
+    }
+}
+
+function selectInstructor(inst: Instructor) {
+    const name = instructorName(inst);
+    form.instructor_id = inst.id;
+    form.instructor_name = name;
+    instructorQuery.value = name;
+    isDropdownOpen.value = false;
+}
+
+function useAsCustomInstructor() {
+    form.instructor_id = '';
+    form.instructor_name = instructorQuery.value.trim();
+    isDropdownOpen.value = false;
+}
+
+function clearInstructor() {
+    form.instructor_id = '';
+    form.instructor_name = '';
+    instructorQuery.value = '';
+    isDropdownOpen.value = false;
+}
+
+async function copyInstructorText() {
+    const text = form.instructor_name || instructorQuery.value;
+    if (!text) return;
+    try {
+        await navigator.clipboard.writeText(text);
+        copiedInstructor.value = true;
+        setTimeout(() => {
+            copiedInstructor.value = false;
+        }, 2000);
+    } catch {
+        // Fallback
+    }
+}
+
+onMounted(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+        const el = document.getElementById('instructor_container');
+        if (el && !el.contains(e.target as Node)) {
+            isDropdownOpen.value = false;
+        }
+    };
+    window.addEventListener('click', handleClickOutside);
+    onUnmounted(() => {
+        window.removeEventListener('click', handleClickOutside);
+    });
 });
 
 const isDateOrderInvalid = computed(() => {
@@ -68,15 +164,6 @@ const isDateOrderInvalid = computed(() => {
     }
     return false;
 });
-
-const selectedInstructor = computed(() => {
-    return props.instructors.find((i) => i.id === Number(form.instructor_id));
-});
-
-function instructorName(inst: Instructor): string {
-    const parts = [inst.name, inst.paterno, inst.materno].filter(Boolean);
-    return parts.length > 0 ? parts.join(' ') : inst.name;
-}
 
 function submit() {
     form.post('/courses');
@@ -270,58 +357,165 @@ function submit() {
                     <!-- COLUMNA 2 (DERECHA - 5 COLS): GESTIÓN ACADÉMICA, AFORO Y VISTA PREVIA -->
                     <div class="lg:col-span-5 space-y-6">
                         
-                        <!-- TARJETA: DOCENTE RESPONSABLE -->
-                        <Card class="border border-slate-200 dark:border-slate-800 shadow-xs bg-white dark:bg-slate-900 overflow-hidden">
-                            <CardHeader class="bg-slate-50/70 dark:bg-slate-900/80 border-b pb-3.5">
+                        <!-- TARJETA: PONENTE / DOCENTE RESPONSABLE -->
+                        <Card id="instructor_container" class="border border-slate-200 dark:border-slate-800 shadow-xs bg-white dark:bg-slate-900 overflow-visible relative">
+                            <CardHeader class="bg-slate-50/70 dark:bg-slate-900/80 border-b pb-3.5 rounded-t-xl">
                                 <div class="flex items-center gap-2 text-xs font-black text-rose-900 dark:text-rose-400 uppercase tracking-wider">
                                     <Users class="size-4 text-rose-800" />
-                                    <span>Cuerpo Docente</span>
+                                    <span>Cuerpo Académico</span>
                                 </div>
                                 <CardTitle class="text-base font-bold text-slate-950 dark:text-white">
-                                    Docente / Instructor a Cargo
+                                    Ponente / Docente a Cargo
                                 </CardTitle>
                                 <CardDescription class="text-xs text-slate-600 dark:text-slate-400">
-                                    El docente tendrá permisos para emitir QR de asistencia y registrar notas.
+                                    Ponente o docente responsable de impartir la capacitación y firmar certificados.
                                 </CardDescription>
                             </CardHeader>
 
-                            <CardContent class="p-5 sm:p-6 space-y-3.5">
-                                <div class="space-y-1.5">
-                                    <Label for="instructor_id" class="text-xs font-bold text-slate-800 dark:text-slate-200">
-                                        Seleccionar Docente <span class="text-rose-700">*</span>
-                                    </Label>
-                                    <select
-                                        id="instructor_id"
-                                        v-model="form.instructor_id"
-                                        class="w-full h-10 rounded-md border border-slate-300 bg-white px-3 py-1 text-xs sm:text-sm font-semibold shadow-2xs focus:border-rose-900 focus:outline-hidden dark:border-slate-700 dark:bg-slate-950"
-                                        required
-                                    >
-                                        <option disabled value="">Seleccione un docente capacitador...</option>
-                                        <option v-for="inst in instructors" :key="inst.id" :value="inst.id">
-                                            {{ instructorName(inst) }} ({{ inst.role }})
-                                        </option>
-                                    </select>
-                                    <span v-if="form.errors.instructor_id" class="text-xs text-red-600 font-semibold block">
-                                        {{ form.errors.instructor_id }}
+                            <CardContent class="p-5 sm:p-6 space-y-4">
+                                <div class="space-y-1.5 relative">
+                                    <div class="flex items-center justify-between">
+                                        <Label for="instructor_input" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                            Nombre del Ponente / Docente <span class="text-rose-700">*</span>
+                                        </Label>
+                                        <div class="flex items-center gap-1.5">
+                                            <button
+                                                v-if="instructorQuery"
+                                                type="button"
+                                                class="text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:text-rose-900 flex items-center gap-1 transition-colors px-2 py-0.5 rounded-md hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer border border-slate-200 dark:border-slate-800"
+                                                @click="copyInstructorText"
+                                                title="Copiar nombre al portapapeles"
+                                            >
+                                                <Check v-if="copiedInstructor" class="size-3 text-emerald-600" />
+                                                <Copy v-else class="size-3 text-slate-500" />
+                                                <span>{{ copiedInstructor ? '¡Copiado!' : 'Copiar' }}</span>
+                                            </button>
+                                            <button
+                                                v-if="instructorQuery"
+                                                type="button"
+                                                class="text-[11px] text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50 dark:hover:bg-red-950/40 cursor-pointer"
+                                                @click="clearInstructor"
+                                                title="Limpiar campo"
+                                            >
+                                                <X class="size-3.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Input con capacidad completa de tipeo, copiar y pegar (Ctrl+V) -->
+                                    <div class="relative">
+                                        <Input
+                                            id="instructor_input"
+                                            :value="instructorQuery"
+                                            @input="onInstructorInput"
+                                            @focus="isDropdownOpen = true"
+                                            placeholder="Escribe o pega el nombre del ponente o docente..."
+                                            class="h-10 text-xs sm:text-sm font-semibold border-slate-300 focus-visible:ring-rose-900 pr-10 bg-white dark:bg-slate-950 text-slate-950 dark:text-white"
+                                            autocomplete="off"
+                                            required
+                                        />
+                                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <Search class="size-4" />
+                                        </div>
+                                    </div>
+
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                        Puedes escribir o pegar con <strong>Ctrl + V</strong>. Selecciona un docente del sistema o déjalo como ponente externo.
+                                    </p>
+
+                                    <span v-if="form.errors.instructor_name || form.errors.instructor_id" class="text-xs text-red-600 font-semibold block">
+                                        {{ form.errors.instructor_name || form.errors.instructor_id }}
                                     </span>
+
+                                    <!-- Dropdown / Sugerencias de Autocompletado -->
+                                    <div
+                                        v-if="isDropdownOpen"
+                                        class="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-1.5 space-y-1"
+                                    >
+                                        <div class="px-2 py-1 text-[10px] font-black uppercase tracking-wider text-rose-900 dark:text-rose-400 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                            <span>Ponentes / Docentes del Sistema</span>
+                                            <span class="text-[9px] text-slate-400">Clic para asignar</span>
+                                        </div>
+
+                                        <div v-if="filteredInstructors.length > 0">
+                                            <button
+                                                v-for="inst in filteredInstructors"
+                                                :key="inst.id"
+                                                type="button"
+                                                class="w-full text-left p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center justify-between gap-2 transition-colors cursor-pointer group"
+                                                @mousedown="selectInstructor(inst)"
+                                            >
+                                                <div class="min-w-0">
+                                                    <div class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-rose-900 flex items-center gap-1.5">
+                                                        <span>{{ instructorName(inst) }}</span>
+                                                        <CheckCircle2 v-if="Number(form.instructor_id) === inst.id" class="size-3 text-emerald-600" />
+                                                    </div>
+                                                    <div class="text-[11px] text-slate-500 truncate">
+                                                        {{ inst.email }}
+                                                    </div>
+                                                </div>
+                                                <Badge variant="outline" class="text-[10px] uppercase font-bold border-rose-200 text-rose-900 shrink-0">
+                                                    {{ inst.role }}
+                                                </Badge>
+                                            </button>
+                                        </div>
+
+                                        <!-- Opción de Ponente Externo si escribió o pegó texto -->
+                                        <div v-if="instructorQuery.trim().length > 0" class="pt-1 border-t border-slate-100 dark:border-slate-800">
+                                            <button
+                                                type="button"
+                                                class="w-full text-left p-2 rounded-lg bg-amber-50/80 hover:bg-amber-100/90 dark:bg-amber-950/30 text-amber-950 dark:text-amber-200 text-xs font-bold flex items-center justify-between gap-2 transition-colors cursor-pointer"
+                                                @mousedown="useAsCustomInstructor"
+                                            >
+                                                <div class="flex items-center gap-1.5 truncate">
+                                                    <Sparkles class="size-3.5 text-amber-600 shrink-0" />
+                                                    <span class="truncate">Asignar como Ponente Externo: "<strong>{{ instructorQuery.trim() }}</strong>"</span>
+                                                </div>
+                                                <Badge class="bg-amber-700 text-white text-[9px] uppercase shrink-0">
+                                                    Externo
+                                                </Badge>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <!-- Ficha resumen del Docente Seleccionado -->
-                                <div v-if="selectedInstructor" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
-                                    <div class="size-9 rounded-lg bg-rose-100 dark:bg-rose-950 text-rose-900 dark:text-rose-300 flex items-center justify-center font-bold text-xs shrink-0">
-                                        {{ selectedInstructor.name.charAt(0) }}
-                                    </div>
-                                    <div class="min-w-0 flex-1 text-xs">
-                                        <div class="font-bold text-slate-950 dark:text-white truncate">
-                                            {{ instructorName(selectedInstructor) }}
+                                <!-- Ficha Resumen del Ponente / Docente Seleccionado o Escrito -->
+                                <div v-if="selectedInstructor || form.instructor_name" class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="size-10 rounded-lg bg-gradient-to-br from-rose-100 to-rose-200 dark:from-rose-950 dark:to-slate-900 text-rose-900 dark:text-rose-300 flex items-center justify-center font-black text-sm shrink-0 border border-rose-300/50">
+                                            {{ (form.instructor_name || selectedInstructor?.name || 'P')[0] }}
                                         </div>
-                                        <div class="text-[11px] text-slate-500 truncate">
-                                            {{ selectedInstructor.email }}
+                                        <div class="min-w-0 flex-1 text-xs">
+                                            <div class="font-bold text-slate-950 dark:text-white truncate">
+                                                {{ form.instructor_name || instructorName(selectedInstructor!) }}
+                                            </div>
+                                            <div v-if="selectedInstructor?.email" class="text-[11px] text-slate-500 truncate">
+                                                {{ selectedInstructor.email }}
+                                            </div>
+                                            <div v-else class="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
+                                                Ponente / Docente externo registrado para este curso
+                                            </div>
                                         </div>
                                     </div>
-                                    <Badge variant="outline" class="text-[10px] font-bold border-rose-300 text-rose-900 dark:text-rose-300 capitalize">
-                                        {{ selectedInstructor.role }}
-                                    </Badge>
+
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <Badge
+                                            variant="outline"
+                                            class="text-[10px] font-black uppercase px-2 py-0.5"
+                                            :class="selectedInstructor ? 'border-rose-300 text-rose-900 bg-rose-50' : 'border-amber-300 text-amber-800 bg-amber-50'"
+                                        >
+                                            {{ selectedInstructor ? selectedInstructor.role : 'Ponente / Docente' }}
+                                        </Badge>
+                                        <button
+                                            type="button"
+                                            class="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 transition-colors cursor-pointer"
+                                            @click="copyInstructorText"
+                                            title="Copiar nombre"
+                                        >
+                                            <Check v-if="copiedInstructor" class="size-3.5 text-emerald-600" />
+                                            <Copy v-else class="size-3.5" />
+                                        </button>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>

@@ -44,6 +44,7 @@ interface CourseDetail {
     capacity: number;
     status: 'abierto' | 'en_curso' | 'concluido' | 'cancelado';
     instructor?: Instructor;
+    instructor_name?: string;
 }
 
 const props = defineProps<{
@@ -250,24 +251,24 @@ function instructorName(inst?: Instructor): string {
 
                 <!-- Right Col: Instructor & DNI Enrollment Tool -->
                 <div class="space-y-6">
-                    <!-- Docente Responsable -->
+                    <!-- Ponente / Docente Responsable -->
                     <Card>
                         <CardHeader class="pb-3">
                             <CardTitle class="text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                                Docente / Instructor
+                                Ponente / Docente
                             </CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-3 text-sm">
                             <div class="flex items-center gap-3">
                                 <div class="size-11 rounded-full bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200 flex items-center justify-center font-bold text-base">
-                                    {{ (course.instructor?.name || 'D')[0] }}
+                                    {{ (course.instructor?.name || course.instructor_name || 'P')[0] }}
                                 </div>
                                 <div>
                                     <div class="font-semibold text-neutral-900 dark:text-neutral-100">
-                                        {{ instructorName(course.instructor) }}
+                                        {{ instructorName(course.instructor) || course.instructor_name || 'Ponente / Docente Asignado' }}
                                     </div>
                                     <div class="text-xs text-neutral-500">
-                                        {{ course.instructor?.email || 'Sin correo' }}
+                                        {{ course.instructor?.email || 'Ponente para esta capacitación' }}
                                     </div>
                                     <div v-if="course.instructor?.dni" class="text-[11px] text-neutral-400 font-mono mt-0.5">
                                         DNI: {{ course.instructor.dni }}

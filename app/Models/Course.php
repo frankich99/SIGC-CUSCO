@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property string $title
  * @property string|null $description
  * @property int|null $instructor_id
+ * @property string|null $instructor_name
  * @property Carbon $start_date
  * @property Carbon $end_date
  * @property int $hours
@@ -25,11 +26,19 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User|null $instructor
+ * @property-read string $instructor_display_name
  */
-#[Fillable(['code', 'title', 'institution', 'description', 'instructor_id', 'start_date', 'end_date', 'hours', 'capacity', 'status'])]
+#[Fillable(['code', 'title', 'institution', 'description', 'instructor_id', 'instructor_name', 'start_date', 'end_date', 'hours', 'capacity', 'status'])]
 class Course extends Model
 {
     use HasFactory;
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = ['instructor_display_name'];
 
     /**
      * Get the attributes that should be cast.
@@ -55,6 +64,20 @@ class Course extends Model
     public function instructor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'instructor_id');
+    }
+
+    /**
+     * Obtiene el nombre completo del ponente o docente a cargo.
+     */
+    public function getInstructorDisplayNameAttribute(): string
+    {
+        if ($this->instructor) {
+            $parts = array_filter([$this->instructor->name, $this->instructor->paterno, $this->instructor->materno]);
+
+            return implode(' ', $parts) ?: $this->instructor->name;
+        }
+
+        return $this->instructor_name ?: 'Ponente / Docente por asignar';
     }
 
     /**

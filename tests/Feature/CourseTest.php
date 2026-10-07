@@ -90,6 +90,35 @@ test('CP-04 admin creates valid course and stores in mysql', function () {
     ]);
 });
 
+test('CP-05 admin creates valid course with external ponente and stores in mysql', function () {
+    $admin = User::factory()->create([
+        'role' => UserRole::Admin,
+        'email_verified_at' => now(),
+    ]);
+
+    $courseData = [
+        'code' => 'SIGC-TEST-EXT-01',
+        'title' => 'Seminario Internacional de Ciberdefensa',
+        'description' => 'Ponencia magistral con especialista externo.',
+        'instructor_name' => 'Dr. Walter Quispe Mendoza',
+        'start_date' => '2026-11-05',
+        'end_date' => '2026-11-15',
+        'hours' => 20,
+        'capacity' => 50,
+        'status' => 'abierto',
+    ];
+
+    $response = $this->actingAs($admin)->post(route('courses.store'), $courseData);
+
+    $response->assertRedirect(route('courses.index'));
+    $this->assertDatabaseHas('courses', [
+        'code' => 'SIGC-TEST-EXT-01',
+        'title' => 'Seminario Internacional de Ciberdefensa',
+        'instructor_name' => 'Dr. Walter Quispe Mendoza',
+        'instructor_id' => null,
+    ]);
+});
+
 test('authenticated user can query dni endpoint', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
 

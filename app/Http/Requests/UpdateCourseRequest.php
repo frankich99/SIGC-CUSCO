@@ -33,7 +33,8 @@ class UpdateCourseRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'institution' => ['nullable', 'string', 'max:150'],
             'description' => ['nullable', 'string'],
-            'instructor_id' => ['required', 'exists:users,id'],
+            'instructor_id' => ['nullable', 'exists:users,id'],
+            'instructor_name' => ['required_without:instructor_id', 'nullable', 'string', 'max:200'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'hours' => ['required', 'integer', 'min:1'],
@@ -51,8 +52,8 @@ class UpdateCourseRequest extends FormRequest
     {
         return [
             'title.required' => 'El título de la capacitación es obligatorio.',
-            'instructor_id.required' => 'Debe asignar un docente o instructor responsable.',
-            'instructor_id.exists' => 'El docente seleccionado no existe en el sistema.',
+            'instructor_name.required_without' => 'Debe ingresar o seleccionar un ponente / docente responsable.',
+            'instructor_id.exists' => 'El ponente / docente seleccionado no existe en el sistema.',
             'start_date.required' => 'La fecha de inicio es obligatoria.',
             'end_date.required' => 'La fecha de fin es obligatoria.',
             'end_date.after_or_equal' => 'La fecha de fin no puede ser anterior a la fecha de inicio.',

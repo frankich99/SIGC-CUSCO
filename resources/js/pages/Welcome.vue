@@ -48,6 +48,7 @@ interface CourseItem {
         paterno?: string;
         materno?: string;
     };
+    instructor_name?: string | null;
 }
 
 const props = defineProps<{
@@ -386,10 +387,10 @@ function statusBadgeInfo(status: string) {
                             <!-- Instructor snippet -->
                             <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-neutral-800 text-slate-800 dark:text-neutral-200">
                                 <div class="size-6 rounded-full bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-300 flex items-center justify-center font-bold text-[10px]">
-                                    {{ course.instructor?.name?.charAt(0) || 'D' }}
+                                    {{ (course.instructor?.name || course.instructor_name || 'P')[0] }}
                                 </div>
                                 <span class="truncate">
-                                    Docente: <strong>{{ course.instructor ? `${course.instructor.name} ${course.instructor.paterno || ''}` : 'Por asignar' }}</strong>
+                                    Ponente / Docente: <strong>{{ course.instructor ? `${course.instructor.name} ${course.instructor.paterno || ''}` : (course.instructor_name || 'Por asignar') }}</strong>
                                 </span>
                             </div>
 

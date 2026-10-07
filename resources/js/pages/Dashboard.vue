@@ -55,6 +55,7 @@ interface CourseItem {
     status: string;
     enrollments_count?: number;
     instructor?: InstructorSnippet;
+    instructor_name?: string | null;
 }
 
 interface EnrollmentItem {
@@ -154,7 +155,7 @@ function roleBadgeData(role?: string) {
             };
         case 'docente':
             return {
-                label: 'Docente / Instructor',
+                label: 'Ponente / Docente',
                 desc: 'Dictado de clases, proyección de QR de asistencia en aula y evaluación.',
                 badgeClass: 'bg-amber-700 text-white font-black shadow-xs',
             };
@@ -507,7 +508,7 @@ function roleBadgeData(role?: string) {
                                     {{ item.course?.title }}
                                 </CardTitle>
                                 <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    Docente: {{ item.course?.instructor ? `${item.course.instructor.name} ${item.course.instructor.paterno || ''}` : 'Por asignar' }}
+                                    Ponente / Docente: {{ item.course?.instructor ? `${item.course.instructor.name} ${item.course.instructor.paterno || ''}` : (item.course?.instructor_name || 'Por asignar') }}
                                 </CardDescription>
                             </CardHeader>
 

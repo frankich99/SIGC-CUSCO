@@ -85,6 +85,13 @@ class CourseController extends Controller
             $validated['code'] = 'SIGC-'.date('Y').'-'.str_pad((string) (Course::max('id') + 1), 3, '0', STR_PAD_LEFT);
         }
 
+        if (! empty($validated['instructor_id']) && empty($validated['instructor_name'])) {
+            $user = User::find($validated['instructor_id']);
+            if ($user) {
+                $validated['instructor_name'] = trim("{$user->name} {$user->paterno} {$user->materno}") ?: $user->name;
+            }
+        }
+
         Course::create($validated);
 
         return redirect()->route('courses.index')->with('success', 'Capacitación creada exitosamente.');
@@ -95,13 +102,24 @@ class CourseController extends Controller
      */
     public function show(Request $request, Course $course): Response
     {
-        $course->load(['instructor:id,name,paterno,materno,email,role']);
+        $course->load([
+            'instructor:id,name,paterno,materno,email,role',
+            'enrollments' => function ($query) {
+                $query->orderBy('paterno')->orderBy('nombres');
+            },
+        ]);
+
+        $course->loadCount(['enrollments' => fn ($q) => $q->where('status', '!=', 'cancelado')]);
+
+        $user = $request->user();
+        $isStaff = $user && ($user->isAdmin() || ($user->isDocente() && $course->instructor_id === $user->id));
 
         return Inertia::render('courses/Show', [
             'course' => $course,
             'can' => [
-                'update' => $request->user()?->isAdmin() ?? false,
-                'delete' => $request->user()?->isAdmin() ?? false,
+                'update' => $user?->isAdmin() ?? false,
+                'delete' => $user?->isAdmin() ?? false,
+                'manage_enrollments' => $isStaff,
             ],
         ]);
     }
@@ -135,7 +153,16 @@ class CourseController extends Controller
      */
     public function update(UpdateCourseRequest $request, Course $course): RedirectResponse
     {
-        $course->update($request->validated());
+        $validated = $request->validated();
+
+        if (! empty($validated['instructor_id']) && empty($validated['instructor_name'])) {
+            $user = User::find($validated['instructor_id']);
+            if ($user) {
+                $validated['instructor_name'] = trim("{$user->name} {$user->paterno} {$user->materno}") ?: $user->name;
+            }
+        }
+
+        $course->update($validated);
 
         return redirect()->route('courses.show', $course)->with('success', 'Capacitación actualizada exitosamente.');
     }

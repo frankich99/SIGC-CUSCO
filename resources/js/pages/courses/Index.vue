@@ -46,6 +46,7 @@ interface CourseItem {
     capacity: number;
     status: 'abierto' | 'en_curso' | 'concluido' | 'cancelado';
     instructor?: Instructor;
+    instructor_name?: string;
 }
 
 interface PaginationMeta {
@@ -241,8 +242,8 @@ function instructorName(inst?: Instructor): string {
                             <div class="flex items-center gap-2">
                                 <User class="size-3.5 text-neutral-400 shrink-0" />
                                 <span class="truncate">
-                                    <strong class="font-medium text-neutral-700 dark:text-neutral-300">Docente:</strong>
-                                    {{ instructorName(course.instructor) }}
+                                    <strong class="font-medium text-neutral-700 dark:text-neutral-300">Ponente / Docente:</strong>
+                                    {{ instructorName(course.instructor) || course.instructor_name || 'Por asignar' }}
                                 </span>
                             </div>
                             <div class="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200">
