@@ -117,7 +117,7 @@ function statusBadgeInfo(status: string) {
         case 'abierto':
             return {
                 label: 'Inscripciones Abiertas',
-                class: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
+                class: 'bg-rose-100 text-rose-950 border border-rose-300 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-800 font-bold',
             };
         case 'en_curso':
             return {

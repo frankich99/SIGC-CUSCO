@@ -356,7 +356,7 @@ function roleBadgeData(role?: string) {
                                     <span class="font-mono font-bold text-rose-950 bg-rose-100 dark:bg-rose-950 dark:text-rose-200 px-2.5 py-1 rounded border border-rose-200 dark:border-rose-800">
                                         {{ course.code }}
                                     </span>
-                                    <Badge class="text-[11px] font-extrabold uppercase px-2.5 py-0.5" :class="course.status === 'abierto' ? 'bg-emerald-100 text-emerald-950 border border-emerald-300' : 'bg-slate-100 text-slate-800'">
+                                    <Badge class="text-[11px] font-extrabold uppercase px-2.5 py-0.5" :class="course.status === 'abierto' ? 'bg-amber-100 text-amber-950 border border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800' : 'bg-slate-100 text-slate-800'">
                                         {{ course.status }}
                                     </Badge>
                                 </div>
@@ -500,7 +500,7 @@ function roleBadgeData(role?: string) {
                                     <span class="font-mono text-xs font-bold text-rose-950 bg-rose-100 dark:bg-rose-950 dark:text-rose-200 px-2.5 py-1 rounded border border-rose-200 dark:border-rose-800">
                                         {{ item.course?.code }}
                                     </span>
-                                    <Badge class="capitalize text-xs font-extrabold px-2.5 py-0.5" :class="item.status === 'aprobado' ? 'bg-emerald-100 text-emerald-950 border border-emerald-300' : 'bg-rose-100 text-rose-950 border border-rose-300'">
+                                    <Badge class="capitalize text-xs font-extrabold px-2.5 py-0.5" :class="item.status === 'aprobado' ? 'bg-amber-100 text-amber-950 border border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800' : 'bg-rose-100 text-rose-950 border border-rose-300'">
                                         {{ item.status }}
                                     </Badge>
                                 </div>

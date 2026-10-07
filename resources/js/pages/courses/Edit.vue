@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { AlertCircle, ArrowLeft, Check, GraduationCap } from '@lucide/vue';
+import { THEME_BUTTONS } from '@/lib/theme';
 import type { BreadcrumbItem } from '@/types';
 
 interface Instructor {
@@ -85,7 +86,7 @@ function instructorName(inst: Instructor): string {
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-                        <GraduationCap class="size-6 text-emerald-600" />
+                        <GraduationCap class="size-6 text-rose-900" />
                         Editar Capacitación
                     </h1>
                     <p class="text-xs text-neutral-500 mt-1">
@@ -129,7 +130,7 @@ function instructorName(inst: Instructor): string {
                                 <select
                                     id="status"
                                     v-model="form.status"
-                                    class="w-full h-9 rounded-md border border-neutral-300 bg-white px-3 py-1 text-sm shadow-xs focus:border-emerald-500 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-900"
+                                    class="w-full h-9 rounded-md border border-neutral-300 bg-white px-3 py-1 text-sm shadow-xs focus:border-rose-900 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-900"
                                 >
                                     <option v-for="st in statuses" :key="st.value" :value="st.value">
                                         {{ st.label }}
@@ -167,7 +168,7 @@ function instructorName(inst: Instructor): string {
                                 id="description"
                                 v-model="form.description"
                                 rows="3"
-                                class="w-full rounded-md border border-neutral-300 bg-white p-3 text-sm shadow-xs focus:border-emerald-500 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-900"
+                                class="w-full rounded-md border border-neutral-300 bg-white p-3 text-sm shadow-xs focus:border-rose-900 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-900"
                             ></textarea>
                             <span v-if="form.errors.description" class="text-xs text-red-600 font-medium">
                                 {{ form.errors.description }}
@@ -179,7 +180,7 @@ function instructorName(inst: Instructor): string {
                             <select
                                 id="instructor_id"
                                 v-model="form.instructor_id"
-                                class="w-full h-9 rounded-md border border-neutral-300 bg-white px-3 py-1 text-sm shadow-xs focus:border-emerald-500 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-900"
+                                class="w-full h-9 rounded-md border border-neutral-300 bg-white px-3 py-1 text-sm shadow-xs focus:border-rose-900 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-900"
                                 required
                             >
                                 <option v-for="inst in instructors" :key="inst.id" :value="inst.id">
@@ -239,7 +240,7 @@ function instructorName(inst: Instructor): string {
                             <Button
                                 type="submit"
                                 :disabled="form.processing || isDateOrderInvalid"
-                                class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-xs"
+                                :class="['font-bold shadow-sm', THEME_BUTTONS.primary]"
                             >
                                 <Spinner v-if="form.processing" class="mr-1.5 size-4" />
                                 <Check v-else class="mr-1.5 size-4" />

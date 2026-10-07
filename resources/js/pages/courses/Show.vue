@@ -119,7 +119,7 @@ function instructorName(inst?: Instructor): string {
                                 Catálogo
                             </Link>
                         </Button>
-                        <span class="font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                        <span class="font-mono text-xs font-bold text-rose-950 dark:text-rose-200 bg-rose-100 dark:bg-rose-950 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800">
                             {{ course.code }}
                         </span>
                         <span :class="['text-xs font-medium px-2.5 py-0.5 rounded-full border', getStatusBadge(course.status).class]">
@@ -131,9 +131,9 @@ function instructorName(inst?: Instructor): string {
                     </h1>
                     <div
                         v-if="course.institution"
-                        class="flex items-center gap-1.5 text-xs font-medium text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-md border border-emerald-200/80 dark:border-emerald-800/60 w-fit"
+                        class="flex items-center gap-1.5 text-xs font-bold text-rose-900 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 px-2.5 py-1 rounded-md border border-rose-200/80 dark:border-rose-800/60 w-fit"
                     >
-                        <Building2 class="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                        <Building2 class="size-4 shrink-0 text-rose-800 dark:text-rose-400" />
                         <span>Entidad Organizadora: <strong>{{ course.institution }}</strong></span>
                     </div>
                 </div>
@@ -176,7 +176,7 @@ function instructorName(inst?: Instructor): string {
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
                                 <div class="rounded-lg border p-3 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
                                     <div class="flex items-center gap-1.5 text-xs text-neutral-500 font-medium">
-                                        <Clock class="size-4 text-emerald-600" />
+                                        <Clock class="size-4 text-amber-600" />
                                         Horas Académicas
                                     </div>
                                     <div class="text-lg font-bold text-neutral-900 dark:text-neutral-100 mt-1">
@@ -186,7 +186,7 @@ function instructorName(inst?: Instructor): string {
 
                                 <div class="rounded-lg border p-3 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
                                     <div class="flex items-center gap-1.5 text-xs text-neutral-500 font-medium">
-                                        <Users class="size-4 text-emerald-600" />
+                                        <Users class="size-4 text-rose-800" />
                                         Vacantes Máximas
                                     </div>
                                     <div class="text-lg font-bold text-neutral-900 dark:text-neutral-100 mt-1">
@@ -196,13 +196,13 @@ function instructorName(inst?: Instructor): string {
 
                                 <div class="rounded-lg border p-3 border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/60">
                                     <div class="flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-300 font-bold">
-                                        <Calendar class="size-4 text-emerald-600" />
+                                        <Calendar class="size-4 text-rose-800" />
                                         Cronograma Oficial
                                     </div>
                                     <div class="text-xs font-bold text-slate-900 dark:text-slate-100 mt-1.5">
                                         {{ formatDate(course.start_date, 'compact') }} al {{ formatDate(course.end_date, 'compact') }}
                                     </div>
-                                    <div class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                                    <div class="text-[11px] font-bold text-rose-900 dark:text-rose-400">
                                         {{ formatDateRange(course.start_date, course.end_date, 'medium') }}
                                     </div>
                                 </div>
@@ -221,7 +221,7 @@ function instructorName(inst?: Instructor): string {
                         <CardContent>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                                 <div class="p-3 rounded-lg border dark:border-neutral-800 space-y-1">
-                                    <div class="flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
+                                    <div class="flex items-center gap-1.5 font-bold text-rose-900 dark:text-rose-400">
                                         <CheckCircle2 class="size-4" />
                                         1. Matrícula DNI
                                     </div>
@@ -259,7 +259,7 @@ function instructorName(inst?: Instructor): string {
                         </CardHeader>
                         <CardContent class="space-y-3 text-sm">
                             <div class="flex items-center gap-3">
-                                <div class="size-11 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 flex items-center justify-center font-bold text-base">
+                                <div class="size-11 rounded-full bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200 flex items-center justify-center font-bold text-base">
                                     {{ (course.instructor?.name || 'D')[0] }}
                                 </div>
                                 <div>
@@ -278,14 +278,14 @@ function instructorName(inst?: Instructor): string {
                     </Card>
 
                     <!-- Inscripción Oficial con DNI -->
-                    <Card class="border-2 border-emerald-300 dark:border-emerald-800 bg-gradient-to-br from-emerald-50/50 to-transparent dark:from-emerald-950/20 shadow-sm rounded-xl">
+                    <Card class="border-2 border-rose-200 dark:border-rose-900 bg-gradient-to-br from-rose-50/40 to-transparent dark:from-rose-950/20 shadow-sm rounded-xl">
                         <CardHeader class="pb-3">
                             <div class="flex items-center justify-between">
                                 <CardTitle class="text-sm sm:text-base font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                                    <UserCheck class="size-4 text-emerald-600" />
+                                    <UserCheck class="size-4 text-rose-800" />
                                     Inscripción en Línea
                                 </CardTitle>
-                                <Badge variant="outline" class="text-[10px] font-bold border-emerald-400 text-emerald-700 bg-emerald-50 dark:bg-emerald-950">
+                                <Badge variant="outline" class="text-[10px] font-bold border-rose-300 text-rose-900 bg-rose-50 dark:bg-rose-950">
                                     RENIEC API
                                 </Badge>
                             </div>
@@ -307,7 +307,7 @@ function instructorName(inst?: Instructor): string {
                             <Button
                                 v-if="course.status === 'abierto'"
                                 size="lg"
-                                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm h-10 shadow-sm"
+                                :class="['w-full h-10 text-xs sm:text-sm', THEME_BUTTONS.primary]"
                                 @click="isEnrollModalOpen = true"
                             >
                                 <CheckCircle2 class="size-4 mr-2" />

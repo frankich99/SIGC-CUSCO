@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { Search, CheckCircle2, AlertCircle, UserCheck } from '@lucide/vue';
+import { THEME_BUTTONS } from '@/lib/theme';
 
 export interface DniPersonData {
     dni: string;
@@ -63,19 +64,19 @@ async function consultDni() {
 </script>
 
 <template>
-    <Card class="border-emerald-200/60 dark:border-emerald-900/40 bg-gradient-to-br from-emerald-50/40 to-transparent dark:from-emerald-950/10">
+    <Card class="border-rose-200/80 dark:border-rose-900/60 bg-gradient-to-br from-rose-50/40 to-transparent dark:from-rose-950/20">
         <CardHeader class="pb-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <div class="rounded-lg bg-emerald-600/10 p-2 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                    <div class="rounded-lg bg-rose-900/10 p-2 text-rose-900 dark:bg-rose-500/10 dark:text-rose-300">
                         <UserCheck class="size-5" />
                     </div>
                     <div>
-                        <CardTitle class="text-base font-semibold">Consulta Rápida de DNI</CardTitle>
-                        <CardDescription class="text-xs">Validación oficial vía API RENIEC / Base Pública</CardDescription>
+                        <CardTitle class="text-base font-bold text-slate-950 dark:text-white">Consulta Rápida de DNI</CardTitle>
+                        <CardDescription class="text-xs text-slate-600 dark:text-slate-400">Validación oficial vía API RENIEC / Base Pública</CardDescription>
                     </div>
                 </div>
-                <Badge variant="outline" class="border-emerald-300 text-emerald-700 dark:border-emerald-700 dark:text-emerald-300 text-[10px]">
+                <Badge variant="outline" class="border-rose-300 text-rose-900 dark:border-rose-700 dark:text-rose-300 text-[10px] font-bold bg-rose-50 dark:bg-rose-950">
                     En línea
                 </Badge>
             </div>
@@ -87,44 +88,48 @@ async function consultDni() {
                         v-model="dniInput"
                         placeholder="Ingrese DNI (8 dígitos)..."
                         maxlength="8"
-                        class="pr-3 text-sm font-mono tracking-wider"
+                        class="pr-3 text-sm font-mono tracking-wider font-semibold"
                         @keydown.enter.prevent="consultDni"
                     />
                 </div>
-                <Button :disabled="loading || dniInput.trim().length !== 8" @click="consultDni" class="bg-emerald-600 hover:bg-emerald-700 text-white">
-                    <Spinner v-if="loading" class="mr-1 size-4" />
-                    <Search v-else class="mr-1 size-4" />
+                <Button
+                    :disabled="loading || dniInput.trim().length !== 8"
+                    @click="consultDni"
+                    :class="['text-xs font-bold', THEME_BUTTONS.primary]"
+                >
+                    <Spinner v-if="loading" class="mr-1 size-3.5" />
+                    <Search v-else class="mr-1 size-3.5" />
                     Consultar
                 </Button>
             </div>
 
             <!-- Error -->
-            <div v-if="error" class="flex items-center gap-2 rounded-md bg-red-50 p-2.5 text-xs text-red-700 dark:bg-red-950/40 dark:text-red-300 border border-red-200 dark:border-red-800">
-                <AlertCircle class="size-4 shrink-0" />
+            <div v-if="error" class="flex items-center gap-2 rounded-md bg-rose-100 p-2.5 text-xs text-rose-950 dark:bg-rose-950/60 dark:text-rose-200 border border-rose-300 dark:border-rose-800 font-bold">
+                <AlertCircle class="size-4 shrink-0 text-rose-800" />
                 <span>{{ error }}</span>
             </div>
 
             <!-- Resultado encontrado -->
-            <div v-if="person" class="rounded-lg border border-emerald-200 bg-white p-3 shadow-xs dark:border-emerald-800 dark:bg-neutral-900 space-y-1.5">
-                <div class="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 text-xs font-medium">
+            <div v-if="person" class="rounded-lg border border-rose-200 bg-white p-3 shadow-xs dark:border-rose-800 dark:bg-neutral-900 space-y-1.5">
+                <div class="flex items-center gap-2 text-rose-900 dark:text-rose-300 text-xs font-bold">
                     <CheckCircle2 class="size-4" />
                     <span>Ciudadano validado correctamente</span>
                 </div>
-                <div class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                <div class="text-sm font-bold text-slate-950 dark:text-white">
                     {{ person.nombre_completo }}
                 </div>
-                <div class="grid grid-cols-2 gap-2 text-xs text-neutral-600 dark:text-neutral-400 pt-1">
+                <div class="grid grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300 pt-1 font-medium">
                     <div>
-                        <span class="font-medium text-neutral-500">DNI:</span> {{ person.dni }}
+                        <span class="font-bold text-slate-500">DNI:</span> {{ person.dni }}
                     </div>
                     <div>
-                        <span class="font-medium text-neutral-500">Dígito Verif.:</span> {{ person.codigo_verificacion || '-' }}
+                        <span class="font-bold text-slate-500">Dígito Verif.:</span> {{ person.codigo_verificacion || '-' }}
                     </div>
                     <div>
-                        <span class="font-medium text-neutral-500">Nombres:</span> {{ person.nombres }}
+                        <span class="font-bold text-slate-500">Nombres:</span> {{ person.nombres }}
                     </div>
                     <div>
-                        <span class="font-medium text-neutral-500">Apellidos:</span> {{ person.apellido_paterno }} {{ person.apellido_materno }}
+                        <span class="font-bold text-slate-500">Apellidos:</span> {{ person.apellido_paterno }} {{ person.apellido_materno }}
                     </div>
                 </div>
             </div>
