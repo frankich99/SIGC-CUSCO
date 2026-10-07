@@ -75,10 +75,10 @@ const email = ref('');
 const phone = ref('');
 const termsAccepted = ref(false);
 
-// Status state
 const isLookingUpDni = ref(false);
 const dniLookupSuccess = ref(false);
 const dniLookupError = ref<string | null>(null);
+const manualEntry = ref(false);
 const isSubmitting = ref(false);
 const submitSuccess = ref(false);
 const submitError = ref<string | null>(null);
@@ -91,7 +91,8 @@ const isPhoneValid = computed(() => !phone.value || /^[0-9]{9}$/.test(phone.valu
 const canSubmit = computed(() => {
     return (
         props.course !== null &&
-        dniLookupSuccess.value &&
+        (dniLookupSuccess.value || manualEntry.value) &&
+        isDniFormatValid.value &&
         nombres.value.trim().length > 0 &&
         paterno.value.trim().length > 0 &&
         isEmailValid.value &&
@@ -165,16 +166,16 @@ async function lookupDni() {
             materno.value = (p.materno || p.apellido_materno || '').trim();
             dniLookupSuccess.value = true;
             dniLookupError.value = null;
+            manualEntry.value = false;
         } else {
             dniLookupError.value =
-                data.message || 'No se encontraron datos registrados para este DNI en RENIEC.';
-            nombres.value = '';
-            paterno.value = '';
-            materno.value = '';
+                data.message || 'No se encontraron datos en RENIEC. Puedes ingresar los nombres y apellidos manualmente.';
+            manualEntry.value = true;
             dniLookupSuccess.value = false;
         }
     } catch {
-        dniLookupError.value = 'Error al comunicarse con el servicio de RENIEC. Intente nuevamente.';
+        dniLookupError.value = 'Error al comunicarse con RENIEC. Puedes ingresar los datos manualmente.';
+        manualEntry.value = true;
         dniLookupSuccess.value = false;
     } finally {
         isLookingUpDni.value = false;
@@ -184,6 +185,7 @@ async function lookupDni() {
 // Reset DNI to allow querying another citizen
 function resetDni() {
     dniLookupSuccess.value = false;
+    manualEntry.value = false;
     dniLookupError.value = null;
     nombres.value = '';
     paterno.value = '';
@@ -195,8 +197,8 @@ function resetDni() {
 function submitEnrollment() {
     if (!props.course) return;
 
-    if (!dniLookupSuccess.value) {
-        submitError.value = 'Debe validar su DNI con RENIEC antes de continuar.';
+    if (!dniLookupSuccess.value && !manualEntry.value) {
+        submitError.value = 'Debe validar su DNI con RENIEC o habilitar ingreso manual.';
         return;
     }
 
@@ -458,15 +460,33 @@ function closeModal() {
                             </div>
 
                             <!-- Estado: Error al buscar DNI -->
-                            <div v-if="dniLookupError" class="text-xs font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5 pt-1">
-                                <AlertCircle class="size-4 text-rose-600 shrink-0" />
-                                <span>{{ dniLookupError }}</span>
+                            <div v-if="dniLookupError" class="text-xs font-bold text-rose-700 dark:text-rose-400 flex flex-col gap-1 pt-1">
+                                <div class="flex items-center gap-1.5">
+                                    <AlertCircle class="size-4 text-rose-600 shrink-0" />
+                                    <span>{{ dniLookupError }}</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    @click="manualEntry = true"
+                                    class="text-left text-xs font-bold text-rose-900 dark:text-rose-300 underline pl-5 cursor-pointer hover:text-rose-950"
+                                >
+                                    ✍️ Ingresar nombres y apellidos manualmente para continuar
+                                </button>
                             </div>
 
                             <!-- Estado: Mensaje cuando aún no se validó -->
-                            <div v-if="!dniLookupSuccess && !dniLookupError" class="text-[11px] font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1.5 pt-0.5">
-                                <Info class="size-3.5 text-slate-500 shrink-0" />
-                                <span>Ingresa los 8 dígitos y pulsa «Validar RENIEC». Los nombres se cargarán automáticamente y quedarán bloqueados para garantizar su autenticidad.</span>
+                            <div v-if="!dniLookupSuccess && !dniLookupError" class="flex flex-col gap-1.5 pt-0.5">
+                                <div class="text-[11px] font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                                    <Info class="size-3.5 text-slate-500 shrink-0" />
+                                    <span>Ingresa los 8 dígitos y pulsa «Validar RENIEC». Los nombres se cargarán automáticamente.</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    @click="manualEntry = !manualEntry"
+                                    class="text-left text-[11px] font-bold text-rose-900 dark:text-rose-400 hover:underline cursor-pointer"
+                                >
+                                    {{ manualEntry ? 'Volver a validación automática RENIEC' : '¿Problemas con el servicio RENIEC? Habilitar ingreso manual' }}
+                                </button>
                             </div>
 
                             <!-- Estado: Éxito en RENIEC (Tarjeta de confirmación) -->
@@ -489,71 +509,93 @@ function closeModal() {
                             </div>
                         </div>
 
-                        <!-- Paso 2: Datos de Identidad (BLOQUEADOS Y SOLO LECTURA) -->
+                        <!-- Paso 2: Datos de Identidad -->
                         <div class="space-y-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                             <div class="flex items-center justify-between border-b pb-2">
                                 <div class="text-xs font-black text-slate-950 dark:text-white flex items-center gap-1.5">
-                                    <Lock class="size-3.5 text-rose-900" />
-                                    <span>Paso 2: Datos Oficiales de Identidad</span>
+                                    <Lock v-if="dniLookupSuccess" class="size-3.5 text-rose-900" />
+                                    <UserCheck v-else class="size-3.5 text-amber-600" />
+                                    <span>Paso 2: Datos de Identidad</span>
                                 </div>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                                    🔒 Solo Lectura (RENIEC)
+                                <span
+                                    class="text-[10px] font-bold px-2 py-0.5 rounded"
+                                    :class="dniLookupSuccess ? 'bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200' : (manualEntry ? 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300')"
+                                >
+                                    {{ dniLookupSuccess ? '🔒 Verificado (RENIEC)' : (manualEntry ? '✍️ Ingreso Manual Habilitado' : 'Pendiente de DNI') }}
                                 </span>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div class="space-y-1 sm:col-span-2">
                                     <Label for="nombres" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                                        <span>Nombres Completos</span>
+                                        <span>Nombres Completos <span class="text-rose-600">*</span></span>
                                         <span v-if="dniLookupSuccess" class="text-[10px] text-rose-800 font-bold">Oficial RENIEC</span>
+                                        <span v-else-if="manualEntry" class="text-[10px] text-amber-700 font-bold">Ingreso Manual</span>
                                     </Label>
                                     <div class="relative">
                                         <Input
                                             id="nombres"
                                             v-model="nombres"
                                             type="text"
-                                            readonly
-                                            tabindex="-1"
-                                            :placeholder="dniLookupSuccess ? 'Nombres oficiales' : 'Pendiente de consulta DNI'"
-                                            class="text-xs font-bold bg-slate-100/90 dark:bg-slate-950/80 cursor-not-allowed border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white pr-8"
+                                            :readonly="dniLookupSuccess"
+                                            :tabindex="dniLookupSuccess ? -1 : 0"
+                                            :placeholder="dniLookupSuccess ? 'Nombres oficiales' : (manualEntry ? 'Ingresa los nombres del participante' : 'Pendiente de consulta DNI')"
+                                            :class="[
+                                                'text-xs font-bold pr-8',
+                                                dniLookupSuccess
+                                                    ? 'bg-slate-100/90 dark:bg-slate-950/80 cursor-not-allowed border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white'
+                                                    : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-800'
+                                            ]"
                                         />
-                                        <Lock class="size-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                        <Lock v-if="dniLookupSuccess" class="size-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                                     </div>
                                 </div>
 
                                 <div class="space-y-1">
-                                    <Label for="paterno" class="text-xs font-bold text-slate-800 dark:text-slate-200">
-                                        Apellido Paterno
+                                    <Label for="paterno" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                                        <span>Apellido Paterno <span class="text-rose-600">*</span></span>
+                                        <span v-if="manualEntry" class="text-[10px] text-amber-700 font-bold">Manual</span>
                                     </Label>
                                     <div class="relative">
                                         <Input
                                             id="paterno"
                                             v-model="paterno"
                                             type="text"
-                                            readonly
-                                            tabindex="-1"
-                                            :placeholder="dniLookupSuccess ? 'Apellido paterno' : 'Pendiente de DNI'"
-                                            class="text-xs font-bold bg-slate-100/90 dark:bg-slate-950/80 cursor-not-allowed border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white pr-8"
+                                            :readonly="dniLookupSuccess"
+                                            :tabindex="dniLookupSuccess ? -1 : 0"
+                                            :placeholder="dniLookupSuccess ? 'Apellido paterno' : (manualEntry ? 'Primer apellido' : 'Pendiente de DNI')"
+                                            :class="[
+                                                'text-xs font-bold pr-8',
+                                                dniLookupSuccess
+                                                    ? 'bg-slate-100/90 dark:bg-slate-950/80 cursor-not-allowed border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white'
+                                                    : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-800'
+                                            ]"
                                         />
-                                        <Lock class="size-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                        <Lock v-if="dniLookupSuccess" class="size-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                                     </div>
                                 </div>
 
                                 <div class="space-y-1">
-                                    <Label for="materno" class="text-xs font-bold text-slate-800 dark:text-slate-200">
-                                        Apellido Materno
+                                    <Label for="materno" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                                        <span>Apellido Materno</span>
+                                        <span v-if="manualEntry" class="text-[10px] text-slate-500 font-normal">Opcional</span>
                                     </Label>
                                     <div class="relative">
                                         <Input
                                             id="materno"
                                             v-model="materno"
                                             type="text"
-                                            readonly
-                                            tabindex="-1"
-                                            :placeholder="dniLookupSuccess ? 'Apellido materno' : 'Pendiente de DNI'"
-                                            class="text-xs font-bold bg-slate-100/90 dark:bg-slate-950/80 cursor-not-allowed border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white pr-8"
+                                            :readonly="dniLookupSuccess"
+                                            :tabindex="dniLookupSuccess ? -1 : 0"
+                                            :placeholder="dniLookupSuccess ? 'Apellido materno' : (manualEntry ? 'Segundo apellido' : 'Pendiente de DNI')"
+                                            :class="[
+                                                'text-xs font-bold pr-8',
+                                                dniLookupSuccess
+                                                    ? 'bg-slate-100/90 dark:bg-slate-950/80 cursor-not-allowed border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white'
+                                                    : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-800'
+                                            ]"
                                         />
-                                        <Lock class="size-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                        <Lock v-if="dniLookupSuccess" class="size-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                                     </div>
                                 </div>
                             </div>
