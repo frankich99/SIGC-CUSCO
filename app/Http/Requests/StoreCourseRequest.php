@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\CourseStatus;
+use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -18,6 +19,21 @@ class StoreCourseRequest extends FormRequest
     }
 
     /**
+     * Prepare inputs for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (empty($this->instructor_name) && ! empty($this->instructor_id)) {
+            $user = User::find($this->instructor_id);
+            if ($user) {
+                $this->merge([
+                    'instructor_name' => trim("{$user->name} {$user->paterno} {$user->materno}") ?: $user->name,
+                ]);
+            }
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
@@ -29,8 +45,8 @@ class StoreCourseRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'institution' => ['nullable', 'string', 'max:150'],
             'description' => ['nullable', 'string'],
-            'instructor_id' => ['nullable', 'exists:users,id'],
-            'instructor_name' => ['required_without:instructor_id', 'nullable', 'string', 'max:200'],
+            'instructor_id' => ['nullable'],
+            'instructor_name' => ['required', 'string', 'max:200'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'hours' => ['required', 'integer', 'min:1'],
@@ -48,8 +64,7 @@ class StoreCourseRequest extends FormRequest
     {
         return [
             'title.required' => 'El título de la capacitación es obligatorio.',
-            'instructor_name.required_without' => 'Debe ingresar o seleccionar un ponente / docente responsable.',
-            'instructor_id.exists' => 'El ponente / docente seleccionado no existe en el sistema.',
+            'instructor_name.required' => 'Debe ingresar el nombre del ponente o docente responsable.',
             'start_date.required' => 'La fecha de inicio es obligatoria.',
             'end_date.required' => 'La fecha de fin es obligatoria.',
             'end_date.after_or_equal' => 'La fecha de fin no puede ser anterior a la fecha de inicio.',

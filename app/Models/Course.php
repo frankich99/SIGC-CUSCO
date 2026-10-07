@@ -98,13 +98,17 @@ class Course extends Model
      */
     public function getInstructorDisplayNameAttribute(): string
     {
+        if (! empty($this->instructor_name)) {
+            return $this->instructor_name;
+        }
+
         if ($this->instructor) {
             $parts = array_filter([$this->instructor->name, $this->instructor->paterno, $this->instructor->materno]);
 
             return implode(' ', $parts) ?: $this->instructor->name;
         }
 
-        return $this->instructor_name ?: 'Ponente / Docente por asignar';
+        return 'Ponente / Docente por asignar';
     }
 
     /**

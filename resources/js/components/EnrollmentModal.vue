@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { formatDateRange, formatHours } from '@/lib/formatters';
 import { THEME_BUTTONS, THEME_MODAL } from '@/lib/theme';
 import {
@@ -73,7 +72,7 @@ const paterno = ref('');
 const materno = ref('');
 const email = ref('');
 const phone = ref('');
-const termsAccepted = ref(false);
+const termsAccepted = ref(true);
 
 const isLookingUpDni = ref(false);
 const dniLookupSuccess = ref(false);
@@ -109,7 +108,7 @@ watch(
             submitSuccess.value = false;
             submitError.value = null;
             dniLookupError.value = null;
-            termsAccepted.value = false;
+            termsAccepted.value = true;
 
             // Pre-fill if user is logged in
             if (authUser.value) {
@@ -653,13 +652,26 @@ function closeModal() {
                         </div>
 
                         <!-- Declaración Jurada Obligatoria -->
-                        <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800">
-                            <label class="flex items-start gap-2.5 cursor-pointer text-xs text-slate-800 dark:text-slate-200">
-                                <Checkbox v-model:checked="termsAccepted" class="mt-0.5" />
+                        <div
+                            class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border transition-colors"
+                            :class="!termsAccepted ? 'border-amber-300 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20' : 'border-slate-200 dark:border-slate-800'"
+                        >
+                            <label class="flex items-start gap-3 cursor-pointer text-xs text-slate-800 dark:text-slate-200 select-none">
+                                <input
+                                    type="checkbox"
+                                    v-model="termsAccepted"
+                                    class="mt-0.5 size-4 rounded text-rose-900 border-slate-300 focus:ring-rose-800 focus:ring-2 cursor-pointer accent-rose-900 shrink-0"
+                                />
                                 <span class="font-medium leading-relaxed">
                                     Declaro bajo juramento que los datos de DNI y contacto son legítimos y acepto participar cumpliendo con la asistencia por código QR y evaluaciones de la capacitación.
                                 </span>
                             </label>
+                        </div>
+
+                        <!-- Banner de Error antes de enviar si existe -->
+                        <div v-if="submitError" class="p-3 rounded-xl bg-rose-100 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-900 text-rose-950 dark:text-rose-200 text-xs font-bold flex items-start gap-2.5 animate-in fade-in">
+                            <AlertCircle class="size-4 shrink-0 mt-0.5 text-rose-800" />
+                            <span>{{ submitError }}</span>
                         </div>
 
                         <!-- Botones de Acción -->
@@ -678,19 +690,12 @@ function closeModal() {
                                 type="submit"
                                 size="default"
                                 :class="['w-full sm:w-auto h-10 px-6 text-xs font-black shadow-md cursor-pointer', THEME_BUTTONS.primary]"
-                                :disabled="!canSubmit || isSubmitting"
+                                :disabled="isSubmitting"
                             >
                                 <Loader2 v-if="isSubmitting" class="size-4 mr-2 animate-spin" />
                                 <CheckCircle2 v-else class="size-4 mr-2" />
                                 Confirmar Inscripción Oficial
                             </Button>
-                        </div>
-
-                        <!-- Aviso si el botón está bloqueado -->
-                        <div v-if="!canSubmit" class="text-[11px] text-center font-bold text-amber-700 dark:text-amber-400">
-                            <span v-if="!dniLookupSuccess">⚠️ Debe ingresar y validar su DNI con RENIEC para habilitar la inscripción.</span>
-                            <span v-else-if="!isEmailValid">⚠️ Ingrese un correo electrónico válido.</span>
-                            <span v-else-if="!termsAccepted">⚠️ Debe marcar la casilla de declaración jurada.</span>
                         </div>
                     </div>
                 </div>

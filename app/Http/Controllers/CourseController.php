@@ -89,7 +89,9 @@ class CourseController extends Controller
             $validated['code'] = 'SIGC-'.date('Y').'-'.str_pad((string) (Course::max('id') + 1), 3, '0', STR_PAD_LEFT);
         }
 
-        if (! empty($validated['instructor_id']) && empty($validated['instructor_name'])) {
+        if (empty($validated['instructor_id'])) {
+            $validated['instructor_id'] = null;
+        } elseif (empty($validated['instructor_name'])) {
             $user = User::find($validated['instructor_id']);
             if ($user) {
                 $validated['instructor_name'] = trim("{$user->name} {$user->paterno} {$user->materno}") ?: $user->name;
@@ -159,7 +161,9 @@ class CourseController extends Controller
     {
         $validated = $request->validated();
 
-        if (! empty($validated['instructor_id']) && empty($validated['instructor_name'])) {
+        if (empty($validated['instructor_id'])) {
+            $validated['instructor_id'] = null;
+        } elseif (empty($validated['instructor_name'])) {
             $user = User::find($validated['instructor_id']);
             if ($user) {
                 $validated['instructor_name'] = trim("{$user->name} {$user->paterno} {$user->materno}") ?: $user->name;
