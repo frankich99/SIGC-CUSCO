@@ -56,8 +56,12 @@ import {
     FileText,
     CheckCheck,
     Download,
+    Copy,
+    Eye,
 } from '@lucide/vue';
 import type { BreadcrumbItem } from '@/types';
+import CoursePublicView, { type MyEnrollmentInfo } from '@/components/CoursePublicView.vue';
+import type { CertificateModule } from '@/lib/certificateTemplate';
 
 interface Instructor {
     id: number;
@@ -111,24 +115,38 @@ interface CourseDetail {
     min_attendance_percentage: number;
     capacity: number;
     status: 'abierto' | 'en_curso' | 'concluido' | 'cancelado';
+    enrollments_count?: number;
     acta_closed_at?: string | null;
     acta_closed_by?: number | null;
     acta_closer?: { name: string; paterno?: string } | null;
     instructor?: Instructor;
     instructor_name?: string;
+    instructor_display_name?: string;
     enrollments?: EnrollmentItem[];
 }
 
-const props = defineProps<{
-    course: CourseDetail;
-    can: {
-        update: boolean;
-        delete: boolean;
-        manage_enrollments?: boolean;
-        close_acta?: boolean;
-        issue_certificates?: boolean;
-    };
-}>();
+const props = withDefaults(
+    defineProps<{
+        course: CourseDetail;
+        isStaff?: boolean;
+        myEnrollment?: MyEnrollmentInfo | null;
+        modules?: CertificateModule[];
+        can: {
+            update: boolean;
+            delete: boolean;
+            manage_enrollments?: boolean;
+            close_acta?: boolean;
+            issue_certificates?: boolean;
+        };
+    }>(),
+    {
+        isStaff: false,
+        myEnrollment: null,
+        modules: () => [],
+    }
+);
+
+const staffViewMode = ref<'management' | 'public'>('management');
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Panel Principal', href: '/dashboard' },
@@ -225,6 +243,7 @@ function registerManualAttendance() {
             type: 'warning',
             text: `[Sin Conexión] Asistencia guardada localmente para ${id}. Se enviará al sincronizar.`,
         };
+        notify.warning('Asistencia sin conexión', `Guardada localmente para ${id}. Se sincronizará al tener red.`, 3000);
         return;
     }
 
@@ -247,6 +266,7 @@ function registerManualAttendance() {
                     type: 'success',
                     text: `✓ Asistencia registrada para la sesión ${selectedSession.value}.`,
                 };
+                notify.success('Asistencia registrada', `Sesión ${selectedSession.value} para ${id}`, 1800);
             },
             onError: (errs) => {
                 isSubmittingAttendance.value = false;
@@ -255,6 +275,7 @@ function registerManualAttendance() {
                     type: 'error',
                     text: msg as string,
                 };
+                notify.error('Error al registrar', msg as string, 3000);
             },
         }
     );
@@ -279,10 +300,11 @@ function syncOfflineQueue() {
                 saveOfflineQueue();
                 isSyncing.value = false;
                 syncSuccessMessage.value = `¡Sincronización completada! Se registraron ${count} asistencias guardadas en el equipo.`;
+                notify.success('Sincronización completada', `Se sincronizaron ${count} registros guardados.`, 2500);
             },
             onError: () => {
                 isSyncing.value = false;
-                alert('Ocurrió un problema durante la sincronización.');
+                notify.error('Error de sincronización', 'Ocurrió un problema durante la sincronización.', 3000);
             },
         }
     );
@@ -301,9 +323,11 @@ function confirmCloseActa() {
             onSuccess: () => {
                 isClosingActa.value = false;
                 isCloseActaModalOpen.value = false;
+                notify.success('Acta oficial cerrada', 'Calificaciones y asistencias selladas con valor legal.', 2500);
             },
             onError: () => {
                 isClosingActa.value = false;
+                notify.error('Error al cerrar acta', 'No se pudo cerrar el acta del curso.', 3000);
             },
         }
     );
@@ -323,9 +347,11 @@ function bulkIssueCertificates() {
             preserveScroll: true,
             onSuccess: () => {
                 isIssuingCertificates.value = false;
+                notify.success('Certificados emitidos', 'Certificados digitales oficiales generados para participantes aprobados.', 2500);
             },
             onError: () => {
                 isIssuingCertificates.value = false;
+                notify.error('Error en emisión', 'No se pudieron emitir los certificados masivos.', 3000);
             },
         }
     );
@@ -427,10 +453,12 @@ function saveEnrollment() {
             onSuccess: () => {
                 isSaving.value = false;
                 isEditModalOpen.value = false;
+                notify.success('Matrícula actualizada', 'Los datos del participante fueron guardados.', 1800);
             },
             onError: (errs) => {
                 isSaving.value = false;
                 editError.value = Object.values(errs)[0] as string || 'Error al actualizar la matrícula.';
+                notify.error('Error al actualizar', editError.value, 3000);
             },
         }
     );
@@ -445,6 +473,9 @@ function quickRecordAttendance(enrollment: EnrollmentItem) {
         {},
         {
             preserveScroll: true,
+            onSuccess: () => {
+                notify.success('Asistencia rápida (+1)', `Registrada para ${enrollment.nombres} ${enrollment.paterno}`, 1500);
+            },
             onFinish: () => {
                 isRecordingQuickAttendance.value = null;
             },
@@ -462,6 +493,9 @@ function issueSingleCertificate(enrollment: EnrollmentItem) {
         {},
         {
             preserveScroll: true,
+            onSuccess: () => {
+                notify.success('Certificado generado', `Emitido para ${enrollment.nombres} ${enrollment.paterno}`, 2000);
+            },
             onFinish: () => {
                 isIssuingSingleCert.value = null;
             },
@@ -490,10 +524,11 @@ function confirmDeleteEnrollment() {
                 isDeletingEnrollment.value = false;
                 isDeleteModalOpen.value = false;
                 enrollmentToDelete.value = null;
+                notify.success('Matrícula eliminada', 'El participante fue desmatriculado con éxito.', 2000);
             },
             onError: () => {
                 isDeletingEnrollment.value = false;
-                alert('No se pudo eliminar la matrícula.');
+                notify.error('Error al desmatricular', 'No se pudo eliminar la matrícula del participante.', 3000);
             },
         }
     );
@@ -513,6 +548,15 @@ const credentialQrSvg = computed(() => {
     const code = credentialEnrollment.value.credential_code || `INS-${credentialEnrollment.value.course_id}-${credentialEnrollment.value.dni.slice(-4)}`;
     return generateQrSvg(code, 260, '#800020');
 });
+
+async function copyCredentialCode(code: string) {
+    try {
+        await navigator.clipboard.writeText(code);
+        notify.success('Código copiado al portapapeles', code, 1500);
+    } catch {
+        notify.info('Código de acreditación', code, 2500);
+    }
+}
 
 // Estilo de Badges de Estado
 function getStatusBadge(status: string) {
@@ -571,16 +615,90 @@ onUnmounted(() => {
         <Head :title="`${course.title} - SIGC-CUSCO`" />
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
-            <!-- Header Superior Oficial Granate Cusco -->
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-5 dark:border-slate-800">
-                <div class="space-y-2">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <Button as-child variant="ghost" size="sm" class="-ml-2 text-xs text-slate-600 dark:text-slate-400">
-                            <Link href="/courses">
-                                <ArrowLeft class="mr-1 size-3.5" />
-                                Catálogo de Capacitaciones
+            <!-- Barra de alternancia de vista exclusiva para Docentes y Administradores (Staff) -->
+            <div
+                v-if="isStaff"
+                class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3.5 rounded-2xl bg-slate-900 text-white shadow-sm border border-slate-800"
+            >
+                <div class="flex items-center gap-2.5">
+                    <div class="size-8 rounded-lg bg-rose-900 text-amber-300 flex items-center justify-center shrink-0">
+                        <ShieldCheck class="size-4" />
+                    </div>
+                    <div>
+                        <div class="text-xs font-black">
+                            Personal Autorizado: Docente / Administrador
+                        </div>
+                        <div class="text-[11px] text-slate-300">
+                            Alterna entre el panel de gestión académica confidencial y la vista pública del curso.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <Button
+                        type="button"
+                        size="sm"
+                        :variant="staffViewMode === 'management' ? 'default' : 'secondary'"
+                        class="text-xs font-black cursor-pointer"
+                        :class="staffViewMode === 'management' ? 'bg-rose-900 hover:bg-rose-950 text-white shadow-xs' : 'bg-slate-800 text-slate-200'"
+                        @click="staffViewMode = 'management'"
+                    >
+                        <Users class="mr-1.5 size-3.5" />
+                        Panel Académico (Staff)
+                    </Button>
+                    <Button
+                        type="button"
+                        size="sm"
+                        :variant="staffViewMode === 'public' ? 'default' : 'secondary'"
+                        class="text-xs font-black cursor-pointer"
+                        :class="staffViewMode === 'public' ? 'bg-amber-600 hover:bg-amber-500 text-slate-950 shadow-xs' : 'bg-slate-800 text-slate-200'"
+                        @click="staffViewMode = 'public'"
+                    >
+                        <Eye class="mr-1.5 size-3.5" />
+                        Vista Pública Informativa
+                    </Button>
+                </div>
+            </div>
+
+            <!-- 1. VISTA PÚBLICA INFORMATIVA (Público General, Visitantes, Alumnos, o Staff en modo preview) -->
+            <div v-if="!isStaff || staffViewMode === 'public'" class="space-y-6">
+                <div class="flex items-center justify-between pb-1">
+                    <Button as-child variant="ghost" size="sm" class="-ml-2 text-xs text-slate-600 dark:text-slate-400">
+                        <Link href="/courses">
+                            <ArrowLeft class="mr-1 size-3.5" />
+                            Catálogo de Capacitaciones
+                        </Link>
+                    </Button>
+                    <div v-if="can.update" class="flex items-center gap-2">
+                        <Button as-child variant="outline" size="sm" class="text-xs font-bold">
+                            <Link :href="`/courses/${course.id}/edit`">
+                                <Pencil class="mr-1.5 size-3.5" />
+                                Editar Curso
                             </Link>
                         </Button>
+                    </div>
+                </div>
+
+                <CoursePublicView
+                    :course="course"
+                    :modules="modules || []"
+                    :my-enrollment="myEnrollment"
+                    @open-enrollment="isEnrollModalOpen = true"
+                />
+            </div>
+
+            <!-- 2. PANEL PRIVADO DE GESTIÓN ACADÉMICA (Solo para Staff en modo management) -->
+            <div v-else-if="isStaff && staffViewMode === 'management'" class="space-y-6">
+                <!-- Header Superior Oficial Granate Cusco -->
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-5 dark:border-slate-800">
+                    <div class="space-y-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <Button as-child variant="ghost" size="sm" class="-ml-2 text-xs text-slate-600 dark:text-slate-400">
+                                <Link href="/courses">
+                                    <ArrowLeft class="mr-1 size-3.5" />
+                                    Catálogo de Capacitaciones
+                                </Link>
+                            </Button>
                         <span class="font-mono text-xs font-black text-rose-950 dark:text-rose-200 bg-rose-100 dark:bg-rose-950 px-2 py-0.5 rounded border border-rose-300 dark:border-rose-800">
                             {{ course.code }}
                         </span>
@@ -1614,6 +1732,7 @@ onUnmounted(() => {
                     </CardContent>
                 </Card>
             </div>
+            </div>
         </div>
 
         <!-- MODAL DE PROYECCIÓN QR EN PANTALLA GIGANTE (SIGC-4) -->
@@ -1736,7 +1855,18 @@ onUnmounted(() => {
                         </div>
                         <div class="space-y-1.5">
                             <Label for="edit-phone" class="font-bold">Teléfono / WhatsApp</Label>
-                            <Input id="edit-phone" v-model="editForm.phone" type="text" maxlength="9" placeholder="9XXXXXXXX" class="h-9 text-xs font-medium font-mono" />
+                            <Input
+                                id="edit-phone"
+                                v-model="editForm.phone"
+                                type="tel"
+                                inputmode="numeric"
+                                pattern="[0-9]*"
+                                maxlength="9"
+                                placeholder="9XXXXXXXX (9 dígitos)"
+                                class="h-9 text-xs font-medium font-mono"
+                                @keypress="(e: KeyboardEvent) => { if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) e.preventDefault(); }"
+                                @input="(e: Event) => { editForm.phone = ((e.target as HTMLInputElement).value || '').replace(/\D/g, '').slice(0, 9); }"
+                            />
                         </div>
                     </div>
 
@@ -1843,12 +1973,23 @@ onUnmounted(() => {
                         </div>
                     </div>
 
-                    <div class="pt-2 border-t">
+                    <div class="pt-2 border-t flex flex-col sm:flex-row gap-2">
+                        <Button
+                            v-if="credentialEnrollment?.credential_code"
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            class="text-xs font-bold flex-1 flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-800"
+                            @click="copyCredentialCode(credentialEnrollment.credential_code)"
+                        >
+                            <Copy class="size-3.5 text-rose-800" />
+                            <span>Copiar Código</span>
+                        </Button>
                         <Button
                             type="button"
                             variant="outline"
                             size="sm"
-                            class="text-xs font-bold w-full"
+                            class="text-xs font-bold flex-1"
                             @click="isCredentialModalOpen = false"
                         >
                             Cerrar Credencial

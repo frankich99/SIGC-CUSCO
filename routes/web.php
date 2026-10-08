@@ -7,8 +7,8 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\UserController;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Services\CertificateService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -41,17 +41,45 @@ Route::resource('courses', CourseController::class);
 Route::get('certificates', function (Request $request) {
     return Inertia::render('certificates/Index', [
         'initialDni' => (string) $request->query('dni', ''),
+        'initialCode' => (string) $request->query('code', ''),
     ]);
 })->name('certificates.index');
 
 Route::get('certificados', function (Request $request) {
-    return redirect()->route('certificates.index', array_filter(['dni' => $request->query('dni')]));
+    return redirect()->route('certificates.index', array_filter([
+        'dni' => $request->query('dni'),
+        'code' => $request->query('code'),
+    ]));
 });
+
+Route::get('certificates/verify/{code}', function (string $code) {
+    $enrollment = Enrollment::where('certificate_code', $code)->first();
+    if ($enrollment) {
+        return redirect()->route('certificates.index', [
+            'dni' => $enrollment->dni,
+            'code' => $code,
+        ]);
+    }
+
+    return redirect()->route('certificates.index', ['code' => $code]);
+})->name('certificates.verify');
 
 Route::get('api/dni/{dni}', [DniController::class, 'lookup'])->name('dni.lookup')->middleware('throttle:60,1');
 
 Route::get('api/certificates/lookup', function (Request $request) {
     $dni = trim((string) $request->query('dni', ''));
+    $code = trim((string) $request->query('code', ''));
+
+    // Si viene código directo sin DNI (escaneo directo de QR)
+    if (! empty($code) && empty($dni)) {
+        $single = Enrollment::with(['course.instructor:id,name,paterno,materno'])
+            ->where('certificate_code', $code)
+            ->first();
+
+        if ($single) {
+            $dni = $single->dni;
+        }
+    }
 
     if (! preg_match('/^\d{8}$/', $dni)) {
         return response()->json([
@@ -77,24 +105,7 @@ Route::get('api/certificates/lookup', function (Request $request) {
         'success' => true,
         'dni' => $dni,
         'records' => $enrollments->map(function ($e) {
-            $formattedStart = $e->course?->start_date ? Carbon::parse($e->course->start_date)->format('d/m/Y') : null;
-            $formattedEnd = $e->course?->end_date ? Carbon::parse($e->course->end_date)->format('d/m/Y') : null;
-
-            return [
-                'id' => $e->id,
-                'course_code' => $e->course?->code,
-                'course_title' => $e->course?->title,
-                'institution' => $e->course?->institution ?? 'SIGC-CUSCO',
-                'hours' => $e->course?->hours,
-                'start_date' => $formattedStart,
-                'end_date' => $formattedEnd,
-                'instructor_name' => $e->course?->instructor_display_name ?? 'Ponente / Docente Asignado',
-                'student_name' => $e->full_name,
-                'status' => $e->status,
-                'certificate_code' => $e->certificate_code ?? ('CERT-2026-UNSAAC-'.str_pad((string) $e->course_id, 3, '0', STR_PAD_LEFT).'-'.str_pad((string) $e->id, 4, '0', STR_PAD_LEFT)),
-                'certificate_hash' => $e->certificate_hash,
-                'certificate_issued_at' => $e->certificate_issued_at ? $e->certificate_issued_at->format('d/m/Y') : ($formattedEnd ?? date('d/m/Y')),
-            ];
+            return CertificateService::getCertificatePayload($e);
         }),
     ]);
 })->name('certificates.lookup')->middleware('throttle:60,1');

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useForm, router } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import { useForm } from '@inertiajs/vue3';
 import {
     Dialog,
     DialogContent,
@@ -12,11 +12,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { LogIn, Loader2, AlertCircle, ShieldCheck } from '@lucide/vue';
+import { LogIn, Loader2, AlertCircle, ShieldCheck, Eye, EyeOff } from '@lucide/vue';
 import { THEME_BUTTONS, THEME_MODAL } from '@/lib/theme';
+import { useAuthModal } from '@/composables/useAuthModal';
+import { notify } from '@/lib/notify';
 
 const props = defineProps<{
-    open: boolean;
+    open?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -24,24 +26,47 @@ const emit = defineEmits<{
     (e: 'switchToRegister'): void;
 }>();
 
+const { isLoginModalOpen, switchToRegister: composableSwitchToRegister } = useAuthModal();
+
+// Control reactivo bidireccional del estado abierto
+const isOpen = computed({
+    get: () => (props.open !== undefined ? props.open : isLoginModalOpen.value),
+    set: (val: boolean) => {
+        emit('update:open', val);
+        isLoginModalOpen.value = val;
+    },
+});
+
+const showPassword = ref(false);
+
 const form = useForm({
     email: '',
     password: '',
     remember: true,
 });
 
+function handleSwitchToRegister() {
+    emit('switchToRegister');
+    composableSwitchToRegister();
+}
+
 function submitLogin() {
     form.post('/login', {
         onSuccess: () => {
-            emit('update:open', false);
+            isOpen.value = false;
             form.reset('password');
+            notify.success('¡Bienvenido!', 'Sesión iniciada correctamente.', 1800);
+        },
+        onError: () => {
+            const err = form.errors.email || form.errors.password || 'Por favor verifique sus credenciales.';
+            notify.error('Error al iniciar sesión', err, 3000);
         },
     });
 }
 </script>
 
 <template>
-    <Dialog :open="open" @update:open="emit('update:open', $event)">
+    <Dialog :open="isOpen" @update:open="isOpen = $event">
         <DialogContent :class="THEME_MODAL.authDialog">
             <!-- Header Superior del Modal (FIJO) -->
             <div class="p-5 sm:p-6 pb-2 shrink-0 pr-12">
@@ -59,7 +84,7 @@ function submitLogin() {
                 </DialogHeader>
             </div>
 
-            <!-- Cuerpo del Formulario con scrollbar sutil redondeado si es necesario -->
+            <!-- Cuerpo del Formulario con scrollbar sutil redondeado -->
             <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar px-5 pb-5 sm:px-6 sm:pb-6">
                 <form @submit.prevent="submitLogin" class="space-y-3.5 py-1">
                     <!-- Generic error alert -->
@@ -69,7 +94,9 @@ function submitLogin() {
                     </div>
 
                     <div class="space-y-1">
-                        <Label for="login-modal-email" class="text-xs font-bold text-slate-900 dark:text-white">Correo Electrónico o DNI</Label>
+                        <Label for="login-modal-email" class="text-xs font-bold text-slate-900 dark:text-white">
+                            Correo Electrónico o DNI
+                        </Label>
                         <Input
                             id="login-modal-email"
                             v-model="form.email"
@@ -83,19 +110,33 @@ function submitLogin() {
 
                     <div class="space-y-1">
                         <div class="flex items-center justify-between">
-                            <Label for="login-modal-password" class="text-xs font-bold text-slate-900 dark:text-white">Contraseña</Label>
+                            <Label for="login-modal-password" class="text-xs font-bold text-slate-900 dark:text-white">
+                                Contraseña
+                            </Label>
                             <a href="/forgot-password" class="text-[11px] font-semibold text-rose-900 dark:text-rose-400 hover:underline">
                                 ¿Olvidaste tu clave?
                             </a>
                         </div>
-                        <Input
-                            id="login-modal-password"
-                            v-model="form.password"
-                            type="password"
-                            placeholder="••••••••"
-                            class="text-xs h-9 font-medium"
-                            required
-                        />
+                        <div class="relative">
+                            <Input
+                                id="login-modal-password"
+                                v-model="form.password"
+                                :type="showPassword ? 'text' : 'password'"
+                                placeholder="••••••••"
+                                class="text-xs h-9 font-medium pr-9"
+                                required
+                            />
+                            <button
+                                type="button"
+                                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-0.5 cursor-pointer"
+                                tabindex="-1"
+                                :title="showPassword ? 'Ocultar contraseña' : 'Ver contraseña'"
+                                @click="showPassword = !showPassword"
+                            >
+                                <EyeOff v-if="showPassword" class="size-4" />
+                                <Eye v-else class="size-4" />
+                            </button>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-between pt-0.5">
@@ -122,7 +163,7 @@ function submitLogin() {
                         <button
                             type="button"
                             class="text-rose-900 dark:text-rose-300 font-black hover:underline ml-1 cursor-pointer"
-                            @click="emit('switchToRegister')"
+                            @click="handleSwitchToRegister"
                         >
                             Regístrate aquí
                         </button>

@@ -177,3 +177,41 @@ test('api de consulta de certificados valida formato de 8 digitos', function () 
             'success' => false,
         ]);
 });
+
+test('rechaza letras en el numero de celular al matricularse', function () {
+    $course = Course::factory()->create([
+        'status' => CourseStatus::Abierto,
+        'capacity' => 10,
+    ]);
+
+    $response = $this->post(route('courses.enroll', $course), [
+        'dni' => '72345678',
+        'nombres' => 'MARIA',
+        'paterno' => 'CONDORI',
+        'email' => 'maria@unsaac.edu.pe',
+        'phone' => '999abc123',
+    ]);
+
+    $response->assertSessionHasErrors(['phone']);
+});
+
+test('acepta numero de celular valido de 9 digitos iniciando en 9', function () {
+    $course = Course::factory()->create([
+        'status' => CourseStatus::Abierto,
+        'capacity' => 10,
+    ]);
+
+    $response = $this->post(route('courses.enroll', $course), [
+        'dni' => '72345679',
+        'nombres' => 'MARIO',
+        'paterno' => 'CONDORI',
+        'email' => 'mario@unsaac.edu.pe',
+        'phone' => '984123456',
+    ]);
+
+    $response->assertRedirect();
+    $this->assertDatabaseHas('enrollments', [
+        'dni' => '72345679',
+        'phone' => '984123456',
+    ]);
+});

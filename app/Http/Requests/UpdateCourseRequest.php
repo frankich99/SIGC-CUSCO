@@ -16,7 +16,19 @@ class UpdateCourseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->isAdmin() ?? false;
+        $user = $this->user();
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        /** @var Course|null $course */
+        $course = $this->route('course');
+
+        return $user->isDocente() && $course && $course->instructor_id === $user->id;
     }
 
     /**

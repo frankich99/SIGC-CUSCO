@@ -30,6 +30,7 @@ import LoginModal from '@/components/auth/LoginModal.vue';
 import RegisterModal from '@/components/auth/RegisterModal.vue';
 import GlobalToast from '@/components/GlobalToast.vue';
 import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
+import { useAuthModal } from '@/composables/useAuthModal';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
 
 interface CourseItem {
@@ -72,8 +73,7 @@ const selectedStatus = ref<string>('all');
 const mobileMenuOpen = ref(false);
 
 // Modals state
-const isLoginModalOpen = ref(false);
-const isRegisterModalOpen = ref(false);
+const { isLoginModalOpen, isRegisterModalOpen, openLogin, openRegister, switchToRegister, switchToLogin } = useAuthModal();
 
 const selectedCourseForEnrollment = ref<CourseItem | null>(null);
 const isEnrollmentModalOpen = ref(false);
@@ -81,16 +81,6 @@ const isEnrollmentModalOpen = ref(false);
 function openEnrollment(course: CourseItem) {
     selectedCourseForEnrollment.value = course;
     isEnrollmentModalOpen.value = true;
-}
-
-function switchToRegister() {
-    isLoginModalOpen.value = false;
-    isRegisterModalOpen.value = true;
-}
-
-function switchToLogin() {
-    isRegisterModalOpen.value = false;
-    isLoginModalOpen.value = true;
 }
 
 // Filtered courses
@@ -207,19 +197,19 @@ function statusBadgeInfo(status: string) {
                         </Button>
                     </template>
                     <template v-else>
-                        <Button variant="ghost" size="sm" class="text-xs font-bold text-slate-800 hover:text-rose-900" @click="isLoginModalOpen = true">
+                        <Button variant="ghost" size="sm" class="text-xs font-bold text-slate-800 hover:text-rose-900 cursor-pointer" @click="openLogin">
                             <LogIn class="size-3.5 mr-1 text-rose-900" />
                             Iniciar Sesión
                         </Button>
-                        <Button size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs" @click="isRegisterModalOpen = true">
+                        <Button size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer" @click="openRegister">
                             <UserPlus class="size-3.5 mr-1" />
                             Registrarse
                         </Button>
                     </template>
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <div class="flex md:hidden">
+                <!-- Mobile Menu Button (< sm) -->
+                <div class="flex sm:hidden">
                     <Button variant="ghost" size="icon" @click="mobileMenuOpen = !mobileMenuOpen">
                         <X v-if="mobileMenuOpen" class="size-5" />
                         <Menu v-else class="size-5" />
@@ -228,7 +218,7 @@ function statusBadgeInfo(status: string) {
             </div>
 
             <!-- Mobile Dropdown -->
-            <div v-if="mobileMenuOpen" class="md:hidden border-b border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 pt-2 pb-4 space-y-3">
+            <div v-if="mobileMenuOpen" class="sm:hidden border-b border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 pt-2 pb-4 space-y-3">
                 <div v-if="canCreateCourse" class="pb-1">
                     <Link
                         href="/courses/create"
@@ -256,10 +246,10 @@ function statusBadgeInfo(status: string) {
                         </Button>
                     </template>
                     <template v-else>
-                        <Button variant="outline" size="sm" class="flex-1 text-xs font-semibold" @click="isLoginModalOpen = true; mobileMenuOpen = false">
+                        <Button variant="outline" size="sm" class="flex-1 text-xs font-semibold cursor-pointer" @click="openLogin(); mobileMenuOpen = false">
                             Ingresar
                         </Button>
-                        <Button size="sm" class="flex-1 bg-rose-900 text-white text-xs font-bold" @click="isRegisterModalOpen = true; mobileMenuOpen = false">
+                        <Button size="sm" class="flex-1 bg-rose-900 text-white text-xs font-bold cursor-pointer" @click="openRegister(); mobileMenuOpen = false">
                             Registrarse
                         </Button>
                     </template>

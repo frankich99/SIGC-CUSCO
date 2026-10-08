@@ -7,7 +7,9 @@ use App\Enums\UserRole;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use App\Models\Course;
+use App\Models\Enrollment;
 use App\Models\User;
+use App\Services\CertificateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -43,7 +45,7 @@ class CourseController extends Controller
             'filters' => $filters,
             'statuses' => $statuses,
             'can' => [
-                'create' => $request->user() ? ($request->user()->isAdmin() || $request->user()->isDocente()) : true,
+                'create' => $request->user() ? ($request->user()->isAdmin() || $request->user()->isDocente()) : false,
             ],
         ]);
     }
@@ -108,24 +110,91 @@ class CourseController extends Controller
      */
     public function show(Request $request, Course $course): Response
     {
-        $course->load([
-            'instructor:id,name,paterno,materno,email,role,dni',
-            'enrollments' => function ($query) {
-                $query->with('attendanceRecords')->orderBy('paterno')->orderBy('nombres');
-            },
-        ]);
-
-        $course->loadCount(['enrollments' => fn ($q) => $q->where('status', '!=', 'cancelado')]);
-
         $user = $request->user();
         $isStaff = $user && ($user->isAdmin() || ($user->isDocente() && $course->instructor_id === $user->id));
 
+        $course->loadCount(['enrollments' => fn ($q) => $q->where('status', '!=', 'cancelado')]);
+
+        $instructorFields = $isStaff
+            ? 'id,name,paterno,materno,email,role,dni'
+            : 'id,name,paterno,materno,email,role';
+
+        $course->load([
+            'instructor:'.$instructorFields,
+        ]);
+
+        $myEnrollment = null;
+
+        if ($isStaff) {
+            // SOLO personal docente responsable o administrador ve la lista completa de matriculados
+            $course->load([
+                'enrollments' => function ($query) {
+                    $query->with('attendanceRecords')->orderBy('paterno')->orderBy('nombres');
+                },
+                'actaCloser:id,name,paterno',
+            ]);
+        } else {
+            // SEGURIDAD Y PRIVACIDAD ACADÉMICA:
+            // Para el público general y visitantes: NUNCA enviar la lista nominal ni datos de otros participantes
+            $course->setRelation('enrollments', collect([]));
+
+            if ($user) {
+                $myEnrollmentModel = Enrollment::with('attendanceRecords')
+                    ->where('course_id', $course->id)
+                    ->where(function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                        if ($user->dni) {
+                            $q->orWhere('dni', $user->dni);
+                        }
+                    })
+                    ->first();
+
+                if ($myEnrollmentModel) {
+                    $totalSessions = max(1, $course->total_sessions);
+                    $attendedCount = $myEnrollmentModel->attendanceRecords->whereIn('status', ['presente', 'tardanza'])->count();
+                    $myEnrollmentModel->attendance_percentage = round(($attendedCount / $totalSessions) * 100);
+
+                    $certificatePayload = null;
+                    if ($myEnrollmentModel->status === 'aprobado' || $myEnrollmentModel->certificate_code) {
+                        $certificatePayload = CertificateService::getCertificatePayload($myEnrollmentModel);
+                    }
+
+                    $myEnrollment = [
+                        'id' => $myEnrollmentModel->id,
+                        'dni' => $myEnrollmentModel->dni,
+                        'nombres' => $myEnrollmentModel->nombres,
+                        'paterno' => $myEnrollmentModel->paterno,
+                        'materno' => $myEnrollmentModel->materno,
+                        'full_name' => $myEnrollmentModel->full_name,
+                        'email' => $myEnrollmentModel->email,
+                        'phone' => $myEnrollmentModel->phone,
+                        'status' => $myEnrollmentModel->status,
+                        'attended_sessions' => $myEnrollmentModel->attended_sessions,
+                        'attendance_percentage' => $myEnrollmentModel->attendance_percentage,
+                        'final_grade' => $myEnrollmentModel->final_grade,
+                        'credential_code' => $myEnrollmentModel->credential_code,
+                        'certificate_code' => $myEnrollmentModel->certificate_code,
+                        'certificate_hash' => $myEnrollmentModel->certificate_hash,
+                        'certificate_issued_at' => $myEnrollmentModel->certificate_issued_at?->format('d/m/Y'),
+                        'certificate' => $certificatePayload,
+                    ];
+                }
+            }
+        }
+
+        $modules = CertificateService::getCourseModules($course);
+
         return Inertia::render('courses/Show', [
             'course' => $course,
+            'isStaff' => $isStaff,
+            'myEnrollment' => $myEnrollment,
+            'modules' => $modules,
             'can' => [
                 'update' => $user?->isAdmin() ?? false,
                 'delete' => $user?->isAdmin() ?? false,
                 'manage_enrollments' => $isStaff,
+                'close_acta' => $isStaff,
+                'issue_certificates' => $isStaff,
             ],
         ]);
     }

@@ -12,8 +12,10 @@ import {
     Award,
     QrCode,
     ShieldCheck,
+    LogIn,
+    UserPlus,
 } from '@lucide/vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -35,6 +37,7 @@ import {
 import UserMenuContent from '@/components/UserMenuContent.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
+import { useAuthModal } from '@/composables/useAuthModal';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
@@ -50,6 +53,8 @@ const page = usePage();
 const auth = computed(() => page.props.auth);
 const user = computed(() => page.props.auth?.user);
 const { isCurrentUrl } = useCurrentUrl();
+const { openLogin, openRegister } = useAuthModal();
+const isMobileMenuOpen = ref(false);
 
 const isCoursesActive = computed(() => {
     return isCurrentUrl('/courses') || isCurrentUrl('/courses/*');
@@ -96,7 +101,7 @@ function roleBadge(role?: string) {
             <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
                 <!-- Mobile Trigger (< md) -->
                 <div class="md:hidden">
-                    <Sheet>
+                    <Sheet v-model:open="isMobileMenuOpen">
                         <SheetTrigger :as-child="true">
                             <Button
                                 variant="outline"
@@ -196,13 +201,37 @@ function roleBadge(role?: string) {
                                     </div>
                                 </nav>
 
-                                <div class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1 px-2">
+                                <div v-if="user" class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1 px-2">
                                     <div class="text-xs text-slate-700 dark:text-slate-300 font-bold truncate">
-                                        Usuario: {{ user?.name || 'Invitado' }}
+                                        Usuario: {{ user.name }}
                                     </div>
-                                    <div v-if="user?.role" class="text-[10px] uppercase font-bold text-rose-900 dark:text-rose-400">
+                                    <div v-if="user.role" class="text-[10px] uppercase font-bold text-rose-900 dark:text-rose-400">
                                         Rol: {{ roleBadge(user.role).label }}
                                     </div>
+                                </div>
+                                <div v-else class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2 px-2">
+                                    <div class="text-[11px] font-extrabold uppercase tracking-wider text-rose-900 dark:text-rose-400 mb-1">
+                                        Acceso al Sistema
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        class="w-full text-xs font-bold justify-center cursor-pointer"
+                                        @click="isMobileMenuOpen = false; openLogin()"
+                                    >
+                                        <LogIn class="size-3.5 mr-1.5 text-rose-900" />
+                                        Iniciar Sesión
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs justify-center shadow-xs cursor-pointer"
+                                        @click="isMobileMenuOpen = false; openRegister()"
+                                    >
+                                        <UserPlus class="size-3.5 mr-1.5" />
+                                        Registrarse
+                                    </Button>
                                 </div>
                             </div>
                         </SheetContent>
@@ -398,12 +427,26 @@ function roleBadge(role?: string) {
                     </DropdownMenu>
                 </template>
                 <template v-else>
-                    <div class="flex items-center gap-2">
-                        <Button as-child variant="ghost" size="sm" class="text-xs font-bold text-slate-800 hover:text-rose-900">
-                            <Link href="/login">Iniciar Sesión</Link>
+                    <div class="flex items-center gap-1.5 sm:gap-2">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            class="text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-rose-900 cursor-pointer px-2 sm:px-3"
+                            @click="openLogin"
+                        >
+                            <LogIn class="size-3.5 sm:mr-1 text-rose-900" />
+                            <span class="hidden sm:inline">Iniciar Sesión</span>
+                            <span class="sm:hidden">Ingresar</span>
                         </Button>
-                        <Button as-child size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs">
-                            <Link href="/register">Registrarse</Link>
+                        <Button
+                            type="button"
+                            size="sm"
+                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer px-2.5 sm:px-3"
+                            @click="openRegister"
+                        >
+                            <UserPlus class="size-3.5 sm:mr-1" />
+                            <span>Registrarse</span>
                         </Button>
                     </div>
                 </template>

@@ -23,6 +23,7 @@ import {
 } from '@lucide/vue';
 import { THEME_BUTTONS, THEME_BADGES } from '@/lib/theme';
 import { formatDateRange, formatHours } from '@/lib/formatters';
+import { notify } from '@/lib/notify';
 import type { BreadcrumbItem } from '@/types';
 
 interface Instructor {
@@ -84,7 +85,11 @@ const isDateOrderInvalid = computed(() => {
 });
 
 function submit() {
-    form.put(`/courses/${props.course.id}`);
+    form.put(`/courses/${props.course.id}`, {
+        onError: () => {
+            notify.error('Errores al actualizar', 'Revise los campos requeridos marcados en rojo.');
+        },
+    });
 }
 </script>
 

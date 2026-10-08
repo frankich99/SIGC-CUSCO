@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { ShieldCheck, UploadCloud, FileCheck, AlertTriangle, CheckCircle2, Loader2, X } from '@lucide/vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { notify } from '@/lib/notify';
 
 const props = defineProps<{
     expectedHash?: string | null;
@@ -20,6 +21,7 @@ async function handleFileChange(event: Event) {
     const file = input.files[0];
     if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
         errorMsg.value = 'Por favor seleccione un archivo en formato PDF.';
+        notify.warning('Formato no válido', 'Seleccione un archivo en formato PDF.', 2500);
         return;
     }
 
@@ -34,8 +36,19 @@ async function handleFileChange(event: Event) {
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
         calculatedHash.value = hashHex;
+
+        if (props.expectedHash) {
+            if (hashHex.toLowerCase() === props.expectedHash.toLowerCase()) {
+                notify.success('Certificado Auténtico', 'La huella SHA-256 coincide exactamente con el registro oficial.', 3000);
+            } else {
+                notify.error('Alerta de Alteración', 'La huella no coincide con el certificado oficial registrado.', 3500);
+            }
+        } else {
+            notify.success('Huella SHA-256 Obtenida', 'Cálculo completado exitosamente en su navegador.', 2000);
+        }
     } catch (err) {
         errorMsg.value = 'No se pudo calcular el hash criptográfico del archivo.';
+        notify.error('Error de cálculo', errorMsg.value, 3000);
     } finally {
         isCalculating.value = false;
     }

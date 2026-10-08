@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatDateRange, formatHours } from '@/lib/formatters';
 import { THEME_BUTTONS, THEME_MODAL } from '@/lib/theme';
+import { notify } from '@/lib/notify';
 import {
     Search,
     Loader2,
@@ -85,7 +86,27 @@ const submitError = ref<string | null>(null);
 // Validation computed properties
 const isDniFormatValid = computed(() => /^[0-9]{8}$/.test(dni.value.trim()));
 const isEmailValid = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()));
-const isPhoneValid = computed(() => !phone.value || /^[0-9]{9}$/.test(phone.value.trim()));
+const isPhoneValid = computed(() => !phone.value || /^9[0-9]{8}$/.test(phone.value.trim()));
+
+function onPhoneInput(e: Event) {
+    const target = e.target as HTMLInputElement;
+    phone.value = target.value.replace(/\D/g, '').slice(0, 9);
+}
+
+function onDniInput(e: Event) {
+    const target = e.target as HTMLInputElement;
+    dni.value = target.value.replace(/\D/g, '').slice(0, 8);
+}
+
+function allowOnlyNumbers(e: KeyboardEvent) {
+    if (['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Enter'].includes(e.key)) {
+        return;
+    }
+    if (e.ctrlKey || e.metaKey) return;
+    if (!/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+    }
+}
 
 const canSubmit = computed(() => {
     return (
@@ -95,6 +116,7 @@ const canSubmit = computed(() => {
         nombres.value.trim().length > 0 &&
         paterno.value.trim().length > 0 &&
         isEmailValid.value &&
+        isPhoneValid.value &&
         termsAccepted.value &&
         !isSubmitting.value
     );
@@ -166,16 +188,19 @@ async function lookupDni() {
             dniLookupSuccess.value = true;
             dniLookupError.value = null;
             manualEntry.value = false;
+            notify.success('RENIEC Validado', `${nombres.value} ${paterno.value}`, 2000);
         } else {
             dniLookupError.value =
                 data.message || 'No se encontraron datos en RENIEC. Puedes ingresar los nombres y apellidos manualmente.';
             manualEntry.value = true;
             dniLookupSuccess.value = false;
+            notify.info('Ingreso manual habilitado', 'Ingrese sus nombres y apellidos manualmente.', 2500);
         }
     } catch {
         dniLookupError.value = 'Error al comunicarse con RENIEC. Puedes ingresar los datos manualmente.';
         manualEntry.value = true;
         dniLookupSuccess.value = false;
+        notify.info('Ingreso manual habilitado', 'Ingrese sus nombres y apellidos manualmente.', 2500);
     } finally {
         isLookingUpDni.value = false;
     }
@@ -198,26 +223,31 @@ function submitEnrollment() {
 
     if (!dniLookupSuccess.value && !manualEntry.value) {
         submitError.value = 'Debe validar su DNI con RENIEC o habilitar ingreso manual.';
+        notify.warning('Validación requerida', submitError.value, 2500);
         return;
     }
 
     if (!nombres.value || !paterno.value) {
         submitError.value = 'Los datos de nombres y apellidos son obligatorios.';
+        notify.warning('Campos incompletos', submitError.value, 2500);
         return;
     }
 
     if (!isEmailValid.value) {
         submitError.value = 'Ingrese una dirección de correo electrónico válida para recibir su comprobante.';
+        notify.warning('Correo inválido', submitError.value, 2500);
         return;
     }
 
     if (phone.value && !isPhoneValid.value) {
         submitError.value = 'El número de celular debe contener 9 dígitos numéricos.';
+        notify.warning('Teléfono inválido', submitError.value, 2500);
         return;
     }
 
     if (!termsAccepted.value) {
         submitError.value = 'Debe aceptar la declaración jurada para confirmar su inscripción.';
+        notify.warning('Términos requeridos', submitError.value, 2500);
         return;
     }
 
@@ -239,12 +269,14 @@ function submitEnrollment() {
             onSuccess: () => {
                 isSubmitting.value = false;
                 submitSuccess.value = true;
+                notify.success('¡Inscripción Confirmada!', `Inscrito exitosamente en ${props.course?.title}`, 2500);
                 emit('enrolled');
             },
             onError: (errors) => {
                 isSubmitting.value = false;
                 const firstKey = Object.keys(errors)[0];
                 submitError.value = errors[firstKey] || 'Ocurrió un error al procesar la inscripción.';
+                notify.error('Error de inscripción', submitError.value, 3000);
             },
         }
     );
@@ -428,10 +460,14 @@ function closeModal() {
                                     id="dni-input"
                                     v-model="dni"
                                     type="text"
+                                    inputmode="numeric"
+                                    pattern="[0-9]*"
                                     maxlength="8"
-                                    placeholder="Ingresa 8 dígitos"
+                                    placeholder="Ingresa 8 dígitos numéricos"
                                     class="font-mono text-sm tracking-wider font-bold bg-white dark:bg-slate-950"
                                     :disabled="isSubmitting || dniLookupSuccess"
+                                    @keypress="allowOnlyNumbers"
+                                    @input="onDniInput"
                                     @keyup.enter.prevent="lookupDni"
                                 />
                                 <Button
@@ -639,13 +675,17 @@ function closeModal() {
                                         id="phone"
                                         v-model="phone"
                                         type="tel"
+                                        inputmode="numeric"
+                                        pattern="[0-9]*"
                                         maxlength="9"
-                                        placeholder="9XXXXXXXX (9 dígitos)"
-                                        class="text-xs font-medium text-slate-900 dark:text-white"
+                                        placeholder="9XXXXXXXX (9 dígitos numéricos)"
+                                        class="text-xs font-medium text-slate-900 dark:text-white font-mono"
                                         :class="{ 'border-rose-500 ring-rose-500/20': phone && !isPhoneValid }"
+                                        @keypress="allowOnlyNumbers"
+                                        @input="onPhoneInput"
                                     />
                                     <span v-if="phone && !isPhoneValid" class="text-[11px] font-bold text-rose-600">
-                                        El número de celular debe contener 9 dígitos numéricos.
+                                        El número de celular debe contener 9 dígitos numéricos e iniciar con 9.
                                     </span>
                                 </div>
                             </div>

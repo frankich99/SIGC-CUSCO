@@ -25,7 +25,7 @@ class EnrollmentController extends Controller
             'paterno' => ['required', 'string', 'max:100'],
             'materno' => ['nullable', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'regex:/^9[0-9]{8}$/'],
         ], [
             'dni.required' => 'El número de DNI es obligatorio.',
             'dni.size' => 'El DNI debe contener exactamente 8 dígitos.',
@@ -34,6 +34,7 @@ class EnrollmentController extends Controller
             'paterno.required' => 'El apellido paterno es obligatorio.',
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'El correo electrónico ingresado no tiene un formato válido.',
+            'phone.regex' => 'El número de celular debe contener exactamente 9 dígitos e iniciar con 9 (ej. 9XXXXXXXX).',
         ]);
 
         // Validar que el curso esté abierto o que sea admin/docente quien matricula
@@ -120,7 +121,9 @@ class EnrollmentController extends Controller
             'final_grade' => ['nullable', 'numeric', 'min:0', 'max:20'],
             'certificate_code' => ['nullable', 'string', 'max:100'],
             'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'regex:/^9[0-9]{8}$/'],
+        ], [
+            'phone.regex' => 'El número de celular debe contener exactamente 9 dígitos e iniciar con 9 (ej. 9XXXXXXXX).',
         ]);
 
         // Si se aprueba y no tiene código de certificado, se genera automáticamente

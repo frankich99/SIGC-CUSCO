@@ -6,6 +6,8 @@ import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { GraduationCap } from '@lucide/vue';
 import { Toaster } from '@/components/ui/sonner';
 import GlobalToast from '@/components/GlobalToast.vue';
+import LoginModal from '@/components/auth/LoginModal.vue';
+import RegisterModal from '@/components/auth/RegisterModal.vue';
 import type { BreadcrumbItem } from '@/types';
 
 type Props = {
@@ -41,5 +43,7 @@ withDefaults(defineProps<Props>(), {
 
         <Toaster />
         <GlobalToast />
+        <LoginModal />
+        <RegisterModal />
     </AppShell>
 </template>

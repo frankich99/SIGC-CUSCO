@@ -256,3 +256,76 @@ test('CP-10 offline attendance sync processes multiple batch records', function 
 
     expect(AttendanceRecord::where('course_id', $course->id)->count())->toBe(2);
 });
+
+test('CP-11 certificate lookup API returns enriched official payload with qr and modules', function () {
+    $course = Course::create([
+        'code' => 'SIGC-TEST-006',
+        'title' => 'Desarrollo Web Moderno con Laravel 13 e Inertia Vue',
+        'start_date' => now()->format('Y-m-d'),
+        'end_date' => now()->addDays(5)->format('Y-m-d'),
+        'hours' => 40,
+        'total_sessions' => 4,
+        'capacity' => 20,
+        'status' => CourseStatus::Concluido,
+    ]);
+
+    Enrollment::create([
+        'course_id' => $course->id,
+        'dni' => '99887766',
+        'nombres' => 'CARLOS',
+        'paterno' => 'MAMANI',
+        'email' => 'carlos@unsaac.edu.pe',
+        'status' => 'aprobado',
+        'final_grade' => 20.0,
+        'certificate_code' => 'CERT-2026-UNSAAC-006-9988',
+        'certificate_hash' => hash('sha256', 'test-hash-payload'),
+        'certificate_issued_at' => now(),
+    ]);
+
+    $response = $this->getJson('/api/certificates/lookup?dni=99887766');
+
+    $response->assertOk()
+        ->assertJson([
+            'success' => true,
+            'dni' => '99887766',
+        ]);
+
+    $data = $response->json('records.0');
+    expect($data)->not->toBeNull();
+    expect($data['dni'])->toBe('99887766');
+    expect($data['student_name'])->toBe('CARLOS MAMANI');
+    expect($data['final_grade'])->toBe('20.00');
+    expect($data['final_grade_text'])->toContain('Veinte');
+    expect($data['verification_url'])->toContain('99887766');
+    expect($data['qr_svg'])->toContain('<svg');
+    expect($data['modules'])->toBeArray()->and(count($data['modules']))->toBeGreaterThanOrEqual(1);
+});
+
+test('CP-12 permanent verification route redirects to certificate page with dni and code', function () {
+    $course = Course::create([
+        'code' => 'SIGC-TEST-007',
+        'title' => 'Ciberseguridad y Ethical Hacking',
+        'start_date' => now()->format('Y-m-d'),
+        'end_date' => now()->addDays(5)->format('Y-m-d'),
+        'hours' => 30,
+        'total_sessions' => 4,
+        'capacity' => 20,
+        'status' => CourseStatus::Concluido,
+    ]);
+
+    Enrollment::create([
+        'course_id' => $course->id,
+        'dni' => '33445566',
+        'nombres' => 'ANA',
+        'paterno' => 'QUISPE',
+        'email' => 'ana@unsaac.edu.pe',
+        'status' => 'aprobado',
+        'certificate_code' => 'CERT-2026-UNSAAC-007-3344',
+    ]);
+
+    $response = $this->get(route('certificates.verify', 'CERT-2026-UNSAAC-007-3344'));
+    $response->assertRedirect(route('certificates.index', [
+        'dni' => '33445566',
+        'code' => 'CERT-2026-UNSAAC-007-3344',
+    ]));
+});

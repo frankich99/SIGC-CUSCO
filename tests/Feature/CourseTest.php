@@ -1,7 +1,10 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Models\Course;
+use App\Models\Enrollment;
 use App\Models\User;
+use Inertia\Testing\AssertableInertia as Assert;
 
 test('CP-01 non admin cannot access create course screen and gets 403', function () {
     $alumno = User::factory()->create([
@@ -146,4 +149,119 @@ test('authenticated user can query dni endpoint', function () {
                 'nombre_completo' => 'JUAN QUISPE FLORES',
             ],
         ]);
+});
+
+test('CP-06 guest user visiting course show gets 200 without exposing confidential enrollments list', function () {
+    $course = Course::factory()->create(['status' => 'abierto', 'capacity' => 40]);
+
+    // Crear dos matrículas con datos confidenciales
+    Enrollment::create([
+        'course_id' => $course->id,
+        'dni' => '71234567',
+        'nombres' => 'MARIA',
+        'paterno' => 'MAMANI',
+        'email' => 'maria@secreto.com',
+        'phone' => '984112233',
+        'status' => 'en_curso',
+        'attended_sessions' => 0,
+    ]);
+    Enrollment::create([
+        'course_id' => $course->id,
+        'dni' => '82345678',
+        'nombres' => 'CARLOS',
+        'paterno' => 'CONDORI',
+        'email' => 'carlos@secreto.com',
+        'phone' => '984556677',
+        'status' => 'aprobado',
+        'attended_sessions' => 4,
+    ]);
+
+    // Acceder sin iniciar sesión (invitado público)
+    $response = $this->get(route('courses.show', $course));
+
+    $response->assertOk();
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('courses/Show')
+        ->where('isStaff', false)
+        ->where('myEnrollment', null)
+        ->has('modules')
+        ->where('course.enrollments', []) // Confidencialidad: lista de alumnos NO expuesta
+    );
+});
+
+test('CP-07 participante user visiting course show sees only their own enrollment data', function () {
+    $studentUser = User::factory()->create([
+        'role' => UserRole::Participante,
+        'dni' => '71234567',
+        'email_verified_at' => now(),
+    ]);
+
+    $course = Course::factory()->create(['status' => 'abierto']);
+
+    // Matrícula del alumno autenticado
+    Enrollment::create([
+        'course_id' => $course->id,
+        'user_id' => $studentUser->id,
+        'dni' => '71234567',
+        'nombres' => 'ALUMNO',
+        'paterno' => 'AUTENTICADO',
+        'email' => 'alumno@unsaac.pe',
+        'status' => 'en_curso',
+        'attended_sessions' => 1,
+    ]);
+
+    // Matrícula de un compañero ajeno
+    Enrollment::create([
+        'course_id' => $course->id,
+        'dni' => '99999999',
+        'nombres' => 'OTRO',
+        'paterno' => 'COMPAÑERO',
+        'email' => 'privado@gmail.com',
+        'status' => 'aprobado',
+        'attended_sessions' => 4,
+    ]);
+
+    $response = $this->actingAs($studentUser)->get(route('courses.show', $course));
+
+    $response->assertOk();
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('courses/Show')
+        ->where('isStaff', false)
+        ->where('course.enrollments', []) // Confidencialidad: no ve la lista de todos
+        ->where('myEnrollment.dni', '71234567') // Ve su propio avance
+        ->where('myEnrollment.nombres', 'ALUMNO')
+    );
+});
+
+test('CP-08 admin or course docente visiting course show receives full enrollments and isStaff true', function () {
+    $docente = User::factory()->create([
+        'role' => UserRole::Docente,
+        'email_verified_at' => now(),
+    ]);
+
+    $course = Course::factory()->create([
+        'instructor_id' => $docente->id,
+        'status' => 'abierto',
+    ]);
+
+    for ($i = 1; $i <= 3; $i++) {
+        Enrollment::create([
+            'course_id' => $course->id,
+            'dni' => '1000000'.$i,
+            'nombres' => 'ALUMNO'.$i,
+            'paterno' => 'TEST',
+            'email' => "alumno{$i}@unsaac.pe",
+            'status' => 'inscrito',
+            'attended_sessions' => 0,
+        ]);
+    }
+
+    $response = $this->actingAs($docente)->get(route('courses.show', $course));
+
+    $response->assertOk();
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('courses/Show')
+        ->where('isStaff', true)
+        ->has('course.enrollments', 3) // El docente titular gestiona a todos los alumnos
+    );
 });

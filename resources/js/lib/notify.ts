@@ -40,9 +40,9 @@ export function addToast(options: ToastOptions | string): number {
         id,
         icon: opts.icon || 'success',
         position: opts.position || 'top-end',
-        timer: opts.timer !== undefined ? opts.timer : 1800,
+        timer: opts.timer !== undefined ? opts.timer : 4000,
         timerProgressBar: opts.timerProgressBar !== undefined ? opts.timerProgressBar : true,
-        remaining: opts.timer !== undefined ? opts.timer : 1800,
+        remaining: opts.timer !== undefined ? opts.timer : 4000,
         createdAt: Date.now(),
     };
 
@@ -70,21 +70,21 @@ export function clearToasts(): void {
     activeToasts.value = [];
 }
 
-// API de notificación SweetAlert2 compatible y simplificada
+// API de notificación SweetAlert2 compatible y simplificada (Estilo FUNDO_PARQUE)
 export const notify = {
     fire(options: ToastOptions | string): number {
         return addToast(options);
     },
-    success(title: string, text?: string, timer = 1800): number {
+    success(title: string, text?: string, timer = 4000): number {
         return addToast({ icon: 'success', title, text, timer });
     },
-    error(title: string, text?: string, timer = 2500): number {
+    error(title: string, text?: string, timer = 5000): number {
         return addToast({ icon: 'error', title, text, timer });
     },
-    warning(title: string, text?: string, timer = 2200): number {
+    warning(title: string, text?: string, timer = 4500): number {
         return addToast({ icon: 'warning', title, text, timer });
     },
-    info(title: string, text?: string, timer = 2000): number {
+    info(title: string, text?: string, timer = 4000): number {
         return addToast({ icon: 'info', title, text, timer });
     },
     remove: removeToast,
@@ -150,4 +150,25 @@ export function setupInertiaFlashListener(): void {
             checkFlash(props);
         }
     });
+
+    // Revisar mensaje flash en la carga inicial de página (SSR o hidratación)
+    const checkInitialFlash = () => {
+        try {
+            const appEl = document.getElementById('app');
+            if (appEl?.dataset?.page) {
+                const parsed = JSON.parse(appEl.dataset.page);
+                if (parsed?.props) {
+                    checkFlash(parsed.props);
+                }
+            }
+        } catch {
+            // Silencioso
+        }
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkInitialFlash, { once: true });
+    } else {
+        setTimeout(checkInitialFlash, 50);
+    }
 }

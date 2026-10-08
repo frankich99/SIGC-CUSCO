@@ -120,17 +120,17 @@ const mobileMenuOpen = ref(false);
             </div>
         </header>
 
-        <!-- CONTENEDOR PRINCIPAL: TARJETA DE ACCESO INSTITUCIONAL -->
+        <!-- CONTENEDOR PRINCIPAL: TARJETA DE ACCESO INSTITUCIONAL (DIMENSIÓN APROBADA SM:MAX-W-SM) -->
         <main class="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-            <div class="w-full max-w-md">
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-2xl p-6 sm:p-8 space-y-6">
+            <div class="w-[92vw] sm:max-w-sm">
+                <div class="bg-white dark:bg-slate-950 border border-rose-200 dark:border-rose-900 shadow-2xl rounded-2xl p-5 sm:p-6 space-y-4">
                     <!-- Encabezado de la Tarjeta con Identidad Cusco UNSAAC -->
-                    <div class="space-y-2 text-center">
+                    <div class="space-y-1.5 text-center">
                         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-300 text-[11px] font-black shadow-2xs">
                             <ShieldCheck class="size-3.5 text-rose-800" />
                             <span>Acceso Institucional UNSAAC</span>
                         </div>
-                        <h1 class="text-2xl font-black text-slate-950 dark:text-white tracking-tight">
+                        <h1 class="text-xl font-black text-slate-950 dark:text-white tracking-tight">
                             {{ title }}
                         </h1>
                         <p v-if="description" class="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
