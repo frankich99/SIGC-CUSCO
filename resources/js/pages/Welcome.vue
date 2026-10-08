@@ -28,6 +28,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
 import LoginModal from '@/components/auth/LoginModal.vue';
 import RegisterModal from '@/components/auth/RegisterModal.vue';
+import GlobalToast from '@/components/GlobalToast.vue';
 import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
 
@@ -566,5 +567,7 @@ function statusBadgeInfo(status: string) {
             v-model:open="isRegisterModalOpen"
             @switch-to-login="switchToLogin"
         />
+
+        <GlobalToast />
     </div>
 </template>

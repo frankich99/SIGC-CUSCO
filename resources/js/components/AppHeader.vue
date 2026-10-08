@@ -11,10 +11,10 @@ import {
     ChevronDown,
     Award,
     QrCode,
+    ShieldCheck,
 } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
-import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -59,6 +59,10 @@ const isCertificatesActive = computed(() => {
     return isCurrentUrl('/certificates') || isCurrentUrl('/certificates/*');
 });
 
+const isUsersActive = computed(() => {
+    return isCurrentUrl('/users') || isCurrentUrl('/users/*');
+});
+
 const canCreateCourse = computed(() => {
     return user.value?.role === 'admin' || user.value?.role === 'docente';
 });
@@ -87,9 +91,9 @@ function roleBadge(role?: string) {
 <template>
     <!-- CABECERA INSTITUCIONAL RESPONSIVE - GRANATE IMPERIAL CUSCO -->
     <header class="sticky top-0 z-40 w-full border-b border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md shadow-xs">
-        <div class="mx-auto flex h-16 items-center justify-between px-3 sm:px-6 lg:px-8 max-w-7xl gap-3 sm:gap-4">
+        <div class="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 max-w-7xl gap-2 sm:gap-4 w-full">
             <!-- 1. GRUPO IZQUIERDO: BOTÓN MÓVIL + LOGO + NAVEGACIÓN DOCKING (alineada a la izquierda, no centrada) -->
-            <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0">
+            <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
                 <!-- Mobile Trigger (< md) -->
                 <div class="md:hidden">
                     <Sheet>
@@ -174,6 +178,20 @@ function roleBadge(role?: string) {
                                         >
                                             <Globe class="size-4 text-blue-600" />
                                             <span>Portal Público</span>
+                                        </Link>
+                                    </div>
+
+                                    <div v-if="user?.role === 'admin'" class="space-y-1">
+                                        <div class="text-[11px] font-extrabold uppercase tracking-wider text-rose-900 dark:text-rose-400 px-3">
+                                            Administración
+                                        </div>
+                                        <Link
+                                            href="/users"
+                                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                            :class="isUsersActive ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
+                                        >
+                                            <ShieldCheck class="size-4 text-emerald-600" />
+                                            <span>Usuarios y Roles</span>
                                         </Link>
                                     </div>
                                 </nav>
@@ -299,14 +317,26 @@ function roleBadge(role?: string) {
                         </DropdownMenuContent>
                     </DropdownMenu>
 
+                    <!-- Usuarios y Roles (Solo Admin) -->
+                    <Link
+                        v-if="user?.role === 'admin'"
+                        href="/users"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all shrink-0"
+                        :class="isUsersActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
+                        title="Administración de Usuarios y Roles Institucionales"
+                    >
+                        <ShieldCheck class="size-4" :class="isUsersActive ? 'text-amber-300' : 'text-emerald-600'" />
+                        <span>Usuarios y Roles</span>
+                    </Link>
+
                     <!-- Ir al Portal Web (ÚNICA OPCIÓN QUE LLEVA A LA WEB PÚBLICA) -->
                     <Link
                         href="/"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-black transition-all text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900 shrink-0"
                         title="Ir a la página principal pública de SIGC-CUSCO"
                     >
-                        <Globe class="size-4 text-blue-600" />
-                        <span>Portal Público</span>
+                        <Globe class="size-4 text-blue-600 shrink-0" />
+                        <span class="hidden xl:inline">Portal Público</span>
                     </Link>
                 </nav>
             </div>
@@ -318,22 +348,16 @@ function roleBadge(role?: string) {
                     v-if="canCreateCourse"
                     as-child
                     size="sm"
-                    class="bg-rose-900 hover:bg-rose-950 text-white font-extrabold text-xs shadow-xs px-3 sm:px-3.5 py-1.5 h-9 rounded-lg border border-rose-800 flex items-center gap-1.5 transition-all cursor-pointer hover:shadow-sm"
+                    class="bg-rose-900 hover:bg-rose-950 text-white font-extrabold text-xs shadow-xs px-2.5 sm:px-3.5 py-1.5 h-8.5 rounded-lg border border-rose-800 flex items-center gap-1.5 transition-all cursor-pointer hover:shadow-sm shrink-0 whitespace-nowrap"
                 >
                     <Link href="/courses/create">
-                        <Plus class="size-4 text-amber-300 stroke-[2.5]" />
-                        <span class="hidden sm:inline">Agregar Curso</span>
-                        <span class="sm:hidden">Curso</span>
+                        <Plus class="size-3.5 text-amber-300 stroke-[2.5]" />
+                        <span>Agregar Curso</span>
                     </Link>
                 </Button>
 
                 <!-- Divisor vertical si hay botón -->
                 <div v-if="canCreateCourse" class="h-5 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block shrink-0" />
-
-                <!-- Geobadge en pantallas amplias -->
-                <div class="hidden xl:block">
-                    <PeruGeoBadge />
-                </div>
 
                 <template v-if="auth.user">
                     <!-- Rol del Usuario con Granate Imperial -->

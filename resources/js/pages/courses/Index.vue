@@ -151,7 +151,7 @@ function instructorName(inst?: Instructor): string {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Capacitaciones - SIGC-CUSCO" />
 
-        <div class="space-y-6 px-4 py-6 md:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
             <!-- Header Section -->
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b pb-5 dark:border-neutral-800">
                 <div>

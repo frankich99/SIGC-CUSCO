@@ -190,7 +190,7 @@ function roleBadgeData(role?: string) {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Panel de Control - SIGC-CUSCO" />
 
-        <div class="space-y-8 px-4 py-6 md:px-8 max-w-7xl mx-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
             <!-- BANNER PRINCIPAL: GRANATE IMPERIAL CUSCO (UNSAAC) -->
             <div class="relative overflow-hidden rounded-2xl border-2 border-rose-900/40 bg-gradient-to-r from-[#4c0519] via-[#701a31] to-slate-950 p-6 sm:p-8 text-white shadow-xl">
                 <!-- Background decorative glow -->

@@ -36,8 +36,10 @@ void createInertiaApp({
     },
 });
 
+import { setupInertiaFlashListener } from '@/lib/notify';
+
 // This will set light / dark mode on page load...
 initializeTheme();
 
-// This will listen for flash toast data from the server...
-initializeFlashToast();
+// This will listen for flash notifications and SweetAlert toasts from the server...
+setupInertiaFlashListener();

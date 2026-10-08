@@ -9,6 +9,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { home } from '@/routes';
+import GlobalToast from '@/components/GlobalToast.vue';
 
 defineProps<{
     title?: string;
@@ -20,6 +21,7 @@ defineProps<{
     <div
         class="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10"
     >
+        <GlobalToast />
         <div class="flex w-full max-w-md flex-col gap-6">
             <Link
                 :href="home()"

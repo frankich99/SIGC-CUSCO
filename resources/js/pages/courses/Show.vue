@@ -19,6 +19,7 @@ import EnrollmentModal from '@/components/EnrollmentModal.vue';
 import { formatDate, formatDateRange } from '@/lib/formatters';
 import { THEME_BUTTONS, THEME_BADGES } from '@/lib/theme';
 import { generateQrSvg } from '@/lib/qr';
+import { notify } from '@/lib/notify';
 import {
     Calendar,
     Clock,
@@ -569,7 +570,7 @@ onUnmounted(() => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head :title="`${course.title} - SIGC-CUSCO`" />
 
-        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
             <!-- Header Superior Oficial Granate Cusco -->
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-5 dark:border-slate-800">
                 <div class="space-y-2">

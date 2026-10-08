@@ -4,6 +4,7 @@ use App\Http\Controllers\CourseAcademicController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DniController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\UserController;
 use App\Models\Course;
 use App\Models\Enrollment;
 use Illuminate\Http\Request;
@@ -162,6 +163,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('courses/{course}/certificates/bulk-issue', [CourseAcademicController::class, 'bulkIssueCertificates'])->name('courses.certificates.bulk-issue');
     Route::get('courses/{course}/reports/attendance-csv', [CourseAcademicController::class, 'exportAttendanceCsv'])->name('courses.reports.attendance-csv');
     Route::get('courses/{course}/reports/acta-csv', [CourseAcademicController::class, 'exportActaCsv'])->name('courses.reports.acta-csv');
+
+    // Administración Institucional de Usuarios, Roles y Permisos (Solo Administrador)
+    Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::put('users/{user}/role', [UserController::class, 'updateRole'])->name('users.update-role');
 });
 
 require __DIR__.'/settings.php';

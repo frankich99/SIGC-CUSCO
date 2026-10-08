@@ -20,6 +20,7 @@ import {
     ArrowLeft,
 } from '@lucide/vue';
 import { home } from '@/routes';
+import GlobalToast from '@/components/GlobalToast.vue';
 
 defineProps<{
     title?: string;
@@ -156,5 +157,6 @@ const mobileMenuOpen = ref(false);
                 </div>
             </div>
         </footer>
+        <GlobalToast />
     </div>
 </template>

@@ -43,6 +43,8 @@ import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import LoginModal from '@/components/auth/LoginModal.vue';
 import RegisterModal from '@/components/auth/RegisterModal.vue';
 import PdfIntegrityVerifier from '@/components/PdfIntegrityVerifier.vue';
+import GlobalToast from '@/components/GlobalToast.vue';
+import { notify } from '@/lib/notify';
 import { formatDateRange, formatHours } from '@/lib/formatters';
 import type { BreadcrumbItem } from '@/types';
 
@@ -387,7 +389,7 @@ onMounted(() => {
     <AppLayout v-if="authUser" :breadcrumbs="breadcrumbs">
         <Head title="Validación Oficial de Certificados - SIGC-CUSCO" />
 
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
             <!-- HEADER DE SECCIÓN ACADÉMICA -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/90 dark:border-slate-800 pb-5">
                 <div class="space-y-1">
@@ -1090,4 +1092,6 @@ onMounted(() => {
             @switch-to-login="switchToLogin"
         />
     </template>
+
+    <GlobalToast />
 </template>

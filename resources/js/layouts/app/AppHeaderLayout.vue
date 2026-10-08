@@ -5,6 +5,7 @@ import AppShell from '@/components/AppShell.vue';
 import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { GraduationCap } from '@lucide/vue';
 import { Toaster } from '@/components/ui/sonner';
+import GlobalToast from '@/components/GlobalToast.vue';
 import type { BreadcrumbItem } from '@/types';
 
 type Props = {
@@ -39,5 +40,6 @@ withDefaults(defineProps<Props>(), {
         </footer>
 
         <Toaster />
+        <GlobalToast />
     </AppShell>
 </template>
