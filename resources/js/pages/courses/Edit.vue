@@ -198,7 +198,7 @@ function submit() {
                                 <select
                                     id="status"
                                     v-model="form.status"
-                                    class="w-full h-10 rounded-md border border-slate-300 bg-white px-3 py-1 text-xs sm:text-sm font-semibold shadow-2xs focus:border-rose-900 focus:outline-hidden dark:border-slate-700 dark:bg-slate-950"
+                                    class="w-full h-10 rounded-xl border border-slate-300 bg-white px-3 py-1 text-xs sm:text-sm font-semibold shadow-2xs focus:border-rose-900 focus:ring-2 focus:ring-rose-900/20 focus:outline-hidden dark:border-slate-700 dark:bg-slate-950 cursor-pointer"
                                 >
                                     <option v-for="st in statuses" :key="st.value" :value="st.value">
                                         {{ st.label }}
@@ -219,7 +219,7 @@ function submit() {
                                 id="title"
                                 v-model="form.title"
                                 placeholder="Ej: Especialización en Desarrollo Web Fullstack e Inteligencia Artificial"
-                                class="h-10 text-sm font-bold border-slate-300 focus-visible:ring-rose-900"
+                                class="h-10 text-sm font-bold border-slate-300 focus-visible:ring-rose-900 rounded-xl"
                                 required
                             />
                             <span v-if="form.errors.title" class="text-xs text-red-600 font-semibold block">
@@ -238,7 +238,7 @@ function submit() {
                                     id="institution"
                                     v-model="form.institution"
                                     placeholder="Ej: Colegio de Ingenieros del Perú - CD Cusco"
-                                    class="h-10 text-xs sm:text-sm border-slate-300 focus-visible:ring-rose-900"
+                                    class="h-10 text-xs sm:text-sm border-slate-300 focus-visible:ring-rose-900 rounded-xl"
                                 />
                                 <span v-if="form.errors.institution" class="text-xs text-red-600 font-semibold block">
                                     {{ form.errors.institution }}
@@ -254,7 +254,7 @@ function submit() {
                                     id="instructor_name"
                                     v-model="form.instructor_name"
                                     placeholder="Ej: Ing. Carlos Alberto Quispe Pérez"
-                                    class="h-10 text-xs sm:text-sm font-bold border-slate-300 focus-visible:ring-rose-900"
+                                    class="h-10 text-xs sm:text-sm font-bold border-slate-300 focus-visible:ring-rose-900 rounded-xl"
                                     required
                                 />
                                 <span v-if="form.errors.instructor_name" class="text-xs text-red-600 font-semibold block">
@@ -277,7 +277,7 @@ function submit() {
                                 id="description"
                                 v-model="form.description"
                                 rows="3"
-                                class="w-full rounded-md border border-slate-300 bg-white p-3 text-xs sm:text-sm shadow-2xs focus:border-rose-900 focus:outline-hidden dark:border-slate-700 dark:bg-slate-950 leading-relaxed font-normal"
+                                class="w-full rounded-xl border border-slate-300 bg-white p-3 text-xs sm:text-sm shadow-2xs focus:border-rose-900 focus:ring-2 focus:ring-rose-900/20 focus:outline-hidden dark:border-slate-700 dark:bg-slate-950 leading-relaxed font-normal"
                                 placeholder="Describe brevemente los módulos temáticos, competencias a desarrollar y prerrequisitos del curso..."
                             ></textarea>
                             <span v-if="form.errors.description" class="text-xs text-red-600 font-semibold block">
@@ -313,7 +313,7 @@ function submit() {
                                     id="start_date"
                                     type="date"
                                     v-model="form.start_date"
-                                    class="h-10 text-xs sm:text-sm font-medium border-slate-300 focus-visible:ring-rose-900"
+                                    class="h-10 text-xs sm:text-sm font-medium border-slate-300 focus-visible:ring-rose-900 rounded-xl cursor-pointer"
                                     required
                                 />
                                 <span v-if="form.errors.start_date" class="text-xs text-red-600 font-semibold block">
@@ -329,7 +329,7 @@ function submit() {
                                     id="end_date"
                                     type="date"
                                     v-model="form.end_date"
-                                    class="h-10 text-xs sm:text-sm font-medium border-slate-300 focus-visible:ring-rose-900"
+                                    class="h-10 text-xs sm:text-sm font-medium border-slate-300 focus-visible:ring-rose-900 rounded-xl cursor-pointer"
                                     required
                                 />
                                 <span v-if="form.errors.end_date" class="text-xs text-red-600 font-semibold block">

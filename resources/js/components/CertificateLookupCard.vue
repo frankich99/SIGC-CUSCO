@@ -571,9 +571,9 @@ function copyVerificationUrl(url: string) {
                     <!-- CARA 1: ANVERSO -->
                     <div
                         v-if="previewTab === 'anverso'"
-                        class="bg-white dark:bg-slate-900 border-4 border-[#800020] p-6 sm:p-8 text-center space-y-4 rounded-sm shadow-md"
+                        class="bg-white dark:bg-slate-900 border-2 border-[#800020] p-6 sm:p-8 text-center space-y-4 rounded-2xl shadow-md"
                     >
-                        <div class="border-2 border-[#b45309] p-4 sm:p-6">
+                        <div class="border border-[#b45309] p-4 sm:p-6 rounded-xl">
                             <!-- Cabecera con 3 Logos -->
                             <div class="flex items-center justify-between border-b-2 border-[#800020] pb-3 mb-4">
                                 <div class="w-14 flex justify-center">
@@ -589,7 +589,7 @@ function copyVerificationUrl(url: string) {
                                     <div class="text-[9px] text-slate-600 dark:text-slate-400 uppercase tracking-wider font-semibold">
                                         Facultad de Ing. Eléctrica, Electrónica, Informática y Mecánica
                                     </div>
-                                    <div class="inline-block bg-[#800020] text-white text-[8px] font-bold px-2 py-0.5 rounded mt-1 uppercase">
+                                    <div class="inline-block bg-[#800020] text-white text-[8px] font-bold px-2.5 py-0.5 rounded-full mt-1 uppercase tracking-wider">
                                         SIGC-CUSCO • ACREDITACIÓN OFICIAL
                                     </div>
                                 </div>
@@ -618,7 +618,7 @@ function copyVerificationUrl(url: string) {
                                     {{ selectedCert.student_name }}
                                 </div>
                                 <div class="mt-2">
-                                    <span class="text-xs font-mono font-bold bg-rose-50 dark:bg-rose-950/60 text-[#800020] border border-rose-200 px-3 py-1 rounded">
+                                    <span class="text-xs font-mono font-bold bg-rose-50 dark:bg-rose-950/60 text-[#800020] border border-rose-200 px-3.5 py-1 rounded-full">
                                         D.N.I. N° {{ selectedCert.dni }}
                                     </span>
                                 </div>
@@ -670,7 +670,7 @@ function copyVerificationUrl(url: string) {
                     <!-- CARA 2: REVERSO -->
                     <div
                         v-else
-                        class="bg-white dark:bg-slate-900 border-4 border-[#800020] p-6 text-left space-y-4 rounded-sm shadow-md"
+                        class="bg-white dark:bg-slate-900 border-2 border-[#800020] p-6 text-left space-y-4 rounded-2xl shadow-md"
                     >
                         <div class="border-b-2 border-[#800020] pb-2">
                             <div class="text-[10px] font-black text-[#800020] uppercase">
@@ -694,11 +694,11 @@ function copyVerificationUrl(url: string) {
                                 <span class="text-[10px] text-slate-500">{{ selectedCert.hours }} Horas</span>
                             </div>
 
-                            <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                            <div class="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
                                 <div
                                     v-for="(module, index) in selectedCert.modules"
                                     :key="index"
-                                    class="p-2 rounded bg-slate-50 dark:bg-slate-800 border-l-4 border-l-[#800020] text-xs"
+                                    class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border-l-4 border-l-[#800020] text-xs"
                                 >
                                     <div class="flex items-center justify-between font-bold text-slate-900 dark:text-white">
                                         <span class="text-[#800020] font-black mr-2">{{ module.number }}</span>
@@ -714,7 +714,7 @@ function copyVerificationUrl(url: string) {
 
                         <!-- Calificación y Docente -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                            <div class="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 flex items-center justify-between">
+                            <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 flex items-center justify-between">
                                 <div>
                                     <div class="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 uppercase">Calificación</div>
                                     <div class="text-2xl font-black text-emerald-950 dark:text-emerald-100">{{ selectedCert.final_grade }}</div>

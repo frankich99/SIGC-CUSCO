@@ -956,44 +956,10 @@ onMounted(() => {
                             <span class="text-slate-500 font-sans">FORMATO OFICIAL A4 LANDSCAPE (297mm × 210mm)</span>
                         </div>
 
-                        <!-- LIENZO DE PAPEL A4 LANDSCAPE (ANVERSO) -->
-                        <div class="w-full aspect-[297/210] min-h-[580px] sm:min-h-[660px] md:min-h-[720px] bg-[#fefefc] text-slate-950 p-6 sm:p-10 md:p-12 relative flex flex-col justify-between shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] border-[8px] sm:border-[10px] border-[#800020] rounded-xs select-text overflow-hidden">
+                        <!-- LIENZO DE PAPEL A4 LANDSCAPE (ANVERSO) - DOBLE MARCO INSTITUCIONAL LIMPIO -->
+                        <div class="w-full aspect-[297/210] min-h-[580px] sm:min-h-[660px] md:min-h-[720px] bg-[#fefefc] text-slate-950 p-6 sm:p-10 md:p-12 relative flex flex-col justify-between shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] border-[3px] border-[#800020] rounded-xl select-text overflow-hidden">
                             <!-- Filete Interior Dorado -->
-                            <div class="absolute inset-2 sm:inset-3 border-2 border-[#b45309] pointer-events-none z-10"></div>
-
-                            <!-- Cintas Esquinadas Geométricas Académicas (4 Esquinas) -->
-                            <div class="absolute top-0 left-0 size-8 sm:size-11 pointer-events-none z-10">
-                                <svg viewBox="0 0 46 46" class="size-full">
-                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
-                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
-                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
-                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
-                                </svg>
-                            </div>
-                            <div class="absolute top-0 right-0 size-8 sm:size-11 pointer-events-none z-10 scale-x-[-1]">
-                                <svg viewBox="0 0 46 46" class="size-full">
-                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
-                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
-                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
-                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
-                                </svg>
-                            </div>
-                            <div class="absolute bottom-0 left-0 size-8 sm:size-11 pointer-events-none z-10 scale-y-[-1]">
-                                <svg viewBox="0 0 46 46" class="size-full">
-                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
-                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
-                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
-                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
-                                </svg>
-                            </div>
-                            <div class="absolute bottom-0 right-0 size-8 sm:size-11 pointer-events-none z-10 scale-[-1]">
-                                <svg viewBox="0 0 46 46" class="size-full">
-                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
-                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
-                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
-                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
-                                </svg>
-                            </div>
+                            <div class="absolute inset-2 sm:inset-3 border border-[#b45309] rounded-lg pointer-events-none z-10"></div>
 
                             <!-- Marca de Agua Institucional de Fondo -->
                             <div class="absolute inset-0 flex items-center justify-center opacity-[0.035] pointer-events-none select-none z-0">
@@ -1054,7 +1020,7 @@ onMounted(() => {
                                         {{ selectedCert.student_name }}
                                     </div>
                                     <div class="mt-1.5">
-                                        <span class="text-xs sm:text-sm font-mono font-black bg-rose-50 text-[#800020] border border-rose-300 px-4 py-0.5 rounded-sm shadow-2xs inline-block">
+                                        <span class="text-xs sm:text-sm font-mono font-black bg-rose-50 text-[#800020] border border-rose-300 px-4 py-0.5 rounded-full shadow-2xs inline-block">
                                             D.N.I. N° {{ selectedCert.dni }}
                                         </span>
                                     </div>
@@ -1127,44 +1093,10 @@ onMounted(() => {
                             <span class="text-slate-500 font-sans">FORMATO OFICIAL A4 LANDSCAPE (297mm × 210mm)</span>
                         </div>
 
-                        <!-- LIENZO DE PAPEL A4 LANDSCAPE (REVERSO) -->
-                        <div class="w-full aspect-[297/210] min-h-[580px] sm:min-h-[660px] md:min-h-[720px] bg-[#fefefc] text-slate-950 p-6 sm:p-10 md:p-12 relative flex flex-col justify-between shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] border-[8px] sm:border-[10px] border-[#800020] rounded-xs select-text overflow-hidden">
+                        <!-- LIENZO DE PAPEL A4 LANDSCAPE (REVERSO) - DOBLE MARCO INSTITUCIONAL LIMPIO -->
+                        <div class="w-full aspect-[297/210] min-h-[580px] sm:min-h-[660px] md:min-h-[720px] bg-[#fefefc] text-slate-950 p-6 sm:p-10 md:p-12 relative flex flex-col justify-between shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] border-[3px] border-[#800020] rounded-xl select-text overflow-hidden">
                             <!-- Filete Interior Dorado -->
-                            <div class="absolute inset-2 sm:inset-3 border-2 border-[#b45309] pointer-events-none z-10"></div>
-
-                            <!-- Cintas Esquinadas Geométricas Académicas (4 Esquinas) -->
-                            <div class="absolute top-0 left-0 size-8 sm:size-11 pointer-events-none z-10">
-                                <svg viewBox="0 0 46 46" class="size-full">
-                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
-                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
-                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
-                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
-                                </svg>
-                            </div>
-                            <div class="absolute top-0 right-0 size-8 sm:size-11 pointer-events-none z-10 scale-x-[-1]">
-                                <svg viewBox="0 0 46 46" class="size-full">
-                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
-                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
-                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
-                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
-                                </svg>
-                            </div>
-                            <div class="absolute bottom-0 left-0 size-8 sm:size-11 pointer-events-none z-10 scale-y-[-1]">
-                                <svg viewBox="0 0 46 46" class="size-full">
-                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
-                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
-                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
-                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
-                                </svg>
-                            </div>
-                            <div class="absolute bottom-0 right-0 size-8 sm:size-11 pointer-events-none z-10 scale-[-1]">
-                                <svg viewBox="0 0 46 46" class="size-full">
-                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
-                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
-                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
-                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
-                                </svg>
-                            </div>
+                            <div class="absolute inset-2 sm:inset-3 border border-[#b45309] rounded-lg pointer-events-none z-10"></div>
 
                             <!-- Contenido del Diploma Reverso -->
                             <div class="relative z-20 h-full flex flex-col justify-between text-left">

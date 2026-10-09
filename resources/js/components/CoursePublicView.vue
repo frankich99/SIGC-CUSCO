@@ -599,7 +599,7 @@ async function copyCode(code: string) {
                             DNI: {{ myEnrollment.dni }}
                         </div>
                         <div class="pt-2">
-                            <span class="font-mono text-xs font-bold px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 border">
+                            <span class="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border">
                                 {{ myEnrollment.credential_code || `INS-${course.id}-${myEnrollment.dni.slice(-4)}` }}
                             </span>
                         </div>
@@ -660,7 +660,7 @@ async function copyCode(code: string) {
                     <!-- Cara 1: Anverso -->
                     <div
                         v-if="activeCertificateFace === 'front'"
-                        class="p-6 rounded-xl border-4 border-amber-600/40 bg-gradient-to-br from-amber-50/60 via-white to-amber-50/40 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 text-center space-y-4 shadow-inner"
+                        class="p-6 rounded-2xl border-2 border-[#800020] bg-gradient-to-br from-amber-50/60 via-white to-amber-50/40 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 text-center space-y-4 shadow-inner"
                     >
                         <div class="flex items-center justify-between px-4">
                             <img src="/images/unsaac-logo.png" alt="UNSAAC" class="h-14 object-contain" />
@@ -723,7 +723,7 @@ async function copyCode(code: string) {
                     <!-- Cara 2: Reverso -->
                     <div
                         v-else
-                        class="p-6 rounded-xl border-4 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs space-y-4"
+                        class="p-6 rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs space-y-4 shadow-sm"
                     >
                         <div class="border-b pb-2 flex items-center justify-between">
                             <span class="font-black text-sm text-slate-900 dark:text-white">Plan Curricular y Calificación Oficial</span>
@@ -737,7 +737,7 @@ async function copyCode(code: string) {
                                 <div
                                     v-for="(mod, i) in myEnrollment.certificate.modules"
                                     :key="i"
-                                    class="p-2 rounded-md bg-slate-50 dark:bg-slate-800 border text-[11px]"
+                                    class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border text-[11px]"
                                 >
                                     <div class="font-bold text-slate-900 dark:text-white">{{ mod.number }}: {{ mod.title }}</div>
                                     <div class="text-[10px] text-slate-500">{{ mod.topics }}</div>
@@ -745,7 +745,7 @@ async function copyCode(code: string) {
                             </div>
 
                             <!-- Calificación y QR -->
-                            <div class="space-y-4 flex flex-col items-center text-center p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border">
+                            <div class="space-y-4 flex flex-col items-center text-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border">
                                 <div class="space-y-1">
                                     <div class="text-[10px] font-bold text-slate-500 uppercase">Calificación Obtenida</div>
                                     <div class="text-xl font-black text-rose-950 dark:text-rose-300">

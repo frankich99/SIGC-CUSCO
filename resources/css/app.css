@@ -179,6 +179,30 @@
     scrollbar-color: rgba(244, 63, 94, 0.2) transparent;
 }
 
+/* Input de fechas moderno, redondeado y adaptado a la estética institucional UNSAAC */
+input[type="date"] {
+    position: relative;
+    border-radius: 0.75rem;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    border-radius: 0.375rem;
+    padding: 2px 4px;
+    filter: invert(0.2) sepia(1) saturate(5) hue-rotate(310deg);
+    opacity: 0.75;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    transform: scale(1.08);
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.85) sepia(0.6) saturate(3) hue-rotate(310deg);
+}
+
 
 :root {
     --background: hsl(0 0% 100%);

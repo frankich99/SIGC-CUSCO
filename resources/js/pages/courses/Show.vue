@@ -1060,7 +1060,7 @@ onUnmounted(() => {
                             </span>
                             <select
                                 v-model="statusFilter"
-                                class="h-9 px-3 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer w-full sm:w-auto"
+                                class="h-9 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer w-full sm:w-auto"
                             >
                                 <option value="todos">Todos los Estados ({{ totalEnrolled }})</option>
                                 <option value="inscrito">Inscritos ({{ registeredStudents.length }})</option>
@@ -1314,7 +1314,7 @@ onUnmounted(() => {
 
                         <select
                             v-model="manualStatus"
-                            class="h-9 px-3 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200"
+                            class="h-9 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer"
                         >
                             <option value="presente">Presente</option>
                             <option value="tardanza">Tardanza</option>
@@ -1938,7 +1938,7 @@ onUnmounted(() => {
                         <select
                             id="edit-status"
                             v-model="editForm.status"
-                            class="w-full h-9 rounded-md border border-slate-300 bg-white px-3 py-1 text-xs font-bold"
+                            class="w-full h-9 rounded-xl border border-slate-300 bg-white px-3 py-1 text-xs font-bold cursor-pointer"
                         >
                             <option value="inscrito">Inscrito</option>
                             <option value="en_curso">En Curso</option>

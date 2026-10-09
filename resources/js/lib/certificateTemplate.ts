@@ -102,26 +102,8 @@ export function formatSpanishDateRange(startVal?: string | null, endVal?: string
     return `del ${sDay} de ${sMonth} de ${sYear} al ${eDay} de ${eMonth} de ${eYear}`;
 }
 
-// SVG Cinta Esquinera Geométrica Oficial (Elimina escuadras toscas por un ribete señorial)
-export const CORNER_RIBBON_SVG = (corner: 'tl' | 'tr' | 'bl' | 'br') => {
-    const transform = {
-        tl: '',
-        tr: 'transform="scale(-1, 1) translate(-46, 0)"',
-        bl: 'transform="scale(1, -1) translate(0, -46)"',
-        br: 'transform="scale(-1, -1) translate(-46, -46)"',
-    }[corner];
-
-    return `
-        <svg class="corner-ribbon corner-${corner}" viewBox="0 0 46 46" width="38" height="38">
-            <g ${transform}>
-                <polygon points="0,0 46,0 0,46" fill="#800020" />
-                <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
-                <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
-                <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
-            </g>
-        </svg>
-    `;
-};
+// SVG Cinta Esquinera Oficial (deprecada por diseño limpio institucional sin esquinas toscas)
+export const CORNER_RIBBON_SVG = (_corner?: 'tl' | 'tr' | 'bl' | 'br') => '';
 
 // SVG Medalla Dorada de Calidad Académica
 export const GOLD_MEDAL_SVG = `
@@ -332,14 +314,14 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
             }
         }
 
-        /* Marco Perimetral de Honor */
+        /* Marco Perimetral Académico Doble Oficial (Líneas Clásicas Nobres - Sin Esquinas Cloradas) */
         .page-border {
             position: absolute;
             top: 5mm;
             left: 5mm;
             right: 5mm;
             bottom: 5mm;
-            border: 4px solid #800020;
+            border: 2.5px solid #800020;
             pointer-events: none;
             z-index: 10;
         }
@@ -349,21 +331,10 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
             left: 7.5mm;
             right: 7.5mm;
             bottom: 7.5mm;
-            border: 1.2px solid #b45309;
+            border: 1px solid #b45309;
             pointer-events: none;
             z-index: 10;
         }
-        .corner-ribbon {
-            position: absolute;
-            pointer-events: none;
-            z-index: 12;
-            width: 38px;
-            height: 38px;
-        }
-        .corner-tl { top: 4.8mm; left: 4.8mm; }
-        .corner-tr { top: 4.8mm; right: 4.8mm; }
-        .corner-bl { bottom: 4.8mm; left: 4.8mm; }
-        .corner-br { bottom: 4.8mm; right: 4.8mm; }
 
         .issue-date-line {
             font-size: 11px;
@@ -504,9 +475,9 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
             font-weight: bold;
             color: #800020;
             background: #fff1f2;
-            padding: 2px 10px;
+            padding: 3px 14px;
             border: 1px solid #fecdd3;
-            border-radius: 4px;
+            border-radius: 9999px;
             display: inline-block;
             margin-bottom: 6px;
         }
@@ -871,13 +842,9 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
          HOJA 1: ANVERSO - DIPLOMA DE HONOR INSTITUCIONAL
          ======================================================== -->
     <div class="page-sheet">
-        <!-- Borde Académico Doble y Cintas de Esquina -->
+        <!-- Borde Académico Doble Oficial -->
         <div class="page-border"></div>
         <div class="page-border-inner"></div>
-        ${CORNER_RIBBON_SVG('tl')}
-        ${CORNER_RIBBON_SVG('tr')}
-        ${CORNER_RIBBON_SVG('bl')}
-        ${CORNER_RIBBON_SVG('br')}
 
         <!-- Marca de Agua Central -->
         <img class="watermark" src="${unsaacLogoUrl}" alt="Escudo UNSAAC" />
@@ -974,12 +941,9 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
          HOJA 2: REVERSO - SYLLABUS, NOTAS Y QR PERMANENTE
          ======================================================== -->
     <div class="page-sheet">
+        <!-- Borde Académico Doble Oficial -->
         <div class="page-border"></div>
         <div class="page-border-inner"></div>
-        ${CORNER_RIBBON_SVG('tl')}
-        ${CORNER_RIBBON_SVG('tr')}
-        ${CORNER_RIBBON_SVG('bl')}
-        ${CORNER_RIBBON_SVG('br')}
 
         <div class="cert-content">
             <!-- Cabecera del Reverso -->

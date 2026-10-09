@@ -201,7 +201,7 @@ function instructorName(inst?: Instructor): string {
                             type="button"
                             @click="selectedStatus = st.value; applyFilters()"
                             :class="[
-                                'px-3 py-1.5 rounded-md text-xs font-bold transition-colors shrink-0',
+                                'px-3 py-1.5 rounded-xl text-xs font-bold transition-colors shrink-0',
                                 selectedStatus === st.value
                                     ? 'bg-rose-900 text-white shadow-xs dark:bg-rose-800'
                                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300'
@@ -221,10 +221,10 @@ function instructorName(inst?: Instructor): string {
                     >
                         <CardHeader class="p-4 sm:p-5 pb-3 space-y-2 min-w-0 max-w-full">
                             <div class="flex items-center justify-between gap-1.5 min-w-0 w-full">
-                                <span class="font-mono text-xs font-bold text-rose-900 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800 shrink-0">
+                                <span class="font-mono text-xs font-bold text-rose-900 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 px-2.5 py-0.5 rounded-full border border-rose-200 dark:border-rose-800 shrink-0">
                                     {{ course.code }}
                                 </span>
-                                <span :class="['text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full border shrink-0 text-center truncate max-w-[62%]', getStatusBadge(course.status).class]">
+                                <span :class="['text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-full border shrink-0 text-center truncate max-w-[62%]', getStatusBadge(course.status).class]">
                                     {{ getStatusBadge(course.status).label }}
                                 </span>
                             </div>
@@ -232,7 +232,7 @@ function instructorName(inst?: Instructor): string {
                             <!-- Organizing Entity / Institution -->
                             <div
                                 v-if="course.institution"
-                                class="flex items-center gap-1.5 text-xs font-semibold text-rose-950 dark:text-rose-200 bg-rose-50/80 dark:bg-rose-950/40 px-2.5 py-1 rounded-md border border-rose-200/80 dark:border-rose-800/60 w-full min-w-0 max-w-full overflow-hidden"
+                                class="flex items-center gap-1.5 text-xs font-semibold text-rose-950 dark:text-rose-200 bg-rose-50/80 dark:bg-rose-950/40 px-2.5 py-1 rounded-xl border border-rose-200/80 dark:border-rose-800/60 w-full min-w-0 max-w-full overflow-hidden"
                             >
                                 <Building2 class="size-3.5 shrink-0 text-rose-800 dark:text-rose-400" />
                                 <span class="truncate block min-w-0 flex-1">{{ course.institution }}</span>
@@ -356,16 +356,16 @@ function instructorName(inst?: Instructor): string {
                                 v-if="link.url"
                                 :href="link.url"
                                 :class="[
-                                    'px-3 py-1.5 text-xs rounded-md border font-bold transition-colors',
+                                    'px-3 py-1.5 text-xs rounded-xl border font-bold transition-colors',
                                     link.active
-                                        ? 'bg-rose-900 text-white border-rose-900'
+                                        ? 'bg-rose-900 text-white border-rose-900 shadow-xs'
                                         : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300'
                                 ]"
                                 v-html="link.label"
                             />
                             <span
                                 v-else
-                                class="px-3 py-1.5 text-xs rounded-md border border-neutral-200 text-neutral-400 dark:border-neutral-800"
+                                class="px-3 py-1.5 text-xs rounded-xl border border-neutral-200 text-neutral-400 dark:border-neutral-800"
                                 v-html="link.label"
                             />
                         </template>
