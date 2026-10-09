@@ -70,7 +70,7 @@ interface EnrollmentItem {
     materno?: string;
     email: string;
     phone?: string;
-    status: 'inscrito' | 'en_curso' | 'aprobado' | 'desaprobado' | 'cancelado' | string;
+    status: 'inscrito' | 'en_curso' | 'aprobado' | 'desaprobado' | 'reprobado' | 'cancelado' | string;
     attended_sessions: number;
     final_grade?: number | string | null;
     certificate_code?: string | null;
@@ -181,6 +181,42 @@ function roleBadgeData(role?: string) {
                 label: 'Participante / Alumno',
                 desc: 'Inscripción a programas, registro de asistencia con QR y descarga de certificados.',
                 badgeClass: 'bg-blue-800 text-white font-black shadow-xs',
+            };
+    }
+}
+
+function enrollmentStatusBadge(status: string) {
+    switch (status) {
+        case 'aprobado':
+            return {
+                label: 'Aprobado',
+                class: 'bg-emerald-100 text-emerald-950 border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-800',
+            };
+        case 'en_curso':
+            return {
+                label: 'En Curso',
+                class: 'bg-amber-100 text-amber-950 border border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800',
+            };
+        case 'inscrito':
+            return {
+                label: 'Inscrito',
+                class: 'bg-sky-100 text-sky-950 border border-sky-300 dark:bg-sky-950 dark:text-sky-200 dark:border-sky-800',
+            };
+        case 'reprobado':
+        case 'desaprobado':
+            return {
+                label: 'No Aprobado',
+                class: 'bg-rose-100 text-rose-950 border border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800',
+            };
+        case 'cancelado':
+            return {
+                label: 'Cancelado',
+                class: 'bg-slate-100 text-slate-800 border border-slate-300 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-700',
+            };
+        default:
+            return {
+                label: status,
+                class: 'bg-slate-100 text-slate-800 border border-slate-300',
             };
     }
 }
@@ -520,8 +556,8 @@ function roleBadgeData(role?: string) {
                                     <span class="font-mono text-xs font-bold text-rose-950 bg-rose-100 dark:bg-rose-950 dark:text-rose-200 px-2.5 py-1 rounded border border-rose-200 dark:border-rose-800">
                                         {{ item.course?.code }}
                                     </span>
-                                    <Badge class="capitalize text-xs font-extrabold px-2.5 py-0.5" :class="item.status === 'aprobado' ? 'bg-amber-100 text-amber-950 border border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800' : 'bg-rose-100 text-rose-950 border border-rose-300'">
-                                        {{ item.status }}
+                                    <Badge class="capitalize text-xs font-extrabold px-2.5 py-0.5" :class="enrollmentStatusBadge(item.status).class">
+                                        {{ enrollmentStatusBadge(item.status).label }}
                                     </Badge>
                                 </div>
                                 <CardTitle class="text-base font-black text-slate-950 dark:text-white line-clamp-2 leading-snug">

@@ -7,8 +7,8 @@ const name = usePage().props.name || 'SIGC-CUSCO';
 
 <template>
     <div class="flex items-center gap-2.5">
-        <div class="flex size-9 items-center justify-center rounded-xl bg-rose-900 text-white shadow-xs shrink-0 ring-1 ring-rose-950/20">
-            <AppLogoIcon class="size-5 fill-current text-white" />
+        <div class="flex size-9 items-center justify-center rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] text-white shadow-xs shrink-0 ring-1 ring-rose-950/20">
+            <AppLogoIcon class="size-5 text-amber-300 stroke-[2.2]" />
         </div>
         <div class="flex flex-col text-left leading-tight shrink-0">
             <span class="text-sm font-black tracking-tight text-slate-950 dark:text-white">

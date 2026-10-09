@@ -46,6 +46,8 @@ interface CourseData {
     start_date: string;
     end_date: string;
     hours: number;
+    total_sessions?: number;
+    min_attendance_percentage?: number;
     capacity: number;
     status: string;
 }
@@ -73,6 +75,8 @@ const form = useForm({
     start_date: props.course.start_date,
     end_date: props.course.end_date,
     hours: props.course.hours,
+    total_sessions: props.course.total_sessions ?? 4,
+    min_attendance_percentage: props.course.min_attendance_percentage ?? 75,
     capacity: props.course.capacity,
     status: props.course.status,
 });
@@ -419,6 +423,51 @@ function submit() {
                                         </span>
                                     </div>
                                 </div>
+
+                                <!-- Parámetros de Acreditación Académica -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1 border-t border-slate-100 dark:border-slate-800">
+                                    <div class="space-y-1.5">
+                                        <Label for="total_sessions" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                                            <BookOpen class="size-3.5 text-rose-800" />
+                                            <span>N° Sesiones Programadas</span> <span class="text-rose-700">*</span>
+                                        </Label>
+                                        <Input
+                                            id="total_sessions"
+                                            type="number"
+                                            min="1"
+                                            max="200"
+                                            v-model.number="form.total_sessions"
+                                            placeholder="4"
+                                            class="h-10 font-bold border-slate-300 focus-visible:ring-rose-900"
+                                            required
+                                        />
+                                        <p class="text-[10px] text-slate-500">Total de clases para el cómputo de asistencias.</p>
+                                        <span v-if="form.errors.total_sessions" class="text-xs text-red-600 font-semibold block">
+                                            {{ form.errors.total_sessions }}
+                                        </span>
+                                    </div>
+
+                                    <div class="space-y-1.5">
+                                        <Label for="min_attendance_percentage" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                                            <CheckCircle2 class="size-3.5 text-emerald-700" />
+                                            <span>Asistencia Mínima Exigida (%)</span> <span class="text-rose-700">*</span>
+                                        </Label>
+                                        <Input
+                                            id="min_attendance_percentage"
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            v-model.number="form.min_attendance_percentage"
+                                            placeholder="75"
+                                            class="h-10 font-bold border-slate-300 focus-visible:ring-rose-900"
+                                            required
+                                        />
+                                        <p class="text-[10px] text-slate-500">Mínimo para certificación (Norma UNSAAC: 75%).</p>
+                                        <span v-if="form.errors.min_attendance_percentage" class="text-xs text-red-600 font-semibold block">
+                                            {{ form.errors.min_attendance_percentage }}
+                                        </span>
+                                    </div>
+                                </div>
                             </CardContent>
                         </Card>
 
@@ -448,18 +497,22 @@ function submit() {
                                 </span>
                             </div>
 
-                            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-700 dark:text-slate-300 font-bold">
+                            <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-700 dark:text-slate-300 font-bold">
                                 <div>
                                     <span class="text-[9px] uppercase text-slate-500 block">Horas</span>
                                     {{ formatHours(form.hours || 0) }}
                                 </div>
                                 <div>
-                                    <span class="text-[9px] uppercase text-slate-500 block">Vacantes</span>
-                                    {{ form.capacity || 0 }} cupos
+                                    <span class="text-[9px] uppercase text-slate-500 block">Sesiones</span>
+                                    {{ form.total_sessions || 0 }} cls
                                 </div>
                                 <div>
-                                    <span class="text-[9px] uppercase text-slate-500 block">Estado</span>
-                                    <span class="capitalize text-rose-900 dark:text-rose-400">{{ form.status }}</span>
+                                    <span class="text-[9px] uppercase text-slate-500 block">Asist. Mín</span>
+                                    {{ form.min_attendance_percentage || 0 }}%
+                                </div>
+                                <div>
+                                    <span class="text-[9px] uppercase text-slate-500 block">Vacantes</span>
+                                    {{ form.capacity || 0 }} cupos
                                 </div>
                             </div>
                         </div>

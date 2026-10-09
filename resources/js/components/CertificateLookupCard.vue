@@ -37,7 +37,12 @@ import {
     Share2,
     Sparkles,
 } from '@lucide/vue';
-import { type CertificateRecord, printCertificate } from '@/lib/certificateTemplate';
+import {
+    type CertificateRecord,
+    printCertificate,
+    formatSpanishDate,
+    formatSpanishDateRange,
+} from '@/lib/certificateTemplate';
 
 export type { CertificateRecord };
 
@@ -620,13 +625,13 @@ function copyVerificationUrl(url: string) {
                             </div>
 
                             <!-- Motivo -->
-                            <div class="text-xs text-slate-700 dark:text-slate-300 max-w-lg mx-auto leading-relaxed my-3">
+                            <div class="text-xs text-slate-700 dark:text-slate-300 max-w-lg mx-auto leading-relaxed my-3 font-serif">
                                 Por haber aprobado el programa de capacitación en:
                                 <strong class="text-[#800020] block my-1 text-sm font-black">
                                     "{{ selectedCert.course_title }}"
                                 </strong>
-                                con un total de <strong>{{ formatHours(selectedCert.hours) }}</strong> lectivas, desarrollado
-                                del {{ selectedCert.start_date }} al {{ selectedCert.end_date }}.
+                                desarrollado <strong>{{ selectedCert.date_range_formal || formatSpanishDateRange(selectedCert.start_date, selectedCert.end_date) }}</strong>,
+                                con un total de <strong>{{ formatHours(selectedCert.hours) }}</strong> lectivas.
                             </div>
 
                             <!-- Calificación -->
@@ -634,6 +639,11 @@ function copyVerificationUrl(url: string) {
                                 <span>Calificación:</span>
                                 <span class="text-emerald-700 dark:text-emerald-400 font-black">{{ selectedCert.final_grade }} / 20.00</span>
                                 <span class="text-slate-600 dark:text-slate-400 font-semibold">({{ selectedCert.final_grade_text || 'Aprobado' }})</span>
+                            </div>
+
+                            <!-- Fecha Formal -->
+                            <div class="text-right text-[11px] font-serif font-bold text-slate-600 dark:text-slate-400 italic pr-2 my-1">
+                                {{ selectedCert.city_issued_formal || ('Cusco, ' + formatSpanishDate(selectedCert.certificate_issued_at || selectedCert.end_date)) }}
                             </div>
 
                             <!-- Firmas -->
@@ -651,6 +661,7 @@ function copyVerificationUrl(url: string) {
                             <!-- Pie -->
                             <div class="pt-3 text-[10px] font-mono text-slate-500 flex justify-between items-center border-t border-dashed border-slate-300 dark:border-slate-800 mt-4">
                                 <span>Cód: <strong>{{ selectedCert.certificate_code }}</strong></span>
+                                <span>Emisión: <strong>{{ selectedCert.issued_date_formal || formatSpanishDate(selectedCert.certificate_issued_at || selectedCert.end_date) }}</strong></span>
                                 <span class="text-[#800020] font-bold">VÁLIDO OFICIALMENTE • CUSCO</span>
                             </div>
                         </div>

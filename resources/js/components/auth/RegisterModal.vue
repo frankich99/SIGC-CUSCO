@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import {
     Dialog,
@@ -16,9 +16,14 @@ import { THEME_BUTTONS, THEME_MODAL } from '@/lib/theme';
 import { useAuthModal } from '@/composables/useAuthModal';
 import { notify } from '@/lib/notify';
 
-const props = defineProps<{
-    open?: boolean;
-}>();
+const props = withDefaults(
+    defineProps<{
+        open?: boolean | null;
+    }>(),
+    {
+        open: null,
+    }
+);
 
 const emit = defineEmits<{
     (e: 'update:open', value: boolean): void;
@@ -27,12 +32,22 @@ const emit = defineEmits<{
 
 const { isRegisterModalOpen, switchToLogin: composableSwitchToLogin } = useAuthModal();
 
+watch(
+    () => props.open,
+    (val) => {
+        if (typeof val === 'boolean') {
+            isRegisterModalOpen.value = val;
+        }
+    },
+    { immediate: true }
+);
+
 // Control reactivo bidireccional del estado abierto
 const isOpen = computed({
-    get: () => (props.open !== undefined ? props.open : isRegisterModalOpen.value),
+    get: () => isRegisterModalOpen.value,
     set: (val: boolean) => {
-        emit('update:open', val);
         isRegisterModalOpen.value = val;
+        emit('update:open', val);
     },
 });
 

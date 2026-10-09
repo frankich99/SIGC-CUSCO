@@ -14,6 +14,7 @@ import {
     ShieldCheck,
     LogIn,
     UserPlus,
+    Home,
 } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
@@ -55,6 +56,10 @@ const user = computed(() => page.props.auth?.user);
 const { isCurrentUrl } = useCurrentUrl();
 const { openLogin, openRegister } = useAuthModal();
 const isMobileMenuOpen = ref(false);
+
+const isHomeActive = computed(() => {
+    return isCurrentUrl('/');
+});
 
 const isCoursesActive = computed(() => {
     return isCurrentUrl('/courses') || isCurrentUrl('/courses/*');
@@ -107,6 +112,7 @@ function roleBadge(role?: string) {
                                 variant="outline"
                                 size="icon"
                                 class="h-9 w-9 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white"
+                                aria-label="Abrir Menú de Navegación"
                             >
                                 <Menu class="h-5 w-5" />
                             </Button>
@@ -124,81 +130,103 @@ function roleBadge(role?: string) {
                                         <Link
                                             href="/courses/create"
                                             class="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-lg text-xs font-black bg-rose-900 text-white shadow-xs hover:bg-rose-950 transition-colors"
+                                            @click="isMobileMenuOpen = false"
                                         >
                                             <Plus class="size-4 text-amber-300 stroke-[2.5]" />
                                             <span>+ Agregar Curso</span>
                                         </Link>
                                     </div>
 
-                                    <div class="space-y-1">
-                                        <div class="text-[11px] font-extrabold uppercase tracking-wider text-rose-900 dark:text-rose-400 px-3">
-                                            Navegación Principal
+                                    <!-- SI ES USUARIO AUTENTICADO: NAVEGACIÓN INTRANET -->
+                                    <template v-if="user">
+                                        <div class="space-y-1">
+                                            <div class="text-[11px] font-extrabold uppercase tracking-wider text-rose-900 dark:text-rose-400 px-3">
+                                                Navegación
+                                            </div>
+                                            <Link
+                                                :href="dashboard()"
+                                                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                                :class="isCurrentUrl(dashboard()) ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
+                                                @click="isMobileMenuOpen = false"
+                                            >
+                                                <LayoutGrid class="size-4 text-rose-800" />
+                                                <span>Panel de Control</span>
+                                            </Link>
+                                            <Link
+                                                href="/courses"
+                                                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                                :class="isCoursesActive ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
+                                                @click="isMobileMenuOpen = false"
+                                            >
+                                                <GraduationCap class="size-4 text-rose-800" />
+                                                <span>Capacitaciones</span>
+                                            </Link>
+                                            <Link
+                                                href="/certificates"
+                                                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                                :class="isCertificatesActive ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
+                                                @click="isMobileMenuOpen = false"
+                                            >
+                                                <Award class="size-4 text-amber-600" />
+                                                <span>Validar Certificados</span>
+                                            </Link>
+                                            <Link
+                                                v-if="user?.role === 'admin'"
+                                                href="/users"
+                                                class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                                :class="isUsersActive ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
+                                                @click="isMobileMenuOpen = false"
+                                            >
+                                                <ShieldCheck class="size-4 text-emerald-600" />
+                                                <span>Usuarios y Roles</span>
+                                            </Link>
+                                            <Link
+                                                href="/"
+                                                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                                :class="isHomeActive ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
+                                                @click="isMobileMenuOpen = false"
+                                            >
+                                                <Globe class="size-4 text-blue-600" />
+                                                <span>Portal Público</span>
+                                            </Link>
                                         </div>
-                                        <Link
-                                            :href="dashboard()"
-                                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                                            :class="isCurrentUrl(dashboard()) ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
-                                        >
-                                            <LayoutGrid class="size-4 text-rose-800" />
-                                            <span>Panel de Control</span>
-                                        </Link>
-                                    </div>
+                                    </template>
 
-                                    <div class="space-y-1">
-                                        <div class="text-[11px] font-extrabold uppercase tracking-wider text-rose-900 dark:text-rose-400 px-3">
-                                            Capacitaciones
+                                    <!-- SI ES VISITANTE PÚBLICO (INVITADO): NAVEGACIÓN UNIFICADA LIMPIA -->
+                                    <template v-else>
+                                        <div class="space-y-1">
+                                            <div class="text-[11px] font-extrabold uppercase tracking-wider text-rose-900 dark:text-rose-400 px-3">
+                                                Navegación
+                                            </div>
+                                            <Link
+                                                href="/"
+                                                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                                :class="isHomeActive ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
+                                                @click="isMobileMenuOpen = false"
+                                            >
+                                                <Home class="size-4 text-rose-800" />
+                                                <span>Inicio</span>
+                                            </Link>
+                                            <Link
+                                                href="/courses"
+                                                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                                :class="isCoursesActive ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
+                                                @click="isMobileMenuOpen = false"
+                                            >
+                                                <GraduationCap class="size-4 text-rose-800" />
+                                                <span>Capacitaciones</span>
+                                            </Link>
+                                            <Link
+                                                href="/certificates"
+                                                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                                :class="isCertificatesActive ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
+                                                @click="isMobileMenuOpen = false"
+                                            >
+                                                <Award class="size-4 text-amber-600" />
+                                                <span>Validar Certificados</span>
+                                            </Link>
                                         </div>
-                                        <Link
-                                            href="/courses"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                                            :class="isCurrentUrl('/courses') ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
-                                        >
-                                            <GraduationCap class="size-4 text-rose-800" />
-                                            <span>Catálogo de Cursos</span>
-                                        </Link>
-                                        <Link
-                                            v-if="canCreateCourse"
-                                            href="/courses/create"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40"
-                                        >
-                                            <PlusCircle class="size-4 text-amber-600" />
-                                            <span>Agregar Curso</span>
-                                        </Link>
-                                    </div>
-
-                                    <div class="space-y-1">
-                                        <div class="text-[11px] font-extrabold uppercase tracking-wider text-rose-900 dark:text-rose-400 px-3">
-                                            Servicios al Ciudadano
-                                        </div>
-                                        <Link
-                                            href="/certificates"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                                        >
-                                            <Award class="size-4 text-amber-600" />
-                                            <span>Validar Certificados</span>
-                                        </Link>
-                                        <Link
-                                            href="/"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                                        >
-                                            <Globe class="size-4 text-blue-600" />
-                                            <span>Portal Público</span>
-                                        </Link>
-                                    </div>
-
-                                    <div v-if="user?.role === 'admin'" class="space-y-1">
-                                        <div class="text-[11px] font-extrabold uppercase tracking-wider text-rose-900 dark:text-rose-400 px-3">
-                                            Administración
-                                        </div>
-                                        <Link
-                                            href="/users"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-bold text-slate-900 dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                                            :class="isUsersActive ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200' : ''"
-                                        >
-                                            <ShieldCheck class="size-4 text-emerald-600" />
-                                            <span>Usuarios y Roles</span>
-                                        </Link>
-                                    </div>
+                                    </template>
                                 </nav>
 
                                 <div v-if="user" class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1 px-2">
@@ -239,15 +267,45 @@ function roleBadge(role?: string) {
                 </div>
 
                 <!-- Logotipo Principal -->
-                <Link :href="dashboard()" class="flex items-center gap-x-2 shrink-0 hover:opacity-95 transition-opacity">
+                <Link :href="user ? dashboard() : '/'" class="flex items-center gap-x-2 shrink-0 hover:opacity-95 transition-opacity">
                     <AppLogo />
                 </Link>
 
                 <!-- Separador vertical sutil institucional -->
                 <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden md:block shrink-0 mx-1" />
 
-                <!-- Navegación Jerárquica Desktop (alineada a la izquierda junto al logo) -->
-                <nav class="hidden md:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
+                <!-- CASO A: INVITADO PÚBLICO (UNIFICADO, LIMPIO Y SIN ELEMENTOS INTERNOS) -->
+                <nav v-if="!user" class="hidden md:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
+                    <Link
+                        href="/"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all"
+                        :class="isHomeActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
+                    >
+                        <Home class="size-4" />
+                        <span>Inicio</span>
+                    </Link>
+
+                    <Link
+                        href="/courses"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all"
+                        :class="isCoursesActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
+                    >
+                        <GraduationCap class="size-4" :class="isCoursesActive ? 'text-amber-300' : 'text-rose-800'" />
+                        <span>Capacitaciones</span>
+                    </Link>
+
+                    <Link
+                        href="/certificates"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all"
+                        :class="isCertificatesActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
+                    >
+                        <Award class="size-4" :class="isCertificatesActive ? 'text-amber-300' : 'text-amber-600'" />
+                        <span>Validar Certificados</span>
+                    </Link>
+                </nav>
+
+                <!-- CASO B: USUARIO AUTENTICADO (PANEL, MIS CURSOS, ROLES, ETC.) -->
+                <nav v-else class="hidden md:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
                     <!-- Panel -->
                     <Link
                         :href="dashboard()"
@@ -308,43 +366,15 @@ function roleBadge(role?: string) {
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <!-- Certificados Dropdown -->
-                    <DropdownMenu>
-                        <DropdownMenuTrigger as-child>
-                            <button
-                                type="button"
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
-                                :class="isCertificatesActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
-                            >
-                                <Award class="size-4" :class="isCertificatesActive ? 'text-amber-300' : 'text-amber-600'" />
-                                <span>Certificados</span>
-                                <ChevronDown class="size-3.5 opacity-70" />
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" class="w-64 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl">
-                            <DropdownMenuLabel class="text-[11px] font-black text-rose-900 dark:text-rose-400 uppercase tracking-wider px-2">
-                                Acreditación Digital
-                            </DropdownMenuLabel>
-                            <DropdownMenuItem as-child>
-                                <Link href="/certificates" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
-                                    <Award class="size-4 text-amber-600 mt-0.5" />
-                                    <div>
-                                        <div class="text-xs font-bold text-slate-900 dark:text-white">Validar Certificados</div>
-                                        <div class="text-[11px] text-slate-600 dark:text-slate-400">Consulta por DNI o archivo PDF</div>
-                                    </div>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem as-child>
-                                <Link :href="dashboard()" class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer">
-                                    <QrCode class="size-4 text-rose-800 mt-0.5" />
-                                    <div>
-                                        <div class="text-xs font-bold text-slate-900 dark:text-white">Asistencia y Credencial QR</div>
-                                        <div class="text-[11px] text-slate-600 dark:text-slate-400">Control y marcación en aula</div>
-                                    </div>
-                                </Link>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <!-- Validar Certificados -->
+                    <Link
+                        href="/certificates"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all"
+                        :class="isCertificatesActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
+                    >
+                        <Award class="size-4" :class="isCertificatesActive ? 'text-amber-300' : 'text-amber-600'" />
+                        <span>Validar Certificados</span>
+                    </Link>
 
                     <!-- Usuarios y Roles (Solo Admin) -->
                     <Link
@@ -358,7 +388,7 @@ function roleBadge(role?: string) {
                         <span>Usuarios y Roles</span>
                     </Link>
 
-                    <!-- Ir al Portal Web (ÚNICA OPCIÓN QUE LLEVA A LA WEB PÚBLICA) -->
+                    <!-- Ir al Portal Web -->
                     <Link
                         href="/"
                         class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-black transition-all text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900 shrink-0"

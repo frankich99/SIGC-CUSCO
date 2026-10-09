@@ -48,6 +48,7 @@ defineProps<Props>();
     <DropdownMenuItem :as-child="true">
         <Link
             class="block w-full cursor-pointer"
+            method="post"
             :href="logout()"
             @click="handleLogout"
             as="button"

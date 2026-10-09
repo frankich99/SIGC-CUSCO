@@ -48,12 +48,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
-import LoginModal from '@/components/auth/LoginModal.vue';
-import RegisterModal from '@/components/auth/RegisterModal.vue';
 import PdfIntegrityVerifier from '@/components/PdfIntegrityVerifier.vue';
-import GlobalToast from '@/components/GlobalToast.vue';
-import { useAuthModal } from '@/composables/useAuthModal';
 import { notify } from '@/lib/notify';
 import { formatDateRange, formatHours } from '@/lib/formatters';
 import type { BreadcrumbItem } from '@/types';
@@ -64,6 +59,8 @@ import {
     EMBLEM_SVG,
     DOCENTE_STAMP_SVG,
     DIRECCION_STAMP_SVG,
+    formatSpanishDate,
+    formatSpanishDateRange,
 } from '@/lib/certificateTemplate';
 
 export type { CertificateRecord };
@@ -77,10 +74,13 @@ const props = defineProps<{
 const page = usePage();
 const authUser = computed(() => (page.props.auth as any)?.user);
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Panel Principal', href: '/dashboard' },
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
+    {
+        title: authUser.value ? 'Panel Principal' : 'Portal Principal',
+        href: authUser.value ? '/dashboard' : '/',
+    },
     { title: 'Validación de Certificados', href: '/certificates' },
-];
+]);
 
 // Pestaña activa: 'dni' para consulta por documento | 'pdf' para validación de archivo PDF
 const activeTab = ref<'dni' | 'pdf'>('dni');
@@ -113,8 +113,6 @@ function resetZoom() {
     zoomScale.value = 100;
 }
 
-// Modales de Autenticación para invitados
-const { isLoginModalOpen, isRegisterModalOpen, openLogin, openRegister, switchToRegister, switchToLogin } = useAuthModal();
 
 function onDniInput(e: Event) {
     const target = e.target as HTMLInputElement;
@@ -234,8 +232,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <!-- CASO 1: USUARIO AUTENTICADO (MANTIENE AL 100% SU NAVBAR VERIFICADO APPLAYOUT) -->
-    <AppLayout v-if="authUser" :breadcrumbs="breadcrumbs">
+    <!-- VISTA OFICIAL DE CONSULTA Y VALIDACIÓN DE CERTIFICADOS (UNIFICADA CON APPLAYOUT) -->
+    <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Validación Oficial de Certificados - SIGC-CUSCO" />
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
@@ -259,9 +257,9 @@ onMounted(() => {
 
                 <div class="flex items-center gap-2">
                     <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 hover:text-rose-900 cursor-pointer">
-                        <Link href="/dashboard">
+                        <Link :href="authUser ? '/dashboard' : '/'">
                             <ArrowLeft class="size-3.5 mr-1 text-rose-800" />
-                            Volver al Panel
+                            {{ authUser ? 'Volver al Panel' : 'Portal Principal' }}
                         </Link>
                     </Button>
                 </div>
@@ -504,336 +502,6 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-    </AppLayout>
-
-    <!-- CASO 2: VISITANTE PÚBLICO (CABECERA INSTITUCIONAL LIMPIA Y ELEGANTE) -->
-    <div v-else class="min-h-screen flex flex-col justify-between bg-slate-50/70 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-rose-900 selection:text-white">
-        <Head title="Acreditación Digital Oficial • Consulta de Certificados - SIGC-CUSCO" />
-
-        <!-- TOP INSTITUTIONAL GUEST HEADER -->
-        <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md shadow-xs">
-            <div class="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
-                <div class="flex items-center gap-4 lg:gap-6 min-w-0">
-                    <Link href="/" class="flex items-center gap-3 group shrink-0">
-                        <div class="size-10 rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] flex items-center justify-center text-white shadow-sm shadow-rose-900/20 group-hover:scale-105 transition-transform">
-                            <GraduationCap class="size-5 text-amber-300" />
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-1.5 font-bold text-base tracking-tight text-slate-950 dark:text-white">
-                                <span>SIGC-CUSCO</span>
-                            </div>
-                            <p class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium hidden sm:block">
-                                Acreditación Digital Oficial • Cusco, Perú
-                            </p>
-                        </div>
-                    </Link>
-
-                    <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden md:block shrink-0" />
-
-                    <nav class="hidden md:flex items-center gap-4 text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0">
-                        <Button as-child variant="ghost" size="sm" class="text-xs font-bold text-slate-800 hover:text-rose-900 cursor-pointer">
-                            <Link href="/">
-                                <ArrowLeft class="size-3.5 mr-1 text-rose-800" />
-                                <span>Portal Principal</span>
-                            </Link>
-                        </Button>
-                        <Link href="/courses" class="hover:text-rose-900 transition-colors flex items-center gap-1.5">
-                            <GraduationCap class="size-4 text-rose-800" />
-                            <span>Capacitaciones</span>
-                        </Link>
-                        <span class="text-rose-900 dark:text-rose-300 flex items-center gap-1.5 border-b-2 border-rose-900 pb-1">
-                            <Award class="size-4 text-amber-600" />
-                            <span>Validar Certificados</span>
-                        </span>
-                    </nav>
-                </div>
-
-                <div class="flex items-center gap-1.5 sm:gap-2.5">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        class="text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-rose-900 cursor-pointer px-2 sm:px-3"
-                        @click="openLogin"
-                    >
-                        <LogIn class="size-3.5 sm:mr-1 text-rose-900" />
-                        <span class="hidden sm:inline">Iniciar Sesión</span>
-                        <span class="sm:hidden">Ingresar</span>
-                    </Button>
-                    <Button
-                        size="sm"
-                        class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer px-2.5 sm:px-3"
-                        @click="openRegister"
-                    >
-                        <UserPlus class="size-3.5 sm:mr-1" />
-                        <span>Registrarse</span>
-                    </Button>
-                </div>
-            </div>
-        </header>
-
-        <!-- MAIN CONTENT FOR GUEST -->
-        <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
-            <div class="text-center max-w-2xl mx-auto space-y-3">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100/90 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 text-rose-950 dark:text-rose-200 text-xs font-black shadow-xs">
-                    <ShieldCheck class="size-3.5 text-rose-800" />
-                    <span>Fe Pública Oficial • UNSAAC / Cusco</span>
-                </div>
-                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-950 dark:text-white leading-tight">
-                    Consulta y Validación de <span class="text-rose-900 dark:text-rose-400">Certificados Digitales</span>
-                </h1>
-                <p class="text-xs sm:text-sm text-slate-700 dark:text-neutral-300 leading-relaxed font-semibold">
-                    Verifica la autenticidad e integridad de los diplomas oficiales expedidos en las capacitaciones académicas.
-                </p>
-            </div>
-
-            <!-- SELECTOR DE MODALIDAD (TABS LIMPIOS) -->
-            <div class="flex items-center justify-center">
-                <div class="inline-flex p-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs">
-                    <button
-                        type="button"
-                        @click="activeTab = 'dni'"
-                        class="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer"
-                        :class="activeTab === 'dni' ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:text-rose-900'"
-                    >
-                        <Search class="size-3.5" />
-                        <span>Búsqueda Oficial por DNI</span>
-                    </button>
-                    <button
-                        type="button"
-                        @click="activeTab = 'pdf'"
-                        class="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer"
-                        :class="activeTab === 'pdf' ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:text-rose-900'"
-                    >
-                        <FileCheck class="size-3.5 text-amber-500" />
-                        <span>Comprobador de Archivo PDF (SHA-256)</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- VISTA 1: BÚSQUEDA POR DNI (GUEST) -->
-            <div v-if="activeTab === 'dni'" class="space-y-6">
-                <!-- Tarjeta de Búsqueda -->
-                <Card class="max-w-2xl mx-auto border-2 border-rose-900/20 dark:border-rose-900/40 shadow-sm bg-white dark:bg-slate-900 overflow-hidden">
-                    <CardHeader class="bg-gradient-to-r from-rose-50/80 via-white to-amber-50/20 dark:from-rose-950/30 dark:to-slate-900 border-b pb-3.5">
-                        <div class="flex items-center gap-2 text-xs font-black text-rose-900 dark:text-rose-300 uppercase tracking-wider">
-                            <Search class="size-4 text-rose-800" />
-                            <span>Búsqueda Oficial con DNI</span>
-                        </div>
-                        <CardTitle class="text-base sm:text-lg font-bold text-slate-950 dark:text-white">
-                            Consulta Inmediata de Diplomas
-                        </CardTitle>
-                        <CardDescription class="text-xs text-slate-600 dark:text-slate-400">
-                            Ingresa el número de documento de identidad de 8 dígitos.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent class="p-5 sm:p-6 space-y-4">
-                        <form @submit.prevent="searchCertificates" class="flex flex-col sm:flex-row gap-3">
-                            <div class="relative flex-1">
-                                <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                                <Input
-                                    :value="dniQuery"
-                                    @input="onDniInput"
-                                    type="text"
-                                    inputmode="numeric"
-                                    maxlength="8"
-                                    placeholder="Ingresa tu DNI (8 dígitos)"
-                                    class="pl-10 font-mono text-base tracking-widest font-bold text-slate-950 dark:text-white border-slate-300 focus-visible:ring-rose-900 h-11"
-                                    :disabled="loading"
-                                    autofocus
-                                />
-                                <div class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-slate-400">
-                                    {{ dniQuery.length }}/8
-                                </div>
-                            </div>
-                            <Button
-                                type="submit"
-                                :disabled="loading || dniQuery.length !== 8"
-                                class="bg-rose-900 hover:bg-rose-950 text-white font-bold h-11 px-6 shadow-xs shrink-0 text-xs sm:text-sm cursor-pointer"
-                            >
-                                <Loader2 v-if="loading" class="size-4 mr-2 animate-spin" />
-                                <Search v-else class="size-4 mr-2" />
-                                <span>Consultar DNI</span>
-                            </Button>
-                        </form>
-
-                        <div v-if="error" class="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-200 text-xs font-bold flex items-center gap-2">
-                            <AlertCircle class="size-4 shrink-0 text-rose-700" />
-                            <span>{{ error }}</span>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <!-- Resultados de Búsqueda -->
-                <div v-if="loading" class="max-w-3xl mx-auto py-10 text-center space-y-3">
-                    <Loader2 class="size-8 mx-auto animate-spin text-rose-900" />
-                    <p class="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300">
-                        Consultando capacitaciones y diplomas emitidos para el DNI {{ dniQuery }}...
-                    </p>
-                </div>
-
-                <div v-else-if="searched" class="max-w-3xl mx-auto space-y-5">
-                    <template v-if="records.length > 0">
-                        <!-- Titular Acreditado -->
-                        <div class="p-4 sm:p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                            <div class="flex items-center gap-3">
-                                <div class="size-11 rounded-xl bg-rose-900 text-white flex items-center justify-center font-black shadow-xs shrink-0">
-                                    <User class="size-5 text-amber-300" />
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <h2 class="text-base sm:text-lg font-black text-slate-950 dark:text-white uppercase tracking-tight">
-                                            {{ studentName }}
-                                        </h2>
-                                        <Badge class="bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 text-[10px] font-black">
-                                            <CheckCircle2 class="size-3 mr-1 text-emerald-700" />
-                                            Titular Oficial
-                                        </Badge>
-                                    </div>
-                                    <div class="text-xs font-mono text-slate-600 dark:text-slate-400 mt-0.5">
-                                        DNI: <strong class="text-slate-900 dark:text-white">{{ dniQuery }}</strong>
-                                    </div>
-                                </div>
-                            </div>
-                            <Badge variant="outline" class="border-rose-300 text-rose-900 dark:border-rose-800 dark:text-rose-300 font-bold text-xs py-1 px-3 bg-rose-50 dark:bg-rose-950">
-                                <Award class="size-3.5 mr-1 text-rose-800" />
-                                {{ records.length }} {{ records.length === 1 ? 'Capacitación Aprobada' : 'Capacitaciones Aprobadas' }}
-                            </Badge>
-                        </div>
-
-                        <!-- Lista de Certificados Oficiales -->
-                        <div class="space-y-4">
-                            <Card
-                                v-for="record in records"
-                                :key="record.id"
-                                class="border border-slate-200 dark:border-slate-800 shadow-xs hover:border-rose-300 transition-all bg-white dark:bg-slate-900 overflow-hidden"
-                            >
-                                <CardHeader class="p-4 sm:p-5 pb-3 bg-slate-50/70 dark:bg-slate-900/80 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs font-black font-mono px-2 py-0.5 rounded bg-rose-900 text-white">
-                                            {{ record.course_code }}
-                                        </span>
-                                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                                            <Building2 class="size-3 text-slate-400" />
-                                            {{ record.institution || 'SIGC-CUSCO' }}
-                                        </span>
-                                    </div>
-                                    <Badge class="text-[11px] font-black bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200">
-                                        <CheckCircle2 class="size-3 mr-1 text-rose-800" />
-                                        Acreditado Oficialmente
-                                    </Badge>
-                                </CardHeader>
-                                <CardContent class="p-4 sm:p-5 space-y-3.5">
-                                    <h3 class="text-base sm:text-lg font-bold text-slate-950 dark:text-white leading-snug">
-                                        {{ record.course_title }}
-                                    </h3>
-
-                                    <!-- Calificación Oficial Acreditada -->
-                                    <div class="flex items-center gap-2">
-                                        <Badge class="bg-emerald-100 text-emerald-950 dark:bg-emerald-950 dark:text-emerald-200 border-emerald-300 font-bold text-xs py-1 px-3">
-                                            <CheckCircle2 class="size-3.5 mr-1.5 text-emerald-700" />
-                                            Calificación: {{ record.final_grade }} / 20.00 ({{ record.final_grade_text || 'Aprobado' }})
-                                        </Badge>
-                                    </div>
-
-                                    <!-- Datos Públicos Relevantes -->
-                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
-                                        <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
-                                            <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Ponente / Docente</div>
-                                            <div class="font-bold text-slate-900 dark:text-white truncate">
-                                                {{ record.instructor_name }}
-                                            </div>
-                                        </div>
-                                        <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
-                                            <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Carga Lectiva</div>
-                                            <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1">
-                                                <Clock class="size-3 text-amber-600" />
-                                                {{ formatHours(record.hours) }}
-                                            </div>
-                                        </div>
-                                        <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
-                                            <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Período</div>
-                                            <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1">
-                                                <Calendar class="size-3 text-rose-800" />
-                                                {{ formatDateRange(record.start_date, record.end_date, 'short') }}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Código, Fecha y Acciones -->
-                                    <div class="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800">
-                                        <div class="flex flex-col gap-0.5 text-xs font-mono text-slate-600 dark:text-slate-400">
-                                            <div class="flex items-center gap-2">
-                                                <span class="font-bold text-slate-900 dark:text-slate-200">Cód. Verificación:</span>
-                                                <span class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded font-black text-rose-900 dark:text-rose-400 border border-slate-200 dark:border-slate-700">
-                                                    {{ record.certificate_code }}
-                                                </span>
-                                            </div>
-                                            <div class="text-[10px] text-slate-500">
-                                                Expedido: <strong>{{ record.certificate_issued_at || 'Oficial' }}</strong>
-                                            </div>
-                                        </div>
-
-                                        <div class="flex items-center gap-2">
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                class="text-xs font-bold border-slate-300 hover:text-rose-900 hover:bg-rose-50 cursor-pointer h-9 px-3.5"
-                                                @click="openCertificatePreview(record)"
-                                            >
-                                                <Eye class="size-3.5 mr-1.5 text-slate-700" />
-                                                Ver Diploma
-                                            </Button>
-                                            <Button
-                                                type="button"
-                                                size="sm"
-                                                class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer h-9 px-3.5"
-                                                @click="printCertificate(record)"
-                                            >
-                                                <Download class="size-3.5 mr-1.5" />
-                                                Descargar PDF (2 Páginas)
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </template>
-
-                    <!-- Sin registros -->
-                    <div v-else class="p-8 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-3 shadow-xs">
-                        <div class="size-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center">
-                            <Award class="size-6" />
-                        </div>
-                        <h3 class="text-base font-bold text-slate-950 dark:text-white">
-                            No se registran certificados para el DNI {{ dniQuery }}
-                        </h3>
-                        <p class="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-                            Los certificados se generan una vez concluida la capacitación y cerrada el acta de evaluación oficial.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- VISTA 2: VERIFICACIÓN CRIPTOGRÁFICA DE ARCHIVO PDF (GUEST) -->
-            <div v-else class="max-w-3xl mx-auto space-y-4">
-                <PdfIntegrityVerifier :expected-hash="selectedCert?.certificate_hash || records[0]?.certificate_hash" />
-            </div>
-        </main>
-
-        <!-- FOOTER INSTITUCIONAL PARA INVITADO -->
-        <footer class="border-t border-slate-200/90 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 py-5 text-xs text-slate-600 dark:text-slate-400">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div class="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-200">
-                    <GraduationCap class="size-4 text-rose-900" />
-                    <span>SIGC-CUSCO • Acreditación Oficial</span>
-                </div>
-                <div class="flex items-center">
-                    <PeruGeoBadge />
-                </div>
-            </div>
-        </footer>
-    </div>
 
     <!-- MODAL DE VISTA PREVIA DEL DIPLOMA OFICIAL (COMPARTIDO - VISOR ESTUDIO A4 LANDSCAPE) -->
     <Dialog v-model:open="isCertModalOpen">
@@ -997,11 +665,39 @@ onMounted(() => {
                             <!-- Filete Interior Dorado -->
                             <div class="absolute inset-2 sm:inset-3 border-2 border-[#b45309] pointer-events-none z-10"></div>
 
-                            <!-- Rosetas Ornamentales en 4 Esquinas -->
-                            <div class="absolute top-2.5 left-2.5 sm:top-3.5 sm:left-3.5 size-5 sm:size-6 border-t-2 border-l-2 border-[#b45309] pointer-events-none z-10"></div>
-                            <div class="absolute top-2.5 right-2.5 sm:top-3.5 sm:right-3.5 size-5 sm:size-6 border-t-2 border-r-2 border-[#b45309] pointer-events-none z-10"></div>
-                            <div class="absolute bottom-2.5 left-2.5 sm:bottom-3.5 sm:left-3.5 size-5 sm:size-6 border-b-2 border-l-2 border-[#b45309] pointer-events-none z-10"></div>
-                            <div class="absolute bottom-2.5 right-2.5 sm:bottom-3.5 sm:right-3.5 size-5 sm:size-6 border-b-2 border-r-2 border-[#b45309] pointer-events-none z-10"></div>
+                            <!-- Cintas Esquinadas Geométricas Académicas (4 Esquinas) -->
+                            <div class="absolute top-0 left-0 size-8 sm:size-11 pointer-events-none z-10">
+                                <svg viewBox="0 0 46 46" class="size-full">
+                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
+                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
+                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
+                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
+                                </svg>
+                            </div>
+                            <div class="absolute top-0 right-0 size-8 sm:size-11 pointer-events-none z-10 scale-x-[-1]">
+                                <svg viewBox="0 0 46 46" class="size-full">
+                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
+                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
+                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
+                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
+                                </svg>
+                            </div>
+                            <div class="absolute bottom-0 left-0 size-8 sm:size-11 pointer-events-none z-10 scale-y-[-1]">
+                                <svg viewBox="0 0 46 46" class="size-full">
+                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
+                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
+                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
+                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
+                                </svg>
+                            </div>
+                            <div class="absolute bottom-0 right-0 size-8 sm:size-11 pointer-events-none z-10 scale-[-1]">
+                                <svg viewBox="0 0 46 46" class="size-full">
+                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
+                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
+                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
+                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
+                                </svg>
+                            </div>
 
                             <!-- Marca de Agua Institucional de Fondo -->
                             <div class="absolute inset-0 flex items-center justify-center opacity-[0.035] pointer-events-none select-none z-0">
@@ -1017,7 +713,7 @@ onMounted(() => {
                                     </div>
                                     <div class="flex-1 px-3 text-center min-w-0">
                                         <div class="text-[10px] sm:text-xs font-black text-[#800020] tracking-[0.25em] uppercase">
-                                            REPÚBLICA DEL PERÚ • REGIÓN CUSCO
+                                             REPÚBLICA DEL PERÚ • REGIÓN CUSCO
                                         </div>
                                         <h1 class="text-base sm:text-2xl md:text-[26px] font-black text-slate-950 uppercase tracking-tight font-serif mt-1 leading-tight">
                                             Universidad Nacional de San Antonio Abad del Cusco
@@ -1074,8 +770,8 @@ onMounted(() => {
                                     <strong class="text-[#800020] block my-1.5 text-base sm:text-xl md:text-2xl font-black font-serif tracking-tight leading-snug">
                                         "{{ selectedCert.course_title }}"
                                     </strong>
-                                    con una carga lectiva de <strong>{{ formatHours(selectedCert.hours) }} lectivas</strong>, desarrollado
-                                    del <strong>{{ selectedCert.start_date }}</strong> al <strong>{{ selectedCert.end_date }}</strong>.
+                                    desarrollado <strong>{{ selectedCert.date_range_formal || formatSpanishDateRange(selectedCert.start_date, selectedCert.end_date) }}</strong>,
+                                    con una carga lectiva de <strong>{{ formatHours(selectedCert.hours) }}</strong>, en cumplimiento de los estándares de acreditación universitaria.
                                 </div>
 
                                 <!-- Calificación Oficial Obtenida -->
@@ -1083,6 +779,11 @@ onMounted(() => {
                                     <span class="text-slate-600 font-serif">Calificación Obtenida:</span>
                                     <span class="text-emerald-700 text-sm sm:text-base font-black">{{ selectedCert.final_grade }} / 20.00</span>
                                     <span class="text-slate-600 font-semibold font-serif">({{ selectedCert.final_grade_text || 'Sobresaliente' }})</span>
+                                </div>
+
+                                <!-- Lugar y Fecha de Emisión Formal -->
+                                <div class="text-right text-[11px] sm:text-xs font-serif font-bold text-slate-600 italic pr-6 sm:pr-10 my-1">
+                                    {{ selectedCert.city_issued_formal || ('Cusco, ' + formatSpanishDate(selectedCert.certificate_issued_at || selectedCert.end_date)) }}
                                 </div>
 
                                 <!-- Firmas Digitales con Sellos Redondos Oficiales -->
@@ -1108,7 +809,7 @@ onMounted(() => {
                                 <!-- Pie de Página con Código de Verificación Oficial -->
                                 <div class="pt-2 text-[10px] font-mono text-slate-500 flex justify-between items-center border-t border-dashed border-slate-300 mt-2">
                                     <span>Cód. Verificación: <strong class="text-slate-900">{{ selectedCert.certificate_code }}</strong></span>
-                                    <span>Fecha de Emisión: <strong>{{ selectedCert.certificate_issued_at || '08/10/2026' }}</strong></span>
+                                    <span>Fecha de Emisión: <strong>{{ selectedCert.issued_date_formal || formatSpanishDate(selectedCert.certificate_issued_at || selectedCert.end_date) }}</strong></span>
                                     <span class="text-[#800020] font-black">REGISTRO OFICIAL DE FE PÚBLICA • CUSCO, PERÚ</span>
                                 </div>
                             </div>
@@ -1135,11 +836,39 @@ onMounted(() => {
                             <!-- Filete Interior Dorado -->
                             <div class="absolute inset-2 sm:inset-3 border-2 border-[#b45309] pointer-events-none z-10"></div>
 
-                            <!-- Rosetas Ornamentales en 4 Esquinas -->
-                            <div class="absolute top-2.5 left-2.5 sm:top-3.5 sm:left-3.5 size-5 sm:size-6 border-t-2 border-l-2 border-[#b45309] pointer-events-none z-10"></div>
-                            <div class="absolute top-2.5 right-2.5 sm:top-3.5 sm:right-3.5 size-5 sm:size-6 border-t-2 border-r-2 border-[#b45309] pointer-events-none z-10"></div>
-                            <div class="absolute bottom-2.5 left-2.5 sm:bottom-3.5 sm:left-3.5 size-5 sm:size-6 border-b-2 border-l-2 border-[#b45309] pointer-events-none z-10"></div>
-                            <div class="absolute bottom-2.5 right-2.5 sm:bottom-3.5 sm:right-3.5 size-5 sm:size-6 border-b-2 border-r-2 border-[#b45309] pointer-events-none z-10"></div>
+                            <!-- Cintas Esquinadas Geométricas Académicas (4 Esquinas) -->
+                            <div class="absolute top-0 left-0 size-8 sm:size-11 pointer-events-none z-10">
+                                <svg viewBox="0 0 46 46" class="size-full">
+                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
+                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
+                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
+                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
+                                </svg>
+                            </div>
+                            <div class="absolute top-0 right-0 size-8 sm:size-11 pointer-events-none z-10 scale-x-[-1]">
+                                <svg viewBox="0 0 46 46" class="size-full">
+                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
+                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
+                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
+                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
+                                </svg>
+                            </div>
+                            <div class="absolute bottom-0 left-0 size-8 sm:size-11 pointer-events-none z-10 scale-y-[-1]">
+                                <svg viewBox="0 0 46 46" class="size-full">
+                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
+                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
+                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
+                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
+                                </svg>
+                            </div>
+                            <div class="absolute bottom-0 right-0 size-8 sm:size-11 pointer-events-none z-10 scale-[-1]">
+                                <svg viewBox="0 0 46 46" class="size-full">
+                                    <polygon points="0,0 46,0 0,46" fill="#800020" />
+                                    <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
+                                    <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
+                                    <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
+                                </svg>
+                            </div>
 
                             <!-- Contenido del Diploma Reverso -->
                             <div class="relative z-20 h-full flex flex-col justify-between text-left">
@@ -1271,7 +1000,7 @@ onMounted(() => {
                                 <!-- Pie del Reverso -->
                                 <div class="pt-2 text-[10px] font-mono text-slate-500 flex justify-between items-center border-t border-dashed border-slate-300 mt-2">
                                     <span>Certificado: <strong>{{ selectedCert.certificate_code }}</strong></span>
-                                    <span>Registro en Actas: <strong>{{ selectedCert.certificate_issued_at || '08/10/2026' }}</strong></span>
+                                    <span>Registro en Actas: <strong>{{ selectedCert.issued_date_formal || formatSpanishDate(selectedCert.certificate_issued_at || selectedCert.end_date) }}</strong></span>
                                     <span class="text-[#800020] font-black">CUSCO, REPÚBLICA DEL PERÚ • CERTIFICACIÓN OFICIAL</span>
                                 </div>
                             </div>
@@ -1329,17 +1058,5 @@ onMounted(() => {
         </DialogContent>
     </Dialog>
 
-    <!-- AUTH MODALS (SOLO PARA INVITADOS) -->
-    <template v-if="!authUser">
-        <LoginModal
-            v-model:open="isLoginModalOpen"
-            @switch-to-register="switchToRegister"
-        />
-        <RegisterModal
-            v-model:open="isRegisterModalOpen"
-            @switch-to-login="switchToLogin"
-        />
-    </template>
-
-    <GlobalToast />
+    </AppLayout>
 </template>

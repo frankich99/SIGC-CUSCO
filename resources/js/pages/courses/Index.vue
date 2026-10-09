@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { computed, ref, watch } from 'vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,10 +77,16 @@ const props = defineProps<{
     };
 }>();
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Panel Principal', href: '/dashboard' },
+const page = usePage();
+const authUser = computed(() => (page.props.auth as any)?.user);
+
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
+    {
+        title: authUser.value ? 'Panel Principal' : 'Portal Principal',
+        href: authUser.value ? '/dashboard' : '/',
+    },
     { title: 'Capacitaciones', href: '/courses' },
-];
+]);
 
 const searchQuery = ref(props.filters.search || '');
 const selectedStatus = ref(props.filters.status || 'all');

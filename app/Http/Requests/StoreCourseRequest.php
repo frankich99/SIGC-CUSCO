@@ -33,6 +33,14 @@ class StoreCourseRequest extends FormRequest
                 ]);
             }
         }
+
+        if (! $this->has('total_sessions') || is_null($this->input('total_sessions'))) {
+            $this->merge(['total_sessions' => 4]);
+        }
+
+        if (! $this->has('min_attendance_percentage') || is_null($this->input('min_attendance_percentage'))) {
+            $this->merge(['min_attendance_percentage' => 75]);
+        }
     }
 
     /**
@@ -52,6 +60,8 @@ class StoreCourseRequest extends FormRequest
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'hours' => ['required', 'integer', 'min:1'],
+            'total_sessions' => ['required', 'integer', 'min:1', 'max:200'],
+            'min_attendance_percentage' => ['required', 'numeric', 'min:0', 'max:100'],
             'capacity' => ['required', 'integer', 'min:1'],
             'status' => ['required', Rule::enum(CourseStatus::class)],
         ];
@@ -72,6 +82,11 @@ class StoreCourseRequest extends FormRequest
             'end_date.after_or_equal' => 'La fecha de fin no puede ser anterior a la fecha de inicio.',
             'hours.required' => 'Las horas académicas son obligatorias.',
             'hours.min' => 'Las horas académicas deben ser mayores a 0.',
+            'total_sessions.required' => 'El número de sesiones es obligatorio.',
+            'total_sessions.min' => 'Debe haber al menos 1 sesión programada.',
+            'min_attendance_percentage.required' => 'El porcentaje mínimo de asistencia es obligatorio.',
+            'min_attendance_percentage.min' => 'El porcentaje de asistencia no puede ser menor a 0.',
+            'min_attendance_percentage.max' => 'El porcentaje de asistencia no puede superar el 100%.',
             'capacity.required' => 'El límite de vacantes es obligatorio.',
             'capacity.min' => 'El límite de vacantes debe ser un número positivo mayor a 0.',
             'status.required' => 'El estado del curso es obligatorio.',

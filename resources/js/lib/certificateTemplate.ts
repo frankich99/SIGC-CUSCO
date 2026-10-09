@@ -14,17 +14,23 @@ export interface CertificateRecord {
     id: number;
     dni: string;
     student_name: string;
+    full_name?: string;
     course_code: string;
     course_title: string;
     institution: string;
     hours: number;
     start_date: string;
     end_date: string;
+    date_range_formal?: string;
+    issued_date_formal?: string;
+    city_issued_formal?: string;
     instructor_name: string;
     instructor_title?: string;
     status: string;
     final_grade: string;
     final_grade_text?: string;
+    grade_numeric?: string;
+    grade_text?: string;
     certificate_code: string;
     certificate_hash?: string | null;
     certificate_issued_at?: string | null;
@@ -32,6 +38,90 @@ export interface CertificateRecord {
     qr_svg: string;
     modules: CertificateModule[];
 }
+
+export const SPANISH_MONTHS: Record<number, string> = {
+    1: 'enero', 2: 'febrero', 3: 'marzo', 4: 'abril',
+    5: 'mayo', 6: 'junio', 7: 'julio', 8: 'agosto',
+    9: 'setiembre', 10: 'octubre', 11: 'noviembre', 12: 'diciembre',
+};
+
+export function parseDateSafe(val?: string | null): Date | null {
+    if (!val) return null;
+    if (/^\d{4}-\d{2}-\d{2}/.test(val)) {
+        const parts = val.split(/[-T ]/);
+        return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    }
+    if (/^\d{2}\/\d{2}\/\d{4}/.test(val)) {
+        const parts = val.split('/');
+        return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+    }
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+export function formatSpanishDate(val?: string | null): string {
+    const d = parseDateSafe(val);
+    if (!d) {
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = SPANISH_MONTHS[now.getMonth() + 1] || 'octubre';
+        return `${dd} de ${mm} de ${now.getFullYear()}`;
+    }
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = SPANISH_MONTHS[d.getMonth() + 1] || 'enero';
+    return `${day} de ${month} de ${d.getFullYear()}`;
+}
+
+export function formatSpanishDateRange(startVal?: string | null, endVal?: string | null): string {
+    const start = parseDateSafe(startVal);
+    const end = parseDateSafe(endVal);
+
+    if (!start && !end) {
+        return 'del 19 de enero al 28 de febrero de 2026';
+    }
+    if (start && !end) {
+        return `a partir del ${formatSpanishDate(startVal)}`;
+    }
+    if (!start && end) {
+        return `al ${formatSpanishDate(endVal)}`;
+    }
+
+    const sDay = String(start!.getDate()).padStart(2, '0');
+    const eDay = String(end!.getDate()).padStart(2, '0');
+    const sMonth = SPANISH_MONTHS[start!.getMonth() + 1] || '';
+    const eMonth = SPANISH_MONTHS[end!.getMonth() + 1] || '';
+    const sYear = start!.getFullYear();
+    const eYear = end!.getFullYear();
+
+    if (sYear === eYear) {
+        if (start!.getMonth() === end!.getMonth()) {
+            return `del ${sDay} al ${eDay} de ${eMonth} de ${eYear}`;
+        }
+        return `del ${sDay} de ${sMonth} al ${eDay} de ${eMonth} de ${eYear}`;
+    }
+    return `del ${sDay} de ${sMonth} de ${sYear} al ${eDay} de ${eMonth} de ${eYear}`;
+}
+
+// SVG Cinta Esquinera Geométrica Oficial (Elimina escuadras toscas por un ribete señorial)
+export const CORNER_RIBBON_SVG = (corner: 'tl' | 'tr' | 'bl' | 'br') => {
+    const transform = {
+        tl: '',
+        tr: 'transform="scale(-1, 1) translate(-46, 0)"',
+        bl: 'transform="scale(1, -1) translate(0, -46)"',
+        br: 'transform="scale(-1, -1) translate(-46, -46)"',
+    }[corner];
+
+    return `
+        <svg class="corner-ribbon corner-${corner}" viewBox="0 0 46 46" width="38" height="38">
+            <g ${transform}>
+                <polygon points="0,0 46,0 0,46" fill="#800020" />
+                <polygon points="0,46 46,0 46,4.5 4.5,46" fill="#b45309" />
+                <polygon points="0,32 32,0 35,0 0,35" fill="#f59e0b" opacity="0.95" />
+                <polygon points="0,18 18,0 20,0 0,20" fill="#fef08a" opacity="0.85" />
+            </g>
+        </svg>
+    `;
+};
 
 // SVG Medalla Dorada de Calidad Académica
 export const GOLD_MEDAL_SVG = `
@@ -128,6 +218,10 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
     const gradeNum = parseFloat(record.final_grade) || 20;
     const gradeHonor = gradeNum >= 18 ? 'Con Mención de Excelencia Académica' : 'Acreditado Oficialmente';
 
+    const dateRangeProse = record.date_range_formal || formatSpanishDateRange(record.start_date, record.end_date);
+    const issuedDateProse = record.issued_date_formal || formatSpanishDate(record.certificate_issued_at || record.end_date);
+    const cityIssuedProse = record.city_issued_formal || `Cusco, ${issuedDateProse}`;
+
     const goldMedalSvg = GOLD_MEDAL_SVG;
     const emblemSvg = EMBLEM_SVG;
     const docenteStampSvg = DOCENTE_STAMP_SVG;
@@ -213,7 +307,7 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 12mm 14mm 10mm 14mm;
+            padding: 10mm 12mm 8mm 12mm;
         }
         .page-sheet:last-child {
             page-break-after: auto;
@@ -241,35 +335,46 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
         /* Marco Perimetral de Honor */
         .page-border {
             position: absolute;
-            top: 6mm;
-            left: 6mm;
-            right: 6mm;
-            bottom: 6mm;
-            border: 4.5px solid #800020;
+            top: 5mm;
+            left: 5mm;
+            right: 5mm;
+            bottom: 5mm;
+            border: 4px solid #800020;
             pointer-events: none;
             z-index: 10;
         }
         .page-border-inner {
             position: absolute;
-            top: 8.5mm;
-            left: 8.5mm;
-            right: 8.5mm;
-            bottom: 8.5mm;
-            border: 1.5px solid #b45309;
+            top: 7.5mm;
+            left: 7.5mm;
+            right: 7.5mm;
+            bottom: 7.5mm;
+            border: 1.2px solid #b45309;
             pointer-events: none;
             z-index: 10;
         }
-        .corner-ornament {
+        .corner-ribbon {
             position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #b45309;
-            z-index: 11;
+            pointer-events: none;
+            z-index: 12;
+            width: 38px;
+            height: 38px;
         }
-        .corner-tl { top: 7mm; left: 7mm; border-right: none; border-bottom: none; }
-        .corner-tr { top: 7mm; right: 7mm; border-left: none; border-bottom: none; }
-        .corner-bl { bottom: 7mm; left: 7mm; border-right: none; border-top: none; }
-        .corner-br { bottom: 7mm; right: 7mm; border-left: none; border-top: none; }
+        .corner-tl { top: 4.8mm; left: 4.8mm; }
+        .corner-tr { top: 4.8mm; right: 4.8mm; }
+        .corner-bl { bottom: 4.8mm; left: 4.8mm; }
+        .corner-br { bottom: 4.8mm; right: 4.8mm; }
+
+        .issue-date-line {
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            font-style: italic;
+            text-align: right;
+            padding-right: 20mm;
+            margin: 3px 0 2px 0;
+            font-family: 'Times New Roman', Times, Georgia, serif;
+        }
 
         /* Marca de agua institucional suave */
         .watermark {
@@ -766,13 +871,13 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
          HOJA 1: ANVERSO - DIPLOMA DE HONOR INSTITUCIONAL
          ======================================================== -->
     <div class="page-sheet">
-        <!-- Borde Académico Doble -->
+        <!-- Borde Académico Doble y Cintas de Esquina -->
         <div class="page-border"></div>
         <div class="page-border-inner"></div>
-        <div class="corner-ornament corner-tl"></div>
-        <div class="corner-ornament corner-tr"></div>
-        <div class="corner-ornament corner-bl"></div>
-        <div class="corner-ornament corner-br"></div>
+        ${CORNER_RIBBON_SVG('tl')}
+        ${CORNER_RIBBON_SVG('tr')}
+        ${CORNER_RIBBON_SVG('bl')}
+        ${CORNER_RIBBON_SVG('br')}
 
         <!-- Marca de Agua Central -->
         <img class="watermark" src="${unsaacLogoUrl}" alt="Escudo UNSAAC" />
@@ -813,13 +918,18 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
                 Por haber aprobado satisfactoriamente con alto rendimiento académico el programa de capacitación especializada en:
                 <span class="course-title-highlight">"${record.course_title}"</span>
                 <div class="cert-details-line">
-                    Desarrollado del <strong>${record.start_date}</strong> al <strong>${record.end_date}</strong>,
+                    Desarrollado <strong>${dateRangeProse}</strong>,
                     con una duración lectiva de <strong>${record.hours} HORAS ACADÉMICAS</strong>,
                     en cumplimiento de los estándares de acreditación universitaria de fe pública.
                 </div>
                 <div class="grade-badge-line">
                     Calificación Obtenida: <strong>${record.final_grade} / 20.00</strong> — ${record.final_grade_text || gradeHonor}
                 </div>
+            </div>
+
+            <!-- Lugar y Fecha Oficial de Emisión -->
+            <div class="issue-date-line">
+                ${cityIssuedProse}
             </div>
 
             <!-- Firmas y Sellos Digitales -->
@@ -854,7 +964,7 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
             <!-- Metadatos del Certificado -->
             <div class="cert-footer-meta">
                 <span>CÓDIGO DE REGISTRO: <strong class="meta-code">${record.certificate_code}</strong></span>
-                <span>EMISIÓN OFICIAL: <strong>${record.certificate_issued_at || 'Oficial'}</strong></span>
+                <span>FECHA DE EMISIÓN: <strong>${issuedDateProse}</strong></span>
                 <span>ACREDITADO • LEY UNIVERSITARIA N° 30220 • CUSCO, PERÚ</span>
             </div>
         </div>
@@ -866,6 +976,10 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
     <div class="page-sheet">
         <div class="page-border"></div>
         <div class="page-border-inner"></div>
+        ${CORNER_RIBBON_SVG('tl')}
+        ${CORNER_RIBBON_SVG('tr')}
+        ${CORNER_RIBBON_SVG('bl')}
+        ${CORNER_RIBBON_SVG('br')}
 
         <div class="cert-content">
             <!-- Cabecera del Reverso -->
@@ -939,7 +1053,7 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
                     <div class="hash-string">${record.certificate_hash || 'SHA-256 INMUTABLE'}</div>
                 </div>
                 <div style="text-align: right; flex-shrink: 0; margin-left: 10px;">
-                    FECHA DE REGISTRO EN ACTAS: <strong>${record.certificate_issued_at || '08/10/2026'}</strong>
+                    FECHA DE REGISTRO EN ACTAS: <strong>${issuedDateProse}</strong>
                 </div>
             </div>
         </div>

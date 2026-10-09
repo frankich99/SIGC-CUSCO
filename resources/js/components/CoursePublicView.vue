@@ -684,7 +684,7 @@ async function copyCode(code: string) {
                             </h2>
                             <div class="text-xs text-slate-600 dark:text-slate-400">a favor de:</div>
                             <div class="text-xl sm:text-2xl font-serif font-black text-slate-900 dark:text-white underline decoration-amber-600/50 underline-offset-8">
-                                {{ myEnrollment.certificate.full_name }}
+                                {{ myEnrollment.certificate.student_name || myEnrollment.certificate.full_name }}
                             </div>
                             <div class="text-xs font-mono font-bold text-slate-600 dark:text-slate-400 pt-1">
                                 Documento Nacional de Identidad N° {{ myEnrollment.certificate.dni }}
@@ -696,7 +696,12 @@ async function copyCode(code: string) {
                             <div class="font-bold text-sm text-rose-950 dark:text-rose-200 py-1">
                                 "{{ myEnrollment.certificate.course_title }}"
                             </div>
-                            Desarrollado con una duración total de <strong>{{ myEnrollment.certificate.hours }} horas académicas</strong>.
+                            Desarrollado <strong>{{ myEnrollment.certificate.date_range_formal || formatDateRange(course.start_date, course.end_date) }}</strong>,
+                            con una duración lectiva de <strong>{{ myEnrollment.certificate.hours }} horas académicas</strong>.
+                        </div>
+
+                        <div class="text-right text-[11px] font-serif font-bold text-slate-600 dark:text-slate-400 italic max-w-lg mx-auto pr-2 my-1">
+                            {{ myEnrollment.certificate.city_issued_formal || ('Cusco, ' + formatDate(myEnrollment.certificate.certificate_issued_at || course.end_date)) }}
                         </div>
 
                         <div class="pt-4 grid grid-cols-2 gap-8 text-center text-xs font-serif border-t max-w-lg mx-auto">
@@ -744,10 +749,10 @@ async function copyCode(code: string) {
                                 <div class="space-y-1">
                                     <div class="text-[10px] font-bold text-slate-500 uppercase">Calificación Obtenida</div>
                                     <div class="text-xl font-black text-rose-950 dark:text-rose-300">
-                                        {{ myEnrollment.certificate.grade_numeric }} / 20.00
+                                        {{ myEnrollment.certificate.final_grade || myEnrollment.certificate.grade_numeric }} / 20.00
                                     </div>
                                     <div class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
-                                        {{ myEnrollment.certificate.grade_text }}
+                                        {{ myEnrollment.certificate.final_grade_text || myEnrollment.certificate.grade_text }}
                                     </div>
                                 </div>
 

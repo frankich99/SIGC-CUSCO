@@ -15,6 +15,96 @@ use Illuminate\Support\Carbon;
 class CertificateService
 {
     /**
+     * Meses oficiales en español para certificaciones académicas.
+     *
+     * @var array<int, string>
+     */
+    protected static array $spanishMonths = [
+        1 => 'enero',
+        2 => 'febrero',
+        3 => 'marzo',
+        4 => 'abril',
+        5 => 'mayo',
+        6 => 'junio',
+        7 => 'julio',
+        8 => 'agosto',
+        9 => 'setiembre',
+        10 => 'octubre',
+        11 => 'noviembre',
+        12 => 'diciembre',
+    ];
+
+    /**
+     * Formatea una fecha en prosa formal en español: "08 de octubre de 2026".
+     */
+    public static function formatSpanishDate(Carbon|\DateTimeInterface|string|null $date): string
+    {
+        if (! $date) {
+            $month = self::$spanishMonths[(int) date('n')];
+
+            return date('d').' de '.$month.' de '.date('Y');
+        }
+
+        try {
+            $carbon = $date instanceof Carbon ? $date : Carbon::parse($date);
+            $day = str_pad((string) $carbon->day, 2, '0', STR_PAD_LEFT);
+            $month = self::$spanishMonths[$carbon->month] ?? $carbon->format('F');
+            $year = $carbon->year;
+
+            return "{$day} de {$month} de {$year}";
+        } catch (\Throwable) {
+            return (string) $date;
+        }
+    }
+
+    /**
+     * Formatea el rango académico en prosa formal en español:
+     * Ejemplos:
+     * - "del 19 de enero al 28 de febrero de 2026"
+     * - "del 01 al 31 de marzo de 2026"
+     */
+    public static function formatSpanishDateRange(Carbon|\DateTimeInterface|string|null $start, Carbon|\DateTimeInterface|string|null $end): string
+    {
+        if (! $start && ! $end) {
+            $month = self::$spanishMonths[(int) date('n')];
+
+            return "del 01 al 31 de {$month} de ".date('Y');
+        }
+
+        try {
+            $carbonStart = $start ? ($start instanceof Carbon ? $start : Carbon::parse($start)) : null;
+            $carbonEnd = $end ? ($end instanceof Carbon ? $end : Carbon::parse($end)) : null;
+
+            if ($carbonStart && ! $carbonEnd) {
+                return 'a partir del '.self::formatSpanishDate($carbonStart);
+            }
+
+            if (! $carbonStart && $carbonEnd) {
+                return 'al '.self::formatSpanishDate($carbonEnd);
+            }
+
+            /** @var Carbon $carbonStart */
+            /** @var Carbon $carbonEnd */
+            $startDay = str_pad((string) $carbonStart->day, 2, '0', STR_PAD_LEFT);
+            $endDay = str_pad((string) $carbonEnd->day, 2, '0', STR_PAD_LEFT);
+            $startMonth = self::$spanishMonths[$carbonStart->month] ?? '';
+            $endMonth = self::$spanishMonths[$carbonEnd->month] ?? '';
+
+            if ($carbonStart->year === $carbonEnd->year) {
+                if ($carbonStart->month === $carbonEnd->month) {
+                    return "del {$startDay} al {$endDay} de {$endMonth} de {$carbonEnd->year}";
+                }
+
+                return "del {$startDay} de {$startMonth} al {$endDay} de {$endMonth} de {$carbonEnd->year}";
+            }
+
+            return "del {$startDay} de {$startMonth} de {$carbonStart->year} al {$endDay} de {$endMonth} de {$carbonEnd->year}";
+        } catch (\Throwable) {
+            return "del {$start} al {$end}";
+        }
+    }
+
+    /**
      * Convierte la nota numérica a su representación oficial en texto académico.
      */
     public static function formatGradeText(?float $grade): string
@@ -270,21 +360,31 @@ class CertificateService
         $gradeFormatted = number_format($gradeNumeric, 2);
         $gradeText = self::formatGradeText($gradeNumeric);
 
+        $dateRangeFormal = self::formatSpanishDateRange($course?->start_date, $course?->end_date);
+        $issuedFormal = self::formatSpanishDate($enrollment->certificate_issued_at ?? $course?->end_date ?? now());
+        $cityIssuedFormal = "Cusco, {$issuedFormal}";
+
         return [
             'id' => $enrollment->id,
             'dni' => $enrollment->dni,
             'student_name' => $enrollment->full_name,
+            'full_name' => $enrollment->full_name,
             'course_code' => $course?->code ?? 'SIGC-2026-001',
             'course_title' => $course?->title ?? 'Capacitación Oficial UNSAAC',
             'institution' => $course?->institution ?? 'UNSAAC - SIGC CUSCO',
             'hours' => $course?->hours ?? 40,
             'start_date' => $formattedStart ?? '01/01/2026',
             'end_date' => $formattedEnd ?? '31/01/2026',
+            'date_range_formal' => $dateRangeFormal,
+            'issued_date_formal' => $issuedFormal,
+            'city_issued_formal' => $cityIssuedFormal,
             'instructor_name' => $course?->instructor_display_name ?? 'Docente Especialista Asignado',
             'instructor_title' => 'Docente Principal e Investigador',
             'status' => $enrollment->status,
             'final_grade' => $gradeFormatted,
             'final_grade_text' => $gradeText,
+            'grade_numeric' => $gradeFormatted,
+            'grade_text' => $gradeText,
             'certificate_code' => $certCode,
             'certificate_hash' => $certHash,
             'certificate_issued_at' => $issuedAt,

@@ -13,8 +13,6 @@ import {
     ArrowRight,
     Sparkles,
     ShieldCheck,
-    Menu,
-    X,
     ExternalLink,
     Building2,
     LogIn,
@@ -28,6 +26,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
 import LoginModal from '@/components/auth/LoginModal.vue';
 import RegisterModal from '@/components/auth/RegisterModal.vue';
+import AppHeader from '@/components/AppHeader.vue';
 import GlobalToast from '@/components/GlobalToast.vue';
 import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { useAuthModal } from '@/composables/useAuthModal';
@@ -70,7 +69,6 @@ const canCreateCourse = computed(() => authUser.value?.role === 'admin' || authU
 // Search & Filter state
 const searchQuery = ref('');
 const selectedStatus = ref<string>('all');
-const mobileMenuOpen = ref(false);
 
 // Modals state
 const { isLoginModalOpen, isRegisterModalOpen, openLogin, openRegister, switchToRegister, switchToLogin } = useAuthModal();
@@ -135,127 +133,8 @@ function statusBadgeInfo(status: string) {
     <Head title="SIGC-CUSCO — Catálogo de Capacitaciones y Certificación" />
 
     <div class="min-h-screen bg-slate-50/50 dark:bg-neutral-950 text-slate-900 dark:text-neutral-100 antialiased selection:bg-rose-900 selection:text-white">
-        <!-- TOP NAVBAR (PÚBLICA) -->
-        <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-neutral-800 bg-white/95 dark:bg-neutral-900/90 backdrop-blur-md">
-            <div class="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
-                <!-- Lado Izquierdo: Brand Logo + Divisor + Navegación Acoplada a la Izquierda -->
-                <div class="flex items-center gap-4 lg:gap-6 min-w-0">
-                    <Link href="/" class="flex items-center gap-3 group shrink-0">
-                        <div class="size-10 rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] flex items-center justify-center text-white shadow-sm shadow-rose-900/20 group-hover:scale-105 transition-transform">
-                            <GraduationCap class="size-5 text-amber-300" />
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-1.5 font-bold text-base tracking-tight text-slate-900 dark:text-white">
-                                <span>SIGC-CUSCO</span>
-                            </div>
-                            <p class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium hidden sm:block">
-                                Plataforma Oficial de Capacitaciones • Cusco
-                            </p>
-                        </div>
-                    </Link>
-
-                    <!-- Divisor vertical institucional -->
-                    <div class="h-6 w-px bg-slate-200 dark:bg-neutral-800 hidden md:block shrink-0" />
-
-                    <!-- Desktop Navigation Links (Alineados a la izquierda junto al logo) -->
-                    <nav class="hidden md:flex items-center gap-5 text-sm font-semibold text-slate-700 dark:text-neutral-300 shrink-0">
-                        <a href="#cursos" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
-                            Capacitaciones
-                        </a>
-                        <Link href="/certificates" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
-                            Certificados Digitales
-                        </Link>
-                        <a href="#beneficios" class="hover:text-rose-900 dark:hover:text-rose-400 transition-colors">
-                            Características
-                        </a>
-                    </nav>
-                </div>
-
-                <!-- Lado Derecho: Acciones (Agregar Curso, Mi Panel o Iniciar Sesión / Registro) -->
-                <div class="hidden sm:flex items-center gap-2.5 shrink-0">
-                    <template v-if="authUser">
-                        <!-- Botón Rápido Agregar Curso para Admin o Docente -->
-                        <Button
-                            v-if="canCreateCourse"
-                            as-child
-                            size="sm"
-                            class="bg-rose-900 hover:bg-rose-950 text-white font-extrabold text-xs shadow-xs px-3 h-8.5 rounded-lg border border-rose-800"
-                        >
-                            <Link href="/courses/create" class="flex items-center gap-1.5">
-                                <Plus class="size-3.5 text-amber-300 stroke-[2.5]" />
-                                <span>Agregar Curso</span>
-                            </Link>
-                        </Button>
-
-                        <Button as-child size="sm" variant="outline" class="border-slate-300 dark:border-neutral-700 text-slate-800 dark:text-white hover:text-rose-900 font-bold text-xs h-8.5">
-                            <Link href="/dashboard" class="flex items-center gap-1.5">
-                                <span>Mi Panel</span>
-                                <span class="text-[10px] bg-rose-900 text-white px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">
-                                    {{ authUser.role }}
-                                </span>
-                            </Link>
-                        </Button>
-                    </template>
-                    <template v-else>
-                        <Button variant="ghost" size="sm" class="text-xs font-bold text-slate-800 hover:text-rose-900 cursor-pointer" @click="openLogin">
-                            <LogIn class="size-3.5 mr-1 text-rose-900" />
-                            Iniciar Sesión
-                        </Button>
-                        <Button size="sm" class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer" @click="openRegister">
-                            <UserPlus class="size-3.5 mr-1" />
-                            Registrarse
-                        </Button>
-                    </template>
-                </div>
-
-                <!-- Mobile Menu Button (< sm) -->
-                <div class="flex sm:hidden">
-                    <Button variant="ghost" size="icon" @click="mobileMenuOpen = !mobileMenuOpen">
-                        <X v-if="mobileMenuOpen" class="size-5" />
-                        <Menu v-else class="size-5" />
-                    </Button>
-                </div>
-            </div>
-
-            <!-- Mobile Dropdown -->
-            <div v-if="mobileMenuOpen" class="sm:hidden border-b border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 pt-2 pb-4 space-y-3">
-                <div v-if="canCreateCourse" class="pb-1">
-                    <Link
-                        href="/courses/create"
-                        class="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-lg text-xs font-black bg-rose-900 text-white shadow-xs hover:bg-rose-950 transition-colors"
-                        @click="mobileMenuOpen = false"
-                    >
-                        <Plus class="size-4 text-amber-300 stroke-[2.5]" />
-                        <span>+ Agregar Curso</span>
-                    </Link>
-                </div>
-
-                <a href="#cursos" @click="mobileMenuOpen = false" class="block py-1.5 text-sm font-semibold text-slate-800 dark:text-neutral-200">
-                    Capacitaciones Disponibles
-                </a>
-                <Link href="/certificates" @click="mobileMenuOpen = false" class="block py-1.5 text-sm font-semibold text-slate-800 dark:text-neutral-200">
-                    Consultar Certificados por DNI
-                </Link>
-                <a href="#beneficios" @click="mobileMenuOpen = false" class="block py-1.5 text-sm font-semibold text-slate-800 dark:text-neutral-200">
-                    Características del Sistema
-                </a>
-                <div class="pt-2 border-t border-slate-200 dark:border-neutral-800 flex gap-2">
-                    <template v-if="authUser">
-                        <Button as-child class="w-full bg-rose-900 text-white text-xs font-bold">
-                            <Link href="/dashboard">Ir a mi Panel ({{ authUser.role }})</Link>
-                        </Button>
-                    </template>
-                    <template v-else>
-                        <Button variant="outline" size="sm" class="flex-1 text-xs font-semibold cursor-pointer" @click="openLogin(); mobileMenuOpen = false">
-                            Ingresar
-                        </Button>
-                        <Button size="sm" class="flex-1 bg-rose-900 text-white text-xs font-bold cursor-pointer" @click="openRegister(); mobileMenuOpen = false">
-                            Registrarse
-                        </Button>
-                    </template>
-                </div>
-            </div>
-        </header>
+        <!-- TOP NAVBAR UNIFICADA -->
+        <AppHeader />
 
         <!-- HERO SECTION -->
         <section class="relative overflow-hidden pt-12 pb-16 md:pt-20 md:pb-24 bg-gradient-to-b from-rose-50/70 via-transparent to-transparent dark:from-rose-950/20">
