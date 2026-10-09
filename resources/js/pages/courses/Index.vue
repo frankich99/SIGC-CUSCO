@@ -127,7 +127,7 @@ function getStatusBadge(status: string) {
     switch (status) {
         case 'abierto':
             return {
-                label: 'Convocatoria Abierta',
+                label: 'Inscripción Abierta',
                 class: THEME_BADGES.abierto,
             };
         case 'en_curso':
@@ -159,7 +159,7 @@ function instructorName(inst?: Instructor): string {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Capacitaciones - SIGC-CUSCO" />
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 min-w-0 w-full overflow-x-hidden">
             <!-- Header Section -->
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b pb-5 dark:border-neutral-800">
                 <div>
@@ -185,7 +185,7 @@ function instructorName(inst?: Instructor): string {
             <div class="space-y-6">
                 <!-- Search and Status Bar -->
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <div class="relative flex-1">
+                    <div class="relative flex-1 min-w-0">
                         <Search class="absolute left-3 top-2.5 size-4 text-slate-500" />
                         <Input
                             v-model="searchQuery"
@@ -194,7 +194,7 @@ function instructorName(inst?: Instructor): string {
                             @keydown.enter="applyFilters"
                         />
                     </div>
-                    <div class="flex gap-2 items-center overflow-x-auto pb-1 sm:pb-0 custom-scrollbar">
+                    <div class="flex gap-2 items-center overflow-x-auto pb-1 sm:pb-0 custom-scrollbar max-w-full min-w-0">
                         <button
                             v-for="st in [{ value: 'all', label: 'Todos' }, ...statuses]"
                             :key="st.value"
@@ -217,14 +217,14 @@ function instructorName(inst?: Instructor): string {
                     <Card
                         v-for="course in courses.data"
                         :key="course.id"
-                        class="flex flex-col justify-between border-slate-200 dark:border-neutral-800 hover:border-rose-400/80 transition-all hover:shadow-md"
+                        class="flex flex-col justify-between border-slate-200 dark:border-neutral-800 hover:border-rose-400/80 transition-all hover:shadow-md min-w-0 max-w-full overflow-hidden"
                     >
-                        <CardHeader class="pb-3">
-                            <div class="flex items-center justify-between gap-2 mb-2">
-                                <span class="font-mono text-xs font-bold text-rose-900 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800">
+                        <CardHeader class="p-4 sm:p-5 pb-3 space-y-2 min-w-0 max-w-full">
+                            <div class="flex items-center justify-between gap-1.5 min-w-0 w-full">
+                                <span class="font-mono text-xs font-bold text-rose-900 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800 shrink-0">
                                     {{ course.code }}
                                 </span>
-                                <span :class="['text-[11px] font-bold px-2 py-0.5 rounded-full border', getStatusBadge(course.status).class]">
+                                <span :class="['text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full border shrink-0 text-center truncate max-w-[62%]', getStatusBadge(course.status).class]">
                                     {{ getStatusBadge(course.status).label }}
                                 </span>
                             </div>
@@ -232,46 +232,46 @@ function instructorName(inst?: Instructor): string {
                             <!-- Organizing Entity / Institution -->
                             <div
                                 v-if="course.institution"
-                                class="flex items-center gap-1.5 text-xs font-semibold text-rose-950 dark:text-rose-200 bg-rose-50/80 dark:bg-rose-950/40 px-2.5 py-1 rounded-md border border-rose-200/80 dark:border-rose-800/60 mb-2"
+                                class="flex items-center gap-1.5 text-xs font-semibold text-rose-950 dark:text-rose-200 bg-rose-50/80 dark:bg-rose-950/40 px-2.5 py-1 rounded-md border border-rose-200/80 dark:border-rose-800/60 w-full min-w-0 max-w-full overflow-hidden"
                             >
                                 <Building2 class="size-3.5 shrink-0 text-rose-800 dark:text-rose-400" />
-                                <span class="truncate">{{ course.institution }}</span>
+                                <span class="truncate block min-w-0 flex-1">{{ course.institution }}</span>
                             </div>
 
-                            <CardTitle class="text-base font-bold leading-snug line-clamp-2 text-slate-900 dark:text-white">
+                            <CardTitle class="text-base font-bold leading-snug line-clamp-2 text-slate-900 dark:text-white break-words min-w-0">
                                 {{ course.title }}
                             </CardTitle>
-                            <CardDescription class="text-xs line-clamp-2 mt-1">
+                            <CardDescription class="text-xs line-clamp-2 mt-1 break-words min-w-0">
                                 {{ course.description || 'Sin descripción detallada.' }}
                             </CardDescription>
                         </CardHeader>
 
-                        <CardContent class="space-y-2.5 text-xs text-neutral-600 dark:text-neutral-400 border-t pt-3 dark:border-neutral-800">
-                            <div class="flex items-center gap-2">
+                        <CardContent class="px-4 sm:px-5 space-y-2.5 text-xs text-neutral-600 dark:text-neutral-400 border-t pt-3 dark:border-neutral-800 min-w-0 max-w-full overflow-hidden">
+                            <div class="flex items-center gap-2 min-w-0 max-w-full">
                                 <User class="size-3.5 text-neutral-400 shrink-0" />
-                                <span class="truncate">
+                                <span class="truncate min-w-0 flex-1">
                                     <strong class="font-medium text-neutral-700 dark:text-neutral-300">Ponente / Docente:</strong>
                                     {{ instructorName(course.instructor) || course.instructor_name || 'Por asignar' }}
                                 </span>
                             </div>
-                            <div class="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200">
+                            <div class="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200 min-w-0">
                                 <Calendar class="size-3.5 text-rose-800 dark:text-rose-400 shrink-0" />
-                                <span>{{ formatDateRange(course.start_date, course.end_date, 'compact') }}</span>
+                                <span class="truncate">{{ formatDateRange(course.start_date, course.end_date, 'compact') }}</span>
                             </div>
-                            <div class="flex items-center justify-between pt-1 text-[11px]">
-                                <span class="inline-flex items-center gap-1 font-bold text-slate-800 dark:text-slate-200">
-                                    <Clock class="size-3 text-amber-700 dark:text-amber-400" />
+                            <div class="flex items-center justify-between pt-1 text-[11px] gap-2 min-w-0">
+                                <span class="inline-flex items-center gap-1 font-bold text-slate-800 dark:text-slate-200 shrink-0">
+                                    <Clock class="size-3 text-amber-700 dark:text-amber-400 shrink-0" />
                                     {{ formatHours(course.hours) }}
                                 </span>
-                                <span class="inline-flex items-center gap-1 font-bold text-rose-900 dark:text-rose-300">
-                                    <Users class="size-3 text-rose-800 dark:text-rose-400" />
+                                <span class="inline-flex items-center gap-1 font-bold text-rose-900 dark:text-rose-300 shrink-0">
+                                    <Users class="size-3 text-rose-800 dark:text-rose-400 shrink-0" />
                                     Cupo: {{ course.capacity }} vacantes
                                 </span>
                             </div>
                         </CardContent>
 
-                        <CardFooter class="pt-3 border-t dark:border-neutral-800 flex items-center justify-between gap-2">
-                            <Button as-child variant="outline" size="sm" class="flex-1 text-xs font-semibold">
+                        <CardFooter class="px-4 sm:px-5 pt-3 pb-4 border-t dark:border-neutral-800 flex flex-wrap items-center justify-between gap-2 min-w-0 max-w-full">
+                            <Button as-child variant="outline" size="sm" class="flex-1 min-w-[90px] text-xs font-semibold">
                                 <Link :href="`/courses/${course.id}`">
                                     <Eye class="mr-1 size-3.5" />
                                     Ver curso
@@ -284,7 +284,7 @@ function instructorName(inst?: Instructor): string {
                                 as-child
                                 size="sm"
                                 variant="outline"
-                                class="flex-1 text-xs font-black border-emerald-600 text-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700"
+                                class="flex-1 min-w-[100px] text-xs font-black border-emerald-600 text-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700"
                             >
                                 <Link :href="`/courses/${course.id}`">
                                     <CheckCircle2 class="mr-1 size-3.5 text-emerald-600" />
@@ -297,7 +297,7 @@ function instructorName(inst?: Instructor): string {
                                 v-else-if="authUser && (authUser.role === 'admin' || (authUser.role === 'docente' && course.instructor?.id === authUser.id))"
                                 as-child
                                 size="sm"
-                                class="bg-amber-700 hover:bg-amber-800 text-white text-xs flex-1 font-bold shadow-xs"
+                                class="bg-amber-700 hover:bg-amber-800 text-white text-xs flex-1 min-w-[100px] font-bold shadow-xs"
                             >
                                 <Link :href="`/courses/${course.id}`">
                                     <BookOpen class="mr-1 size-3.5" />
@@ -309,12 +309,12 @@ function instructorName(inst?: Instructor): string {
                             <Button
                                 v-else-if="course.status === 'abierto'"
                                 size="sm"
-                                class="bg-rose-900 hover:bg-rose-950 text-white text-xs flex-1 font-bold shadow-xs cursor-pointer"
+                                class="bg-rose-900 hover:bg-rose-950 text-white text-xs flex-1 min-w-[100px] font-bold shadow-xs cursor-pointer"
                                 @click="openEnroll(course)"
                             >
                                 Inscribirme
                             </Button>
-                            <div v-if="can.create" class="flex items-center gap-1">
+                            <div v-if="can.create" class="flex items-center gap-1 shrink-0">
                                 <Button as-child variant="ghost" size="icon-sm" class="size-7 text-slate-600 hover:text-slate-900">
                                     <Link :href="`/courses/${course.id}/edit`">
                                         <Pencil class="size-3.5" />

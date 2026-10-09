@@ -223,7 +223,7 @@ function formatDate(dateStr?: string): string {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Gestión de Usuarios y Roles - SIGC-CUSCO" />
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 min-w-0 w-full overflow-x-hidden">
             <!-- HEADER DE SECCIÓN INSTITUCIONAL -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/90 dark:border-slate-800 pb-5">
                 <div class="space-y-1">

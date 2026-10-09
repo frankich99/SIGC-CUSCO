@@ -214,7 +214,7 @@ function enrollmentStatusBadge(status: string) {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Panel de Control - SIGC-CUSCO" />
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 min-w-0 w-full overflow-x-hidden">
             <!-- BANNER PRINCIPAL: GRANATE IMPERIAL CUSCO (UNSAAC) -->
             <div class="relative overflow-hidden rounded-2xl border-2 border-rose-900/40 bg-gradient-to-r from-[#4c0519] via-[#701a31] to-slate-950 p-6 sm:p-8 text-white shadow-xl">
                 <!-- Background decorative glow -->
@@ -394,28 +394,28 @@ function enrollmentStatusBadge(status: string) {
 
                     <!-- Lista de Cursos Asignados -->
                     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <Card v-for="course in taughtCourses" :key="course.id" class="border-2 border-slate-200 dark:border-slate-800 hover:border-rose-800 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between rounded-xl bg-white dark:bg-slate-950">
-                            <CardHeader class="pb-3 space-y-2">
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="font-mono font-bold text-rose-950 bg-rose-100 dark:bg-rose-950 dark:text-rose-200 px-2.5 py-1 rounded border border-rose-200 dark:border-rose-800">
+                        <Card v-for="course in taughtCourses" :key="course.id" class="border-2 border-slate-200 dark:border-slate-800 hover:border-rose-800 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between rounded-xl bg-white dark:bg-slate-950 min-w-0 max-w-full overflow-hidden">
+                            <CardHeader class="p-4 sm:p-5 pb-3 space-y-2 min-w-0 max-w-full">
+                                <div class="flex items-center justify-between gap-1.5 min-w-0 w-full text-xs">
+                                    <span class="font-mono font-bold text-rose-950 bg-rose-100 dark:bg-rose-950 dark:text-rose-200 px-2.5 py-1 rounded border border-rose-200 dark:border-rose-800 shrink-0">
                                         {{ course.code }}
                                     </span>
-                                    <Badge class="text-[11px] font-extrabold uppercase px-2.5 py-0.5" :class="course.status === 'abierto' ? 'bg-amber-100 text-amber-950 border border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800' : 'bg-slate-100 text-slate-800'">
+                                    <Badge class="text-[10px] sm:text-[11px] font-extrabold uppercase px-2.5 py-0.5 shrink-0 truncate max-w-[62%]" :class="course.status === 'abierto' ? 'bg-amber-100 text-amber-950 border border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800' : 'bg-slate-100 text-slate-800'">
                                         {{ course.status }}
                                     </Badge>
                                 </div>
-                                <CardTitle class="text-base font-black text-slate-950 dark:text-white line-clamp-2 leading-snug">
+                                <CardTitle class="text-base font-black text-slate-950 dark:text-white line-clamp-2 leading-snug break-words min-w-0">
                                     {{ course.title }}
                                 </CardTitle>
-                                <div v-if="course.institution" class="text-xs font-bold text-rose-800 dark:text-rose-400">
+                                <div v-if="course.institution" class="text-xs font-bold text-rose-800 dark:text-rose-400 truncate w-full min-w-0 max-w-full overflow-hidden">
                                     {{ course.institution }}
                                 </div>
-                                <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 pt-1">
+                                <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 pt-1 min-w-0">
                                     <Calendar class="size-3.5 text-rose-800 shrink-0" />
-                                    <span>Inicio: <strong>{{ formatDate(course.start_date, 'compact') }}</strong></span>
+                                    <span class="truncate">Inicio: <strong>{{ formatDate(course.start_date, 'compact') }}</strong></span>
                                     <span>•</span>
                                     <Clock class="size-3.5 text-amber-600 shrink-0" />
-                                    <span>{{ formatHours(course.hours) }}</span>
+                                    <span class="truncate">{{ formatHours(course.hours) }}</span>
                                 </CardDescription>
                             </CardHeader>
 
@@ -607,12 +607,12 @@ function enrollmentStatusBadge(status: string) {
                                 </div>
                             </CardContent>
 
-                            <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 rounded-b-xl">
-                                <Button size="sm" variant="outline" class="flex-1 text-xs font-bold h-9 border-rose-300 text-rose-950 hover:bg-rose-50 cursor-pointer" @click="openCredentialModal(item)">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center gap-2 rounded-b-xl">
+                                <Button size="sm" variant="outline" class="flex-1 min-w-[120px] text-xs font-bold h-9 border-rose-300 text-rose-950 hover:bg-rose-50 cursor-pointer" @click="openCredentialModal(item)">
                                     <QrCode class="size-4 mr-1.5 text-rose-800" />
                                     Mi Credencial QR
                                 </Button>
-                                <Button as-child variant="outline" size="sm" class="flex-1 text-xs font-bold h-9 border-slate-300 text-slate-800 hover:text-rose-900">
+                                <Button as-child variant="outline" size="sm" class="flex-1 min-w-[100px] text-xs font-bold h-9 border-slate-300 text-slate-800 hover:text-rose-900">
                                     <Link :href="`/courses/${item.course_id}`">
                                         <BookOpen class="size-4 mr-1.5 text-slate-700" />
                                         Ver Curso
@@ -623,7 +623,7 @@ function enrollmentStatusBadge(status: string) {
                                     as-child
                                     size="sm"
                                     variant="outline"
-                                    class="flex-1 text-xs font-black h-9 border-amber-500 text-amber-950 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950 dark:text-amber-200"
+                                    class="flex-1 min-w-[110px] text-xs font-black h-9 border-amber-500 text-amber-950 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950 dark:text-amber-200"
                                 >
                                     <a :href="`/certificates?dni=${item.dni}&code=${item.certificate_code || ''}`" target="_blank">
                                         <Award class="size-4 mr-1.5 text-amber-700" />
@@ -653,28 +653,28 @@ function enrollmentStatusBadge(status: string) {
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <Card v-for="course in openCourses" :key="course.id" class="border-2 border-slate-200 dark:border-slate-800 flex flex-col justify-between hover:border-rose-800 shadow-sm hover:shadow-lg transition-all rounded-xl bg-white dark:bg-slate-950">
-                            <CardHeader class="pb-3 space-y-1.5">
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="font-mono font-bold text-rose-950 bg-rose-100 dark:bg-rose-950 dark:text-rose-200 px-2.5 py-0.5 rounded border border-rose-200 dark:border-rose-800">
+                        <Card v-for="course in openCourses" :key="course.id" class="border-2 border-slate-200 dark:border-slate-800 flex flex-col justify-between hover:border-rose-800 shadow-sm hover:shadow-lg transition-all rounded-xl bg-white dark:bg-slate-950 min-w-0 max-w-full overflow-hidden">
+                            <CardHeader class="p-4 sm:p-5 pb-3 space-y-1.5 min-w-0 max-w-full">
+                                <div class="flex items-center justify-between gap-1.5 min-w-0 w-full text-xs">
+                                    <span class="font-mono font-bold text-rose-950 bg-rose-100 dark:bg-rose-950 dark:text-rose-200 px-2.5 py-0.5 rounded border border-rose-200 dark:border-rose-800 shrink-0">
                                         {{ course.code }}
                                     </span>
-                                    <Badge class="text-[10px] font-bold bg-amber-100 text-amber-950 border border-amber-300">
+                                    <Badge class="text-[10px] font-bold bg-amber-100 text-amber-950 border border-amber-300 shrink-0 truncate max-w-[62%]">
                                         Inscripción Abierta
                                     </Badge>
                                 </div>
-                                <CardTitle class="text-sm sm:text-base font-extrabold text-slate-950 dark:text-white line-clamp-2 leading-snug">
+                                <CardTitle class="text-sm sm:text-base font-extrabold text-slate-950 dark:text-white line-clamp-2 leading-snug break-words min-w-0">
                                     {{ course.title }}
                                 </CardTitle>
-                                <div class="text-xs font-bold text-rose-900 dark:text-rose-400 truncate">
+                                <div class="text-xs font-bold text-rose-900 dark:text-rose-400 truncate w-full min-w-0 max-w-full overflow-hidden">
                                     {{ course.institution || 'Entidad Organizadora' }}
                                 </div>
-                                <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 pt-1">
+                                <CardDescription class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 pt-1 min-w-0">
                                     <Calendar class="size-3.5 text-rose-800 shrink-0" />
-                                    <span>Inicio: <strong>{{ formatDate(course.start_date, 'compact') }}</strong></span>
+                                    <span class="truncate">Inicio: <strong>{{ formatDate(course.start_date, 'compact') }}</strong></span>
                                     <span>•</span>
                                     <Clock class="size-3.5 text-amber-600 shrink-0" />
-                                    <span>{{ formatHours(course.hours) }}</span>
+                                    <span class="truncate">{{ formatHours(course.hours) }}</span>
                                 </CardDescription>
                             </CardHeader>
 

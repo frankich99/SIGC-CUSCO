@@ -40,7 +40,6 @@ import {
 } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -134,9 +133,23 @@ const reniecPerson = ref<{
 const verificationError = ref<string | null>(null);
 const showHelpModal = ref(false);
 
+function allowOnlyNumbers(e: KeyboardEvent) {
+    if (['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Enter'].includes(e.key)) {
+        return;
+    }
+    if (e.ctrlKey || e.metaKey) return;
+    if (!/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+    }
+}
+
 function onDniInput(e: Event) {
     const target = e.target as HTMLInputElement;
-    dniQuery.value = target.value.replace(/\D/g, '').slice(0, 8);
+    const sanitized = target.value.replace(/\D/g, '').slice(0, 8);
+    if (target.value !== sanitized) {
+        target.value = sanitized;
+    }
+    dniQuery.value = sanitized;
     if (error.value) error.value = null;
     if (searchStep.value !== 1) {
         searchStep.value = 1;
@@ -150,7 +163,11 @@ function onDniInput(e: Event) {
 
 function onVerificationInput(e: Event) {
     const target = e.target as HTMLInputElement;
-    verificationDigit.value = target.value.replace(/[^0-9A-Za-z]/g, '').slice(0, 1).toUpperCase();
+    const sanitized = target.value.replace(/[^0-9A-Za-z]/g, '').slice(0, 1).toUpperCase();
+    if (target.value !== sanitized) {
+        target.value = sanitized;
+    }
+    verificationDigit.value = sanitized;
     if (verificationError.value) verificationError.value = null;
 }
 
@@ -356,7 +373,7 @@ onMounted(() => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Validación Oficial de Certificados - SIGC-CUSCO" />
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 min-w-0 w-full overflow-x-hidden">
             <!-- HEADER DE SECCIÓN ACADÉMICA -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/90 dark:border-slate-800 pb-5">
                 <div class="space-y-1">
@@ -387,26 +404,26 @@ onMounted(() => {
 
             <!-- CONTENIDO MODULAR DE CERTIFICACIÓN -->
             <div class="space-y-6">
-                <!-- SELECTOR DE MODALIDAD (TABS LIMPIOS) -->
-                <div class="flex items-center justify-center">
-                    <div class="inline-flex p-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <!-- SELECTOR DE MODALIDAD (TABS RESPONSIVE) -->
+                <div class="flex items-center justify-center w-full max-w-xl mx-auto px-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 p-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl w-full gap-1">
                         <button
                             type="button"
                             @click="activeTab = 'dni'"
-                            class="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer"
+                            class="flex items-center justify-center gap-2 px-3 sm:px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer text-center"
                             :class="activeTab === 'dni' ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:text-rose-900'"
                         >
-                            <Search class="size-3.5" />
-                            <span>Búsqueda Oficial por DNI</span>
+                            <Search class="size-3.5 shrink-0" />
+                            <span class="truncate">Búsqueda Oficial por DNI</span>
                         </button>
                         <button
                             type="button"
                             @click="activeTab = 'pdf'"
-                            class="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer"
+                            class="flex items-center justify-center gap-2 px-3 sm:px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer text-center"
                             :class="activeTab === 'pdf' ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:text-rose-900'"
                         >
-                            <FileCheck class="size-3.5 text-amber-500" />
-                            <span>Comprobador de Archivo PDF (SHA-256)</span>
+                            <FileCheck class="size-3.5 text-amber-500 shrink-0" />
+                            <span class="truncate">Comprobador PDF (SHA-256)</span>
                         </button>
                     </div>
                 </div>
@@ -414,37 +431,37 @@ onMounted(() => {
                 <!-- VISTA 1: CONSULTA INSTITUCIONAL CON VERIFICACIÓN DE IDENTIDAD EN 2 PASOS -->
                 <div v-if="activeTab === 'dni'" class="space-y-6">
                     <!-- STEPPER INDICADOR INSTITUCIONAL -->
-                    <div class="max-w-2xl mx-auto px-2">
-                        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                    <div class="max-w-2xl mx-auto px-2 w-full">
+                        <div class="grid grid-cols-3 gap-1.5 sm:gap-2 text-center text-[11px] sm:text-xs">
                             <!-- Paso 1 -->
                             <div
-                                class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border font-bold transition-all"
+                                class="flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl border font-bold transition-all min-w-0"
                                 :class="searchStep === 1 ? 'bg-rose-900 text-white border-rose-900 shadow-xs' : (searchStep > 1 ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 text-emerald-800 dark:text-emerald-300' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500')"
                             >
-                                <CheckCircle2 v-if="searchStep > 1" class="size-3.5 text-emerald-600" />
-                                <span v-else class="size-4 rounded-full bg-white/20 text-[10px] flex items-center justify-center">1</span>
-                                <span class="hidden sm:inline">Paso 1:</span>
-                                <span>DNI</span>
+                                <CheckCircle2 v-if="searchStep > 1" class="size-3.5 text-emerald-600 shrink-0" />
+                                <span v-else class="size-4 rounded-full bg-white/20 text-[10px] flex items-center justify-center shrink-0">1</span>
+                                <span class="hidden md:inline">Paso 1:</span>
+                                <span class="truncate">DNI</span>
                             </div>
 
                             <!-- Paso 2 -->
                             <div
-                                class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border font-bold transition-all"
+                                class="flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl border font-bold transition-all min-w-0"
                                 :class="searchStep === 2 ? 'bg-rose-900 text-white border-rose-900 shadow-xs' : (searchStep > 2 ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 text-emerald-800 dark:text-emerald-300' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500')"
                             >
-                                <CheckCircle2 v-if="searchStep > 2" class="size-3.5 text-emerald-600" />
-                                <span v-else class="size-4 rounded-full bg-white/20 text-[10px] flex items-center justify-center">2</span>
-                                <span class="hidden sm:inline">Paso 2:</span>
-                                <span>Código Verif.</span>
+                                <CheckCircle2 v-if="searchStep > 2" class="size-3.5 text-emerald-600 shrink-0" />
+                                <span v-else class="size-4 rounded-full bg-white/20 text-[10px] flex items-center justify-center shrink-0">2</span>
+                                <span class="hidden md:inline">Paso 2:</span>
+                                <span class="truncate">Verificación</span>
                             </div>
 
                             <!-- Paso 3 -->
                             <div
-                                class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border font-bold transition-all"
+                                class="flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl border font-bold transition-all min-w-0"
                                 :class="searchStep === 3 ? 'bg-rose-900 text-white border-rose-900 shadow-xs' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'"
                             >
-                                <span class="size-4 rounded-full bg-white/20 text-[10px] flex items-center justify-center">3</span>
-                                <span>Diplomas</span>
+                                <span class="size-4 rounded-full bg-white/20 text-[10px] flex items-center justify-center shrink-0">3</span>
+                                <span class="truncate">Diplomas</span>
                             </div>
                         </div>
                     </div>
@@ -466,19 +483,22 @@ onMounted(() => {
                         <CardContent class="p-5 sm:p-6 space-y-4">
                             <form @submit.prevent="validateDniStep" class="flex flex-col sm:flex-row gap-3">
                                 <div class="relative flex-1">
-                                    <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                                    <Input
-                                        :value="dniQuery"
+                                    <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
+                                    <input
+                                        id="dni-input"
+                                        v-model="dniQuery"
                                         @input="onDniInput"
+                                        @keypress="allowOnlyNumbers"
                                         type="text"
                                         inputmode="numeric"
+                                        pattern="[0-9]*"
                                         maxlength="8"
                                         placeholder="Ingresa DNI (8 dígitos)"
-                                        class="pl-10 font-mono text-base tracking-widest font-bold text-slate-950 dark:text-white border-slate-300 focus-visible:ring-rose-900 h-11"
+                                        class="w-full pl-10 pr-14 font-mono text-base tracking-widest font-bold text-slate-950 dark:text-white bg-white dark:bg-slate-950 rounded-xl border border-slate-300 dark:border-slate-700 focus:outline-hidden focus:border-rose-900 focus:ring-2 focus:ring-rose-900/30 h-11 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs placeholder:text-slate-400 placeholder:font-normal placeholder:tracking-normal"
                                         :disabled="validatingDni"
                                         autofocus
                                     />
-                                    <div class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-slate-400">
+                                    <div class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-slate-400 pointer-events-none">
                                         {{ dniQuery.length }}/8
                                     </div>
                                 </div>
@@ -551,12 +571,14 @@ onMounted(() => {
                             <form @submit.prevent="verifyAndFetchCertificates" class="space-y-5 max-w-sm mx-auto">
                                 <div class="flex flex-col items-center justify-center gap-2">
                                     <div class="relative">
-                                        <Input
-                                            :value="verificationDigit"
+                                        <input
+                                            id="verification-digit-input"
+                                            v-model="verificationDigit"
                                             @input="onVerificationInput"
+                                            type="text"
                                             maxlength="1"
                                             placeholder="•"
-                                            class="size-16 sm:size-20 text-center text-3xl sm:text-4xl font-mono font-black border-2 border-rose-900/60 focus:border-rose-900 rounded-2xl shadow-sm uppercase text-slate-950 dark:text-white focus-visible:ring-rose-900"
+                                            class="size-16 sm:size-20 text-center text-3xl sm:text-4xl font-mono font-black border-2 border-rose-900/60 focus:border-rose-900 rounded-2xl shadow-sm uppercase text-slate-950 dark:text-white bg-white dark:bg-slate-950 focus:outline-hidden focus:ring-2 focus:ring-rose-900/30 transition-all disabled:opacity-50"
                                             autofocus
                                             :disabled="loading"
                                         />
@@ -717,12 +739,12 @@ onMounted(() => {
                                                 </div>
                                             </div>
 
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                                                 <Button
                                                     type="button"
                                                     variant="outline"
                                                     size="sm"
-                                                    class="text-xs font-bold border-slate-300 hover:text-rose-900 hover:bg-rose-50 cursor-pointer h-9 px-3.5"
+                                                    class="text-xs font-bold border-slate-300 hover:text-rose-900 hover:bg-rose-50 cursor-pointer h-9 px-3.5 w-full sm:w-auto justify-center"
                                                     @click="openCertificatePreview(record)"
                                                 >
                                                     <Eye class="size-3.5 mr-1.5 text-slate-700" />
@@ -731,7 +753,7 @@ onMounted(() => {
                                                 <Button
                                                     type="button"
                                                     size="sm"
-                                                    class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer h-9 px-3.5"
+                                                    class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shadow-xs cursor-pointer h-9 px-3.5 w-full sm:w-auto justify-center"
                                                     @click="printCertificate(record)"
                                                 >
                                                     <Download class="size-3.5 mr-1.5" />
@@ -1285,12 +1307,12 @@ onMounted(() => {
 
             <!-- FOOTER FIJO CON ACCIONES ESTILO ESTUDIO -->
             <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-3 border-t border-slate-800 bg-slate-900/95 shrink-0 select-none">
-                <div class="flex items-center gap-2 w-full sm:w-auto">
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                     <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        class="text-xs font-bold border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 cursor-pointer rounded-xl"
+                        class="text-xs font-bold border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 cursor-pointer rounded-xl flex-1 sm:flex-initial justify-center"
                         @click="selectedCert && copyVerificationCode(selectedCert.certificate_code)"
                     >
                         <Check v-if="copiedCode" class="size-3.5 mr-1 text-emerald-400" />
@@ -1301,16 +1323,16 @@ onMounted(() => {
                         type="button"
                         variant="outline"
                         size="sm"
-                        class="text-xs font-bold border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 cursor-pointer rounded-xl"
+                        class="text-xs font-bold border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 cursor-pointer rounded-xl flex-1 sm:flex-initial justify-center"
                         @click="selectedCert && copyVerificationUrl(selectedCert.verification_url)"
                     >
                         <Check v-if="copiedUrl" class="size-3.5 mr-1 text-emerald-400" />
                         <Share2 v-else class="size-3.5 mr-1 text-slate-400" />
-                        <span>{{ copiedUrl ? '¡Enlace Copiado!' : 'Copiar Enlace QR' }}</span>
+                        <span>{{ copiedUrl ? '¡Enlace Copiado!' : 'Copiar QR' }}</span>
                     </Button>
                 </div>
 
-                <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
                     <Button
                         variant="ghost"
                         size="sm"
@@ -1321,11 +1343,11 @@ onMounted(() => {
                     </Button>
                     <Button
                         size="sm"
-                        class="bg-gradient-to-r from-amber-600 via-[#800020] to-[#800020] hover:brightness-110 text-white font-black text-xs shadow-md cursor-pointer rounded-xl px-4 py-2"
+                        class="bg-gradient-to-r from-amber-600 via-[#800020] to-[#800020] hover:brightness-110 text-white font-black text-xs shadow-md cursor-pointer rounded-xl px-4 py-2 w-full sm:w-auto justify-center"
                         @click="selectedCert && printCertificate(selectedCert)"
                     >
                         <Printer class="size-3.5 mr-1.5 text-amber-200" />
-                        <span>Imprimir / Guardar en PDF (2 Páginas)</span>
+                        <span>Imprimir / PDF (2 Páginas)</span>
                     </Button>
                 </div>
             </div>

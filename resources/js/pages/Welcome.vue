@@ -132,7 +132,7 @@ function statusBadgeInfo(status: string) {
 <template>
     <Head title="SIGC-CUSCO — Catálogo de Capacitaciones y Certificación" />
 
-    <div class="min-h-screen bg-slate-50/50 dark:bg-neutral-950 text-slate-900 dark:text-neutral-100 antialiased selection:bg-rose-900 selection:text-white">
+    <div class="min-h-screen max-w-full overflow-x-hidden bg-slate-50/50 dark:bg-neutral-950 text-slate-900 dark:text-neutral-100 antialiased selection:bg-rose-900 selection:text-white">
         <!-- TOP NAVBAR UNIFICADA -->
         <AppHeader />
 
@@ -252,66 +252,66 @@ function statusBadgeInfo(status: string) {
                     <Card
                         v-for="course in filteredCourses"
                         :key="course.id"
-                        class="flex flex-col border border-slate-200 dark:border-neutral-800 hover:border-rose-400/80 hover:shadow-md transition-all duration-200 overflow-hidden bg-white dark:bg-neutral-900"
+                        class="flex flex-col border border-slate-200 dark:border-neutral-800 hover:border-rose-400/80 hover:shadow-md transition-all duration-200 overflow-hidden bg-white dark:bg-neutral-900 min-w-0 max-w-full"
                     >
                         <!-- Card Header -->
-                        <CardHeader class="pb-3 space-y-2">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-mono text-[11px] font-bold text-rose-900 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800">
+                        <CardHeader class="p-4 sm:p-5 pb-3 space-y-2 min-w-0 max-w-full">
+                            <div class="flex items-center justify-between gap-1.5 min-w-0 w-full">
+                                <span class="font-mono text-[11px] font-bold text-rose-900 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800 shrink-0">
                                     {{ course.code }}
                                 </span>
                                 <span
-                                    class="text-[11px] font-bold px-2 py-0.5 rounded-full border"
+                                    class="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full border shrink-0 text-center truncate max-w-[62%]"
                                     :class="statusBadgeInfo(course.status).class"
                                 >
                                     {{ statusBadgeInfo(course.status).label }}
                                 </span>
                             </div>
 
-                            <CardTitle class="text-lg font-bold line-clamp-2 leading-snug text-slate-900 dark:text-white">
+                            <CardTitle class="text-base sm:text-lg font-bold line-clamp-2 leading-snug text-slate-900 dark:text-white break-words min-w-0">
                                 {{ course.title }}
                             </CardTitle>
 
                             <!-- Organizing Entity / Institución -->
-                            <div class="flex items-center gap-1.5 text-xs text-rose-950 dark:text-rose-200 bg-rose-50/80 dark:bg-rose-950/40 px-2.5 py-1 rounded-md border border-rose-200/80 dark:border-rose-800/60 font-semibold">
+                            <div class="flex items-center gap-1.5 text-xs text-rose-950 dark:text-rose-200 bg-rose-50/80 dark:bg-rose-950/40 px-2.5 py-1 rounded-md border border-rose-200/80 dark:border-rose-800/60 font-semibold w-full min-w-0 max-w-full overflow-hidden">
                                 <Building2 class="size-3.5 shrink-0 text-rose-800 dark:text-rose-400" />
-                                <span class="truncate">{{ course.institution || 'Dirección Académica • Cusco' }}</span>
+                                <span class="truncate block min-w-0 flex-1">{{ course.institution || 'Dirección Académica • Cusco' }}</span>
                             </div>
 
-                            <CardDescription class="text-xs line-clamp-2 text-slate-600 dark:text-neutral-400 font-medium">
+                            <CardDescription class="text-xs line-clamp-2 text-slate-600 dark:text-neutral-400 font-medium break-words min-w-0">
                                 {{ course.description || 'Capacitación profesional oficial con asistencia controlada por código QR y certificación digital.' }}
                             </CardDescription>
                         </CardHeader>
 
                         <!-- Card Body Details -->
-                        <CardContent class="flex-1 space-y-3 text-xs">
+                        <CardContent class="p-4 sm:p-5 pt-0 flex-1 space-y-3 text-xs min-w-0 max-w-full overflow-hidden">
                             <!-- Instructor snippet -->
-                            <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-neutral-800 text-slate-800 dark:text-neutral-200">
-                                <div class="size-6 rounded-full bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-300 flex items-center justify-center font-bold text-[10px]">
+                            <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-neutral-800 text-slate-800 dark:text-neutral-200 min-w-0 max-w-full">
+                                <div class="size-6 rounded-full bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-300 flex items-center justify-center font-bold text-[10px] shrink-0">
                                     {{ (course.instructor?.name || course.instructor_name || 'P')[0] }}
                                 </div>
-                                <span class="truncate">
+                                <span class="truncate min-w-0 flex-1">
                                     Ponente / Docente: <strong>{{ course.instructor ? `${course.instructor.name} ${course.instructor.paterno || ''}` : (course.instructor_name || 'Por asignar') }}</strong>
                                 </span>
                             </div>
 
                             <!-- Meta info: dates & hours -->
-                            <div class="grid grid-cols-2 gap-2 text-slate-800 dark:text-slate-200 text-xs font-semibold">
-                                <div class="flex items-center gap-1.5">
+                            <div class="grid grid-cols-2 gap-2 text-slate-800 dark:text-slate-200 text-xs font-semibold min-w-0">
+                                <div class="flex items-center gap-1.5 min-w-0">
                                     <Calendar class="size-3.5 text-rose-800 dark:text-rose-400 shrink-0" />
-                                    <span>Inicio: <strong>{{ formatDate(course.start_date, 'compact') }}</strong></span>
+                                    <span class="truncate">Inicio: <strong>{{ formatDate(course.start_date, 'compact') }}</strong></span>
                                 </div>
-                                <div class="flex items-center gap-1.5">
+                                <div class="flex items-center gap-1.5 min-w-0">
                                     <Clock class="size-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
-                                    <span><strong>{{ formatHours(course.hours) }}</strong></span>
+                                    <span class="truncate"><strong>{{ formatHours(course.hours) }}</strong></span>
                                 </div>
                             </div>
 
                             <!-- Vacantes / Capacity Bar -->
-                            <div class="space-y-1.5 pt-1">
-                                <div class="flex items-center justify-between text-[11px]">
-                                    <span class="text-slate-600 dark:text-neutral-400 font-medium">Vacantes Disponibles:</span>
-                                    <span class="font-bold" :class="course.capacity - course.enrollments_count > 0 ? 'text-rose-900 dark:text-rose-300' : 'text-rose-600'">
+                            <div class="space-y-1.5 pt-1 min-w-0 max-w-full">
+                                <div class="flex items-center justify-between text-[11px] gap-2 min-w-0">
+                                    <span class="text-slate-600 dark:text-neutral-400 font-medium truncate">Vacantes Disponibles:</span>
+                                    <span class="font-bold shrink-0" :class="course.capacity - course.enrollments_count > 0 ? 'text-rose-900 dark:text-rose-300' : 'text-rose-600'">
                                         {{ Math.max(0, course.capacity - course.enrollments_count) }} de {{ course.capacity }}
                                     </span>
                                 </div>
@@ -325,7 +325,7 @@ function statusBadgeInfo(status: string) {
                         </CardContent>
 
                         <!-- Card Footer Action -->
-                        <CardFooter class="pt-3 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between gap-2 bg-slate-50/50 dark:bg-neutral-900/50">
+                        <CardFooter class="p-4 sm:p-5 pt-3 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between gap-2 bg-slate-50/50 dark:bg-neutral-900/50 min-w-0 max-w-full">
                             <Button as-child variant="ghost" size="sm" class="text-xs flex-1 font-semibold text-slate-700 hover:text-rose-900">
                                 <Link :href="`/courses/${course.id}`">
                                     Detalles

@@ -56,7 +56,19 @@ export function addToast(options: ToastOptions | string): number {
     }
 
     const id = ++toastCounter;
-    const duration = opts.timer !== undefined ? opts.timer : 3500;
+
+    // Duración equilibrada: garantizar lectura cómoda (un poco más de tiempo, mínimo 4500ms)
+    let duration = 4800;
+    if (opts.timer !== undefined && opts.timer > 0) {
+        duration = Math.max(opts.timer, 4500);
+    } else if (opts.timer === 0) {
+        duration = 0;
+    } else {
+        if (icon === 'error') duration = 5800;
+        else if (icon === 'warning') duration = 5200;
+        else if (text && text.length > 35) duration = 5200;
+        else duration = 4800;
+    }
 
     const toast: ActiveToast = {
         ...opts,
@@ -71,14 +83,6 @@ export function addToast(options: ToastOptions | string): number {
 
     // REEMPLAZAR: estrictamente una sola notificación visible en pantalla a la vez
     activeToasts.value = [toast];
-
-    // Auto-eliminar cuando expira el temporizador
-    if (duration > 0) {
-        currentTimerId = setTimeout(() => {
-            removeToast(id);
-            currentTimerId = null;
-        }, duration);
-    }
 
     return id;
 }
@@ -104,16 +108,16 @@ export const notify = {
     fire(options: ToastOptions | string): number {
         return addToast(options);
     },
-    success(title: string, text?: string, timer = 4000): number {
+    success(title: string, text?: string, timer = 4800): number {
         return addToast({ icon: 'success', title, text, timer });
     },
-    error(title: string, text?: string, timer = 5000): number {
+    error(title: string, text?: string, timer = 5800): number {
         return addToast({ icon: 'error', title, text, timer });
     },
-    warning(title: string, text?: string, timer = 4500): number {
+    warning(title: string, text?: string, timer = 5200): number {
         return addToast({ icon: 'warning', title, text, timer });
     },
-    info(title: string, text?: string, timer = 4000): number {
+    info(title: string, text?: string, timer = 4800): number {
         return addToast({ icon: 'info', title, text, timer });
     },
     remove: removeToast,

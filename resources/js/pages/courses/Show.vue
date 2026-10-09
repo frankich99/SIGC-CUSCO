@@ -614,7 +614,7 @@ onUnmounted(() => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head :title="`${course.title} - SIGC-CUSCO`" />
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 min-w-0 w-full overflow-x-hidden">
             <!-- Barra de alternancia de vista exclusiva para Docentes y Administradores (Staff) -->
             <div
                 v-if="isStaff"
@@ -1035,9 +1035,9 @@ onUnmounted(() => {
                         </div>
                     </div>
 
-                    <!-- Contenido de la Tabla Compacta (Sin Scroll Horizontal) -->
+                    <!-- Contenido de la Tabla Compacta (Con Scroll Horizontal Suave en Pantallas Estrechas) -->
                     <CardContent class="p-0">
-                        <div class="w-full">
+                        <div class="w-full overflow-x-auto">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
                                     <tr class="bg-slate-100/90 dark:bg-slate-900 border-b text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -1474,7 +1474,7 @@ onUnmounted(() => {
 
                     <!-- Tabla de Notas -->
                     <CardContent class="p-0">
-                        <div class="w-full">
+                        <div class="w-full overflow-x-auto">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
                                     <tr class="bg-slate-100/90 dark:bg-slate-900 border-b text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -1627,7 +1627,7 @@ onUnmounted(() => {
 
                         <!-- Tabla de Certificados -->
                         <CardContent class="p-0">
-                            <div class="w-full">
+                            <div class="w-full overflow-x-auto">
                                 <table class="w-full text-left text-xs border-collapse">
                                     <thead>
                                         <tr class="bg-slate-100/90 dark:bg-slate-900 border-b text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">

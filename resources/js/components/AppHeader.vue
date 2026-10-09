@@ -101,11 +101,11 @@ function roleBadge(role?: string) {
 <template>
     <!-- CABECERA INSTITUCIONAL RESPONSIVE - GRANATE IMPERIAL CUSCO -->
     <header class="sticky top-0 z-40 w-full border-b border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md shadow-xs">
-        <div class="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 max-w-7xl gap-2 sm:gap-4 w-full">
+        <div class="mx-auto flex h-16 items-center justify-between px-3 sm:px-6 lg:px-8 max-w-7xl gap-2 sm:gap-4 w-full min-w-0">
             <!-- 1. GRUPO IZQUIERDO: BOTÓN MÓVIL + LOGO + NAVEGACIÓN DOCKING (alineada a la izquierda, no centrada) -->
-            <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
-                <!-- Mobile Trigger (< md) -->
-                <div class="md:hidden">
+            <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0">
+                <!-- Mobile Trigger (< xl) -->
+                <div class="xl:hidden">
                     <Sheet v-model:open="isMobileMenuOpen">
                         <SheetTrigger :as-child="true">
                             <Button
@@ -229,12 +229,36 @@ function roleBadge(role?: string) {
                                     </template>
                                 </nav>
 
-                                <div v-if="user" class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1 px-2">
-                                    <div class="text-xs text-slate-700 dark:text-slate-300 font-bold truncate">
-                                        Usuario: {{ user.name }}
+                                <div v-if="user" class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2.5 px-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <Avatar class="size-8.5 rounded-full ring-1 ring-rose-900/30 shrink-0">
+                                            <AvatarImage v-if="user.avatar" :src="user.avatar" :alt="user.name" />
+                                            <AvatarFallback class="bg-rose-900 text-white font-black text-xs">
+                                                {{ getInitials(user.name) }}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div class="flex flex-col min-w-0">
+                                            <span class="text-xs font-black text-slate-900 dark:text-white truncate">
+                                                {{ user.name }}
+                                            </span>
+                                            <span class="text-[10px] text-slate-500 truncate">
+                                                {{ user.email }}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div v-if="user.role" class="text-[10px] uppercase font-bold text-rose-900 dark:text-rose-400">
-                                        Rol: {{ roleBadge(user.role).label }}
+                                    <div class="flex items-center justify-between pt-0.5">
+                                        <span class="text-[9px] uppercase font-black px-2 py-0.5 rounded-full shadow-2xs" :class="roleBadge(user.role).class">
+                                            {{ roleBadge(user.role).label }}
+                                        </span>
+                                        <Link
+                                            href="/logout"
+                                            method="post"
+                                            as="button"
+                                            class="text-xs font-bold text-rose-800 hover:text-rose-950 dark:text-rose-400 cursor-pointer"
+                                            @click="isMobileMenuOpen = false"
+                                        >
+                                            Cerrar sesión
+                                        </Link>
                                     </div>
                                 </div>
                                 <div v-else class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2 px-2">
@@ -272,10 +296,10 @@ function roleBadge(role?: string) {
                 </Link>
 
                 <!-- Separador vertical sutil institucional -->
-                <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden md:block shrink-0 mx-1" />
+                <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden xl:block shrink-0 mx-1" />
 
                 <!-- CASO A: INVITADO PÚBLICO (UNIFICADO, LIMPIO Y SIN ELEMENTOS INTERNOS) -->
-                <nav v-if="!user" class="hidden md:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
+                <nav v-if="!user" class="hidden xl:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
                     <Link
                         href="/"
                         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all"
@@ -305,7 +329,7 @@ function roleBadge(role?: string) {
                 </nav>
 
                 <!-- CASO B: USUARIO AUTENTICADO (PANEL, MIS CURSOS, ROLES, ETC.) -->
-                <nav v-else class="hidden md:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
+                <nav v-else class="hidden xl:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
                     <!-- Panel -->
                     <Link
                         :href="dashboard()"
@@ -369,23 +393,24 @@ function roleBadge(role?: string) {
                     <!-- Validar Certificados -->
                     <Link
                         href="/certificates"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-black transition-all"
                         :class="isCertificatesActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
+                        title="Validar y Consultar Certificados"
                     >
                         <Award class="size-4" :class="isCertificatesActive ? 'text-amber-300' : 'text-amber-600'" />
-                        <span>Validar Certificados</span>
+                        <span><span class="hidden 2xl:inline">Validar </span>Certificados</span>
                     </Link>
 
                     <!-- Usuarios y Roles (Solo Admin) -->
                     <Link
                         v-if="user?.role === 'admin'"
                         href="/users"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all shrink-0"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-black transition-all shrink-0"
                         :class="isUsersActive ? 'bg-rose-900 text-white shadow-xs' : 'text-slate-800 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-900'"
                         title="Administración de Usuarios y Roles Institucionales"
                     >
                         <ShieldCheck class="size-4" :class="isUsersActive ? 'text-amber-300' : 'text-emerald-600'" />
-                        <span>Usuarios y Roles</span>
+                        <span>Usuarios<span class="hidden 2xl:inline"> y Roles</span></span>
                     </Link>
 
                     <!-- Ir al Portal Web -->
@@ -395,23 +420,25 @@ function roleBadge(role?: string) {
                         title="Ir a la página principal pública de SIGC-CUSCO"
                     >
                         <Globe class="size-4 text-blue-600 shrink-0" />
-                        <span class="hidden xl:inline">Portal Público</span>
+                        <span class="hidden 2xl:inline">Portal</span>
                     </Link>
                 </nav>
             </div>
 
             <!-- 2. GRUPO DERECHO: ACCIÓN DESTACADA (+ AGREGAR CURSO) + ROL + AVATAR -->
-            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div class="flex items-center gap-2 sm:gap-2.5 lg:gap-3 shrink-0">
                 <!-- Botón de Acción Directo: Agregar Curso (Visible para admin y docente) -->
                 <Button
                     v-if="canCreateCourse"
                     as-child
                     size="sm"
-                    class="bg-rose-900 hover:bg-rose-950 text-white font-extrabold text-xs shadow-xs px-2.5 sm:px-3.5 py-1.5 h-8.5 rounded-lg border border-rose-800 flex items-center gap-1.5 transition-all cursor-pointer hover:shadow-sm shrink-0 whitespace-nowrap"
+                    class="bg-rose-900 hover:bg-rose-950 text-white font-extrabold text-xs shadow-xs px-2 sm:px-3 py-1.5 h-8.5 rounded-lg border border-rose-800 flex items-center gap-1.5 transition-all cursor-pointer hover:shadow-sm shrink-0 whitespace-nowrap"
                 >
                     <Link href="/courses/create">
                         <Plus class="size-3.5 text-amber-300 stroke-[2.5]" />
-                        <span>Agregar Curso</span>
+                        <span class="hidden sm:inline 2xl:hidden">Curso</span>
+                        <span class="hidden 2xl:inline">Agregar Curso</span>
+                        <span class="sm:hidden text-[11px]">Curso</span>
                     </Link>
                 </Button>
 
@@ -420,12 +447,12 @@ function roleBadge(role?: string) {
 
                 <template v-if="auth.user">
                     <!-- Rol del Usuario con Granate Imperial -->
-                    <div class="hidden sm:flex flex-col items-end text-right">
-                        <span class="text-xs font-black text-slate-950 dark:text-white leading-tight max-w-[130px] lg:max-w-[180px] truncate">
+                    <div class="hidden md:flex flex-col items-end text-right min-w-0">
+                        <span class="text-xs font-black text-slate-950 dark:text-white leading-tight max-w-[100px] xl:max-w-[120px] 2xl:max-w-[160px] truncate" :title="auth.user.name">
                             {{ auth.user.name }}
                         </span>
                         <span
-                            class="text-[10px] uppercase font-black px-2 py-0.5 rounded-full mt-0.5 shadow-2xs"
+                            class="text-[9px] uppercase font-black px-2 py-0.5 rounded-full mt-0.5 shadow-2xs whitespace-nowrap"
                             :class="roleBadge(auth.user.role).class"
                         >
                             {{ roleBadge(auth.user.role).label }}
@@ -437,7 +464,8 @@ function roleBadge(role?: string) {
                         <DropdownMenuTrigger as-child>
                             <button
                                 type="button"
-                                class="relative size-10 rounded-full ring-2 ring-rose-900/40 hover:ring-rose-900 transition-all p-0.5 cursor-pointer"
+                                class="relative size-9 sm:size-10 rounded-full ring-2 ring-rose-900/40 hover:ring-rose-900 transition-all p-0.5 cursor-pointer shrink-0"
+                                aria-label="Menú de perfil de usuario"
                             >
                                 <Avatar class="size-full overflow-hidden rounded-full">
                                     <AvatarImage

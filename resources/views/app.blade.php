@@ -23,10 +23,16 @@
         <style>
             html {
                 background-color: oklch(1 0 0);
+                overflow-x: hidden;
             }
 
             html.dark {
                 background-color: oklch(0.145 0 0);
+            }
+
+            body {
+                overflow-x: hidden;
+                max-width: 100vw;
             }
         </style>
 
@@ -41,7 +47,7 @@
             <title>{{ config('app.name', 'Laravel') }}</title>
         </x-inertia::head>
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased overflow-x-hidden min-h-screen">
         <x-inertia::app />
     </body>
 </html>
