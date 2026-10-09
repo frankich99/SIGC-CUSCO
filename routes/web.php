@@ -192,6 +192,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('courses/{course}/sessions/{session}/attendance', [CourseAcademicController::class, 'recordSessionAttendance'])->name('courses.sessions.attendance');
     Route::post('courses/{course}/attendance/sync', [CourseAcademicController::class, 'syncOfflineAttendance'])->name('courses.attendance.sync');
     Route::post('courses/{course}/acta/close', [CourseAcademicController::class, 'closeActa'])->name('courses.acta.close');
+    Route::post('courses/{course}/acta/reopen', [CourseAcademicController::class, 'reopenActa'])->name('courses.acta.reopen');
     Route::post('courses/{course}/certificates/bulk-issue', [CourseAcademicController::class, 'bulkIssueCertificates'])->name('courses.certificates.bulk-issue');
     Route::get('courses/{course}/reports/attendance-csv', [CourseAcademicController::class, 'exportAttendanceCsv'])->name('courses.reports.attendance-csv');
     Route::get('courses/{course}/reports/acta-csv', [CourseAcademicController::class, 'exportActaCsv'])->name('courses.reports.acta-csv');

@@ -159,6 +159,34 @@ test('CP-08 close acta applies strict UNSAAC rule (grade >= 11 and attendance >=
     expect($alumnoJalado->status)->toBe('reprobado');
 });
 
+test('CP-08b reopen acta resets closure status and allows editing', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+    $course = Course::create([
+        'code' => 'SIGC-TEST-003B',
+        'title' => 'Curso Reapertura de Acta',
+        'start_date' => now()->format('Y-m-d'),
+        'end_date' => now()->addDays(5)->format('Y-m-d'),
+        'hours' => 40,
+        'total_sessions' => 4,
+        'min_attendance_percentage' => 75,
+        'capacity' => 30,
+        'status' => CourseStatus::Concluido,
+        'acta_closed_at' => now(),
+        'acta_closed_by' => $admin->id,
+    ]);
+
+    expect($course->isActaClosed())->toBeTrue();
+
+    $response = $this->actingAs($admin)->post(route('courses.acta.reopen', $course->id));
+    $response->assertSessionHas('success');
+
+    $course->refresh();
+    expect($course->isActaClosed())->toBeFalse();
+    expect($course->acta_closed_at)->toBeNull();
+    expect($course->acta_closed_by)->toBeNull();
+});
+
 test('CP-09 bulk certificate generation assigns codes and SHA-256 digital hashes', function () {
     $admin = User::factory()->create(['role' => UserRole::Admin]);
 

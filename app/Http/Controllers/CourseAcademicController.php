@@ -230,6 +230,26 @@ class CourseAcademicController extends Controller
     }
 
     /**
+     * Reabrir o reactivar acta oficial de notas para correcciones o modificaciones.
+     */
+    public function reopenActa(Course $course): RedirectResponse
+    {
+        $this->authorizeStaff($course);
+
+        if (! $course->isActaClosed()) {
+            return back()->with('error', 'El acta oficial de este curso ya se encuentra abierta para edición.');
+        }
+
+        $course->update([
+            'acta_closed_at' => null,
+            'acta_closed_by' => null,
+            'status' => 'en_curso',
+        ]);
+
+        return back()->with('success', '¡Acta oficial reactivada exitosamente! Ahora se encuentra en modo edición para realizar cualquier corrección o ajuste en calificaciones y asistencias.');
+    }
+
+    /**
      * Emisión en lote de certificados digitales oficiales para aprobados (SIGC-6).
      * Genera código oficial y firma criptográfica SHA-256 única e inalterable.
      */

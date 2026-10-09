@@ -333,6 +333,29 @@ function confirmCloseActa() {
     );
 }
 
+const isReopenActaModalOpen = ref(false);
+const isReopeningActa = ref(false);
+
+function confirmReopenActa() {
+    isReopeningActa.value = true;
+    router.post(
+        `/courses/${props.course.id}/acta/reopen`,
+        {},
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                isReopeningActa.value = false;
+                isReopenActaModalOpen.value = false;
+                notify.success('Acta oficial reactivada', 'El acta se encuentra en modo edición para realizar correcciones o modificaciones.', 3000);
+            },
+            onError: () => {
+                isReopeningActa.value = false;
+                notify.error('Error al reabrir acta', 'No se pudo reactivar el acta del curso.', 3000);
+            },
+        }
+    );
+}
+
 const isIssuingCertificates = ref(false);
 function bulkIssueCertificates() {
     if (!confirm('¿Emitir los certificados digitales oficiales para todos los participantes aprobados?')) {
@@ -705,10 +728,24 @@ onUnmounted(() => {
                         <Badge variant="outline" class="text-xs font-bold border-rose-800 text-rose-900 bg-rose-50 dark:bg-rose-950">
                             {{ course.status.toUpperCase() }}
                         </Badge>
-                        <Badge v-if="isActaClosed" class="bg-emerald-700 text-white font-bold text-xs">
-                            <Lock class="size-3 mr-1" />
-                            Acta Cerrada Oficialmente
-                        </Badge>
+                        <template v-if="isActaClosed">
+                            <Badge class="bg-emerald-700 text-white font-bold text-xs">
+                                <Lock class="size-3 mr-1" />
+                                Acta Cerrada Oficialmente
+                            </Badge>
+                            <Button
+                                v-if="can.manage_enrollments"
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                class="h-6 px-2 text-[11px] font-bold border-amber-600 text-amber-950 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950 dark:text-amber-200 cursor-pointer shadow-2xs"
+                                title="Reabrir acta oficial para corregir calificaciones o asistencias"
+                                @click="isReopenActaModalOpen = true"
+                            >
+                                <Unlock class="size-3 mr-1 text-amber-700" />
+                                Reabrir / Modificar Acta
+                            </Button>
+                        </template>
                         <Badge v-else variant="secondary" class="font-bold text-xs">
                             <Unlock class="size-3 mr-1" />
                             Acta Abierta (En Edición)
@@ -1436,10 +1473,24 @@ onUnmounted(() => {
                                 <Lock class="mr-1.5 size-3.5" />
                                 Cerrar Acta Oficial del Curso
                             </Button>
-                            <Badge v-else-if="isActaClosed" class="bg-emerald-700 text-white font-bold text-xs py-1 px-2.5">
-                                <Lock class="size-3 mr-1" />
-                                Acta Cerrada Oficialmente
-                            </Badge>
+                            <template v-else-if="isActaClosed">
+                                <Badge class="bg-emerald-700 text-white font-bold text-xs py-1 px-2.5">
+                                    <Lock class="size-3 mr-1" />
+                                    Acta Cerrada Oficialmente
+                                </Badge>
+                                <Button
+                                    v-if="can.manage_enrollments"
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    class="text-xs font-bold border-amber-600 text-amber-950 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950 dark:text-amber-200 shadow-xs cursor-pointer"
+                                    title="Reabrir acta oficial para corregir o modificar notas y calificaciones"
+                                    @click="isReopenActaModalOpen = true"
+                                >
+                                    <Unlock class="mr-1.5 size-3.5 text-amber-700" />
+                                    Reabrir / Modificar Acta
+                                </Button>
+                            </template>
                             <Button
                                 as-child
                                 variant="outline"
@@ -1483,7 +1534,7 @@ onUnmounted(() => {
                                         <th class="py-2.5 px-2 text-center w-24">Asistencia %</th>
                                         <th class="py-2.5 px-2 text-center w-24">Nota (0-20)</th>
                                         <th class="py-2.5 px-2 text-center w-28">Condición</th>
-                                        <th v-if="!isActaClosed && can.manage_enrollments" class="py-2.5 px-3 text-right w-20">Acción</th>
+                                        <th v-if="can.manage_enrollments" class="py-2.5 px-3 text-right w-20">Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-950">
@@ -1529,12 +1580,12 @@ onUnmounted(() => {
                                                 {{ (enrollment.status || 'EN CURSO').toUpperCase() }}
                                             </Badge>
                                         </td>
-                                        <td v-if="!isActaClosed && can.manage_enrollments" class="py-2.5 px-3 text-right whitespace-nowrap">
+                                        <td v-if="can.manage_enrollments" class="py-2.5 px-3 text-right whitespace-nowrap">
                                             <Button
                                                 size="sm"
                                                 variant="ghost"
-                                                class="h-7 w-7 p-0 text-slate-700 hover:text-rose-950 hover:bg-rose-50"
-                                                title="Editar calificación"
+                                                class="h-7 w-7 p-0 text-slate-700 hover:text-rose-950 hover:bg-rose-50 cursor-pointer"
+                                                :title="isActaClosed ? 'Modificar calificación o condición' : 'Editar calificación'"
                                                 @click="openEditModal(enrollment)"
                                             >
                                                 <Pencil class="size-3.5" />
@@ -1809,6 +1860,39 @@ onUnmounted(() => {
             </DialogContent>
         </Dialog>
 
+        <!-- MODAL CONFIRMACIÓN REAPERTURA / ACTIVACIÓN DE ACTA -->
+        <Dialog :open="isReopenActaModalOpen" @update:open="isReopenActaModalOpen = $event">
+            <DialogContent class="w-[94vw] sm:max-w-md p-6 rounded-2xl bg-white dark:bg-slate-950 space-y-4">
+                <DialogHeader class="space-y-2">
+                    <div class="size-11 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-900 flex items-center justify-center mx-auto">
+                        <Unlock class="size-6 text-amber-700 dark:text-amber-400" />
+                    </div>
+                    <DialogTitle class="text-lg font-black text-center text-slate-950 dark:text-white">
+                        ¿Reabrir o Activar el Acta del Curso?
+                    </DialogTitle>
+                    <DialogDescription class="text-xs text-center text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Esta acción devolverá el acta al estado <strong>En Edición</strong>. Podrás corregir o modificar notas, registrar asistencias pendientes y actualizar los participantes. Una vez concluidas las correcciones, podrás volver a cerrar el acta oficialmente.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <DialogFooter class="flex items-center justify-end gap-2 pt-2">
+                    <Button variant="outline" size="sm" class="text-xs font-bold" @click="isReopenActaModalOpen = false">
+                        Cancelar
+                    </Button>
+                    <Button
+                        size="sm"
+                        :disabled="isReopeningActa"
+                        class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-black shadow-xs cursor-pointer"
+                        @click="confirmReopenActa"
+                    >
+                        <Loader2 v-if="isReopeningActa" class="size-3.5 mr-1.5 animate-spin" />
+                        <Unlock v-else class="size-3.5 mr-1.5" />
+                        Sí, Reabrir y Activar Edición
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
         <!-- MODAL CRUD EDITAR MATRÍCULA -->
         <Dialog :open="isEditModalOpen" @update:open="isEditModalOpen = $event">
             <DialogContent class="w-[94vw] sm:max-w-lg p-0 rounded-2xl shadow-2xl border bg-white dark:bg-slate-950 overflow-hidden">
@@ -1831,6 +1915,22 @@ onUnmounted(() => {
                 <form @submit.prevent="saveEnrollment" class="p-5 space-y-4 text-xs">
                     <div v-if="editError" class="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 font-bold">
                         {{ editError }}
+                    </div>
+
+                    <div v-if="isActaClosed" class="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-[11px] text-amber-900 dark:text-amber-200 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <Lock class="size-3.5 shrink-0 text-amber-700" />
+                            <span>Acta cerrada: puedes ajustar la calificación o reabrir el acta para edición global.</span>
+                        </div>
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            class="h-6 px-1.5 text-[10px] font-black text-amber-900 dark:text-amber-300 underline hover:bg-amber-100 dark:hover:bg-amber-900/60 cursor-pointer shrink-0"
+                            @click="isEditModalOpen = false; isReopenActaModalOpen = true"
+                        >
+                            Reabrir acta
+                        </Button>
                     </div>
 
                     <div class="space-y-1.5">
