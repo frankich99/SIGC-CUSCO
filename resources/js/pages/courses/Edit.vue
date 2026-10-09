@@ -81,6 +81,37 @@ const form = useForm({
     status: props.course.status,
 });
 
+const statusOptions = [
+    {
+        value: 'abierto',
+        label: 'Abierto',
+        dotClass: 'bg-emerald-500 shadow-xs shadow-emerald-500/50',
+        activeClass: 'bg-emerald-50/90 dark:bg-emerald-950/60 border-emerald-500 text-emerald-950 dark:text-emerald-100 ring-2 ring-emerald-500/20 shadow-xs',
+        checkBadgeClass: 'bg-emerald-600 text-white',
+    },
+    {
+        value: 'en_curso',
+        label: 'En Curso',
+        dotClass: 'bg-blue-500 shadow-xs shadow-blue-500/50',
+        activeClass: 'bg-blue-50/90 dark:bg-blue-950/60 border-blue-500 text-blue-950 dark:text-blue-100 ring-2 ring-blue-500/20 shadow-xs',
+        checkBadgeClass: 'bg-blue-600 text-white',
+    },
+    {
+        value: 'concluido',
+        label: 'Concluido',
+        dotClass: 'bg-purple-500 shadow-xs shadow-purple-500/50',
+        activeClass: 'bg-purple-50/90 dark:bg-purple-950/60 border-purple-500 text-purple-950 dark:text-purple-100 ring-2 ring-purple-500/20 shadow-xs',
+        checkBadgeClass: 'bg-purple-600 text-white',
+    },
+    {
+        value: 'cancelado',
+        label: 'Cancelado',
+        dotClass: 'bg-rose-500 shadow-xs shadow-rose-500/50',
+        activeClass: 'bg-rose-50/90 dark:bg-rose-950/60 border-rose-500 text-rose-950 dark:text-rose-100 ring-2 ring-rose-500/20 shadow-xs',
+        checkBadgeClass: 'bg-rose-600 text-white',
+    },
+];
+
 const isDateOrderInvalid = computed(() => {
     if (form.start_date && form.end_date) {
         return new Date(form.end_date) < new Date(form.start_date);
@@ -185,25 +216,45 @@ function submit() {
 
                             <div class="space-y-1.5">
                                 <div class="flex items-center justify-between">
-                                    <Label for="status" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                    <Label class="text-xs font-bold text-slate-800 dark:text-slate-200">
                                         Estado de la Convocatoria <span class="text-rose-700">*</span>
                                     </Label>
                                     <Badge
-                                        class="text-[10px] font-bold capitalize py-0.5 px-2"
+                                        class="text-[10px] font-bold capitalize py-0.5 px-2.5 rounded-full"
                                         :class="THEME_BADGES[form.status as keyof typeof THEME_BADGES] || 'bg-slate-100 text-slate-800'"
                                     >
-                                        {{ form.status }}
+                                        {{ form.status.replace('_', ' ') }}
                                     </Badge>
                                 </div>
-                                <select
-                                    id="status"
-                                    v-model="form.status"
-                                    class="w-full h-10 rounded-xl border border-slate-300 bg-white px-3 py-1 text-xs sm:text-sm font-semibold shadow-2xs focus:border-rose-900 focus:ring-2 focus:ring-rose-900/20 focus:outline-hidden dark:border-slate-700 dark:bg-slate-950 cursor-pointer"
-                                >
-                                    <option v-for="st in statuses" :key="st.value" :value="st.value">
-                                        {{ st.label }}
-                                    </option>
-                                </select>
+                                <div class="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Estado de la convocatoria">
+                                    <button
+                                        v-for="st in statusOptions"
+                                        :key="st.value"
+                                        type="button"
+                                        role="radio"
+                                        :aria-checked="form.status === st.value"
+                                        @click="form.status = st.value"
+                                        class="h-10 px-3 flex items-center justify-between rounded-xl border text-xs font-bold transition-all duration-150 select-none shadow-2xs cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-rose-800/30"
+                                        :class="form.status === st.value
+                                            ? st.activeClass
+                                            : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50'"
+                                    >
+                                        <div class="flex items-center gap-2 truncate">
+                                            <span class="size-2 rounded-full shrink-0" :class="st.dotClass" />
+                                            <span class="truncate font-semibold">{{ st.label }}</span>
+                                        </div>
+                                        <div
+                                            v-if="form.status === st.value"
+                                            class="size-4.5 rounded-full flex items-center justify-center shrink-0"
+                                            :class="st.checkBadgeClass"
+                                        >
+                                            <Check class="size-3 stroke-[3]" />
+                                        </div>
+                                    </button>
+                                </div>
+                                <p class="text-[11px] text-slate-500 font-medium">
+                                    Selección táctil directa. Define el estado operativo del curso.
+                                </p>
                                 <span v-if="form.errors.status" class="text-xs text-red-600 font-semibold block">
                                     {{ form.errors.status }}
                                 </span>
