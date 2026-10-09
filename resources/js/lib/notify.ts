@@ -25,48 +25,77 @@ export interface ActiveToast extends ToastOptions {
     createdAt: number;
 }
 
-// Estado reactivo global compartido de toasts
+// Estado reactivo global compartido de toasts: garantiza MÁXIMO 1 toast activo
 export const activeToasts = ref<ActiveToast[]>([]);
 
 let toastCounter = 0;
 let lastProcessedFlash: string | null = null;
+let currentTimerId: ReturnType<typeof setTimeout> | null = null;
+let lastToastSignature: string = '';
+let lastToastTimestamp: number = 0;
 
 export function addToast(options: ToastOptions | string): number {
     const opts: ToastOptions = typeof options === 'string' ? { title: options } : options;
+    const title = (opts.title || '').trim();
+    const text = (opts.text || '').trim();
+    const icon = opts.icon || 'success';
+    const signature = `${icon}:${title}:${text}`;
+    const now = Date.now();
+
+    // Debounce: no duplicar la misma notificación en menos de 1500ms
+    if (signature === lastToastSignature && now - lastToastTimestamp < 1500) {
+        return activeToasts.value[0]?.id || 0;
+    }
+    lastToastSignature = signature;
+    lastToastTimestamp = now;
+
+    // Limpiar temporizador previo para evitar que cierre prematuramente la nueva notificación
+    if (currentTimerId) {
+        clearTimeout(currentTimerId);
+        currentTimerId = null;
+    }
+
     const id = ++toastCounter;
+    const duration = opts.timer !== undefined ? opts.timer : 3500;
 
     const toast: ActiveToast = {
         ...opts,
         id,
-        icon: opts.icon || 'success',
+        icon,
         position: opts.position || 'top-end',
-        timer: opts.timer !== undefined ? opts.timer : 4000,
+        timer: duration,
         timerProgressBar: opts.timerProgressBar !== undefined ? opts.timerProgressBar : true,
-        remaining: opts.timer !== undefined ? opts.timer : 4000,
-        createdAt: Date.now(),
+        remaining: duration,
+        createdAt: now,
     };
 
-    // Agregar a la lista
-    activeToasts.value.push(toast);
+    // REEMPLAZAR: estrictamente una sola notificación visible en pantalla a la vez
+    activeToasts.value = [toast];
 
     // Auto-eliminar cuando expira el temporizador
-    if (toast.timer > 0) {
-        setTimeout(() => {
+    if (duration > 0) {
+        currentTimerId = setTimeout(() => {
             removeToast(id);
-        }, toast.timer);
+            currentTimerId = null;
+        }, duration);
     }
 
     return id;
 }
 
 export function removeToast(id: number): void {
-    const idx = activeToasts.value.findIndex((t) => t.id === id);
-    if (idx !== -1) {
-        activeToasts.value.splice(idx, 1);
+    if (currentTimerId) {
+        clearTimeout(currentTimerId);
+        currentTimerId = null;
     }
+    activeToasts.value = activeToasts.value.filter((t) => t.id !== id);
 }
 
 export function clearToasts(): void {
+    if (currentTimerId) {
+        clearTimeout(currentTimerId);
+        currentTimerId = null;
+    }
     activeToasts.value = [];
 }
 
@@ -106,8 +135,11 @@ if (typeof window !== 'undefined') {
 }
 
 // Listener global para mensajes flash de Laravel / Inertia
+let isListenerInitialized = false;
+
 export function setupInertiaFlashListener(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || isListenerInitialized) return;
+    isListenerInitialized = true;
 
     function checkFlash(pageProps: any) {
         const flash = pageProps?.flash as Record<string, string | null> | undefined;
@@ -135,16 +167,8 @@ export function setupInertiaFlashListener(): void {
         }
     }
 
-    // Escuchar eventos de navegación de Inertia
+    // Escuchar únicamente evento finish de Inertia al completar navegación
     router.on('finish', (event: any) => {
-        // En Inertia v2/v3 event.detail?.page?.props tiene los nuevos props
-        const props = event?.detail?.page?.props;
-        if (props) {
-            checkFlash(props);
-        }
-    });
-
-    router.on('success', (event: any) => {
         const props = event?.detail?.page?.props;
         if (props) {
             checkFlash(props);

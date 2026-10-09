@@ -4,7 +4,6 @@ import AppHeader from '@/components/AppHeader.vue';
 import AppShell from '@/components/AppShell.vue';
 import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { GraduationCap } from '@lucide/vue';
-import { Toaster } from '@/components/ui/sonner';
 import GlobalToast from '@/components/GlobalToast.vue';
 import LoginModal from '@/components/auth/LoginModal.vue';
 import RegisterModal from '@/components/auth/RegisterModal.vue';
@@ -41,7 +40,6 @@ withDefaults(defineProps<Props>(), {
             </div>
         </footer>
 
-        <Toaster />
         <GlobalToast />
         <LoginModal />
         <RegisterModal />

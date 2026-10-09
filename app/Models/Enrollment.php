@@ -149,7 +149,9 @@ class Enrollment extends Model
             return 0.0;
         }
 
-        return round(($this->attended_sessions / $totalSessions) * 100, 1);
+        $cappedSessions = min($this->attended_sessions, $totalSessions);
+
+        return round(($cappedSessions / $totalSessions) * 100, 1);
     }
 
     /**

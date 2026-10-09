@@ -89,6 +89,25 @@ Route::get('api/certificates/lookup', function (Request $request) {
         ], 422);
     }
 
+    // Verificación preliminar de existencia
+    if ($request->boolean('check_only')) {
+        $first = Enrollment::where('dni', $dni)
+            ->where('status', '!=', 'cancelado')
+            ->where(function ($q) {
+                $q->where('status', 'aprobado')
+                    ->orWhereNotNull('certificate_code')
+                    ->orWhereNotNull('certificate_issued_at');
+            })
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'dni' => $dni,
+            'has_records' => $first !== null,
+            'student_name' => $first?->full_name,
+        ]);
+    }
+
     // Solo certificaciones aprobadas o con código de certificado emitido para consulta pública
     $enrollments = Enrollment::with(['course.instructor:id,name,paterno,materno'])
         ->where('dni', $dni)
@@ -101,9 +120,12 @@ Route::get('api/certificates/lookup', function (Request $request) {
         ->latest('id')
         ->get();
 
+    $studentName = $enrollments->first()?->full_name;
+
     return response()->json([
         'success' => true,
         'dni' => $dni,
+        'student_name' => $studentName,
         'records' => $enrollments->map(function ($e) {
             return CertificateService::getCertificatePayload($e);
         }),

@@ -154,3 +154,33 @@ test('guest receives 422 error when querying lookup api with invalid dni format'
         'records' => [],
     ]);
 });
+
+test('guest can query lookup api with check_only flag to verify student existence', function () {
+    $course = Course::factory()->create([
+        'title' => 'Gestión Pública y Modernización',
+        'status' => CourseStatus::Concluido,
+    ]);
+
+    Enrollment::create([
+        'course_id' => $course->id,
+        'dni' => '77777777',
+        'nombres' => 'CARLOS',
+        'paterno' => 'CONDORI',
+        'email' => 'carlos@example.com',
+        'status' => 'aprobado',
+        'final_grade' => 19,
+        'certificate_code' => 'SIGC-2026-VALID01',
+        'certificate_hash' => hash('sha256', 'mock_hash_2'),
+        'certificate_issued_at' => now(),
+    ]);
+
+    $response = $this->getJson('/api/certificates/lookup?dni=77777777&check_only=1');
+
+    $response->assertOk();
+    $response->assertJson([
+        'success' => true,
+        'dni' => '77777777',
+        'has_records' => true,
+        'student_name' => 'CARLOS CONDORI',
+    ]);
+});
