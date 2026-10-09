@@ -129,18 +129,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             $taughtCourses = $query->latest('id')->take(6)->get();
         }
 
-        // Si es participante o admin (persona que recibe capacitación)
-        if ($user->isParticipante() || $user->isAdmin()) {
-            $studentEnrollments = Enrollment::with(['course.instructor:id,name,paterno,materno'])
-                ->where(function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                    if ($user->dni) {
-                        $query->orWhere('dni', $user->dni);
-                    }
-                })
-                ->latest('id')
-                ->get();
-        }
+        // Matrículas del usuario como participante (estudiante, docente o admin que se inscribe)
+        $studentEnrollments = Enrollment::with(['course.instructor:id,name,paterno,materno'])
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+                if ($user->dni) {
+                    $query->orWhere('dni', $user->dni);
+                }
+            })
+            ->where('status', '!=', 'cancelado')
+            ->latest('id')
+            ->get();
 
         $openCourses = Course::with('instructor:id,name,paterno,materno')
             ->withCount(['enrollments' => fn ($q) => $q->where('status', '!=', 'cancelado')])

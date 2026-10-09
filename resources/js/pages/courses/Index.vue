@@ -22,6 +22,7 @@ import {
     Trash2,
     BookOpen,
     Building2,
+    CheckCircle2,
 } from '@lucide/vue';
 import type { BreadcrumbItem } from '@/types';
 
@@ -72,6 +73,7 @@ const props = defineProps<{
         status?: string;
     };
     statuses: Array<{ value: string; label: string }>;
+    myEnrolledCourseIds?: number[];
     can: {
         create: boolean;
     };
@@ -275,10 +277,39 @@ function instructorName(inst?: Instructor): string {
                                     Ver curso
                                 </Link>
                             </Button>
+
+                            <!-- Si el participante ya está matriculado en esta capacitación -->
                             <Button
-                                v-if="course.status === 'abierto'"
+                                v-if="authUser && myEnrolledCourseIds?.includes(course.id)"
+                                as-child
                                 size="sm"
-                                class="bg-rose-900 hover:bg-rose-950 text-white text-xs flex-1 font-bold shadow-xs"
+                                variant="outline"
+                                class="flex-1 text-xs font-black border-emerald-600 text-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700"
+                            >
+                                <Link :href="`/courses/${course.id}`">
+                                    <CheckCircle2 class="mr-1 size-3.5 text-emerald-600" />
+                                    Matriculado
+                                </Link>
+                            </Button>
+
+                            <!-- Si el usuario es el docente responsable o administrador del curso -->
+                            <Button
+                                v-else-if="authUser && (authUser.role === 'admin' || (authUser.role === 'docente' && course.instructor?.id === authUser.id))"
+                                as-child
+                                size="sm"
+                                class="bg-amber-700 hover:bg-amber-800 text-white text-xs flex-1 font-bold shadow-xs"
+                            >
+                                <Link :href="`/courses/${course.id}`">
+                                    <BookOpen class="mr-1 size-3.5" />
+                                    Gestionar
+                                </Link>
+                            </Button>
+
+                            <!-- Si la convocatoria está abierta para postulaciones -->
+                            <Button
+                                v-else-if="course.status === 'abierto'"
+                                size="sm"
+                                class="bg-rose-900 hover:bg-rose-950 text-white text-xs flex-1 font-bold shadow-xs cursor-pointer"
                                 @click="openEnroll(course)"
                             >
                                 Inscribirme

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
+use App\Models\AttendanceRecord;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\User;
+use App\Services\CertificateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -138,47 +140,66 @@ class EnrollmentController extends Controller
     }
 
     /**
-     * Incrementar asistencia rápida de una sesión de clase.
+     * Incrementar asistencia rápida de una sesión de clase y sincronizar matriz oficial.
      */
     public function recordAttendance(Enrollment $enrollment): RedirectResponse
     {
         $this->authorizeStaff($enrollment);
 
-        $enrollment->increment('attended_sessions');
+        $course = $enrollment->course;
+        $totalSessions = $course->total_sessions ?: 4;
 
-        if ($enrollment->status === 'inscrito') {
-            $enrollment->update(['status' => 'en_curso']);
+        // Determinar siguiente sesión disponible sin registro
+        $recordedSessions = AttendanceRecord::where('enrollment_id', $enrollment->id)->pluck('session_number')->toArray();
+        $targetSession = 1;
+        for ($i = 1; $i <= $totalSessions; $i++) {
+            if (! in_array($i, $recordedSessions)) {
+                $targetSession = $i;
+                break;
+            }
         }
 
-        return back()->with('success', "Asistencia registrada para {$enrollment->full_name} ({$enrollment->attended_sessions} sesiones).");
+        AttendanceRecord::firstOrCreate(
+            [
+                'course_id' => $enrollment->course_id,
+                'enrollment_id' => $enrollment->id,
+                'session_number' => $targetSession,
+            ],
+            [
+                'status' => 'presente',
+                'method' => 'manual',
+                'recorded_at' => now(),
+                'recorded_by' => Auth::id(),
+            ]
+        );
+
+        $attendedCount = AttendanceRecord::where('enrollment_id', $enrollment->id)
+            ->whereIn('status', ['presente', 'tardanza'])
+            ->count();
+
+        $enrollment->update([
+            'attended_sessions' => max($attendedCount, $enrollment->attended_sessions + 1),
+            'status' => $enrollment->status === 'inscrito' ? 'en_curso' : $enrollment->status,
+        ]);
+
+        return back()->with('success', "Asistencia registrada para {$enrollment->full_name} (sesión {$targetSession}, total {$enrollment->attended_sessions} sesiones).");
     }
 
     /**
-     * Emitir certificado oficial para un participante aprobado.
+     * Emitir certificado oficial para un participante aprobado con firma SHA-256 institucional.
      */
     public function generateCertificate(Enrollment $enrollment): RedirectResponse
     {
         $this->authorizeStaff($enrollment);
 
-        $year = date('Y');
-        $code = "CERT-{$year}-{$enrollment->dni}";
-
-        // Asegurar unicidad si ya existe con el mismo curso
-        $existsOther = Enrollment::where('certificate_code', $code)
-            ->where('id', '!=', $enrollment->id)
-            ->exists();
-
-        if ($existsOther) {
-            $code .= "-{$enrollment->course_id}";
-        }
-
         $enrollment->update([
             'status' => 'aprobado',
-            'certificate_code' => $code,
             'final_grade' => $enrollment->final_grade ?? 18.00,
         ]);
 
-        return back()->with('success', "Certificado emitido exitosamente con código {$code}.");
+        $payload = CertificateService::getCertificatePayload($enrollment);
+
+        return back()->with('success', "Certificado emitido exitosamente con código {$payload['certificate_code']}.");
     }
 
     /**

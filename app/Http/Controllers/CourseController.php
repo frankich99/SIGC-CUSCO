@@ -40,12 +40,23 @@ class CourseController extends Controller
             'label' => $status->label(),
         ], CourseStatus::cases());
 
+        $user = $request->user();
+        $myEnrolledCourseIds = [];
+        if ($user) {
+            $myEnrolledCourseIds = Enrollment::where('user_id', $user->id)
+                ->when($user->dni, fn ($q) => $q->orWhere('dni', $user->dni))
+                ->where('status', '!=', 'cancelado')
+                ->pluck('course_id')
+                ->all();
+        }
+
         return Inertia::render('courses/Index', [
             'courses' => $courses,
             'filters' => $filters,
             'statuses' => $statuses,
+            'myEnrolledCourseIds' => $myEnrolledCourseIds,
             'can' => [
-                'create' => $request->user() ? ($request->user()->isAdmin() || $request->user()->isDocente()) : false,
+                'create' => $user ? ($user->isAdmin() || $user->isDocente()) : false,
             ],
         ]);
     }

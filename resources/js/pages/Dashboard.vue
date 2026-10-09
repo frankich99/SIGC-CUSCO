@@ -98,7 +98,7 @@ const isOrganizerOrTeacher = computed(() => {
 });
 
 const isStudentOrParticipant = computed(() => {
-    return user.value?.role === 'participante' || user.value?.role === 'admin';
+    return user.value?.role === 'participante' || user.value?.role === 'admin' || (props.studentEnrollments && props.studentEnrollments.length > 0);
 });
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -108,7 +108,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// Active view toggle when admin has both views
+// Active view toggle when admin has both views or user is enrolled
 const activeDashboardTab = ref<'organizador' | 'participante'>(
     user.value?.role === 'participante' ? 'participante' : 'organizador'
 );
@@ -119,7 +119,6 @@ const isEnrollModalOpen = ref(false);
 
 const isQrModalOpen = ref(false);
 const activeQrCourse = ref<CourseItem | null>(null);
-const isScanQrModalOpen = ref(false);
 const isCredentialModalOpen = ref(false);
 const activeCredentialEnrollment = ref<EnrollmentItem | null>(null);
 
@@ -134,8 +133,12 @@ const activeCredentialQrSvg = computed(() => {
     return generateQrSvg(code, 260, '#800020');
 });
 
-const scanCodeInput = ref('');
-const scanSuccessMessage = ref<string | null>(null);
+const activeQrSvg = computed(() => {
+    if (!activeQrCourse.value) return '';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const url = `${origin}/courses/${activeQrCourse.value.id}`;
+    return generateQrSvg(url, 260, '#800020');
+});
 
 function openEnroll(course: CourseItem) {
     selectedCourseToEnroll.value = course;
@@ -145,21 +148,6 @@ function openEnroll(course: CourseItem) {
 function openQrProjection(course: CourseItem) {
     activeQrCourse.value = course;
     isQrModalOpen.value = true;
-}
-
-function openScanModal(enrollment: EnrollmentItem) {
-    activeQrCourse.value = enrollment.course;
-    scanCodeInput.value = '';
-    scanSuccessMessage.value = null;
-    isScanQrModalOpen.value = true;
-}
-
-function simulateScan() {
-    if (!scanCodeInput.value) return;
-    scanSuccessMessage.value = `¡Asistencia registrada exitosamente para la sesión de hoy! (Código: ${scanCodeInput.value.toUpperCase()})`;
-    setTimeout(() => {
-        scanCodeInput.value = '';
-    }, 4000);
 }
 
 function roleBadgeData(role?: string) {
@@ -620,22 +608,27 @@ function enrollmentStatusBadge(status: string) {
                             </CardContent>
 
                             <div class="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 rounded-b-xl">
-                                <Button size="sm" variant="outline" class="flex-1 text-xs font-bold h-9 border-rose-300 text-rose-950 hover:bg-rose-50" @click="openCredentialModal(item)">
+                                <Button size="sm" variant="outline" class="flex-1 text-xs font-bold h-9 border-rose-300 text-rose-950 hover:bg-rose-50 cursor-pointer" @click="openCredentialModal(item)">
                                     <QrCode class="size-4 mr-1.5 text-rose-800" />
                                     Mi Credencial QR
                                 </Button>
-                                <Button size="sm" class="flex-1 bg-rose-900 hover:bg-rose-950 text-white text-xs font-bold h-9 shadow-xs" @click="openScanModal(item)">
-                                    <Camera class="size-4 mr-1.5" />
-                                    Escanear
-                                </Button>
-                                <Button v-if="item.status === 'aprobado' || item.certificate_code" size="sm" variant="outline" class="flex-1 text-xs font-bold h-9 border-amber-400 text-amber-900">
-                                    <Download class="size-4 mr-1.5 text-amber-700" />
-                                    Certificado
-                                </Button>
-                                <Button v-else as-child variant="outline" size="sm" class="flex-1 text-xs font-bold h-9 border-slate-300 text-slate-800">
+                                <Button as-child variant="outline" size="sm" class="flex-1 text-xs font-bold h-9 border-slate-300 text-slate-800 hover:text-rose-900">
                                     <Link :href="`/courses/${item.course_id}`">
-                                        Detalles
+                                        <BookOpen class="size-4 mr-1.5 text-slate-700" />
+                                        Ver Curso
                                     </Link>
+                                </Button>
+                                <Button
+                                    v-if="item.status === 'aprobado' || item.certificate_code"
+                                    as-child
+                                    size="sm"
+                                    variant="outline"
+                                    class="flex-1 text-xs font-black h-9 border-amber-500 text-amber-950 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950 dark:text-amber-200"
+                                >
+                                    <a :href="`/certificates?dni=${item.dni}&code=${item.certificate_code || ''}`" target="_blank">
+                                        <Award class="size-4 mr-1.5 text-amber-700" />
+                                        Certificado
+                                    </a>
                                 </Button>
                             </div>
                         </Card>
@@ -726,85 +719,22 @@ function enrollmentStatusBadge(status: string) {
                         </DialogHeader>
                     </div>
 
-                    <!-- QR Visualization Gigante -->
+                    <!-- QR Visualization Gigante Real y Escaneable -->
                     <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-6 space-y-5">
-                        <div class="p-8 bg-white rounded-3xl border-4 border-rose-900 inline-block shadow-xl">
-                            <QrCode class="size-60 sm:size-72 text-slate-950 mx-auto" />
-                        </div>
+                        <div class="p-6 bg-white rounded-3xl border-4 border-rose-900 inline-block shadow-xl" v-html="activeQrSvg"></div>
                         <div class="space-y-2">
                             <div class="inline-block text-sm sm:text-base font-mono font-black tracking-widest text-rose-950 bg-rose-100 px-5 py-2 rounded-full border-2 border-rose-300 shadow-sm">
                                 CÓDIGO DE SESIÓN: {{ activeQrCourse?.code }}-{{ new Date().getDate() }}
                             </div>
                             <p class="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                ⏳ Código de asistencia dinámico activo únicamente durante el horario de la clase de hoy.
+                                ⏳ Código de asistencia dinámico activo para la capacitación en aula.
                             </p>
                         </div>
 
                         <div class="pt-2">
-                            <Button @click="isQrModalOpen = false" class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold h-11 text-sm shadow-md">
+                            <Button @click="isQrModalOpen = false" class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold h-11 text-sm shadow-md cursor-pointer">
                                 Finalizar y Cerrar Proyección
                             </Button>
-                        </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
-
-            <!-- MODAL: MARCAR ASISTENCIA (PARA ALUMNO) -->
-            <Dialog :open="isScanQrModalOpen" @update:open="isScanQrModalOpen = $event">
-                <DialogContent class="w-[94vw] sm:max-w-md max-h-[90vh] flex flex-col p-0 rounded-2xl shadow-xl border border-rose-200 dark:border-rose-900 text-left bg-white dark:bg-slate-950 overflow-hidden">
-                    <div class="p-5 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0 pr-12">
-                        <DialogHeader class="space-y-1">
-                            <DialogTitle class="text-lg font-black text-slate-950 dark:text-white flex items-center gap-2">
-                                <Camera class="size-5 text-rose-800" />
-                                <span>Marcar Mi Asistencia Oficial</span>
-                            </DialogTitle>
-                            <DialogDescription class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                Curso: <strong class="text-rose-900 dark:text-rose-300">{{ activeQrCourse?.title }}</strong>
-                            </DialogDescription>
-                        </DialogHeader>
-                    </div>
-
-                    <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-5 space-y-4">
-                        <div v-if="scanSuccessMessage" class="py-6 text-center space-y-3">
-                            <div class="size-14 rounded-full bg-rose-100 text-rose-900 flex items-center justify-center mx-auto">
-                                <CheckCircle2 class="size-8" />
-                            </div>
-                            <p class="text-sm font-extrabold text-rose-950 dark:text-rose-200">
-                                {{ scanSuccessMessage }}
-                            </p>
-                            <Button @click="isScanQrModalOpen = false" class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold h-10 text-xs shadow-md">
-                                Aceptar y Continuar
-                            </Button>
-                        </div>
-
-                        <div v-else class="space-y-4">
-                            <div class="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-xl text-left space-y-2 border border-slate-200 dark:border-slate-700">
-                                <div class="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white">
-                                    <QrCode class="size-5 text-rose-800" />
-                                    <span>Instrucciones para validar asistencia</span>
-                                </div>
-                                <p class="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    Escanea con la cámara de tu smartphone el código QR que proyecta tu docente en clase, o copia el código numérico de sesión.
-                                </p>
-                            </div>
-
-                            <div class="space-y-2">
-                                <Label for="qr-code-text" class="text-xs font-bold text-slate-900 dark:text-white">
-                                    Ingrese Código de Sesión del Docente
-                                </Label>
-                                <div class="flex gap-2">
-                                    <Input
-                                        id="qr-code-text"
-                                        v-model="scanCodeInput"
-                                        type="text"
-                                        placeholder="Ej: UNS-AI-07"
-                                        class="text-sm font-mono uppercase font-bold tracking-wider border-slate-300"
-                                    />
-                                    <Button size="default" class="bg-rose-900 hover:bg-rose-950 text-white text-xs font-bold px-5 shrink-0 shadow-xs" @click="simulateScan">
-                                        Validar Asistencia
-                                    </Button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </DialogContent>

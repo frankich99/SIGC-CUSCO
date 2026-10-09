@@ -88,6 +88,20 @@ class Enrollment extends Model
     }
 
     /**
+     * Obtener código de credencial garantizando valor para registros antiguos.
+     */
+    public function getCredentialCodeAttribute(?string $value): string
+    {
+        if (! empty($value)) {
+            return $value;
+        }
+
+        $suffix = substr($this->dni, -4) ?: '0000';
+
+        return "INS-{$this->course_id}-{$suffix}";
+    }
+
+    /**
      * Curso al que corresponde la matrícula.
      *
      * @return BelongsTo<Course, $this>
