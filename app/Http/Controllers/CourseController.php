@@ -82,7 +82,19 @@ class CourseController extends Controller
             'label' => $status->label(),
         ], CourseStatus::cases());
 
-        $suggestedCode = 'SIGC-'.date('Y').'-'.str_pad((string) (Course::max('id') + 1), 3, '0', STR_PAD_LEFT);
+        $year = date('Y');
+        $prefix = "SIGC-{$year}-";
+        $latest = Course::where('code', 'like', "{$prefix}%")
+            ->orderByDesc('id')
+            ->value('code');
+
+        if ($latest && preg_match('/SIGC-\d{4}-(\d+)/', $latest, $matches)) {
+            $nextNumber = ((int) $matches[1]) + 1;
+        } else {
+            $nextNumber = (Course::max('id') ?: 0) + 1;
+        }
+
+        $suggestedCode = $prefix.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
 
         return Inertia::render('courses/Create', [
             'instructors' => $instructors,
@@ -99,7 +111,19 @@ class CourseController extends Controller
         $validated = $request->validated();
 
         if (empty($validated['code'])) {
-            $validated['code'] = 'SIGC-'.date('Y').'-'.str_pad((string) (Course::max('id') + 1), 3, '0', STR_PAD_LEFT);
+            $year = date('Y');
+            $prefix = "SIGC-{$year}-";
+            $latest = Course::where('code', 'like', "{$prefix}%")
+                ->orderByDesc('id')
+                ->value('code');
+
+            if ($latest && preg_match('/SIGC-\d{4}-(\d+)/', $latest, $matches)) {
+                $nextNumber = ((int) $matches[1]) + 1;
+            } else {
+                $nextNumber = (Course::max('id') ?: 0) + 1;
+            }
+
+            $validated['code'] = $prefix.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
         }
 
         if (empty($validated['instructor_id'])) {

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\CourseStatus;
+use App\Models\Course;
 use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -25,6 +26,24 @@ class StoreCourseRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        if (empty($this->code)) {
+            $year = date('Y');
+            $prefix = "SIGC-{$year}-";
+            $latest = Course::where('code', 'like', "{$prefix}%")
+                ->orderByDesc('id')
+                ->value('code');
+
+            if ($latest && preg_match('/SIGC-\d{4}-(\d+)/', $latest, $matches)) {
+                $nextNumber = ((int) $matches[1]) + 1;
+            } else {
+                $nextNumber = (Course::max('id') ?: 0) + 1;
+            }
+
+            $this->merge([
+                'code' => $prefix.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT),
+            ]);
+        }
+
         if (empty($this->instructor_name) && ! empty($this->instructor_id)) {
             $user = User::find($this->instructor_id);
             if ($user) {
