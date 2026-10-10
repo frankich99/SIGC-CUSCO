@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -44,6 +45,7 @@ class CourseController extends Controller
 
         $courses = Course::query()
             ->with(['instructor:id,name,paterno,materno,email,role'])
+            ->withCount(['enrollments' => fn ($q) => $q->where('status', '!=', 'cancelado')])
             ->filter($filters)
             ->latest('id')
             ->paginate(9)
@@ -301,6 +303,25 @@ class CourseController extends Controller
     public function destroy(Course $course): RedirectResponse
     {
         Gate::authorize('delete', $course);
+
+        if ($course->isActaClosed()) {
+            throw ValidationException::withMessages([
+                'course' => 'No se puede eliminar una capacitación que ya cuenta con acta oficial cerrada. Anule o archive el curso en su lugar.',
+            ]);
+        }
+
+        $hasIssuedCertificates = $course->enrollments()
+            ->where(function ($query): void {
+                $query->whereNotNull('certificate_code')
+                    ->orWhereNotNull('certificate_issued_at');
+            })
+            ->exists();
+
+        if ($hasIssuedCertificates) {
+            throw ValidationException::withMessages([
+                'course' => 'No se puede eliminar una capacitación con certificados oficiales emitidos. Anule o archive el curso en su lugar.',
+            ]);
+        }
 
         $course->delete();
 

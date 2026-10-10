@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/card';
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
 import { formatDateRange, formatHours } from '@/lib/formatters';
-import { THEME_BADGES, THEME_BUTTONS } from '@/lib/theme';
+import { THEME_BADGES, THEME_BUTTONS, getCourseStatusBadge } from '@/lib/theme';
 import {
     Calendar,
     Clock,
@@ -55,6 +55,7 @@ interface CourseItem {
     status: 'abierto' | 'en_curso' | 'concluido' | 'cancelado';
     instructor?: Instructor;
     instructor_name?: string;
+    enrollments_count?: number;
 }
 
 interface PaginationMeta {
@@ -136,28 +137,7 @@ function deleteCourse(course: CourseItem) {
 }
 
 function getStatusBadge(status: string) {
-    switch (status) {
-        case 'abierto':
-            return {
-                label: 'Inscripción Abierta',
-                class: THEME_BADGES.abierto,
-            };
-        case 'en_curso':
-            return {
-                label: 'En curso',
-                class: THEME_BADGES.en_curso,
-            };
-        case 'concluido':
-            return {
-                label: 'Concluido',
-                class: THEME_BADGES.concluido,
-            };
-        default:
-            return {
-                label: status,
-                class: THEME_BADGES.concluido,
-            };
-    }
+    return getCourseStatusBadge(status);
 }
 
 function instructorName(inst?: Instructor): string {
@@ -418,6 +398,23 @@ function instructorName(inst?: Instructor): string {
                                     <BookOpen class="mr-1 size-3.5" />
                                     Gestionar
                                 </Link>
+                            </Button>
+
+                            <!-- Si la convocatoria está abierta pero se agotaron los cupos -->
+                            <Button
+                                v-else-if="
+                                    course.status === 'abierto' &&
+                                    course.enrollments_count !== undefined &&
+                                    course.capacity -
+                                        course.enrollments_count <=
+                                        0
+                                "
+                                size="sm"
+                                variant="secondary"
+                                disabled
+                                class="min-w-[100px] flex-1 text-xs font-semibold opacity-75"
+                            >
+                                Agotado
                             </Button>
 
                             <!-- Si la convocatoria está abierta para postulaciones -->

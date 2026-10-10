@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdateCourseRequest extends FormRequest
 {
@@ -108,5 +109,31 @@ class UpdateCourseRequest extends FormRequest
             'capacity.min' => 'El límite de vacantes debe ser un número positivo mayor a 0.',
             'status.required' => 'El estado del curso es obligatorio.',
         ];
+    }
+
+    /**
+     * Reglas de validación contextuales para cursos con acta oficial cerrada.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            /** @var Course|null $course */
+            $course = $this->route('course');
+
+            if ($course && $course->isActaClosed()) {
+                if ($this->has('total_sessions') && (int) $this->input('total_sessions') !== (int) $course->total_sessions) {
+                    $validator->errors()->add('total_sessions', 'No se puede modificar el número de sesiones porque el acta oficial ya está cerrada.');
+                }
+
+                if ($this->has('min_attendance_percentage') && (float) $this->input('min_attendance_percentage') !== (float) $course->min_attendance_percentage) {
+                    $validator->errors()->add('min_attendance_percentage', 'No se puede modificar el porcentaje mínimo de asistencia porque el acta oficial ya está cerrada.');
+                }
+
+                $statusValue = $this->input('status');
+                if ($statusValue && $statusValue !== CourseStatus::Concluido->value) {
+                    $validator->errors()->add('status', 'No se puede cambiar el estado de un curso con acta cerrada. Debe reabrir el acta previamente.');
+                }
+            }
+        });
     }
 }

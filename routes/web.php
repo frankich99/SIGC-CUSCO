@@ -73,15 +73,30 @@ Route::get('api/certificates/lookup', function (Request $request) {
     $dni = trim((string) $request->query('dni', ''));
     $code = trim((string) $request->query('code', ''));
 
-    // Si viene código directo sin DNI (escaneo directo de QR)
+    // Si viene código directo sin DNI (escaneo directo de QR o enlace verificado)
     if (! empty($code) && empty($dni)) {
         $single = Enrollment::with(['course.instructor:id,name,paterno,materno'])
             ->where('certificate_code', $code)
+            ->where('status', '!=', 'cancelado')
+            ->whereNotNull('certificate_code')
+            ->whereNotNull('certificate_hash')
+            ->whereNotNull('certificate_issued_at')
             ->first();
 
-        if ($single) {
-            $dni = $single->dni;
+        if (! $single) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró ningún certificado emitido con el código proporcionado.',
+                'records' => [],
+            ], 404);
         }
+
+        return response()->json([
+            'success' => true,
+            'dni' => $single->dni,
+            'student_name' => $single->full_name,
+            'records' => [CertificateService::getCertificatePayload($single)],
+        ]);
     }
 
     if (! preg_match('/^\d{8}$/', $dni)) {

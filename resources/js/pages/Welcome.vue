@@ -38,6 +38,7 @@ import GlobalToast from '@/components/GlobalToast.vue';
 import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { useAuthModal } from '@/composables/useAuthModal';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
+import { getCourseStatusBadge } from '@/lib/theme';
 
 interface CourseItem {
     id: number;
@@ -124,28 +125,7 @@ const filteredCourses = computed(() => {
 });
 
 function statusBadgeInfo(status: string) {
-    switch (status) {
-        case 'abierto':
-            return {
-                label: 'Inscripciones Abiertas',
-                class: 'bg-rose-100 text-rose-950 border border-rose-300 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-800 font-bold',
-            };
-        case 'en_curso':
-            return {
-                label: 'En Curso',
-                class: 'bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800',
-            };
-        case 'concluido':
-            return {
-                label: 'Concluido',
-                class: 'bg-neutral-100 text-neutral-700 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700',
-            };
-        default:
-            return {
-                label: 'Cancelado',
-                class: 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800',
-            };
-    }
+    return getCourseStatusBadge(status);
 }
 </script>
 

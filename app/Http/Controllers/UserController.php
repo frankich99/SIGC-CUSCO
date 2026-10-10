@@ -79,7 +79,7 @@ class UserController extends Controller
             [
                 'modulo' => 'Cierre de Actas y Notas',
                 'descripcion' => 'Registro de notas vigesimales (0-20) y cierre definitivo según regla UNSAAC.',
-                'admin' => 'Auditar, reaperturar y cerrar actas con regla del 80% asistencias',
+                'admin' => 'Auditar, reaperturar y cerrar actas con regla del 75% de asistencias',
                 'docente' => 'Ingresar notas finales y cerrar el acta oficial de su curso',
                 'participante' => 'Visualizar su porcentaje de asistencia y nota obtenida',
             ],

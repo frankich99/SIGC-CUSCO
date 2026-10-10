@@ -57,6 +57,8 @@ export const THEME_BADGES = {
         'bg-slate-100 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 font-bold',
     cancelado:
         'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-400 dark:border-rose-900 font-semibold',
+    inscrito:
+        'bg-sky-100 text-sky-950 border border-sky-300 dark:bg-sky-950 dark:text-sky-200 dark:border-sky-800 font-bold',
     aprobado:
         'bg-emerald-100 text-emerald-950 border border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-200 dark:border-emerald-800 font-bold',
     reprobado:
@@ -64,6 +66,86 @@ export const THEME_BADGES = {
     official:
         'bg-rose-50 text-rose-900 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-800 font-bold',
 } as const;
+
+/**
+ * Unificación tipada de badges y etiquetas para el estado de capacitaciones/cursos.
+ */
+export function getCourseStatusBadge(status?: string | null): {
+    label: string;
+    class: string;
+} {
+    switch (status) {
+        case 'abierto':
+            return {
+                label: 'Inscripción Abierta',
+                class: THEME_BADGES.abierto,
+            };
+        case 'en_curso':
+            return {
+                label: 'En Curso',
+                class: THEME_BADGES.en_curso,
+            };
+        case 'concluido':
+            return {
+                label: 'Concluido',
+                class: THEME_BADGES.concluido,
+            };
+        case 'cancelado':
+            return {
+                label: 'Cancelado',
+                class: THEME_BADGES.cancelado,
+            };
+        default:
+            return {
+                label: (status || 'Desconocido')
+                    .replace('_', ' ')
+                    .toUpperCase(),
+                class: THEME_BADGES.concluido,
+            };
+    }
+}
+
+/**
+ * Unificación tipada de badges y etiquetas para el estado académico de un participante.
+ */
+export function getEnrollmentStatusBadge(status?: string | null): {
+    label: string;
+    class: string;
+} {
+    switch (status) {
+        case 'aprobado':
+            return {
+                label: 'Aprobado',
+                class: THEME_BADGES.aprobado,
+            };
+        case 'en_curso':
+            return {
+                label: 'En Curso',
+                class: THEME_BADGES.en_curso,
+            };
+        case 'inscrito':
+            return {
+                label: 'Inscrito',
+                class: THEME_BADGES.inscrito,
+            };
+        case 'reprobado':
+        case 'desaprobado':
+            return {
+                label: 'Reprobado',
+                class: THEME_BADGES.reprobado,
+            };
+        case 'cancelado':
+            return {
+                label: 'Cancelado',
+                class: THEME_BADGES.cancelado,
+            };
+        default:
+            return {
+                label: (status || 'Registrado').replace('_', ' ').toUpperCase(),
+                class: THEME_BADGES.concluido,
+            };
+    }
+}
 
 /**
  * Standardized Slim & Responsive Modal Layout Configurations

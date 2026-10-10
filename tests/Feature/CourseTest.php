@@ -316,3 +316,83 @@ test('CP-08 admin or course docente visiting course show receives full enrollmen
         ->has('course.enrollments', 3) // El docente titular gestiona a todos los alumnos
     );
 });
+
+test('admin cannot delete a course with closed acta', function () {
+    $admin = User::factory()->create([
+        'role' => UserRole::Admin,
+        'email_verified_at' => now(),
+    ]);
+    $course = Course::factory()->create([
+        'acta_closed_at' => now(),
+        'status' => 'concluido',
+    ]);
+
+    $response = $this->actingAs($admin)->delete(route('courses.destroy', $course));
+
+    $response->assertSessionHasErrors('course');
+    expect(Course::find($course->id))->not->toBeNull();
+});
+
+test('admin cannot delete a course with issued certificates', function () {
+    $admin = User::factory()->create([
+        'role' => UserRole::Admin,
+        'email_verified_at' => now(),
+    ]);
+    $course = Course::factory()->create();
+    Enrollment::create([
+        'course_id' => $course->id,
+        'dni' => '71234567',
+        'nombres' => 'MARIA',
+        'paterno' => 'MAMANI',
+        'email' => 'maria@test.com',
+        'status' => 'aprobado',
+        'attended_sessions' => 4,
+        'certificate_code' => 'CERT-2026-TEST',
+        'certificate_hash' => hash('sha256', 'test'),
+        'certificate_issued_at' => now(),
+    ]);
+
+    $response = $this->actingAs($admin)->delete(route('courses.destroy', $course));
+
+    $response->assertSessionHasErrors('course');
+    expect(Course::find($course->id))->not->toBeNull();
+});
+
+test('cannot modify total_sessions, min_attendance_percentage or status when acta is closed', function () {
+    $admin = User::factory()->create([
+        'role' => UserRole::Admin,
+        'email_verified_at' => now(),
+    ]);
+    $course = Course::factory()->create([
+        'acta_closed_at' => now(),
+        'status' => 'concluido',
+        'total_sessions' => 4,
+        'min_attendance_percentage' => 75,
+    ]);
+
+    $response = $this->actingAs($admin)->put(route('courses.update', $course), [
+        'code' => $course->code,
+        'title' => 'Titulo Modificado',
+        'instructor_name' => 'Docente Responsable',
+        'start_date' => $course->start_date->toDateString(),
+        'end_date' => $course->end_date->toDateString(),
+        'hours' => 60,
+        'total_sessions' => 8,
+        'min_attendance_percentage' => 80,
+        'capacity' => 50,
+        'status' => 'abierto',
+    ]);
+
+    $response->assertSessionHasErrors(['total_sessions', 'min_attendance_percentage', 'status']);
+});
+
+test('api certificates lookup with unknown code returns 404 with exact descriptive message', function () {
+    $response = $this->getJson('/api/certificates/lookup?code=CERT-NO-EXISTE');
+
+    $response->assertStatus(404)
+        ->assertJson([
+            'success' => false,
+            'message' => 'No se encontró ningún certificado emitido con el código proporcionado.',
+            'records' => [],
+        ]);
+});

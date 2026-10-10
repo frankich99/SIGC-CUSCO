@@ -24,6 +24,7 @@ import EnrollmentModal from '@/components/EnrollmentModal.vue';
 import { courseQr } from '@/actions/App/Http/Controllers/CourseController';
 import { credentialQr } from '@/actions/App/Http/Controllers/EnrollmentController';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
+import { getCourseStatusBadge, getEnrollmentStatusBadge } from '@/lib/theme';
 import {
     GraduationCap,
     Users,
@@ -222,39 +223,7 @@ function roleBadgeData(role?: string) {
 }
 
 function enrollmentStatusBadge(status: string) {
-    switch (status) {
-        case 'aprobado':
-            return {
-                label: 'Aprobado',
-                class: 'bg-emerald-100 text-emerald-950 border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-800',
-            };
-        case 'en_curso':
-            return {
-                label: 'En Curso',
-                class: 'bg-amber-100 text-amber-950 border border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800',
-            };
-        case 'inscrito':
-            return {
-                label: 'Inscrito',
-                class: 'bg-sky-100 text-sky-950 border border-sky-300 dark:bg-sky-950 dark:text-sky-200 dark:border-sky-800',
-            };
-        case 'reprobado':
-        case 'desaprobado':
-            return {
-                label: 'No Aprobado',
-                class: 'bg-rose-100 text-rose-950 border border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800',
-            };
-        case 'cancelado':
-            return {
-                label: 'Cancelado',
-                class: 'bg-slate-100 text-slate-800 border border-slate-300 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-700',
-            };
-        default:
-            return {
-                label: status,
-                class: 'bg-slate-100 text-slate-800 border border-slate-300',
-            };
-    }
+    return getEnrollmentStatusBadge(status);
 }
 </script>
 
@@ -597,14 +566,16 @@ function enrollmentStatusBadge(status: string) {
                                         {{ course.code }}
                                     </span>
                                     <Badge
-                                        class="max-w-[62%] shrink-0 truncate px-2.5 py-0.5 text-[10px] font-extrabold uppercase sm:text-[11px]"
+                                        class="max-w-[62%] shrink-0 truncate px-2.5 py-0.5 text-[10px] font-extrabold sm:text-[11px]"
                                         :class="
-                                            course.status === 'abierto'
-                                                ? 'border border-amber-300 bg-amber-100 text-amber-950 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200'
-                                                : 'bg-slate-100 text-slate-800'
+                                            getCourseStatusBadge(course.status)
+                                                .class
                                         "
                                     >
-                                        {{ course.status }}
+                                        {{
+                                            getCourseStatusBadge(course.status)
+                                                .label
+                                        }}
                                     </Badge>
                                 </div>
                                 <CardTitle

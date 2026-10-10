@@ -23,7 +23,12 @@ import {
 } from '@/components/ui/dialog';
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
 import { formatDate, formatDateRange } from '@/lib/formatters';
-import { THEME_BUTTONS, THEME_BADGES } from '@/lib/theme';
+import {
+    THEME_BUTTONS,
+    THEME_BADGES,
+    getCourseStatusBadge,
+    getEnrollmentStatusBadge,
+} from '@/lib/theme';
 import { credentialQr } from '@/actions/App/Http/Controllers/EnrollmentController';
 import { sessionQr } from '@/actions/App/Http/Controllers/CourseAcademicController';
 import { notify } from '@/lib/notify';
@@ -758,43 +763,11 @@ async function copyCredentialCode(code: string) {
 
 // Estilo de Badges de Estado
 function getStatusBadge(status: string) {
-    switch (status) {
-        case 'inscrito':
-            return {
-                label: 'Inscrito',
-                classes:
-                    'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950 dark:text-blue-200 dark:border-blue-800',
-            };
-        case 'en_curso':
-            return {
-                label: 'En Curso',
-                classes:
-                    'bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800',
-            };
-        case 'aprobado':
-            return {
-                label: 'Aprobado',
-                classes:
-                    'bg-emerald-100 text-emerald-950 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-800',
-            };
-        case 'reprobado':
-            return {
-                label: 'Reprobado',
-                classes:
-                    'bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800',
-            };
-        case 'cancelado':
-            return {
-                label: 'Cancelado',
-                classes:
-                    'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
-            };
-        default:
-            return {
-                label: (status || '').toUpperCase(),
-                classes: 'bg-slate-100 text-slate-800 border-slate-300',
-            };
-    }
+    const badge = getEnrollmentStatusBadge(status);
+    return {
+        label: badge.label,
+        classes: badge.class,
+    };
 }
 
 onMounted(() => {
@@ -961,9 +934,12 @@ onUnmounted(() => {
                             </span>
                             <Badge
                                 variant="outline"
-                                class="border-rose-800 bg-rose-50 text-xs font-bold text-rose-900 dark:bg-rose-950"
+                                class="text-xs font-bold"
+                                :class="
+                                    getCourseStatusBadge(course.status).class
+                                "
                             >
-                                {{ course.status.toUpperCase() }}
+                                {{ getCourseStatusBadge(course.status).label }}
                             </Badge>
                             <template v-if="isActaClosed">
                                 <Badge
