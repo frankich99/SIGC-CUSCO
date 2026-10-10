@@ -671,9 +671,9 @@ function submit() {
                                 >
                                 Al cerrar el acta académica, calificarán a
                                 certificación únicamente los participantes con
-                                asistencia $\ge
-                                {{ form.min_attendance_percentage || 75 }}%$ y
-                                nota vigesimal $\ge 11.00$.
+                                asistencia ≥
+                                {{ form.min_attendance_percentage || 75 }}% y
+                                nota vigesimal ≥ 11.00.
                             </div>
                         </div>
                     </CardContent>

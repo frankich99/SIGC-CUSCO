@@ -2198,7 +2198,7 @@ onUnmounted(() => {
                                 </CardTitle>
                                 <CardDescription class="mt-0.5 text-xs">
                                     Reglamento UNSAAC: Aprobación con Nota
-                                    vigesimal >= 11.00 y Asistencia >=
+                                    vigesimal ≥ 11.00 y Asistencia ≥
                                     {{ course.min_attendance_percentage }}%.
                                 </CardDescription>
                             </div>
@@ -2797,7 +2797,7 @@ onUnmounted(() => {
                                             as-child
                                             size="sm"
                                             variant="outline"
-                                            class="flex-1 border-rose-300 text-xs font-bold text-rose-950 hover:bg-rose-50"
+                                            class="flex-1 border-rose-300 text-xs font-bold text-rose-950 hover:bg-rose-50 dark:border-rose-900/60 dark:bg-slate-900/80 dark:text-rose-200 dark:hover:bg-rose-950/40"
                                         >
                                             <a
                                                 :href="`/courses/${course.id}/reports/acta-csv`"
@@ -3090,7 +3090,7 @@ onUnmounted(() => {
                         <select
                             id="edit-status"
                             v-model="editForm.status"
-                            class="h-9 w-full cursor-pointer rounded-xl border border-slate-300 bg-white px-3 py-1 text-xs font-bold"
+                            class="h-9 w-full cursor-pointer rounded-xl border border-slate-300 bg-white px-3 py-1 text-xs font-bold text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                         >
                             <option value="inscrito">Inscrito</option>
                             <option value="en_curso">En Curso</option>

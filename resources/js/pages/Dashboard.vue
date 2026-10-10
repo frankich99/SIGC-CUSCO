@@ -1277,13 +1277,13 @@ function enrollmentStatusBadge(status: string) {
                         ></div>
                         <div
                             v-else
-                            class="rounded-3xl border-2 border-rose-200 bg-rose-50 p-6 text-xs font-bold text-rose-900"
+                            class="rounded-3xl border-2 border-rose-200 bg-rose-50 p-6 text-xs font-bold text-rose-900 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
                         >
                             No se pudo generar el QR. Intenta nuevamente.
                         </div>
                         <div class="space-y-2">
                             <div
-                                class="inline-block rounded-full border-2 border-rose-300 bg-rose-100 px-5 py-2 font-mono text-sm font-black tracking-widest text-rose-950 shadow-sm sm:text-base"
+                                class="inline-block rounded-full border-2 border-rose-300 bg-rose-100 px-5 py-2 font-mono text-sm font-black tracking-widest text-rose-950 shadow-sm sm:text-base dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
                             >
                                 CAPACITACIÓN: {{ activeQrCourse?.code }}
                             </div>
@@ -1358,19 +1358,19 @@ function enrollmentStatusBadge(status: string) {
                     ></div>
                     <div
                         v-else
-                        class="rounded-2xl border-2 border-rose-200 bg-rose-50 p-3 text-xs font-bold text-rose-900"
+                        class="rounded-2xl border-2 border-rose-200 bg-rose-50 p-3 text-xs font-bold text-rose-900 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
                     >
                         No se pudo generar el QR de la credencial.
                     </div>
 
                     <div class="space-y-1">
                         <div
-                            class="text-[11px] font-bold text-slate-500 uppercase"
+                            class="text-[11px] font-bold text-slate-500 uppercase dark:text-slate-400"
                         >
                             Código Único de Matrícula
                         </div>
                         <div
-                            class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-1 font-mono text-lg font-black tracking-wider text-rose-950"
+                            class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-1 font-mono text-lg font-black tracking-wider text-rose-950 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
                         >
                             {{
                                 activeCredentialEnrollment?.credential_code ||

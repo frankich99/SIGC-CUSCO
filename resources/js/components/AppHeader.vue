@@ -18,6 +18,7 @@ import {
 } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
+import ThemeToggle from '@/components/ThemeToggle.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -317,6 +318,17 @@ function roleBadge(role?: string) {
                                 </nav>
 
                                 <div
+                                    class="flex items-center justify-between border-t border-slate-200 px-2 pt-3 pb-1 dark:border-slate-800"
+                                >
+                                    <span
+                                        class="text-xs font-bold text-slate-700 dark:text-slate-300"
+                                    >
+                                        Modo Visual
+                                    </span>
+                                    <ThemeToggle size="sm" :show-label="true" />
+                                </div>
+
+                                <div
                                     v-if="user"
                                     class="space-y-2.5 border-t border-slate-200 px-2 pt-4 dark:border-slate-800"
                                 >
@@ -520,7 +532,7 @@ function roleBadge(role?: string) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                             align="start"
-                            class="w-64 rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-800 dark:bg-slate-900"
+                            class="w-64 rounded-2xl border border-slate-200/90 bg-white/95 p-2 shadow-2xl backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95"
                         >
                             <DropdownMenuLabel
                                 class="px-2 text-[11px] font-black tracking-wider text-rose-900 uppercase dark:text-rose-400"
@@ -530,10 +542,10 @@ function roleBadge(role?: string) {
                             <DropdownMenuItem as-child>
                                 <Link
                                     href="/courses"
-                                    class="flex cursor-pointer items-start gap-2.5 rounded-lg p-2 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                    class="flex cursor-pointer items-start gap-2.5 rounded-xl p-2.5 transition-colors hover:bg-rose-50 dark:hover:bg-rose-950/40"
                                 >
                                     <GraduationCap
-                                        class="mt-0.5 size-4 text-rose-800"
+                                        class="mt-0.5 size-4 text-rose-800 dark:text-rose-400"
                                     />
                                     <div>
                                         <div
@@ -552,10 +564,10 @@ function roleBadge(role?: string) {
                             <DropdownMenuItem as-child>
                                 <Link
                                     :href="`${dashboard()}#mis-cursos`"
-                                    class="flex cursor-pointer items-start gap-2.5 rounded-lg p-2 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                    class="flex cursor-pointer items-start gap-2.5 rounded-xl p-2.5 transition-colors hover:bg-rose-50 dark:hover:bg-rose-950/40"
                                 >
                                     <BookOpen
-                                        class="mt-0.5 size-4 text-amber-700"
+                                        class="mt-0.5 size-4 text-amber-700 dark:text-amber-400"
                                     />
                                     <div>
                                         <div
@@ -578,10 +590,10 @@ function roleBadge(role?: string) {
                                 <DropdownMenuItem as-child>
                                     <Link
                                         href="/courses/create"
-                                        class="flex cursor-pointer items-start gap-2.5 rounded-lg bg-rose-50/80 p-2 hover:bg-rose-100 dark:bg-rose-950/40"
+                                        class="flex cursor-pointer items-start gap-2.5 rounded-xl bg-rose-50/80 p-2.5 transition-colors hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-950/70"
                                     >
                                         <PlusCircle
-                                            class="mt-0.5 size-4 text-rose-800"
+                                            class="mt-0.5 size-4 text-rose-800 dark:text-rose-400"
                                         />
                                         <div>
                                             <div
@@ -665,8 +677,11 @@ function roleBadge(role?: string) {
                 </nav>
             </div>
 
-            <!-- 2. GRUPO DERECHO: ACCIÓN DESTACADA (+ AGREGAR CURSO) + ROL + AVATAR -->
-            <div class="flex shrink-0 items-center gap-2 sm:gap-2.5 lg:gap-3">
+            <!-- 2. GRUPO DERECHO: ACCIÓN DESTACADA (+ AGREGAR CURSO) + TEMA + ROL + AVATAR -->
+            <div class="flex shrink-0 items-center gap-1.5 sm:gap-2.5 lg:gap-3">
+                <!-- Conmutador Interactivo Modo Oscuro / Claro (Unificado y Responsivo) -->
+                <ThemeToggle />
+
                 <!-- Botón de Acción Directo: Agregar Curso (Visible para admin y docente) -->
                 <Button
                     v-if="canCreateCourse"
@@ -733,7 +748,7 @@ function roleBadge(role?: string) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                             align="end"
-                            class="w-60 rounded-xl border border-slate-200 bg-white p-1 shadow-xl dark:border-slate-800 dark:bg-slate-900"
+                            class="w-64 rounded-2xl border border-slate-200/90 bg-white/95 p-2 shadow-2xl backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95"
                         >
                             <UserMenuContent :user="auth.user" />
                         </DropdownMenuContent>

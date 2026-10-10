@@ -1587,13 +1587,13 @@ onMounted(() => {
                                                         module, index
                                                     ) in selectedCert.modules"
                                                     :key="index"
-                                                    class="rounded-lg border border-l-4 border-slate-200 border-l-[#800020] bg-slate-50 p-2.5"
+                                                    class="rounded-lg border border-l-4 border-slate-200 border-l-[#800020] bg-slate-50 p-2.5 dark:border-slate-800 dark:border-l-rose-700 dark:bg-slate-900/60"
                                                 >
                                                     <div
-                                                        class="flex items-center justify-between text-xs font-bold text-slate-950"
+                                                        class="flex items-center justify-between text-xs font-bold text-slate-950 dark:text-slate-100"
                                                     >
                                                         <span
-                                                            class="mr-2 text-[11px] font-black text-[#800020]"
+                                                            class="mr-2 text-[11px] font-black text-[#800020] dark:text-rose-400"
                                                             >{{
                                                                 module.number
                                                             }}</span
@@ -1605,13 +1605,13 @@ onMounted(() => {
                                                             }}</span
                                                         >
                                                         <span
-                                                            class="rounded border border-slate-200 bg-white px-2 py-0.5 font-mono text-[10px] text-slate-600"
+                                                            class="rounded border border-slate-200 bg-white px-2 py-0.5 font-mono text-[10px] text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                                                         >
                                                             {{ module.hours }}
                                                         </span>
                                                     </div>
                                                     <p
-                                                        class="mt-1 text-[11px] leading-relaxed text-slate-600"
+                                                        class="mt-1 text-[11px] leading-relaxed text-slate-600 dark:text-slate-400"
                                                     >
                                                         {{ module.topics }}
                                                     </p>
@@ -1625,16 +1625,16 @@ onMounted(() => {
                                         >
                                             <!-- Cuadro de Calificación Oficial -->
                                             <div
-                                                class="flex items-center justify-between rounded-xl border border-emerald-300 bg-emerald-50 p-3.5"
+                                                class="flex items-center justify-between rounded-xl border border-emerald-300 bg-emerald-50 p-3.5 dark:border-emerald-800/60 dark:bg-emerald-950/30"
                                             >
                                                 <div>
                                                     <div
-                                                        class="text-[10px] font-bold text-emerald-800 uppercase"
+                                                        class="text-[10px] font-bold text-emerald-800 uppercase dark:text-emerald-300"
                                                     >
                                                         Registro de Calificación
                                                     </div>
                                                     <div
-                                                        class="text-2xl font-black text-emerald-950"
+                                                        class="text-2xl font-black text-emerald-950 dark:text-emerald-100"
                                                     >
                                                         {{
                                                             selectedCert.final_grade
@@ -1642,7 +1642,7 @@ onMounted(() => {
                                                         / 20.00
                                                     </div>
                                                     <div
-                                                        class="text-[10px] font-bold text-emerald-700"
+                                                        class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400"
                                                     >
                                                         {{
                                                             selectedCert.final_grade_text ||
@@ -1659,23 +1659,23 @@ onMounted(() => {
 
                                             <!-- Docente Responsable -->
                                             <div
-                                                class="rounded-xl border border-slate-200 bg-slate-50 p-3"
+                                                class="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/60"
                                             >
                                                 <div
-                                                    class="text-[10px] font-bold text-slate-500 uppercase"
+                                                    class="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400"
                                                 >
                                                     Docente / Ponente
                                                     Responsable:
                                                 </div>
                                                 <div
-                                                    class="mt-0.5 text-xs font-black text-slate-950 uppercase"
+                                                    class="mt-0.5 text-xs font-black text-slate-950 uppercase dark:text-white"
                                                 >
                                                     {{
                                                         selectedCert.instructor_name
                                                     }}
                                                 </div>
                                                 <div
-                                                    class="text-[10px] text-slate-600"
+                                                    class="text-[10px] text-slate-600 dark:text-slate-300"
                                                 >
                                                     {{
                                                         selectedCert.instructor_title ||
@@ -1683,7 +1683,7 @@ onMounted(() => {
                                                     }}
                                                 </div>
                                                 <div
-                                                    class="mt-0.5 text-[9px] text-slate-500"
+                                                    class="mt-0.5 text-[9px] text-slate-500 dark:text-slate-400"
                                                 >
                                                     {{
                                                         selectedCert.institution ||
@@ -1694,10 +1694,10 @@ onMounted(() => {
 
                                             <!-- Código QR Permanente de Validación -->
                                             <div
-                                                class="flex items-center gap-3 rounded-xl border-2 border-[#800020] bg-white p-3"
+                                                class="flex items-center gap-3 rounded-xl border-2 border-[#800020] bg-white p-3 dark:border-rose-900 dark:bg-slate-900/80"
                                             >
                                                 <div
-                                                    class="flex size-20 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white p-1"
+                                                    class="flex size-20 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white p-1 dark:border-slate-700"
                                                 >
                                                     <div
                                                         v-html="
@@ -1710,7 +1710,7 @@ onMounted(() => {
                                                     class="min-w-0 flex-1 space-y-0.5"
                                                 >
                                                     <div
-                                                        class="flex items-center gap-1 text-xs font-black text-[#800020] uppercase"
+                                                        class="flex items-center gap-1 text-xs font-black text-[#800020] uppercase dark:text-rose-400"
                                                     >
                                                         <QrCode
                                                             class="size-3.5 shrink-0"
@@ -1721,7 +1721,7 @@ onMounted(() => {
                                                         >
                                                     </div>
                                                     <p
-                                                        class="text-[10px] leading-tight text-slate-600"
+                                                        class="text-[10px] leading-tight text-slate-600 dark:text-slate-400"
                                                     >
                                                         Escanee el código QR
                                                         para verificar la
@@ -1735,7 +1735,7 @@ onMounted(() => {
                                                             selectedCert.verification_url
                                                         "
                                                         target="_blank"
-                                                        class="inline-flex max-w-full items-center gap-1 truncate font-mono text-[9px] font-bold text-blue-700 hover:underline"
+                                                        class="inline-flex max-w-full items-center gap-1 truncate font-mono text-[9px] font-bold text-blue-700 hover:underline dark:text-blue-400"
                                                     >
                                                         <ExternalLink
                                                             class="size-2.5 shrink-0"
@@ -1755,13 +1755,13 @@ onMounted(() => {
                                                 v-if="
                                                     selectedCert.certificate_hash
                                                 "
-                                                class="rounded-lg border border-slate-200 bg-slate-50 p-2 font-mono text-[9px]"
+                                                class="rounded-lg border border-slate-200 bg-slate-50 p-2 font-mono text-[9px] dark:border-slate-800 dark:bg-slate-900/60"
                                             >
                                                 <div
-                                                    class="mb-0.5 flex items-center justify-between font-bold text-slate-600"
+                                                    class="mb-0.5 flex items-center justify-between font-bold text-slate-600 dark:text-slate-400"
                                                 >
                                                     <span
-                                                        class="flex items-center gap-1 text-[#800020]"
+                                                        class="flex items-center gap-1 text-[#800020] dark:text-rose-400"
                                                     >
                                                         <ShieldCheck
                                                             class="size-3"
@@ -1769,12 +1769,12 @@ onMounted(() => {
                                                         Huella SHA-256:
                                                     </span>
                                                     <span
-                                                        class="text-[8px] text-slate-400"
+                                                        class="text-[8px] text-slate-400 dark:text-slate-500"
                                                         >Inmutable</span
                                                     >
                                                 </div>
                                                 <div
-                                                    class="leading-tight font-semibold break-all text-slate-800 select-all"
+                                                    class="leading-tight font-semibold break-all text-slate-800 select-all dark:text-slate-200"
                                                 >
                                                     {{
                                                         selectedCert.certificate_hash

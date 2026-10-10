@@ -33,16 +33,24 @@ defineProps<Props>();
     <DropdownMenuGroup>
         <DropdownMenuItem v-if="user.role === 'admin'" :as-child="true">
             <Link
-                class="block w-full cursor-pointer font-bold text-rose-950 dark:text-rose-200"
+                class="flex w-full cursor-pointer items-center rounded-xl font-bold text-rose-950 dark:text-rose-200"
                 href="/users"
             >
-                <ShieldCheck class="mr-2 inline h-4 w-4 text-emerald-600" />
+                <ShieldCheck
+                    class="mr-2 inline h-4 w-4 text-emerald-600 dark:text-emerald-400"
+                />
                 Usuarios y Roles
             </Link>
         </DropdownMenuItem>
         <DropdownMenuItem :as-child="true">
-            <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
-                <Settings class="mr-2 h-4 w-4" />
+            <Link
+                class="flex w-full cursor-pointer items-center rounded-xl"
+                :href="edit()"
+                prefetch
+            >
+                <Settings
+                    class="mr-2 h-4 w-4 text-slate-600 dark:text-slate-400"
+                />
                 Configuración
             </Link>
         </DropdownMenuItem>
@@ -50,7 +58,7 @@ defineProps<Props>();
     <DropdownMenuSeparator />
     <DropdownMenuItem :as-child="true">
         <Link
-            class="block w-full cursor-pointer"
+            class="flex w-full cursor-pointer items-center rounded-xl text-rose-800 hover:text-rose-950 dark:text-rose-400 dark:hover:text-rose-200"
             method="post"
             :href="logout()"
             @click="handleLogout"
