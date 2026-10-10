@@ -38,7 +38,7 @@ class UpdateCourseRequest extends FormRequest
     {
         if (empty($this->instructor_name) && ! empty($this->instructor_id)) {
             $user = User::find($this->instructor_id);
-            if ($user) {
+            if ($user instanceof User) {
                 $this->merge([
                     'instructor_name' => trim("{$user->name} {$user->paterno} {$user->materno}") ?: $user->name,
                 ]);
@@ -49,11 +49,11 @@ class UpdateCourseRequest extends FormRequest
         $course = $this->route('course');
 
         if (! $this->has('total_sessions') || is_null($this->input('total_sessions'))) {
-            $this->merge(['total_sessions' => $course?->total_sessions ?? 4]);
+            $this->merge(['total_sessions' => $course ? $course->total_sessions : 4]);
         }
 
         if (! $this->has('min_attendance_percentage') || is_null($this->input('min_attendance_percentage'))) {
-            $this->merge(['min_attendance_percentage' => $course?->min_attendance_percentage ?? 75]);
+            $this->merge(['min_attendance_percentage' => $course ? $course->min_attendance_percentage : 75]);
         }
     }
 

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -78,7 +79,7 @@ class AppServiceProvider extends ServiceProvider
                 ->salutation("Saludos cordiales,\n".config('app.name'));
         });
 
-        ResetPassword::toMailUsing(function (object $notifiable, string $token): MailMessage {
+        ResetPassword::toMailUsing(function (CanResetPassword $notifiable, string $token): MailMessage {
             $url = url(route('password.reset', [
                 'token' => $token,
                 'email' => $notifiable->getEmailForPasswordReset(),

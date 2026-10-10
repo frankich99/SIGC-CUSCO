@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CourseStatus;
+use Database\Factories\CourseFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -37,6 +38,7 @@ use Illuminate\Support\Carbon;
 #[Fillable(['code', 'title', 'institution', 'description', 'instructor_id', 'instructor_name', 'start_date', 'end_date', 'hours', 'total_sessions', 'min_attendance_percentage', 'capacity', 'status', 'acta_closed_at', 'acta_closed_by'])]
 class Course extends Model
 {
+    /** @use HasFactory<CourseFactory> */
     use HasFactory;
 
     /**

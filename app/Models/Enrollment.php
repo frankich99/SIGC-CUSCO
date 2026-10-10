@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\EnrollmentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,6 +35,7 @@ use Illuminate\Support\Carbon;
  */
 class Enrollment extends Model
 {
+    /** @use HasFactory<EnrollmentFactory> */
     use HasFactory;
 
     /**
@@ -144,7 +146,7 @@ class Enrollment extends Model
      */
     public function getAttendancePercentageAttribute(): float
     {
-        $totalSessions = $this->course ? $this->course->total_sessions : 4;
+        $totalSessions = $this->course->total_sessions ?: 4;
         if ($totalSessions <= 0) {
             return 0.0;
         }
@@ -160,7 +162,7 @@ class Enrollment extends Model
      */
     public function meetsPassingCriteria(): bool
     {
-        $minAttendance = $this->course ? $this->course->min_attendance_percentage : 75;
+        $minAttendance = $this->course->min_attendance_percentage ?: 75;
         $grade = ! is_null($this->final_grade) ? (float) $this->final_grade : 0.0;
 
         return $this->attendance_percentage >= $minAttendance && $grade >= 11.0;

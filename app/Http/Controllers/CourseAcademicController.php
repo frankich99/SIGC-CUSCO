@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -307,7 +308,7 @@ class CourseAcademicController extends Controller
                     ->count();
                 $enrollment->certificate_code = $enrollment->certificate_code ?: CertificateService::makeCertificateCode($enrollment);
                 $enrollment->certificate_hash = CertificateService::sign($enrollment);
-                $enrollment->certificate_issued_at = $enrollment->certificate_issued_at ?: now();
+                $enrollment->certificate_issued_at = $enrollment->certificate_issued_at ?: Carbon::now();
                 $enrollment->save();
             }
 
@@ -342,6 +343,10 @@ class CourseAcademicController extends Controller
         $headers[] = 'Estado';
 
         $output = fopen('php://temp', 'r+');
+        if (! is_resource($output)) {
+            throw new \RuntimeException('No se pudo abrir el flujo temporal para la exportación.');
+        }
+
         // UTF-8 BOM para que Excel en Windows reconozca tildes y caracteres peruanos
         fwrite($output, "\xEF\xBB\xBF");
         fputcsv($output, $headers, ';');
@@ -372,6 +377,10 @@ class CourseAcademicController extends Controller
         rewind($output);
         $csv = stream_get_contents($output);
         fclose($output);
+
+        if ($csv === false) {
+            $csv = '';
+        }
 
         $fileName = 'Asistencia_'.preg_replace('/[^A-Za-z0-9_-]/', '_', $course->code).'.csv';
 
@@ -407,6 +416,10 @@ class CourseAcademicController extends Controller
         ];
 
         $output = fopen('php://temp', 'r+');
+        if (! is_resource($output)) {
+            throw new \RuntimeException('No se pudo abrir el flujo temporal para el acta oficial.');
+        }
+
         fwrite($output, "\xEF\xBB\xBF");
         fputcsv($output, $headers, ';');
 
@@ -430,6 +443,10 @@ class CourseAcademicController extends Controller
         rewind($output);
         $csv = stream_get_contents($output);
         fclose($output);
+
+        if ($csv === false) {
+            $csv = '';
+        }
 
         $fileName = 'Acta_Oficial_'.preg_replace('/[^A-Za-z0-9_-]/', '_', $course->code).'.csv';
 

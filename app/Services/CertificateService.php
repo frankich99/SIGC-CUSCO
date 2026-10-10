@@ -53,7 +53,7 @@ class CertificateService
 
             return "{$day} de {$month} de {$year}";
         } catch (\Throwable) {
-            return (string) $date;
+            return $date instanceof \DateTimeInterface ? $date->format('d/m/Y') : (string) $date;
         }
     }
 
@@ -100,7 +100,10 @@ class CertificateService
 
             return "del {$startDay} de {$startMonth} de {$carbonStart->year} al {$endDay} de {$endMonth} de {$carbonEnd->year}";
         } catch (\Throwable) {
-            return "del {$start} al {$end}";
+            $startStr = $start instanceof \DateTimeInterface ? $start->format('d/m/Y') : (string) ($start ?? '');
+            $endStr = $end instanceof \DateTimeInterface ? $end->format('d/m/Y') : (string) ($end ?? '');
+
+            return "del {$startStr} al {$endStr}";
         }
     }
 
@@ -360,8 +363,8 @@ class CertificateService
     public static function getCertificatePayload(Enrollment $enrollment): array
     {
         $course = $enrollment->course;
-        $formattedStart = $course?->start_date ? Carbon::parse($course->start_date)->format('d/m/Y') : null;
-        $formattedEnd = $course?->end_date ? Carbon::parse($course->end_date)->format('d/m/Y') : null;
+        $formattedStart = Carbon::parse($course->start_date)->format('d/m/Y');
+        $formattedEnd = Carbon::parse($course->end_date)->format('d/m/Y');
 
         // El código y la huella solo se persisten en la emisión oficial (acta cerrada).
         // Aquí se calculan en memoria para mostrar el diploma sin escribir en una ruta de lectura.
@@ -370,7 +373,7 @@ class CertificateService
 
         $issuedAt = $enrollment->certificate_issued_at
             ? $enrollment->certificate_issued_at->format('d/m/Y')
-            : ($formattedEnd ?? date('d/m/Y'));
+            : $formattedEnd;
 
         // URL permanente que nunca expira para validación online directa
         $verificationUrl = url("/certificates?dni={$enrollment->dni}&code={$certCode}");
@@ -379,14 +382,15 @@ class CertificateService
         $qrSvg = self::generateQrSvg($verificationUrl, 220);
 
         // Módulos
-        $modules = $course ? self::getCourseModules($course) : [];
+        $modules = self::getCourseModules($course);
 
         $gradeNumeric = $enrollment->final_grade !== null ? (float) $enrollment->final_grade : 20.0;
         $gradeFormatted = number_format($gradeNumeric, 2);
         $gradeText = self::formatGradeText($gradeNumeric);
 
-        $dateRangeFormal = self::formatSpanishDateRange($course?->start_date, $course?->end_date);
-        $issuedFormal = self::formatSpanishDate($enrollment->certificate_issued_at ?? $course?->end_date ?? now());
+        $dateRangeFormal = self::formatSpanishDateRange($course->start_date, $course->end_date);
+        $issuedDate = $enrollment->certificate_issued_at ?? $course->end_date ?? now();
+        $issuedFormal = self::formatSpanishDate($issuedDate);
         $cityIssuedFormal = "Cusco, {$issuedFormal}";
 
         return [
@@ -394,16 +398,16 @@ class CertificateService
             'dni' => $enrollment->dni,
             'student_name' => $enrollment->full_name,
             'full_name' => $enrollment->full_name,
-            'course_code' => $course?->code ?? 'SIGC-2026-001',
-            'course_title' => $course?->title ?? 'Capacitación Oficial UNSAAC',
-            'institution' => $course?->institution ?? 'UNSAAC - SIGC CUSCO',
-            'hours' => $course?->hours ?? 40,
-            'start_date' => $formattedStart ?? '01/01/2026',
-            'end_date' => $formattedEnd ?? '31/01/2026',
+            'course_code' => $course->code,
+            'course_title' => $course->title,
+            'institution' => $course->institution,
+            'hours' => $course->hours,
+            'start_date' => $formattedStart,
+            'end_date' => $formattedEnd,
             'date_range_formal' => $dateRangeFormal,
             'issued_date_formal' => $issuedFormal,
             'city_issued_formal' => $cityIssuedFormal,
-            'instructor_name' => $course?->instructor_display_name ?? 'Docente Especialista Asignado',
+            'instructor_name' => $course->instructor_display_name,
             'instructor_title' => 'Docente Principal e Investigador',
             'status' => $enrollment->status,
             'final_grade' => $gradeFormatted,

@@ -144,7 +144,7 @@ class CourseController extends Controller
             $validated['instructor_id'] = null;
         } elseif (empty($validated['instructor_name'])) {
             $user = User::find($validated['instructor_id']);
-            if ($user) {
+            if ($user instanceof User) {
                 $validated['instructor_name'] = trim("{$user->name} {$user->paterno} {$user->materno}") ?: $user->name;
             }
         }
@@ -285,7 +285,7 @@ class CourseController extends Controller
             $validated['instructor_id'] = null;
         } elseif (empty($validated['instructor_name'])) {
             $user = User::find($validated['instructor_id']);
-            if ($user) {
+            if ($user instanceof User) {
                 $validated['instructor_name'] = trim("{$user->name} {$user->paterno} {$user->materno}") ?: $user->name;
             }
         }

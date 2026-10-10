@@ -46,7 +46,7 @@ class StoreCourseRequest extends FormRequest
 
         if (empty($this->instructor_name) && ! empty($this->instructor_id)) {
             $user = User::find($this->instructor_id);
-            if ($user) {
+            if ($user instanceof User) {
                 $this->merge([
                     'instructor_name' => trim("{$user->name} {$user->paterno} {$user->materno}") ?: $user->name,
                 ]);
