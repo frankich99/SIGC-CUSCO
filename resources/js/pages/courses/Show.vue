@@ -65,6 +65,7 @@ import {
     Download,
     Copy,
     Eye,
+    Printer,
 } from '@lucide/vue';
 import type { BreadcrumbItem } from '@/types';
 import CoursePublicView, {
@@ -2255,6 +2256,19 @@ onUnmounted(() => {
                                         Descargar Acta CSV
                                     </a>
                                 </Button>
+                                <Button
+                                    as-child
+                                    size="sm"
+                                    class="cursor-pointer bg-rose-900 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
+                                >
+                                    <a
+                                        :href="`/courses/${course.id}/reports/acta`"
+                                        target="_blank"
+                                    >
+                                        <Printer class="mr-1.5 size-3.5" />
+                                        Imprimir / Ver Acta (PDF)
+                                    </a>
+                                </Button>
                             </div>
                         </CardHeader>
 
@@ -2776,20 +2790,41 @@ onUnmounted(() => {
                                             de certificación emitido.
                                         </p>
                                     </div>
-                                    <Button
-                                        as-child
-                                        size="sm"
-                                        variant="outline"
-                                        class="w-full border-rose-300 text-xs font-bold text-rose-950 hover:bg-rose-50"
+                                    <div
+                                        class="flex w-full flex-col gap-2 sm:flex-row"
                                     >
-                                        <a
-                                            :href="`/courses/${course.id}/reports/acta-csv`"
-                                            download
+                                        <Button
+                                            as-child
+                                            size="sm"
+                                            variant="outline"
+                                            class="flex-1 border-rose-300 text-xs font-bold text-rose-950 hover:bg-rose-50"
                                         >
-                                            <FileText class="mr-1.5 size-3.5" />
-                                            Descargar Acta Oficial CSV
-                                        </a>
-                                    </Button>
+                                            <a
+                                                :href="`/courses/${course.id}/reports/acta-csv`"
+                                                download
+                                            >
+                                                <FileText
+                                                    class="mr-1.5 size-3.5"
+                                                />
+                                                Descargar CSV
+                                            </a>
+                                        </Button>
+                                        <Button
+                                            as-child
+                                            size="sm"
+                                            class="flex-1 cursor-pointer bg-rose-900 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
+                                        >
+                                            <a
+                                                :href="`/courses/${course.id}/reports/acta`"
+                                                target="_blank"
+                                            >
+                                                <Printer
+                                                    class="mr-1.5 size-3.5"
+                                                />
+                                                Imprimir Acta (PDF)
+                                            </a>
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>

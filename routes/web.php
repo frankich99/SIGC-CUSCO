@@ -205,6 +205,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('courses/{course}/certificates/bulk-issue', [CourseAcademicController::class, 'bulkIssueCertificates'])->name('courses.certificates.bulk-issue');
     Route::get('courses/{course}/reports/attendance-csv', [CourseAcademicController::class, 'exportAttendanceCsv'])->name('courses.reports.attendance-csv');
     Route::get('courses/{course}/reports/acta-csv', [CourseAcademicController::class, 'exportActaCsv'])->name('courses.reports.acta-csv');
+    Route::get('courses/{course}/reports/acta', [CourseAcademicController::class, 'reportActa'])->name('courses.reports.acta');
+    Route::post('courses/{course}/attendance/by-credential', [CourseAcademicController::class, 'recordByCredential'])->name('courses.attendance.by-credential');
 
     // Administración Institucional de Usuarios, Roles y Permisos (Solo Administrador)
     Route::get('users', [UserController::class, 'index'])->name('users.index');

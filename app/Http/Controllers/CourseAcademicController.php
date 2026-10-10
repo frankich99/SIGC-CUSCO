@@ -15,6 +15,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class CourseAcademicController extends Controller
 {
@@ -453,6 +455,146 @@ class CourseAcademicController extends Controller
         return response($csv, 200, [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
+        ]);
+    }
+
+    /**
+     * Vista e impresión oficial del Acta de Evaluación y Asistencia (A4 Institucional).
+     */
+    public function reportActa(Course $course): InertiaResponse
+    {
+        $this->authorizeStaff($course);
+
+        $course->load('instructor:id,name,paterno,materno,email,role');
+        $enrollments = $course->enrollments()
+            ->with('attendanceRecords')
+            ->where('status', '!=', 'cancelado')
+            ->orderBy('paterno')
+            ->orderBy('nombres')
+            ->get();
+
+        $totalSessions = max(1, $course->total_sessions);
+        $totalEnrolled = $enrollments->count();
+        $approvedCount = $enrollments->where('status', 'aprobado')->count();
+        $failedCount = $enrollments->where('status', 'reprobado')->count();
+        $inProgressCount = $enrollments->whereIn('status', ['inscrito', 'en_curso'])->count();
+        $avgGrade = $enrollments->whereNotNull('final_grade')->avg('final_grade');
+        $avgAttendance = $enrollments->avg('attendance_percentage');
+
+        $participants = $enrollments->map(function (Enrollment $enrollment) {
+            $grade = $enrollment->final_grade !== null ? (float) $enrollment->final_grade : null;
+
+            return [
+                'id' => $enrollment->id,
+                'dni' => $enrollment->dni,
+                'full_name' => $enrollment->full_name,
+                'attended_sessions' => $enrollment->attended_sessions,
+                'attendance_percentage' => $enrollment->attendance_percentage,
+                'final_grade' => $grade !== null ? number_format($grade, 1) : '-',
+                'final_grade_text' => $grade !== null ? CertificateService::formatGradeText($grade) : '-',
+                'status' => $enrollment->status,
+                'certificate_code' => $enrollment->certificate_code ?: '-',
+                'certificate_hash' => $enrollment->certificate_hash ?: '-',
+            ];
+        });
+
+        $dateRangeFormal = CertificateService::formatSpanishDateRange($course->start_date, $course->end_date);
+        $actaDate = $course->acta_closed_at ?: Carbon::now();
+        $actaDateFormal = CertificateService::formatSpanishDate($actaDate);
+
+        return Inertia::render('courses/reports/ActaOfficial', [
+            'course' => [
+                'id' => $course->id,
+                'code' => $course->code,
+                'title' => $course->title,
+                'institution' => $course->institution,
+                'hours' => $course->hours,
+                'total_sessions' => $course->total_sessions,
+                'min_attendance_percentage' => $course->min_attendance_percentage,
+                'status' => is_string($course->status) ? $course->status : $course->status->value,
+                'is_acta_closed' => $course->isActaClosed(),
+                'acta_closed_at' => $course->acta_closed_at?->format('d/m/Y H:i'),
+                'date_range_formal' => $dateRangeFormal,
+                'acta_date_formal' => $actaDateFormal,
+                'instructor_name' => $course->instructor_display_name,
+            ],
+            'stats' => [
+                'total_enrolled' => $totalEnrolled,
+                'approved_count' => $approvedCount,
+                'failed_count' => $failedCount,
+                'in_progress_count' => $inProgressCount,
+                'approval_rate' => $totalEnrolled > 0 ? round(($approvedCount / $totalEnrolled) * 100, 1) : 0,
+                'avg_grade' => $avgGrade !== null ? round((float) $avgGrade, 1) : '-',
+                'avg_attendance' => $avgAttendance !== null ? round((float) $avgAttendance, 1) : '-',
+            ],
+            'participants' => $participants,
+        ]);
+    }
+
+    /**
+     * Registrar asistencia rápida mediante lector de código de credencial o DNI.
+     */
+    public function recordByCredential(Request $request, Course $course, AttendanceService $attendanceService): JsonResponse
+    {
+        $this->authorizeStaff($course);
+
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'max:50'],
+            'session_number' => ['required', 'integer', 'min:1', 'max:'.$course->total_sessions],
+            'status' => ['nullable', 'string', 'in:presente,tardanza,falta'],
+        ], [
+            'code.required' => 'El código de credencial o DNI es obligatorio.',
+            'session_number.required' => 'Debe especificar el número de sesión.',
+            'session_number.min' => 'El número de sesión debe ser al menos 1.',
+            'session_number.max' => "El número de sesión no puede ser mayor a {$course->total_sessions}.",
+        ]);
+
+        if ($course->isActaClosed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se puede registrar asistencia porque el acta oficial del curso está cerrada.',
+            ], 422);
+        }
+
+        $cleanCode = trim($validated['code']);
+        $enrollment = $course->enrollments()
+            ->where(function ($query) use ($cleanCode) {
+                $query->where('credential_code', $cleanCode)
+                    ->orWhere('dni', $cleanCode);
+            })
+            ->where('status', '!=', 'cancelado')
+            ->first();
+
+        if (! $enrollment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró ningún participante inscrito en este curso con el código o DNI ingresado.',
+            ], 404);
+        }
+
+        $status = $validated['status'] ?? 'presente';
+        $attendanceService->record(
+            $course,
+            $enrollment,
+            (int) $validated['session_number'],
+            $status,
+            'scan',
+            Auth::id(),
+        );
+
+        $enrollment->refresh();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Asistencia registrada exitosamente para {$enrollment->full_name}.",
+            'participant' => [
+                'id' => $enrollment->id,
+                'full_name' => $enrollment->full_name,
+                'dni' => $enrollment->dni,
+                'attended_sessions' => $enrollment->attended_sessions,
+                'attendance_percentage' => $enrollment->attendance_percentage,
+                'status' => $enrollment->status,
+            ],
         ]);
     }
 
