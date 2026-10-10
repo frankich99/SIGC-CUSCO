@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/dialog';
 import { formatDateRange, formatDate } from '@/lib/formatters';
 import { THEME_BUTTONS } from '@/lib/theme';
-import { generateQrSvg } from '@/lib/qr';
 import { generateOfficialCertificateHtml, printCertificate, type CertificateModule, type CertificateRecord } from '@/lib/certificateTemplate';
 import { notify } from '@/lib/notify';
 import {
@@ -81,6 +80,7 @@ export interface MyEnrollmentInfo {
     attendance_percentage: number;
     final_grade?: number | string | null;
     credential_code?: string | null;
+    credential_qr_svg?: string | null;
     certificate_code?: string | null;
     certificate_hash?: string | null;
     certificate_issued_at?: string | null;
@@ -153,11 +153,7 @@ const statusConfig = computed(() => {
 
 // Modal de Credencial QR Personal del Alumno
 const isCredentialModalOpen = ref(false);
-const credentialQrSvg = computed(() => {
-    if (!props.myEnrollment) return '';
-    const code = props.myEnrollment.credential_code || `INS-${props.course.id}-${props.myEnrollment.dni.slice(-4)}`;
-    return generateQrSvg(code, 260, '#800020');
-});
+const credentialQrSvg = computed(() => props.myEnrollment?.credential_qr_svg || '');
 
 // Modal y Visor de Certificado Oficial (Anverso / Reverso)
 const isCertificateModalOpen = ref(false);

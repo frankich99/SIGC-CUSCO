@@ -33,8 +33,6 @@ import {
     ZoomOut,
     RotateCcw,
     Layers,
-    KeyRound,
-    HelpCircle,
     Info,
     Lock,
 } from '@lucide/vue';
@@ -116,22 +114,9 @@ function resetZoom() {
 }
 
 
-// Flujo Institucional en 2 Pasos para consulta pública por DNI
-const searchStep = ref<1 | 2 | 3>(1); // 1 = DNI | 2 = Dígito Verificador | 3 = Diplomas Mostrados
-const verificationDigit = ref('');
+// Flujo institucional en 2 pasos para consulta pública por DNI.
+const searchStep = ref<1 | 2>(1); // 1 = DNI | 2 = Diplomas mostrados
 const validatingDni = ref(false);
-const reniecPerson = ref<{
-    dni: string;
-    nombres: string;
-    apellido_paterno?: string;
-    apellido_materno?: string;
-    paterno?: string;
-    materno?: string;
-    nombre_completo?: string;
-    codigo_verificacion?: string | null;
-} | null>(null);
-const verificationError = ref<string | null>(null);
-const showHelpModal = ref(false);
 
 function allowOnlyNumbers(e: KeyboardEvent) {
     if (['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Enter'].includes(e.key)) {
@@ -153,25 +138,13 @@ function onDniInput(e: Event) {
     if (error.value) error.value = null;
     if (searchStep.value !== 1) {
         searchStep.value = 1;
-        reniecPerson.value = null;
-        verificationDigit.value = '';
-        verificationError.value = null;
         records.value = [];
         searched.value = false;
     }
 }
 
-function onVerificationInput(e: Event) {
-    const target = e.target as HTMLInputElement;
-    const sanitized = target.value.replace(/[^0-9A-Za-z]/g, '').slice(0, 1).toUpperCase();
-    if (target.value !== sanitized) {
-        target.value = sanitized;
-    }
-    verificationDigit.value = sanitized;
-    if (verificationError.value) verificationError.value = null;
-}
 
-async function validateDniStep() {
+async function validateDniStep(): Promise<void> {
     const clean = dniQuery.value.trim();
     if (!/^\d{8}$/.test(clean)) {
         error.value = 'Ingrese un número de DNI válido de exactamente 8 dígitos.';
@@ -180,78 +153,54 @@ async function validateDniStep() {
 
     validatingDni.value = true;
     error.value = null;
-    verificationError.value = null;
-    verificationDigit.value = '';
 
     try {
-        // 1. Validar identidad con la API de RENIEC
-        const response = await fetch(`/api/dni/${clean}`);
+        // Validar identidad con la API de RENIEC; solo se usan los campos mínimos de identidad.
+        const response = await fetch(`/api/dni/${clean}`, {
+            headers: {
+                Accept: 'application/json',
+            },
+        });
         const data = await response.json();
 
         if (response.ok && data.success && data.data) {
-            reniecPerson.value = data.data;
             const fullName = data.data.nombre_completo || `${data.data.nombres} ${data.data.apellido_paterno || ''} ${data.data.apellido_materno || ''}`.trim();
             studentName.value = fullName;
+            await searchCertificates();
             searchStep.value = 2;
             notify.success('Identidad Encontrada en RENIEC', fullName, 2000);
             return;
         }
 
-        // 2. Fallback con verificación en padrón local institucional
-        const localCheck = await fetch(`/api/certificates/lookup?dni=${clean}&check_only=1`);
+        // Fallback con verificación en padrón local institucional.
+        const localCheck = await fetch(`/api/certificates/lookup?dni=${clean}&check_only=1`, {
+            headers: {
+                Accept: 'application/json',
+            },
+        });
         const localData = await localCheck.json();
 
         if (localCheck.ok && localData.success && localData.has_records) {
-            reniecPerson.value = {
-                dni: clean,
-                nombres: localData.student_name || 'Participante Institucional',
-                nombre_completo: localData.student_name || 'Participante Institucional',
-                codigo_verificacion: null,
-            };
-            studentName.value = localData.student_name;
+            studentName.value = localData.student_name || 'Participante Institucional';
+            await searchCertificates();
             searchStep.value = 2;
             notify.info('Registro Académico Encontrado', studentName.value || clean, 2000);
         } else {
             error.value = data.message || 'No se encontró el DNI en el padrón de RENIEC ni en los registros académicos.';
-            notify.warning('DNI no encontrado', error.value, 3000);
+            notify.warning('DNI no encontrado', error.value || 'No se encontraron registros.', 3000);
         }
     } catch {
         error.value = 'Error al conectarse con el servicio de validación de identidad. Intente nuevamente.';
-        notify.error('Error de conexión', error.value, 3000);
+        notify.error('Error de conexión', error.value || 'Intente nuevamente.', 3000);
     } finally {
         validatingDni.value = false;
     }
 }
 
-async function verifyAndFetchCertificates() {
-    const cleanDigit = verificationDigit.value.trim().toUpperCase();
-    if (!cleanDigit || cleanDigit.length !== 1) {
-        verificationError.value = 'Ingrese el código de verificación de 1 dígito de su DNI.';
-        return;
-    }
-
-    // Cotejar con el código oficial de verificación de RENIEC si está presente
-    if (reniecPerson.value?.codigo_verificacion) {
-        const expected = String(reniecPerson.value.codigo_verificacion).trim().toUpperCase();
-        if (cleanDigit !== expected) {
-            verificationError.value = 'El código de verificación no coincide con el registrado en su DNI. Por favor revise el número ubicado a la derecha de su DNI físico.';
-            notify.error('Código Incorrecto', 'El dígito verificador no coincide con su documento físico.', 3000);
-            return;
-        }
-    }
-
-    verificationError.value = null;
-    await searchCertificates();
-    searchStep.value = 3;
-}
-
-function resetSearch() {
+function resetSearch(): void {
     searchStep.value = 1;
     dniQuery.value = '';
-    verificationDigit.value = '';
-    reniecPerson.value = null;
     error.value = null;
-    verificationError.value = null;
     records.value = [];
     searched.value = false;
     studentName.value = null;
@@ -311,11 +260,11 @@ async function searchCertificates(targetCode?: string) {
             }
         } else {
             error.value = data.message || 'No se pudo consultar el registro de certificados.';
-            notify.error('Consulta fallida', error.value, 3000);
+            notify.error('Consulta fallida', error.value || 'No se pudo consultar el registro.', 3000);
         }
     } catch {
         error.value = 'Error al conectarse con el servidor de validación. Intente nuevamente.';
-        notify.error('Error de conexión', error.value, 3000);
+        notify.error('Error de conexión', error.value || 'Intente nuevamente.', 3000);
     } finally {
         loading.value = false;
     }
@@ -428,11 +377,11 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <!-- VISTA 1: CONSULTA INSTITUCIONAL CON VERIFICACIÓN DE IDENTIDAD EN 2 PASOS -->
+                <!-- VISTA 1: CONSULTA INSTITUCIONAL POR DNI -->
                 <div v-if="activeTab === 'dni'" class="space-y-6">
                     <!-- STEPPER INDICADOR INSTITUCIONAL -->
                     <div class="max-w-2xl mx-auto px-2 w-full">
-                        <div class="grid grid-cols-3 gap-1.5 sm:gap-2 text-center text-[11px] sm:text-xs">
+                        <div class="grid grid-cols-2 gap-1.5 sm:gap-2 text-center text-[11px] sm:text-xs">
                             <!-- Paso 1 -->
                             <div
                                 class="flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl border font-bold transition-all min-w-0"
@@ -447,20 +396,9 @@ onMounted(() => {
                             <!-- Paso 2 -->
                             <div
                                 class="flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl border font-bold transition-all min-w-0"
-                                :class="searchStep === 2 ? 'bg-rose-900 text-white border-rose-900 shadow-xs' : (searchStep > 2 ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 text-emerald-800 dark:text-emerald-300' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500')"
+                                :class="searchStep === 2 ? 'bg-rose-900 text-white border-rose-900 shadow-xs' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'"
                             >
-                                <CheckCircle2 v-if="searchStep > 2" class="size-3.5 text-emerald-600 shrink-0" />
-                                <span v-else class="size-4 rounded-full bg-white/20 text-[10px] flex items-center justify-center shrink-0">2</span>
-                                <span class="hidden md:inline">Paso 2:</span>
-                                <span class="truncate">Verificación</span>
-                            </div>
-
-                            <!-- Paso 3 -->
-                            <div
-                                class="flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-3 rounded-xl border font-bold transition-all min-w-0"
-                                :class="searchStep === 3 ? 'bg-rose-900 text-white border-rose-900 shadow-xs' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'"
-                            >
-                                <span class="size-4 rounded-full bg-white/20 text-[10px] flex items-center justify-center shrink-0">3</span>
+                                <span class="size-4 rounded-full bg-white/20 text-[10px] flex items-center justify-center shrink-0">2</span>
                                 <span class="truncate">Diplomas</span>
                             </div>
                         </div>
@@ -477,7 +415,7 @@ onMounted(() => {
                                 Ingrese el Número de DNI
                             </CardTitle>
                             <CardDescription class="text-xs text-slate-600 dark:text-slate-400">
-                                Se validará su identidad en el padrón oficial de RENIEC antes de solicitar el código de verificación.
+                                Se validará su identidad en el padrón oficial de RENIEC antes de mostrar los certificados emitidos.
                             </CardDescription>
                         </CardHeader>
                         <CardContent class="p-5 sm:p-6 space-y-4">
@@ -517,103 +455,6 @@ onMounted(() => {
                                 <AlertCircle class="size-4 shrink-0 text-rose-700" />
                                 <span>{{ error }}</span>
                             </div>
-                        </CardContent>
-                    </Card>
-
-                    <!-- PASO 2: CÓDIGO DE VERIFICACIÓN DEL DNI -->
-                    <Card v-else-if="searchStep === 2" class="max-w-2xl mx-auto border border-rose-900/20 dark:border-rose-900/40 shadow-sm bg-white dark:bg-slate-900 overflow-hidden">
-                        <!-- Cabecera con datos de la persona validada en RENIEC -->
-                        <div class="p-4 sm:p-5 bg-gradient-to-r from-emerald-50/80 via-white to-rose-50/30 dark:from-emerald-950/20 dark:via-slate-900 dark:to-slate-900 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="size-11 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black shadow-xs shrink-0">
-                                    <ShieldCheck class="size-6 text-emerald-200" />
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <Badge class="bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 text-[10px] font-black">
-                                            <CheckCircle2 class="size-3 mr-1 text-emerald-700" />
-                                            Identidad Verificada en RENIEC
-                                        </Badge>
-                                        <span class="text-xs font-mono font-bold text-slate-500">DNI: {{ dniQuery }}</span>
-                                    </div>
-                                    <h3 class="text-sm sm:text-base font-black text-slate-950 dark:text-white uppercase tracking-tight truncate mt-0.5">
-                                        {{ studentName }}
-                                    </h3>
-                                </div>
-                            </div>
-
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                @click="resetSearch"
-                                class="text-xs text-slate-600 hover:text-rose-900 border-slate-300 shrink-0 cursor-pointer"
-                            >
-                                <RotateCcw class="size-3.5 mr-1 text-rose-800" />
-                                Cambiar DNI
-                            </Button>
-                        </div>
-
-                        <!-- Formulario de ingreso de Código de Verificación (1 dígito) -->
-                        <CardContent class="p-6 sm:p-8 space-y-6">
-                            <div class="text-center space-y-2">
-                                <div class="inline-flex items-center justify-center size-10 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-600 mb-1">
-                                    <KeyRound class="size-5" />
-                                </div>
-                                <CardTitle class="text-base sm:text-lg font-black text-slate-950 dark:text-white">
-                                    Paso 2: Ingrese el Código de Verificación de su DNI
-                                </CardTitle>
-                                <CardDescription class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto">
-                                    Por seguridad institucional y para proteger la privacidad de sus diplomas, ingrese el dígito verificador que figura en su DNI físico.
-                                </CardDescription>
-                            </div>
-
-                            <form @submit.prevent="verifyAndFetchCertificates" class="space-y-5 max-w-sm mx-auto">
-                                <div class="flex flex-col items-center justify-center gap-2">
-                                    <div class="relative">
-                                        <input
-                                            id="verification-digit-input"
-                                            v-model="verificationDigit"
-                                            @input="onVerificationInput"
-                                            type="text"
-                                            maxlength="1"
-                                            placeholder="•"
-                                            class="size-16 sm:size-20 text-center text-3xl sm:text-4xl font-mono font-black border-2 border-rose-900/60 focus:border-rose-900 rounded-2xl shadow-sm uppercase text-slate-950 dark:text-white bg-white dark:bg-slate-950 focus:outline-hidden focus:ring-2 focus:ring-rose-900/30 transition-all disabled:opacity-50"
-                                            autofocus
-                                            :disabled="loading"
-                                        />
-                                    </div>
-                                    <p class="text-[11px] text-slate-500 font-medium">
-                                        Es un único dígito numérico o alfanumérico (1 carácter)
-                                    </p>
-                                </div>
-
-                                <div class="text-center">
-                                    <button
-                                        type="button"
-                                        @click="showHelpModal = true"
-                                        class="text-xs font-bold text-rose-900 dark:text-rose-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
-                                    >
-                                        <HelpCircle class="size-3.5" />
-                                        <span>¿Dónde encuentro el código de verificación en mi DNI?</span>
-                                    </button>
-                                </div>
-
-                                <div v-if="verificationError" class="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-200 text-xs font-bold flex items-center gap-2">
-                                    <AlertCircle class="size-4 shrink-0 text-rose-700" />
-                                    <span>{{ verificationError }}</span>
-                                </div>
-
-                                <Button
-                                    type="submit"
-                                    :disabled="loading || verificationDigit.length !== 1"
-                                    class="w-full h-12 bg-rose-900 hover:bg-rose-950 text-white font-black text-sm shadow-md cursor-pointer rounded-xl"
-                                >
-                                    <Loader2 v-if="loading" class="size-4 mr-2 animate-spin" />
-                                    <Award v-else class="size-4 mr-2 text-amber-300" />
-                                    <span>Verificar y Mostrar Certificados</span>
-                                </Button>
-                            </form>
                         </CardContent>
                     </Card>
 
@@ -720,7 +561,7 @@ onMounted(() => {
                                                 <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Período</div>
                                                 <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1">
                                                     <Calendar class="size-3 text-rose-800" />
-                                                    {{ formatDateRange(record.start_date, record.end_date, 'short') }}
+                                                    {{ formatDateRange(record.start_date, record.end_date, 'medium') }}
                                                 </div>
                                             </div>
                                         </div>
@@ -1283,70 +1124,6 @@ onMounted(() => {
                     </Button>
                 </div>
             </div>
-        </DialogContent>
-    </Dialog>
-
-    <!-- MODAL DE AYUDA VISUAL: DÓNDE UBICAR EL CÓDIGO DE VERIFICACIÓN DEL DNI -->
-    <Dialog v-model:open="showHelpModal">
-        <DialogContent class="max-w-md w-[92vw] p-5 sm:p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl">
-            <DialogHeader class="space-y-1.5 text-left border-b pb-3">
-                <div class="flex items-center gap-2 text-xs font-bold text-rose-900 dark:text-rose-300">
-                    <HelpCircle class="size-4" />
-                    <span>Guía Oficial RENIEC • Identidad Nacional</span>
-                </div>
-                <DialogTitle class="text-base sm:text-lg font-black text-slate-950 dark:text-white">
-                    ¿Dónde encuentro el Código de Verificación?
-                </DialogTitle>
-                <DialogDescription class="text-xs text-slate-600 dark:text-slate-400">
-                    El código verificador es un único dígito que valida la autenticidad física de su documento.
-                </DialogDescription>
-            </DialogHeader>
-
-            <div class="space-y-3.5 py-3 text-xs">
-                <!-- DNI Azul -->
-                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-1.5">
-                    <div class="font-bold text-slate-900 dark:text-white flex items-center justify-between">
-                        <span>1. DNI Azul Convencional</span>
-                        <Badge variant="outline" class="text-[10px] font-mono border-blue-400 text-blue-800 bg-blue-50/60">DNI Azul</Badge>
-                    </div>
-                    <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-[11px]">
-                        En la esquina superior derecha, inmediatamente después del guion:
-                        <span class="font-mono font-black text-rose-950 dark:text-amber-300 bg-rose-100 dark:bg-rose-950/60 px-1.5 py-0.5 rounded border border-rose-300">00000000 - [X]</span>.
-                    </p>
-                </div>
-
-                <!-- DNI Electrónico DNIe -->
-                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-1.5">
-                    <div class="font-bold text-slate-900 dark:text-white flex items-center justify-between">
-                        <span>2. DNI Electrónico (DNIe)</span>
-                        <Badge variant="outline" class="text-[10px] font-mono border-emerald-400 text-emerald-800 bg-emerald-50/60">DNIe</Badge>
-                    </div>
-                    <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-[11px]">
-                        En el anverso (cara principal), al lado derecho del número de DNI dentro de un recuadro sombreado independiente.
-                    </p>
-                </div>
-
-                <!-- DNI Amarillo -->
-                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-1.5">
-                    <div class="font-bold text-slate-900 dark:text-white flex items-center justify-between">
-                        <span>3. DNI Amarillo (Menores)</span>
-                        <Badge variant="outline" class="text-[10px] font-mono border-amber-400 text-amber-800 bg-amber-50/60">Menores</Badge>
-                    </div>
-                    <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-[11px]">
-                        En la parte superior derecha, junto a los 8 dígitos numéricos del documento.
-                    </p>
-                </div>
-            </div>
-
-            <DialogFooter class="pt-2 border-t">
-                <Button
-                    type="button"
-                    class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs h-10 rounded-xl cursor-pointer shadow-xs"
-                    @click="showHelpModal = false"
-                >
-                    Entendido, ya identifiqué mi código
-                </Button>
-            </DialogFooter>
         </DialogContent>
     </Dialog>
 

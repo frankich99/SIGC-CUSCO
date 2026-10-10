@@ -305,6 +305,54 @@ class CertificateService
     }
 
     /**
+     * Genera un código de certificado único y determinista.
+     */
+    public static function makeCertificateCode(Enrollment $enrollment): string
+    {
+        $year = date('Y');
+
+        return "CERT-{$year}-UNSAAC-".str_pad((string) $enrollment->course_id, 3, '0', STR_PAD_LEFT).'-'.str_pad((string) $enrollment->id, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Devuelve el mensaje canónico que se firma para un certificado.
+     */
+    public static function signaturePayload(Enrollment $enrollment): string
+    {
+        $course = $enrollment->course;
+
+        return implode('|', [
+            'SIGC-UNSAAC',
+            (string) $enrollment->certificate_code,
+            $enrollment->dni,
+            $enrollment->full_name,
+            (string) $course->code,
+            (string) $course->hours,
+            number_format((float) ($enrollment->final_grade ?? 20.0), 2),
+        ]);
+    }
+
+    /**
+     * Firma HMAC-SHA-256 del payload canónico con el secreto de la aplicación.
+     */
+    public static function sign(Enrollment $enrollment): string
+    {
+        return hash_hmac('sha256', self::signaturePayload($enrollment), (string) config('services.sigc.signing_key'));
+    }
+
+    /**
+     * Verifica que la huella almacenada corresponda al certificado firmado.
+     */
+    public static function verifySignature(Enrollment $enrollment): bool
+    {
+        if (empty($enrollment->certificate_hash)) {
+            return false;
+        }
+
+        return hash_equals((string) $enrollment->certificate_hash, self::sign($enrollment));
+    }
+
+    /**
      * Construye el payload completo y enriquecido para un certificado oficial.
      *
      * @return array<string, mixed>
@@ -315,33 +363,10 @@ class CertificateService
         $formattedStart = $course?->start_date ? Carbon::parse($course->start_date)->format('d/m/Y') : null;
         $formattedEnd = $course?->end_date ? Carbon::parse($course->end_date)->format('d/m/Y') : null;
 
-        // Asegurar código de certificado
-        $certCode = $enrollment->certificate_code;
-        if (empty($certCode)) {
-            $year = date('Y');
-            $certCode = "CERT-{$year}-UNSAAC-".str_pad((string) $enrollment->course_id, 3, '0', STR_PAD_LEFT).'-'.str_pad((string) $enrollment->id, 4, '0', STR_PAD_LEFT);
-            $enrollment->certificate_code = $certCode;
-        }
-
-        // Asegurar hash criptográfico SHA-256
-        $certHash = $enrollment->certificate_hash;
-        if (empty($certHash)) {
-            $courseCode = $course?->code ?? 'SIGC-001';
-            $hours = $course?->hours ?? 40;
-            $grade = $enrollment->final_grade ?? '20.00';
-            $hashPayload = "SIGC-UNSAAC|{$certCode}|{$enrollment->dni}|{$enrollment->full_name}|{$courseCode}|{$hours}|{$grade}";
-            $certHash = hash('sha256', $hashPayload);
-            $enrollment->certificate_hash = $certHash;
-        }
-
-        if (empty($enrollment->certificate_issued_at)) {
-            $enrollment->certificate_issued_at = now();
-        }
-
-        // Guardar si hubo cambios sin disparar eventos innecesarios
-        if ($enrollment->isDirty(['certificate_code', 'certificate_hash', 'certificate_issued_at'])) {
-            $enrollment->saveQuietly();
-        }
+        // El código y la huella solo se persisten en la emisión oficial (acta cerrada).
+        // Aquí se calculan en memoria para mostrar el diploma sin escribir en una ruta de lectura.
+        $certCode = $enrollment->certificate_code ?: self::makeCertificateCode($enrollment);
+        $certHash = $enrollment->certificate_hash ?: self::sign($enrollment);
 
         $issuedAt = $enrollment->certificate_issued_at
             ? $enrollment->certificate_issued_at->format('d/m/Y')

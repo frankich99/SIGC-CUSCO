@@ -5,6 +5,9 @@ export type User = {
     avatar?: string;
     role?: 'admin' | 'docente' | 'participante' | string;
     dni?: string | null;
+    paterno?: string | null;
+    materno?: string | null;
+    phone?: string | null;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
     created_at: string;

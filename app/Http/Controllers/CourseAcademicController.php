@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AttendanceRecord;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Services\AttendanceQrService;
+use App\Services\AttendanceService;
+use App\Services\CertificateService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CourseAcademicController extends Controller
@@ -17,83 +20,71 @@ class CourseAcademicController extends Controller
     /**
      * Registrar asistencia de una sesión individual (escaneo QR o ingreso manual).
      */
-    public function recordSessionAttendance(Request $request, Course $course, int $session): RedirectResponse|JsonResponse
+    public function recordSessionAttendance(Request $request, Course $course, int $session, AttendanceService $attendanceService): RedirectResponse|JsonResponse
     {
         $this->authorizeStaff($course);
 
         $validated = $request->validate([
-            'identifier' => ['required', 'string', 'max:50'], // DNI o Código de Credencial INS-...
+            'identifier' => ['required', 'string', 'max:50'],
             'status' => ['nullable', 'string', 'in:presente,tardanza,falta'],
             'method' => ['nullable', 'string', 'in:qr_proyeccion,manual,offline_sync'],
         ], [
             'identifier.required' => 'Debe ingresar el DNI o código de credencial del participante.',
         ]);
 
-        if ($session < 1 || $session > $course->total_sessions) {
+        $totalSessions = max(1, (int) ($course->total_sessions ?: 4));
+        if ($session < 1 || $session > $totalSessions) {
             throw ValidationException::withMessages([
-                'session' => "El número de sesión debe estar entre 1 y {$course->total_sessions}.",
+                'session' => "El número de sesión debe estar entre 1 y {$totalSessions}.",
             ]);
         }
 
-        $id = trim($validated['identifier']);
-        $enrollment = Enrollment::where('course_id', $course->id)
-            ->where(function ($query) use ($id) {
-                $query->where('dni', $id)
-                    ->orWhere('credential_code', $id);
+        $identifier = trim($validated['identifier']);
+        $enrollment = Enrollment::query()
+            ->where('course_id', $course->id)
+            ->where(function ($query) use ($identifier): void {
+                $query->where('dni', $identifier)
+                    ->orWhere('credential_code', $identifier);
             })
             ->first();
 
         if (! $enrollment) {
+            $message = "No se encontró ningún participante inscrito con DNI o credencial '{$identifier}' en este curso.";
+
             if ($request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => "No se encontró ningún participante inscrito con DNI o credencial '{$id}' en este curso.",
+                    'message' => $message,
                 ], 404);
             }
 
-            throw ValidationException::withMessages([
-                'identifier' => "No se encontró ningún participante inscrito con DNI o credencial '{$id}' en este curso.",
-            ]);
+            throw ValidationException::withMessages(['identifier' => $message]);
         }
 
-        // Verificar si la asistencia a esta sesión ya fue registrada previamente (SIGC-9)
-        $alreadyRecorded = AttendanceRecord::where('enrollment_id', $enrollment->id)
-            ->where('session_number', $session)
-            ->exists();
+        $record = $attendanceService->record(
+            $course,
+            $enrollment,
+            $session,
+            $validated['status'] ?? 'presente',
+            $validated['method'] ?? 'manual',
+            Auth::id(),
+        );
 
-        if ($alreadyRecorded) {
-            $msg = "Tu asistencia a la sesión {$session} ya fue registrada previamente para {$enrollment->full_name}.";
+        if ($record === null) {
+            $message = "Tu asistencia a la sesión {$session} ya fue registrada previamente para {$enrollment->full_name}.";
+
             if ($request->wantsJson()) {
                 return response()->json([
                     'success' => false,
                     'already_recorded' => true,
-                    'message' => $msg,
+                    'message' => $message,
                 ], 422);
             }
 
-            return back()->with('error', $msg);
+            return back()->with('error', $message);
         }
 
-        AttendanceRecord::create([
-            'course_id' => $course->id,
-            'enrollment_id' => $enrollment->id,
-            'session_number' => $session,
-            'status' => $validated['status'] ?? 'presente',
-            'method' => $validated['method'] ?? 'manual',
-            'recorded_at' => now(),
-            'recorded_by' => Auth::id(),
-        ]);
-
-        // Actualizar contador total de sesiones asistidas
-        $attendedCount = AttendanceRecord::where('enrollment_id', $enrollment->id)
-            ->whereIn('status', ['presente', 'tardanza'])
-            ->count();
-
-        $enrollment->update([
-            'attended_sessions' => $attendedCount,
-            'status' => $enrollment->status === 'inscrito' ? 'en_curso' : $enrollment->status,
-        ]);
-
+        $enrollment->refresh();
         $successMsg = "Asistencia registrada: sesión {$session} para {$enrollment->full_name}.";
 
         if ($request->wantsJson()) {
@@ -104,7 +95,7 @@ class CourseAcademicController extends Controller
                     'id' => $enrollment->id,
                     'full_name' => $enrollment->full_name,
                     'dni' => $enrollment->dni,
-                    'attended_sessions' => $attendedCount,
+                    'attended_sessions' => $enrollment->attended_sessions,
                 ],
             ]);
         }
@@ -113,31 +104,48 @@ class CourseAcademicController extends Controller
     }
 
     /**
-     * Sincronizar cola de asistencias offline almacenadas en el navegador (SIGC-12).
+     * Generate a short-lived, signed QR URL for participant self-attendance.
      */
-    public function syncOfflineAttendance(Request $request, Course $course): JsonResponse
+    public function sessionQr(Course $course, int $session, AttendanceQrService $attendanceQrService): JsonResponse
     {
         $this->authorizeStaff($course);
 
+        $totalSessions = max(1, (int) ($course->total_sessions ?: 4));
+        if ($session < 1 || $session > $totalSessions) {
+            throw ValidationException::withMessages([
+                'session' => "El número de sesión debe estar entre 1 y {$totalSessions}.",
+            ]);
+        }
+
+        return response()->json($attendanceQrService->forSession($course, $session));
+    }
+
+    public function syncOfflineAttendance(Request $request, Course $course, AttendanceService $attendanceService): JsonResponse
+    {
+        $this->authorizeStaff($course);
+        $attendanceService->assertCourseOpen($course);
+
+        $totalSessions = max(1, (int) ($course->total_sessions ?: 4));
         $validated = $request->validate([
-            'items' => ['required', 'array'],
-            'items.*.identifier' => ['required', 'string'],
-            'items.*.session_number' => ['required', 'integer', 'min:1'],
+            'items' => ['required', 'array', 'max:500'],
+            'items.*.identifier' => ['required', 'string', 'max:50'],
+            'items.*.session_number' => ['required', 'integer', 'min:1', 'max:'.$totalSessions],
             'items.*.status' => ['nullable', 'string', 'in:presente,tardanza,falta'],
-            'items.*.recorded_at' => ['nullable', 'string'],
+            'items.*.recorded_at' => ['nullable', 'date'],
         ]);
 
         $syncedCount = 0;
         $skippedCount = 0;
 
         foreach ($validated['items'] as $item) {
-            $id = trim($item['identifier']);
+            $identifier = trim($item['identifier']);
             $session = (int) $item['session_number'];
 
-            $enrollment = Enrollment::where('course_id', $course->id)
-                ->where(function ($query) use ($id) {
-                    $query->where('dni', $id)
-                        ->orWhere('credential_code', $id);
+            $enrollment = Enrollment::query()
+                ->where('course_id', $course->id)
+                ->where(function ($query) use ($identifier): void {
+                    $query->where('dni', $identifier)
+                        ->orWhere('credential_code', $identifier);
                 })
                 ->first();
 
@@ -147,34 +155,21 @@ class CourseAcademicController extends Controller
                 continue;
             }
 
-            $alreadyRecorded = AttendanceRecord::where('enrollment_id', $enrollment->id)
-                ->where('session_number', $session)
-                ->exists();
+            $record = $attendanceService->record(
+                $course,
+                $enrollment,
+                $session,
+                $item['status'] ?? 'presente',
+                'offline_sync',
+                Auth::id(),
+                now(),
+            );
 
-            if ($alreadyRecorded) {
+            if ($record === null) {
                 $skippedCount++;
 
                 continue;
             }
-
-            AttendanceRecord::create([
-                'course_id' => $course->id,
-                'enrollment_id' => $enrollment->id,
-                'session_number' => $session,
-                'status' => $item['status'] ?? 'presente',
-                'method' => 'offline_sync',
-                'recorded_at' => ! empty($item['recorded_at']) ? $item['recorded_at'] : now(),
-                'recorded_by' => Auth::id(),
-            ]);
-
-            $attendedCount = AttendanceRecord::where('enrollment_id', $enrollment->id)
-                ->whereIn('status', ['presente', 'tardanza'])
-                ->count();
-
-            $enrollment->update([
-                'attended_sessions' => $attendedCount,
-                'status' => $enrollment->status === 'inscrito' ? 'en_curso' : $enrollment->status,
-            ]);
 
             $syncedCount++;
         }
@@ -195,38 +190,53 @@ class CourseAcademicController extends Controller
     {
         $this->authorizeStaff($course);
 
-        if ($course->isActaClosed()) {
+        $closed = DB::transaction(function () use ($course): bool {
+            $lockedCourse = Course::query()
+                ->whereKey($course->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedCourse->isActaClosed()) {
+                return false;
+            }
+
+            $minAttendance = $lockedCourse->min_attendance_percentage ?: 75;
+            $totalSessions = max(1, (int) ($lockedCourse->total_sessions ?: 4));
+            $enrollments = $lockedCourse->enrollments()
+                ->with('attendanceRecords')
+                ->where('status', '!=', 'cancelado')
+                ->lockForUpdate()
+                ->get();
+
+            foreach ($enrollments as $enrollment) {
+                $attendedCount = $enrollment->attendanceRecords
+                    ->whereIn('status', ['presente', 'tardanza'])
+                    ->count();
+                $attendancePercentage = round(($attendedCount / $totalSessions) * 100, 1);
+                $grade = $enrollment->final_grade !== null ? (float) $enrollment->final_grade : 0.0;
+
+                $enrollment->update([
+                    'attended_sessions' => $attendedCount,
+                    'status' => $attendancePercentage >= $minAttendance && $grade >= 11.0
+                        ? 'aprobado'
+                        : 'reprobado',
+                ]);
+            }
+
+            $lockedCourse->update([
+                'acta_closed_at' => now(),
+                'acta_closed_by' => Auth::id(),
+                'status' => 'concluido',
+            ]);
+
+            return true;
+        });
+
+        if (! $closed) {
             return back()->with('error', 'El acta oficial de este curso ya fue cerrada anteriormente.');
         }
 
-        $minAttendance = $course->min_attendance_percentage ?: 75;
-        $totalSessions = $course->total_sessions ?: 4;
-
-        $enrollments = $course->enrollments()->where('status', '!=', 'cancelado')->get();
-
-        foreach ($enrollments as $enrollment) {
-            $attendancePercentage = $totalSessions > 0
-                ? round(($enrollment->attended_sessions / $totalSessions) * 100, 1)
-                : 0.0;
-
-            $grade = ! is_null($enrollment->final_grade) ? (float) $enrollment->final_grade : 0.0;
-
-            if ($attendancePercentage >= $minAttendance && $grade >= 11.0) {
-                $enrollment->status = 'aprobado';
-            } else {
-                $enrollment->status = 'reprobado';
-            }
-
-            $enrollment->save();
-        }
-
-        $course->update([
-            'acta_closed_at' => now(),
-            'acta_closed_by' => Auth::id(),
-            'status' => 'concluido',
-        ]);
-
-        return back()->with('success', '¡Acta oficial del curso cerrada exitosamente! Se calcularon las condiciones finales de todos los participantes y se habilitó la emisión de certificados.');
+        return back()->with('success', '¡Acta oficial del curso cerrada exitosamente! Se recalcularon las asistencias y condiciones finales de todos los participantes.');
     }
 
     /**
@@ -234,10 +244,10 @@ class CourseAcademicController extends Controller
      */
     public function reopenActa(Course $course): RedirectResponse
     {
-        $this->authorizeStaff($course);
+        $this->authorizeAdmin($course);
 
         if (! $course->isActaClosed()) {
-            return back()->with('error', 'El acta oficial de este curso ya se encuentra abierta para edición.');
+            return back()->with('error', 'El acta oficial del curso ya se encuentra abierta para edición.');
         }
 
         $course->update([
@@ -246,7 +256,7 @@ class CourseAcademicController extends Controller
             'status' => 'en_curso',
         ]);
 
-        return back()->with('success', '¡Acta oficial reactivada exitosamente! Ahora se encuentra en modo edición para realizar cualquier corrección o ajuste en calificaciones y asistencias.');
+        return back()->with('success', '¡Acta oficial reactivada exitosamente! Ahora se encuentra en modo edición para realizar correcciones autorizadas.');
     }
 
     /**
@@ -257,35 +267,54 @@ class CourseAcademicController extends Controller
     {
         $this->authorizeStaff($course);
 
-        if (! $course->isActaClosed()) {
-            return back()->with('error', 'El acta debe estar cerrada oficialmente antes de emitir los certificados.');
-        }
+        $issuedCount = DB::transaction(function () use ($course): int {
+            $lockedCourse = Course::query()
+                ->whereKey($course->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $approvedEnrollments = $course->enrollments()
-            ->where('status', 'aprobado')
-            ->get();
-
-        $issuedCount = 0;
-        $year = date('Y');
-
-        foreach ($approvedEnrollments as $enrollment) {
-            $code = $enrollment->certificate_code;
-
-            if (empty($code)) {
-                $code = "CERT-{$year}-UNSAAC-{$course->id}-{$enrollment->id}";
-                $enrollment->certificate_code = $code;
+            if (! $lockedCourse->isActaClosed()) {
+                throw ValidationException::withMessages([
+                    'certificate' => 'El acta debe estar cerrada oficialmente antes de emitir los certificados.',
+                ]);
             }
 
-            // Generar huella digital SHA-256 oficial
-            $hashPayload = "SIGC-UNSAAC|{$code}|{$enrollment->dni}|{$enrollment->full_name}|{$course->code}|{$course->hours}|{$enrollment->final_grade}";
-            $enrollment->certificate_hash = hash('sha256', $hashPayload);
-            $enrollment->certificate_issued_at = $enrollment->certificate_issued_at ?: now();
-            $enrollment->save();
+            $approvedEnrollments = $lockedCourse->enrollments()
+                ->where('status', 'aprobado')
+                ->with('attendanceRecords')
+                ->lockForUpdate()
+                ->get();
+            $minAttendance = $lockedCourse->min_attendance_percentage ?: 75;
+            $totalSessions = max(1, (int) ($lockedCourse->total_sessions ?: 4));
 
-            $issuedCount++;
-        }
+            foreach ($approvedEnrollments as $enrollment) {
+                $attendedCount = $enrollment->attendanceRecords
+                    ->whereIn('status', ['presente', 'tardanza'])
+                    ->count();
+                $attendancePercentage = round(($attendedCount / $totalSessions) * 100, 1);
+                $grade = $enrollment->final_grade !== null ? (float) $enrollment->final_grade : 0.0;
 
-        return back()->with('success', "Se emitieron exitosamente {$issuedCount} certificados oficiales con firma criptográfica SHA-256.");
+                if ($attendancePercentage < $minAttendance || $grade < 11.0) {
+                    throw ValidationException::withMessages([
+                        'certificate' => "La matrícula {$enrollment->full_name} no cumple los requisitos para certificación.",
+                    ]);
+                }
+            }
+
+            foreach ($approvedEnrollments as $enrollment) {
+                $enrollment->attended_sessions = $enrollment->attendanceRecords
+                    ->whereIn('status', ['presente', 'tardanza'])
+                    ->count();
+                $enrollment->certificate_code = $enrollment->certificate_code ?: CertificateService::makeCertificateCode($enrollment);
+                $enrollment->certificate_hash = CertificateService::sign($enrollment);
+                $enrollment->certificate_issued_at = $enrollment->certificate_issued_at ?: now();
+                $enrollment->save();
+            }
+
+            return $approvedEnrollments->count();
+        });
+
+        return back()->with('success', "Se emitieron exitosamente {$issuedCount} certificados oficiales con sello HMAC-SHA-256.");
     }
 
     /**
@@ -408,6 +437,20 @@ class CourseAcademicController extends Controller
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
         ]);
+    }
+
+    /**
+     * Verifica que el usuario autenticado sea administrador.
+     */
+    private function authorizeAdmin(Course $course): void
+    {
+        $user = Auth::user();
+
+        if (! $user || ! $user->isAdmin()) {
+            abort(403, 'Solo un administrador puede reabrir un acta oficial.');
+        }
+
+        $this->authorizeStaff($course);
     }
 
     /**

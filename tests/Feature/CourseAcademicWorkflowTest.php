@@ -144,6 +144,34 @@ test('CP-08 close acta applies strict UNSAAC rule (grade >= 11 and attendance >=
         'status' => 'en_curso',
     ]);
 
+    foreach ([1, 2, 3] as $sessionNumber) {
+        AttendanceRecord::create([
+            'course_id' => $course->id,
+            'enrollment_id' => $alumnoAprobado->id,
+            'session_number' => $sessionNumber,
+            'status' => 'presente',
+            'method' => 'manual',
+        ]);
+    }
+
+    AttendanceRecord::create([
+        'course_id' => $course->id,
+        'enrollment_id' => $alumnoFaltaAsistencia->id,
+        'session_number' => 1,
+        'status' => 'presente',
+        'method' => 'manual',
+    ]);
+
+    foreach ([1, 2, 3, 4] as $sessionNumber) {
+        AttendanceRecord::create([
+            'course_id' => $course->id,
+            'enrollment_id' => $alumnoJalado->id,
+            'session_number' => $sessionNumber,
+            'status' => 'presente',
+            'method' => 'manual',
+        ]);
+    }
+
     $response = $this->actingAs($admin)->post(route('courses.acta.close', $course->id));
     $response->assertSessionHas('success');
 
@@ -213,6 +241,16 @@ test('CP-09 bulk certificate generation assigns codes and SHA-256 digital hashes
         'final_grade' => 19.5,
         'status' => 'aprobado',
     ]);
+
+    foreach ([1, 2, 3, 4] as $sessionNumber) {
+        AttendanceRecord::create([
+            'course_id' => $course->id,
+            'enrollment_id' => $aprobado->id,
+            'session_number' => $sessionNumber,
+            'status' => 'presente',
+            'method' => 'manual',
+        ]);
+    }
 
     $response = $this->actingAs($admin)->post(route('courses.certificates.bulk-issue', $course->id));
     $response->assertSessionHas('success');
@@ -356,4 +394,117 @@ test('CP-12 permanent verification route redirects to certificate page with dni 
         'dni' => '33445566',
         'code' => 'CERT-2026-UNSAAC-007-3344',
     ]));
+});
+
+test('bloquea el registro de asistencia cuando el acta esta cerrada', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+    $course = Course::create([
+        'code' => 'SIGC-TEST-008',
+        'title' => 'Curso Con Acta Cerrada',
+        'start_date' => now()->format('Y-m-d'),
+        'end_date' => now()->addDays(5)->format('Y-m-d'),
+        'hours' => 20,
+        'total_sessions' => 4,
+        'capacity' => 20,
+        'status' => CourseStatus::Concluido,
+        'acta_closed_at' => now(),
+        'acta_closed_by' => $admin->id,
+    ]);
+
+    $enrollment = Enrollment::create([
+        'course_id' => $course->id,
+        'dni' => '12312312',
+        'nombres' => 'LUIS',
+        'paterno' => 'ROJAS',
+        'email' => 'luis.rojas@unsaac.edu.pe',
+        'status' => 'inscrito',
+        'attended_sessions' => 0,
+    ]);
+
+    $response = $this->actingAs($admin)->post(route('courses.sessions.attendance', [
+        'course' => $course->id,
+        'session' => 1,
+    ]), [
+        'identifier' => '12312312',
+        'status' => 'presente',
+    ]);
+
+    $response->assertSessionHasErrors(['course']);
+    expect(AttendanceRecord::where('enrollment_id', $enrollment->id)->count())->toBe(0);
+});
+
+test('no emite certificado individual cuando el acta esta abierta', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+    $course = Course::create([
+        'code' => 'SIGC-TEST-009',
+        'title' => 'Curso Sin Acta',
+        'start_date' => now()->format('Y-m-d'),
+        'end_date' => now()->addDays(5)->format('Y-m-d'),
+        'hours' => 20,
+        'total_sessions' => 4,
+        'capacity' => 20,
+        'status' => CourseStatus::EnCurso,
+    ]);
+
+    $enrollment = Enrollment::create([
+        'course_id' => $course->id,
+        'dni' => '23423423',
+        'nombres' => 'ANA',
+        'paterno' => 'FLORES',
+        'email' => 'ana.flores@unsaac.edu.pe',
+        'status' => 'aprobado',
+        'attended_sessions' => 4,
+        'final_grade' => 19.0,
+    ]);
+
+    $response = $this->actingAs($admin)->post(route('enrollments.certificate', $enrollment->id));
+
+    $response->assertSessionHasErrors(['certificate']);
+    $enrollment->refresh();
+    expect($enrollment->certificate_code)->toBeNull();
+});
+
+test('no emite certificado individual sin requisitos academicos', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+    $course = Course::create([
+        'code' => 'SIGC-TEST-010',
+        'title' => 'Curso Reprobado',
+        'start_date' => now()->format('Y-m-d'),
+        'end_date' => now()->addDays(5)->format('Y-m-d'),
+        'hours' => 20,
+        'total_sessions' => 4,
+        'min_attendance_percentage' => 75,
+        'capacity' => 20,
+        'status' => CourseStatus::Concluido,
+        'acta_closed_at' => now(),
+        'acta_closed_by' => $admin->id,
+    ]);
+
+    $enrollment = Enrollment::create([
+        'course_id' => $course->id,
+        'dni' => '34534534',
+        'nombres' => 'PEDRO',
+        'paterno' => 'QUISPE',
+        'email' => 'pedro.quispe@unsaac.edu.pe',
+        'status' => 'reprobado',
+        'attended_sessions' => 1,
+        'final_grade' => 9.0,
+    ]);
+
+    AttendanceRecord::create([
+        'course_id' => $course->id,
+        'enrollment_id' => $enrollment->id,
+        'session_number' => 1,
+        'status' => 'presente',
+        'method' => 'manual',
+    ]);
+
+    $response = $this->actingAs($admin)->post(route('enrollments.certificate', $enrollment->id));
+
+    $response->assertSessionHasErrors(['certificate']);
+    $enrollment->refresh();
+    expect($enrollment->certificate_code)->toBeNull();
 });

@@ -4,6 +4,7 @@ use App\Enums\CourseStatus;
 use App\Enums\UserRole;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Models\User;
 
 test('ciudadano puede matricularse en curso abierto con DNI valido', function () {
     $course = Course::factory()->create([
@@ -31,10 +32,8 @@ test('ciudadano puede matricularse en curso abierto con DNI valido', function ()
         'status' => 'inscrito',
     ]);
 
-    $this->assertDatabaseHas('users', [
+    $this->assertDatabaseMissing('users', [
         'email' => 'maria.jimenez@gmail.com',
-        'dni' => '72345678',
-        'role' => UserRole::Participante,
     ]);
 });
 
@@ -152,6 +151,8 @@ test('api de consulta de certificados retorna registros por DNI', function () {
         'attended_sessions' => 5,
         'final_grade' => 19,
         'certificate_code' => 'CERT-TEST-78901234',
+        'certificate_hash' => hash('sha256', 'test-hash'),
+        'certificate_issued_at' => now(),
     ]);
 
     $response = $this->getJson('/api/certificates/lookup?dni=78901234');
@@ -213,5 +214,59 @@ test('acepta numero de celular valido de 9 digitos iniciando en 9', function () 
     $this->assertDatabaseHas('enrollments', [
         'dni' => '72345679',
         'phone' => '984123456',
+    ]);
+});
+
+test('vincula la matricula al usuario autenticado cuando el DNI coincide', function () {
+    $user = User::factory()->create([
+        'dni' => '71111111',
+        'paterno' => 'PEREZ',
+        'role' => UserRole::Participante,
+    ]);
+
+    $course = Course::factory()->create([
+        'status' => CourseStatus::Abierto,
+        'capacity' => 10,
+    ]);
+
+    $response = $this->actingAs($user)->post(route('courses.enroll', $course), [
+        'dni' => '71111111',
+        'nombres' => 'IGNORADO',
+        'paterno' => 'IGNORADO',
+        'email' => 'ignorado@example.com',
+    ]);
+
+    $response->assertSessionHasNoErrors();
+
+    $this->assertDatabaseHas('enrollments', [
+        'course_id' => $course->id,
+        'dni' => '71111111',
+        'user_id' => $user->id,
+        'email' => $user->email,
+    ]);
+});
+
+test('rechaza la matricula cuando el DNI no coincide con la cuenta autenticada', function () {
+    $user = User::factory()->create([
+        'dni' => '71111111',
+        'role' => UserRole::Participante,
+    ]);
+
+    $course = Course::factory()->create([
+        'status' => CourseStatus::Abierto,
+        'capacity' => 10,
+    ]);
+
+    $response = $this->actingAs($user)->post(route('courses.enroll', $course), [
+        'dni' => '72222222',
+        'nombres' => 'OTRO',
+        'paterno' => 'DISTINTO',
+        'email' => 'otro@example.com',
+    ]);
+
+    $response->assertSessionHasErrors(['dni']);
+    $this->assertDatabaseMissing('enrollments', [
+        'course_id' => $course->id,
+        'dni' => '72222222',
     ]);
 });

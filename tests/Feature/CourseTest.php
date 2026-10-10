@@ -122,7 +122,7 @@ test('CP-05 admin creates valid course with external ponente and stores in mysql
     ]);
 });
 
-test('authenticated user can query dni endpoint', function () {
+test('authenticated user can query dni endpoint without receiving unnecessary PII', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
 
     Http::fake([
@@ -135,6 +135,9 @@ test('authenticated user can query dni endpoint', function () {
                 'apellido_paterno' => 'QUISPE',
                 'apellido_materno' => 'FLORES',
                 'nombre_completo' => 'JUAN QUISPE FLORES',
+                'genero' => 'M',
+                'fecha_nacimiento' => '1990-01-01',
+                'codigo_verificacion' => '7',
             ],
         ], 200),
     ]);
@@ -148,7 +151,55 @@ test('authenticated user can query dni endpoint', function () {
                 'dni' => '12345678',
                 'nombre_completo' => 'JUAN QUISPE FLORES',
             ],
-        ]);
+        ])
+        ->assertJsonMissingPath('data.genero')
+        ->assertJsonMissingPath('data.fecha_nacimiento')
+        ->assertJsonMissingPath('data.codigo_verificacion');
+});
+
+test('credential QR is available to its owner but not to another participant', function () {
+    $owner = User::factory()->create([
+        'role' => UserRole::Participante,
+        'dni' => '71234567',
+        'email_verified_at' => now(),
+    ]);
+    $otherParticipant = User::factory()->create([
+        'role' => UserRole::Participante,
+        'dni' => '82345678',
+        'email_verified_at' => now(),
+    ]);
+    $course = Course::factory()->create(['status' => 'en_curso']);
+    $enrollment = Enrollment::create([
+        'course_id' => $course->id,
+        'user_id' => $owner->id,
+        'dni' => '71234567',
+        'nombres' => 'LUZ',
+        'paterno' => 'MAMANI',
+        'email' => $owner->email,
+        'status' => 'en_curso',
+    ]);
+
+    $ownerResponse = $this->actingAs($owner)->getJson(route('enrollments.credential-qr', $enrollment));
+
+    $ownerResponse->assertOk()->assertJsonPath('code', $enrollment->credential_code);
+    expect($ownerResponse->json('svg'))->toContain('<svg');
+
+    $this->actingAs($otherParticipant)
+        ->getJson(route('enrollments.credential-qr', $enrollment))
+        ->assertForbidden();
+});
+
+test('authenticated user receives a standards-compliant course QR', function () {
+    $user = User::factory()->create([
+        'role' => UserRole::Participante,
+        'email_verified_at' => now(),
+    ]);
+    $course = Course::factory()->create();
+
+    $response = $this->actingAs($user)->getJson(route('courses.qr', $course));
+
+    $response->assertOk()->assertJsonPath('url', route('courses.show', $course));
+    expect($response->json('svg'))->toContain('<svg');
 });
 
 test('CP-06 guest user visiting course show gets 200 without exposing confidential enrollments list', function () {

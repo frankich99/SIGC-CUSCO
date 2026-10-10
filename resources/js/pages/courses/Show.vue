@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,8 @@ import {
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
 import { formatDate, formatDateRange } from '@/lib/formatters';
 import { THEME_BUTTONS, THEME_BADGES } from '@/lib/theme';
-import { generateQrSvg } from '@/lib/qr';
+import { credentialQr } from '@/actions/App/Http/Controllers/EnrollmentController';
+import { sessionQr } from '@/actions/App/Http/Controllers/CourseAcademicController';
 import { notify } from '@/lib/notify';
 import {
     Calendar,
@@ -137,6 +138,7 @@ const props = withDefaults(
             manage_enrollments?: boolean;
             close_acta?: boolean;
             issue_certificates?: boolean;
+            reopen_acta?: boolean;
         };
     }>(),
     {
@@ -174,19 +176,34 @@ function updateCuscoTime() {
     }).format(new Date());
 }
 
-const sessionQrPayload = computed(() => {
-    return JSON.stringify({
-        course: props.course.code,
-        course_id: props.course.id,
-        session: selectedSession.value,
-        token: `SES-${props.course.id}-${selectedSession.value}-${props.course.code.slice(-3)}`,
-        system: 'SIGC-CUSCO',
-    });
-});
+const sessionQrSvg = ref('');
+const isLoadingQr = ref(false);
+const qrLoadError = ref<string | null>(null);
 
-const sessionQrSvg = computed(() => {
-    return generateQrSvg(sessionQrPayload.value, 300, '#800020');
-});
+async function loadSessionQr() {
+    if (!isQrProjectorOpen.value) return;
+
+    isLoadingQr.value = true;
+    qrLoadError.value = null;
+    sessionQrSvg.value = '';
+
+    try {
+        const response = await fetch(sessionQr.url({ course: props.course.id, session: selectedSession.value }), {
+            headers: { Accept: 'application/json' },
+        });
+        const data = await response.json();
+
+        if (!response.ok || !data.svg) {
+            throw new Error(data?.message || 'No se pudo generar el código QR de la sesión.');
+        }
+
+        sessionQrSvg.value = data.svg;
+    } catch (e) {
+        qrLoadError.value = e instanceof Error ? e.message : 'No se pudo generar el código QR de la sesión.';
+    } finally {
+        isLoadingQr.value = false;
+    }
+}
 
 const isOnline = ref(typeof navigator !== 'undefined' ? navigator.onLine : true);
 interface OfflineAttendanceItem {
@@ -561,16 +578,29 @@ function confirmDeleteEnrollment() {
 const isCredentialModalOpen = ref(false);
 const credentialEnrollment = ref<EnrollmentItem | null>(null);
 
+const credentialQrSvg = ref('');
+const credentialQrCode = ref('');
+const isCredentialQrLoading = ref(false);
+
 function viewCredential(enrollment: EnrollmentItem) {
     credentialEnrollment.value = enrollment;
     isCredentialModalOpen.value = true;
-}
+    credentialQrSvg.value = '';
+    credentialQrCode.value = '';
+    isCredentialQrLoading.value = true;
 
-const credentialQrSvg = computed(() => {
-    if (!credentialEnrollment.value) return '';
-    const code = credentialEnrollment.value.credential_code || `INS-${credentialEnrollment.value.course_id}-${credentialEnrollment.value.dni.slice(-4)}`;
-    return generateQrSvg(code, 260, '#800020');
-});
+    fetch(credentialQr.url(enrollment.id), { headers: { Accept: 'application/json' } })
+        .then((response) => {
+            if (!response.ok) { throw new Error('No se pudo generar el QR de la credencial.'); }
+            return response.json();
+        })
+        .then((data) => {
+            credentialQrSvg.value = data.svg || '';
+            credentialQrCode.value = data.code || enrollment.credential_code || '';
+        })
+        .catch(() => { credentialQrSvg.value = ''; })
+        .finally(() => { isCredentialQrLoading.value = false; });
+}
 
 async function copyCredentialCode(code: string) {
     try {
@@ -625,6 +655,12 @@ onMounted(() => {
     if (typeof window !== 'undefined') {
         window.addEventListener('online', () => { isOnline.value = true; });
         window.addEventListener('offline', () => { isOnline.value = false; });
+    }
+});
+
+watch([selectedSession, isQrProjectorOpen], () => {
+    if (isQrProjectorOpen.value) {
+        loadSessionQr();
     }
 });
 
@@ -734,7 +770,7 @@ onUnmounted(() => {
                                 Acta Cerrada Oficialmente
                             </Badge>
                             <Button
-                                v-if="can.manage_enrollments"
+                                v-if="can.reopen_acta"
                                 type="button"
                                 size="sm"
                                 variant="outline"
@@ -1479,7 +1515,7 @@ onUnmounted(() => {
                                     Acta Cerrada Oficialmente
                                 </Badge>
                                 <Button
-                                    v-if="can.manage_enrollments"
+                                    v-if="can.reopen_acta"
                                     type="button"
                                     size="sm"
                                     variant="outline"
@@ -1803,15 +1839,17 @@ onUnmounted(() => {
                 </div>
 
                 <div class="p-6 flex flex-col items-center justify-center space-y-4">
-                    <div class="p-4 bg-white rounded-2xl border-4 border-rose-950/20 shadow-md" v-html="sessionQrSvg"></div>
+                    <div v-if="isLoadingQr" class="p-4 bg-white rounded-2xl border-4 border-rose-950/20 shadow-md">
+                        <Loader2 class="size-8 animate-spin text-rose-900" />
+                    </div>
+                    <div v-else-if="qrLoadError" class="max-w-sm p-4 rounded-2xl border border-rose-200 bg-rose-50 text-rose-900 text-xs font-bold">
+                        {{ qrLoadError }}
+                    </div>
+                    <div v-else-if="sessionQrSvg" class="p-4 bg-white rounded-2xl border-4 border-rose-950/20 shadow-md" v-html="sessionQrSvg"></div>
 
                     <div class="text-center space-y-1">
-                        <div class="text-[11px] font-bold text-slate-500 uppercase">Código Alternativo para Alumnos</div>
-                        <div class="font-mono text-xl font-black text-rose-950 bg-rose-50 px-4 py-1.5 rounded-lg border border-rose-200 tracking-wider">
-                            SES-{{ course.id }}-0{{ selectedSession }}-{{ course.code.slice(-3) }}
-                        </div>
-                        <p class="text-[11px] text-slate-500 pt-1">
-                            Escanea con tu cámara o ingresa tu DNI con el docente.
+                        <p class="text-[11px] text-slate-500 max-w-sm">
+                            Escanea con tu cámara para confirmar tu asistencia desde tu cuenta verificada. El enlace expira automáticamente.
                         </p>
                     </div>
 
@@ -2055,9 +2093,15 @@ onUnmounted(() => {
 
                 <div class="p-6 text-center space-y-4">
                     <div class="p-4 bg-white rounded-2xl border-2 border-dashed border-rose-200 inline-block shadow-inner mx-auto">
-                        <div v-html="credentialQrSvg" class="flex justify-center" />
+                        <div v-if="isCredentialQrLoading" class="min-h-[260px] min-w-[260px] flex items-center justify-center text-xs font-bold text-slate-500">
+                            Generando QR...
+                        </div>
+                        <div v-else-if="credentialQrSvg" v-html="credentialQrSvg" class="flex justify-center" />
+                        <div v-else class="p-3 text-xs font-bold text-rose-900">
+                            No se pudo generar el QR de la credencial.
+                        </div>
                         <div class="font-mono text-xs font-black text-rose-950 mt-2">
-                            {{ credentialEnrollment?.credential_code }}
+                            {{ credentialQrCode || credentialEnrollment?.credential_code }}
                         </div>
                     </div>
 
@@ -2075,12 +2119,12 @@ onUnmounted(() => {
 
                     <div class="pt-2 border-t flex flex-col sm:flex-row gap-2">
                         <Button
-                            v-if="credentialEnrollment?.credential_code"
+                            v-if="credentialQrCode || credentialEnrollment?.credential_code"
                             type="button"
                             variant="secondary"
                             size="sm"
                             class="text-xs font-bold flex-1 flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-800"
-                            @click="copyCredentialCode(credentialEnrollment.credential_code)"
+                            @click="copyCredentialCode(credentialQrCode || credentialEnrollment?.credential_code || '')"
                         >
                             <Copy class="size-3.5 text-rose-800" />
                             <span>Copiar Código</span>

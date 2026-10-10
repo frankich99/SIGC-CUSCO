@@ -371,7 +371,7 @@ function copyVerificationUrl(url: string) {
 
         <CardContent class="p-4 sm:p-6 space-y-6">
             <!-- Barra de búsqueda por DNI -->
-            <form @submit.prevent="searchCertificates" class="flex flex-col sm:flex-row gap-2 max-w-md">
+            <form @submit.prevent="() => searchCertificates()" class="flex flex-col sm:flex-row gap-2 max-w-md">
                 <div class="relative flex-1">
                     <Search class="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                     <Input

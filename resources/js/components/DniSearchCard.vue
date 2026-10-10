@@ -15,9 +15,6 @@ export interface DniPersonData {
     apellido_paterno: string;
     apellido_materno: string;
     nombre_completo: string;
-    genero?: string;
-    fecha_nacimiento?: string;
-    codigo_verificacion?: string;
 }
 
 const emit = defineEmits<{
@@ -122,9 +119,7 @@ async function consultDni() {
                     <div>
                         <span class="font-bold text-slate-500">DNI:</span> {{ person.dni }}
                     </div>
-                    <div>
-                        <span class="font-bold text-slate-500">Dígito Verif.:</span> {{ person.codigo_verificacion || '-' }}
-                    </div>
+
                     <div>
                         <span class="font-bold text-slate-500">Nombres:</span> {{ person.nombres }}
                     </div>

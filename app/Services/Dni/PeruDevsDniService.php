@@ -56,8 +56,8 @@ class PeruDevsDniService implements DniLookupService
                 ]);
 
             if (! $response->successful()) {
-                Log::warning("PeruDevs DNI lookup failed HTTP status {$response->status()} for DNI {$cleanDni}", [
-                    'body' => $response->body(),
+                Log::warning('PeruDevs DNI lookup failed.', [
+                    'status' => $response->status(),
                 ]);
 
                 return null;
@@ -75,10 +75,8 @@ class PeruDevsDniService implements DniLookupService
             Cache::put($cacheKey, $resultado, now()->addDays(30));
 
             return DniPerson::fromPeruDevs($resultado);
-        } catch (Throwable $e) {
-            Log::error("PeruDevs DNI service exception for DNI {$cleanDni}: {$e->getMessage()}", [
-                'exception' => $e,
-            ]);
+        } catch (Throwable) {
+            Log::error('PeruDevs DNI service exception.');
 
             return null;
         }

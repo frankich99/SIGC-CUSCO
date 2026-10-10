@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceScanController;
 use App\Http\Controllers\CourseAcademicController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DniController;
@@ -34,7 +35,9 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::post('courses/{course}/enroll', [EnrollmentController::class, 'store'])->name('courses.enroll');
+Route::post('courses/{course}/enroll', [EnrollmentController::class, 'store'])
+    ->middleware('throttle:public-enrollment')
+    ->name('courses.enroll');
 
 Route::resource('courses', CourseController::class);
 
@@ -64,7 +67,7 @@ Route::get('certificates/verify/{code}', function (string $code) {
     return redirect()->route('certificates.index', ['code' => $code]);
 })->name('certificates.verify');
 
-Route::get('api/dni/{dni}', [DniController::class, 'lookup'])->name('dni.lookup')->middleware('throttle:60,1');
+Route::get('api/dni/{dni}', [DniController::class, 'lookup'])->name('dni.lookup')->middleware('throttle:dni-lookup');
 
 Route::get('api/certificates/lookup', function (Request $request) {
     $dni = trim((string) $request->query('dni', ''));
@@ -93,11 +96,9 @@ Route::get('api/certificates/lookup', function (Request $request) {
     if ($request->boolean('check_only')) {
         $first = Enrollment::where('dni', $dni)
             ->where('status', '!=', 'cancelado')
-            ->where(function ($q) {
-                $q->where('status', 'aprobado')
-                    ->orWhereNotNull('certificate_code')
-                    ->orWhereNotNull('certificate_issued_at');
-            })
+            ->whereNotNull('certificate_code')
+            ->whereNotNull('certificate_hash')
+            ->whereNotNull('certificate_issued_at')
             ->first();
 
         return response()->json([
@@ -112,11 +113,9 @@ Route::get('api/certificates/lookup', function (Request $request) {
     $enrollments = Enrollment::with(['course.instructor:id,name,paterno,materno'])
         ->where('dni', $dni)
         ->where('status', '!=', 'cancelado')
-        ->where(function ($q) {
-            $q->where('status', 'aprobado')
-                ->orWhereNotNull('certificate_code')
-                ->orWhereNotNull('certificate_issued_at');
-        })
+        ->whereNotNull('certificate_code')
+        ->whereNotNull('certificate_hash')
+        ->whereNotNull('certificate_issued_at')
         ->latest('id')
         ->get();
 
@@ -184,13 +183,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::put('enrollments/{enrollment}', [EnrollmentController::class, 'update'])->name('enrollments.update');
+    Route::get('enrollments/{enrollment}/credential-qr', [EnrollmentController::class, 'credentialQr'])->name('enrollments.credential-qr');
+    Route::get('courses/{course}/qr', [CourseController::class, 'courseQr'])->name('courses.qr');
     Route::delete('enrollments/{enrollment}', [EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
     Route::post('enrollments/{enrollment}/attendance', [EnrollmentController::class, 'recordAttendance'])->name('enrollments.attendance');
     Route::post('enrollments/{enrollment}/certificate', [EnrollmentController::class, 'generateCertificate'])->name('enrollments.certificate');
 
     // Módulo Académico Oficial SIGC (Asistencia, Actas, Certificados en Lote, Reportes)
     Route::post('courses/{course}/sessions/{session}/attendance', [CourseAcademicController::class, 'recordSessionAttendance'])->name('courses.sessions.attendance');
+    Route::get('courses/{course}/sessions/{session}/qr', [CourseAcademicController::class, 'sessionQr'])->name('courses.sessions.qr');
     Route::post('courses/{course}/attendance/sync', [CourseAcademicController::class, 'syncOfflineAttendance'])->name('courses.attendance.sync');
+
+    Route::get('attendance/scan/{course}/{session}', [AttendanceScanController::class, 'show'])
+        ->middleware('signed')
+        ->name('attendance.scan');
+    Route::post('attendance/scan/{course}/{session}', [AttendanceScanController::class, 'store'])
+        ->middleware('signed')
+        ->name('attendance.scan.store');
     Route::post('courses/{course}/acta/close', [CourseAcademicController::class, 'closeActa'])->name('courses.acta.close');
     Route::post('courses/{course}/acta/reopen', [CourseAcademicController::class, 'reopenActa'])->name('courses.acta.reopen');
     Route::post('courses/{course}/certificates/bulk-issue', [CourseAcademicController::class, 'bulkIssueCertificates'])->name('courses.certificates.bulk-issue');

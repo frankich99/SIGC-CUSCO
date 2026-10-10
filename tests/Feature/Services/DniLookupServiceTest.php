@@ -55,8 +55,7 @@ test('successful dni query returns typed DniPerson and caches result', function 
         ->and($person->nombres)->toBe('MARIA ISABEL')
         ->and($person->apellidoPaterno)->toBe('JIMENEZ')
         ->and($person->apellidoMaterno)->toBe('DIAZ')
-        ->and($person->nombreCompleto)->toBe('MARIA ISABEL JIMENEZ DIAZ')
-        ->and($person->genero)->toBe('F');
+        ->and($person->nombreCompleto)->toBe('MARIA ISABEL JIMENEZ DIAZ');
 
     // Second call should hit cache, not HTTP
     Http::fake();

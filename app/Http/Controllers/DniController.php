@@ -33,12 +33,17 @@ class DniController extends Controller
             ], 404);
         }
 
-        $personArray = $person->toArray();
-
         return response()->json([
             'success' => true,
-            'data' => $personArray,
-            'person' => $personArray,
+            'data' => [
+                'dni' => $person->dni,
+                'nombres' => $person->nombres,
+                'apellido_paterno' => $person->apellidoPaterno,
+                'apellido_materno' => $person->apellidoMaterno,
+                'paterno' => $person->apellidoPaterno,
+                'materno' => $person->apellidoMaterno,
+                'nombre_completo' => $person->nombreCompleto,
+            ],
             'message' => 'Datos obtenidos correctamente.',
         ]);
     }

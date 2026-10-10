@@ -15,8 +15,9 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
+import { courseQr } from '@/actions/App/Http/Controllers/CourseController';
+import { credentialQr } from '@/actions/App/Http/Controllers/EnrollmentController';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
-import { generateQrSvg } from '@/lib/qr';
 import {
     GraduationCap,
     Users,
@@ -52,6 +53,7 @@ interface CourseItem {
     start_date: string;
     end_date: string;
     hours: number;
+    total_sessions?: number;
     capacity: number;
     status: string;
     enrollments_count?: number;
@@ -119,35 +121,50 @@ const isEnrollModalOpen = ref(false);
 
 const isQrModalOpen = ref(false);
 const activeQrCourse = ref<CourseItem | null>(null);
+const activeQrSvg = ref('');
+const isQrLoading = ref(false);
 const isCredentialModalOpen = ref(false);
 const activeCredentialEnrollment = ref<EnrollmentItem | null>(null);
+const activeCredentialQrSvg = ref('');
+const isCredentialQrLoading = ref(false);
+
+async function openQrProjection(course: CourseItem) {
+    activeQrCourse.value = course;
+    isQrModalOpen.value = true;
+    activeQrSvg.value = '';
+    isQrLoading.value = true;
+
+    try {
+        const response = await fetch(courseQr.url(course.id), { headers: { Accept: 'application/json' } });
+        if (!response.ok) { throw new Error('No se pudo generar el QR de la capacitación.'); }
+        const data = await response.json();
+        activeQrSvg.value = data.svg || '';
+    } catch {
+        activeQrSvg.value = '';
+    } finally {
+        isQrLoading.value = false;
+    }
+}
 
 function openCredentialModal(enrollment: EnrollmentItem) {
     activeCredentialEnrollment.value = enrollment;
     isCredentialModalOpen.value = true;
+    activeCredentialQrSvg.value = '';
+    isCredentialQrLoading.value = true;
+
+    fetch(credentialQr.url(enrollment.id), { headers: { Accept: 'application/json' } })
+        .then((response) => {
+            if (!response.ok) { throw new Error('No se pudo generar el QR de la credencial.'); }
+            return response.json();
+        })
+        .then((data) => { activeCredentialQrSvg.value = data.svg || ''; })
+        .catch(() => { activeCredentialQrSvg.value = ''; })
+        .finally(() => { isCredentialQrLoading.value = false; });
 }
-
-const activeCredentialQrSvg = computed(() => {
-    if (!activeCredentialEnrollment.value) return '';
-    const code = activeCredentialEnrollment.value.credential_code || `INS-${activeCredentialEnrollment.value.course_id}-${activeCredentialEnrollment.value.dni.slice(-4)}`;
-    return generateQrSvg(code, 260, '#800020');
-});
-
-const activeQrSvg = computed(() => {
-    if (!activeQrCourse.value) return '';
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const url = `${origin}/courses/${activeQrCourse.value.id}`;
-    return generateQrSvg(url, 260, '#800020');
-});
 
 function openEnroll(course: CourseItem) {
     selectedCourseToEnroll.value = course;
     isEnrollModalOpen.value = true;
-}
-
-function openQrProjection(course: CourseItem) {
-    activeQrCourse.value = course;
-    isQrModalOpen.value = true;
 }
 
 function roleBadgeData(role?: string) {
@@ -721,13 +738,19 @@ function enrollmentStatusBadge(status: string) {
 
                     <!-- QR Visualization Gigante Real y Escaneable -->
                     <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-6 space-y-5">
-                        <div class="p-6 bg-white rounded-3xl border-4 border-rose-900 inline-block shadow-xl" v-html="activeQrSvg"></div>
+                        <div v-if="isQrLoading" class="p-6 bg-white rounded-3xl border-4 border-rose-900 inline-flex min-h-[280px] min-w-[280px] items-center justify-center text-xs font-bold text-slate-500">
+                            Generando QR...
+                        </div>
+                        <div v-else-if="activeQrSvg" class="p-6 bg-white rounded-3xl border-4 border-rose-900 inline-block shadow-xl" v-html="activeQrSvg"></div>
+                        <div v-else class="p-6 bg-rose-50 rounded-3xl border-2 border-rose-200 text-xs font-bold text-rose-900">
+                            No se pudo generar el QR. Intenta nuevamente.
+                        </div>
                         <div class="space-y-2">
                             <div class="inline-block text-sm sm:text-base font-mono font-black tracking-widest text-rose-950 bg-rose-100 px-5 py-2 rounded-full border-2 border-rose-300 shadow-sm">
-                                CÓDIGO DE SESIÓN: {{ activeQrCourse?.code }}-{{ new Date().getDate() }}
+                                CAPACITACIÓN: {{ activeQrCourse?.code }}
                             </div>
                             <p class="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                ⏳ Código de asistencia dinámico activo para la capacitación en aula.
+                                Escanea el código para abrir la página pública de la capacitación. Para asistencia, utiliza el QR de la sesión desde el módulo académico.
                             </p>
                         </div>
 
@@ -764,7 +787,13 @@ function enrollmentStatusBadge(status: string) {
                 </div>
 
                 <div class="p-6 flex flex-col items-center justify-center space-y-4 text-center">
-                    <div class="p-3 bg-white rounded-2xl border-4 border-rose-950/20 shadow-md" v-html="activeCredentialQrSvg"></div>
+                    <div v-if="isCredentialQrLoading" class="p-3 bg-white rounded-2xl border-4 border-rose-950/20 shadow-md min-h-[260px] min-w-[260px] flex items-center justify-center text-xs font-bold text-slate-500">
+                        Generando QR...
+                    </div>
+                    <div v-else-if="activeCredentialQrSvg" class="p-3 bg-white rounded-2xl border-4 border-rose-950/20 shadow-md" v-html="activeCredentialQrSvg"></div>
+                    <div v-else class="p-3 bg-rose-50 rounded-2xl border-2 border-rose-200 text-xs font-bold text-rose-900">
+                        No se pudo generar el QR de la credencial.
+                    </div>
 
                     <div class="space-y-1">
                         <div class="text-[11px] font-bold text-slate-500 uppercase">Código Único de Matrícula</div>

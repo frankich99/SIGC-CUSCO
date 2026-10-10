@@ -40,4 +40,8 @@ return [
         'base_url' => env('PERUDEVS_BASE_URL', 'https://api.perudevs.com/api/v1'),
     ],
 
+    'sigc' => [
+        'signing_key' => env('SIGC_SIGNING_KEY', env('APP_KEY')),
+    ],
+
 ];

@@ -10,6 +10,7 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\User;
 use App\Services\CertificateService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -18,6 +19,19 @@ use Inertia\Response;
 
 class CourseController extends Controller
 {
+    /**
+     * Generar un QR estándar con el enlace público de la capacitación.
+     */
+    public function courseQr(Course $course): JsonResponse
+    {
+        $url = route('courses.show', $course);
+
+        return response()->json([
+            'url' => $url,
+            'svg' => CertificateService::generateQrSvg($url, 260),
+        ]);
+    }
+
     /**
      * Display a listing of courses.
      */
@@ -208,6 +222,7 @@ class CourseController extends Controller
                         'attendance_percentage' => $myEnrollmentModel->attendance_percentage,
                         'final_grade' => $myEnrollmentModel->final_grade,
                         'credential_code' => $myEnrollmentModel->credential_code,
+                        'credential_qr_svg' => CertificateService::generateQrSvg($myEnrollmentModel->credential_code, 260),
                         'certificate_code' => $myEnrollmentModel->certificate_code,
                         'certificate_hash' => $myEnrollmentModel->certificate_hash,
                         'certificate_issued_at' => $myEnrollmentModel->certificate_issued_at?->format('d/m/Y'),
@@ -230,6 +245,7 @@ class CourseController extends Controller
                 'manage_enrollments' => $isStaff,
                 'close_acta' => $isStaff,
                 'issue_certificates' => $isStaff,
+                'reopen_acta' => $user?->isAdmin() ?? false,
             ],
         ]);
     }

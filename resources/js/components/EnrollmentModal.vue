@@ -40,7 +40,7 @@ interface CourseTarget {
     id: number;
     code: string;
     title: string;
-    institution?: string;
+    institution?: string | null;
     hours: number;
     capacity: number;
     start_date: string;
