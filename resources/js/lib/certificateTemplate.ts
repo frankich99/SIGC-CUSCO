@@ -40,20 +40,37 @@ export interface CertificateRecord {
 }
 
 export const SPANISH_MONTHS: Record<number, string> = {
-    1: 'enero', 2: 'febrero', 3: 'marzo', 4: 'abril',
-    5: 'mayo', 6: 'junio', 7: 'julio', 8: 'agosto',
-    9: 'setiembre', 10: 'octubre', 11: 'noviembre', 12: 'diciembre',
+    1: 'enero',
+    2: 'febrero',
+    3: 'marzo',
+    4: 'abril',
+    5: 'mayo',
+    6: 'junio',
+    7: 'julio',
+    8: 'agosto',
+    9: 'setiembre',
+    10: 'octubre',
+    11: 'noviembre',
+    12: 'diciembre',
 };
 
 export function parseDateSafe(val?: string | null): Date | null {
     if (!val) return null;
     if (/^\d{4}-\d{2}-\d{2}/.test(val)) {
         const parts = val.split(/[-T ]/);
-        return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        return new Date(
+            parseInt(parts[0], 10),
+            parseInt(parts[1], 10) - 1,
+            parseInt(parts[2], 10),
+        );
     }
     if (/^\d{2}\/\d{2}\/\d{4}/.test(val)) {
         const parts = val.split('/');
-        return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+        return new Date(
+            parseInt(parts[2], 10),
+            parseInt(parts[1], 10) - 1,
+            parseInt(parts[0], 10),
+        );
     }
     const d = new Date(val);
     return isNaN(d.getTime()) ? null : d;
@@ -72,7 +89,10 @@ export function formatSpanishDate(val?: string | null): string {
     return `${day} de ${month} de ${d.getFullYear()}`;
 }
 
-export function formatSpanishDateRange(startVal?: string | null, endVal?: string | null): string {
+export function formatSpanishDateRange(
+    startVal?: string | null,
+    endVal?: string | null,
+): string {
     const start = parseDateSafe(startVal);
     const end = parseDateSafe(endVal);
 
@@ -193,16 +213,28 @@ export const DIRECCION_STAMP_SVG = `
 /**
  * Genera el documento HTML completo de 2 páginas (Anverso y Reverso) para impresión o guardado como PDF
  */
-export function generateOfficialCertificateHtml(record: CertificateRecord): string {
+export function generateOfficialCertificateHtml(
+    record: CertificateRecord,
+): string {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const unsaacLogoUrl = `${origin}/images/unsaac-logo.png`;
-    const verificationUrl = record.verification_url || `${origin}/certificates?dni=${record.dni}&code=${record.certificate_code}`;
+    const verificationUrl =
+        record.verification_url ||
+        `${origin}/certificates?dni=${record.dni}&code=${record.certificate_code}`;
     const gradeNum = parseFloat(record.final_grade) || 20;
-    const gradeHonor = gradeNum >= 18 ? 'Con Mención de Excelencia Académica' : 'Acreditado Oficialmente';
+    const gradeHonor =
+        gradeNum >= 18
+            ? 'Con Mención de Excelencia Académica'
+            : 'Acreditado Oficialmente';
 
-    const dateRangeProse = record.date_range_formal || formatSpanishDateRange(record.start_date, record.end_date);
-    const issuedDateProse = record.issued_date_formal || formatSpanishDate(record.certificate_issued_at || record.end_date);
-    const cityIssuedProse = record.city_issued_formal || `Cusco, ${issuedDateProse}`;
+    const dateRangeProse =
+        record.date_range_formal ||
+        formatSpanishDateRange(record.start_date, record.end_date);
+    const issuedDateProse =
+        record.issued_date_formal ||
+        formatSpanishDate(record.certificate_issued_at || record.end_date);
+    const cityIssuedProse =
+        record.city_issued_formal || `Cusco, ${issuedDateProse}`;
 
     const goldMedalSvg = GOLD_MEDAL_SVG;
     const emblemSvg = EMBLEM_SVG;
@@ -210,8 +242,11 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
     const direccionStampSvg = DIRECCION_STAMP_SVG;
 
     // Renderizado de módulos curriculares
-    const modulesHtml = record.modules && record.modules.length > 0
-        ? record.modules.map((m, idx) => `
+    const modulesHtml =
+        record.modules && record.modules.length > 0
+            ? record.modules
+                  .map(
+                      (m, idx) => `
             <div class="module-card">
                 <div class="module-header">
                     <span class="module-num">${m.number || `MÓDULO 0${idx + 1}`}</span>
@@ -220,8 +255,10 @@ export function generateOfficialCertificateHtml(record: CertificateRecord): stri
                 </div>
                 <div class="module-topics">${m.topics}</div>
             </div>
-        `).join('')
-        : `
+        `,
+                  )
+                  .join('')
+            : `
             <div class="module-card">
                 <div class="module-header">
                     <span class="module-num">MÓDULO I</span>

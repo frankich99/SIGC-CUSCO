@@ -41,8 +41,9 @@ onUnmounted(() => clearTwoFactorAuthData());
         >
             <p class="text-sm text-muted-foreground">
                 Al activar la autenticación de dos factores, se te solicitará un
-                código PIN seguro al iniciar sesión. Puedes obtener este código desde una
-                aplicación compatible con TOTP en tu teléfono (como Google Authenticator).
+                código PIN seguro al iniciar sesión. Puedes obtener este código
+                desde una aplicación compatible con TOTP en tu teléfono (como
+                Google Authenticator).
             </p>
 
             <div>
@@ -64,9 +65,9 @@ onUnmounted(() => clearTwoFactorAuthData());
 
         <div v-else class="flex flex-col items-start justify-start space-y-4">
             <p class="text-sm text-muted-foreground">
-                Se te solicitará un código PIN seguro durante el inicio de sesión,
-                el cual puedes obtener desde la aplicación de autenticación en tu
-                teléfono.
+                Se te solicitará un código PIN seguro durante el inicio de
+                sesión, el cual puedes obtener desde la aplicación de
+                autenticación en tu teléfono.
             </p>
 
             <div class="relative inline">

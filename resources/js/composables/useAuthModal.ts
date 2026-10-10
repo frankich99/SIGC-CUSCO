@@ -61,10 +61,18 @@ if (typeof window !== 'undefined') {
             const search = new URLSearchParams(window.location.search);
             const authParam = search.get('auth') || search.get('modal');
 
-            if (hash === '#login' || authParam === 'login' || search.has('login')) {
+            if (
+                hash === '#login' ||
+                authParam === 'login' ||
+                search.has('login')
+            ) {
                 isRegisterModalOpen.value = false;
                 isLoginModalOpen.value = true;
-            } else if (hash === '#register' || authParam === 'register' || search.has('register')) {
+            } else if (
+                hash === '#register' ||
+                authParam === 'register' ||
+                search.has('register')
+            ) {
                 isLoginModalOpen.value = false;
                 isRegisterModalOpen.value = true;
             }
@@ -74,7 +82,9 @@ if (typeof window !== 'undefined') {
     }
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', checkUrlAuthIntent, { once: true });
+        document.addEventListener('DOMContentLoaded', checkUrlAuthIntent, {
+            once: true,
+        });
     } else {
         setTimeout(checkUrlAuthIntent, 50);
     }
@@ -86,7 +96,14 @@ if (typeof window !== 'undefined') {
         'click',
         (event: MouseEvent) => {
             // Ignorar clics con modificadores (Ctrl, Cmd, Shift, etc.) o clic derecho/central
-            if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+            if (
+                event.defaultPrevented ||
+                event.button !== 0 ||
+                event.ctrlKey ||
+                event.metaKey ||
+                event.shiftKey ||
+                event.altKey
+            ) {
                 return;
             }
 
@@ -97,7 +114,11 @@ if (typeof window !== 'undefined') {
             if (!href) return;
 
             // Si el enlace apunta exactamente a /login
-            if (href === '/login' || href === 'login' || href.endsWith('/login')) {
+            if (
+                href === '/login' ||
+                href === 'login' ||
+                href.endsWith('/login')
+            ) {
                 // Si la URL actual ya es /login, permitir comportamiento normal
                 if (window.location.pathname === '/login') return;
 
@@ -107,7 +128,11 @@ if (typeof window !== 'undefined') {
                 isLoginModalOpen.value = true;
             }
             // Si el enlace apunta exactamente a /register
-            else if (href === '/register' || href === 'register' || href.endsWith('/register')) {
+            else if (
+                href === '/register' ||
+                href === 'register' ||
+                href.endsWith('/register')
+            ) {
                 // Si la URL actual ya es /register, permitir comportamiento normal
                 if (window.location.pathname === '/register') return;
 
@@ -117,6 +142,6 @@ if (typeof window !== 'undefined') {
                 isRegisterModalOpen.value = true;
             }
         },
-        true // Capture phase para interceptar antes de la navegación de Inertia
+        true, // Capture phase para interceptar antes de la navegación de Inertia
     );
 }

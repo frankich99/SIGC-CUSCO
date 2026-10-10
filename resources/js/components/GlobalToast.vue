@@ -14,7 +14,9 @@ import {
 
 // Obtener estrictamente una única notificación activa (la más reciente)
 const currentToast = computed<ActiveToast | null>(() => {
-    const list = activeToasts.value.filter((t) => !t.position || t.position === 'top-end');
+    const list = activeToasts.value.filter(
+        (t) => !t.position || t.position === 'top-end',
+    );
     return list.length > 0 ? list[list.length - 1] : null;
 });
 
@@ -82,7 +84,7 @@ watch(
             stopTimer();
         }
     },
-    { immediate: true }
+    { immediate: true },
 );
 
 onUnmounted(() => {
@@ -91,7 +93,10 @@ onUnmounted(() => {
 
 const progressPercent = computed(() => {
     if (totalDuration.value <= 0) return 0;
-    return Math.max(0, Math.min(100, (remainingMs.value / totalDuration.value) * 100));
+    return Math.max(
+        0,
+        Math.min(100, (remainingMs.value / totalDuration.value) * 100),
+    );
 });
 
 const secondsLeft = computed(() => {
@@ -133,7 +138,7 @@ function progressBarColor(icon: string) {
     <!-- CONTENEDOR FLOTANTE TOP-END: EXACTAMENTE UNA NOTIFICACIÓN ACTIVA -->
     <div
         aria-live="polite"
-        class="fixed top-2.5 right-2.5 sm:top-4 sm:right-4 z-[99999] pointer-events-none flex flex-col items-end max-w-[calc(100vw-1.25rem)] overflow-hidden"
+        class="pointer-events-none fixed top-2.5 right-2.5 z-[99999] flex max-w-[calc(100vw-1.25rem)] flex-col items-end overflow-hidden sm:top-4 sm:right-4"
     >
         <Transition
             enter-active-class="transform ease-out duration-300 transition"
@@ -147,17 +152,17 @@ function progressBarColor(icon: string) {
                 v-if="currentToast"
                 :key="currentToast.id"
                 role="status"
-                class="group pointer-events-auto relative overflow-hidden rounded-xl border bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-xl py-3 px-3.5 flex items-start gap-2.5 transition-all text-left border-slate-200 dark:border-slate-800 w-[min(22rem,calc(100vw-1.5rem))] max-w-full"
+                class="group pointer-events-auto relative flex w-[min(22rem,calc(100vw-1.5rem))] max-w-full items-start gap-2.5 overflow-hidden rounded-xl border border-slate-200 bg-white/95 px-3.5 py-3 text-left shadow-xl backdrop-blur-md transition-all dark:border-slate-800 dark:bg-slate-900/95"
                 :class="accentBorder(currentToast.icon)"
                 @mouseenter="pauseTimer"
                 @mouseleave="resumeTimer"
             >
                 <!-- ICONO COMPACTO ESTILO SWEETALERT2 -->
-                <div class="shrink-0 mt-0.5">
+                <div class="mt-0.5 shrink-0">
                     <!-- Success -->
                     <div
                         v-if="currentToast.icon === 'success'"
-                        class="size-6 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center ring-2 ring-emerald-500/20 shadow-xs"
+                        class="flex size-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 shadow-xs ring-2 ring-emerald-500/20 dark:bg-emerald-950/80 dark:text-emerald-400"
                     >
                         <CheckCircle2 class="size-3.5 stroke-[2.8]" />
                     </div>
@@ -165,7 +170,7 @@ function progressBarColor(icon: string) {
                     <!-- Error -->
                     <div
                         v-else-if="currentToast.icon === 'error'"
-                        class="size-6 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 flex items-center justify-center ring-2 ring-rose-500/20 shadow-xs"
+                        class="flex size-6 items-center justify-center rounded-full bg-rose-100 text-rose-600 shadow-xs ring-2 ring-rose-500/20 dark:bg-rose-950/80 dark:text-rose-400"
                     >
                         <XCircle class="size-3.5 stroke-[2.8]" />
                     </div>
@@ -173,7 +178,7 @@ function progressBarColor(icon: string) {
                     <!-- Warning -->
                     <div
                         v-else-if="currentToast.icon === 'warning'"
-                        class="size-6 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 flex items-center justify-center ring-2 ring-amber-500/20 shadow-xs"
+                        class="flex size-6 items-center justify-center rounded-full bg-amber-100 text-amber-600 shadow-xs ring-2 ring-amber-500/20 dark:bg-amber-950/80 dark:text-amber-400"
                     >
                         <AlertTriangle class="size-3.5 stroke-[2.8]" />
                     </div>
@@ -181,7 +186,7 @@ function progressBarColor(icon: string) {
                     <!-- Info -->
                     <div
                         v-else-if="currentToast.icon === 'info'"
-                        class="size-6 rounded-full bg-sky-100 dark:bg-sky-950/80 text-sky-600 dark:text-sky-400 flex items-center justify-center ring-2 ring-sky-500/20 shadow-xs"
+                        class="flex size-6 items-center justify-center rounded-full bg-sky-100 text-sky-600 shadow-xs ring-2 ring-sky-500/20 dark:bg-sky-950/80 dark:text-sky-400"
                     >
                         <Info class="size-3.5 stroke-[2.8]" />
                     </div>
@@ -189,43 +194,58 @@ function progressBarColor(icon: string) {
                     <!-- Question / Default -->
                     <div
                         v-else
-                        class="size-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center ring-2 ring-slate-400/20"
+                        class="flex size-6 items-center justify-center rounded-full bg-slate-100 text-slate-700 ring-2 ring-slate-400/20 dark:bg-slate-800 dark:text-slate-300"
                     >
                         <HelpCircle class="size-3.5 stroke-[2.8]" />
                     </div>
                 </div>
 
                 <!-- CONTENIDO DEL TOAST: COMPACTO, LEGIBLE Y ELEGANTE -->
-                <div class="flex-1 min-w-0 pr-1">
-                    <p class="text-xs font-black text-slate-900 dark:text-white leading-tight break-words">
+                <div class="min-w-0 flex-1 pr-1">
+                    <p
+                        class="text-xs leading-tight font-black break-words text-slate-900 dark:text-white"
+                    >
                         {{ currentToast.title }}
                     </p>
                     <p
                         v-if="currentToast.text"
-                        class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-snug break-words font-medium"
+                        class="mt-0.5 text-[11px] leading-snug font-medium break-words text-slate-600 dark:text-slate-400"
                     >
                         {{ currentToast.text }}
                     </p>
                 </div>
 
                 <!-- ACCIONES DE CABECERA: TEMPORIZADOR VISIBLE + BOTÓN CERRAR -->
-                <div class="flex items-center gap-1.5 shrink-0 ml-1">
+                <div class="ml-1 flex shrink-0 items-center gap-1.5">
                     <!-- Indicador visible del temporizador -->
                     <div
                         v-if="currentToast.timer > 0"
-                        class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold transition-all select-none"
-                        :class="isPaused ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 ring-1 ring-amber-400/40' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400'"
-                        :title="isPaused ? 'Temporizador en pausa (mouse encima)' : `Cierre automático en ${secondsLeft}s`"
+                        class="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-mono text-[10px] font-bold transition-all select-none"
+                        :class="
+                            isPaused
+                                ? 'bg-amber-100 text-amber-800 ring-1 ring-amber-400/40 dark:bg-amber-950/80 dark:text-amber-300'
+                                : 'bg-slate-100 text-slate-500 dark:bg-slate-800/80 dark:text-slate-400'
+                        "
+                        :title="
+                            isPaused
+                                ? 'Temporizador en pausa (mouse encima)'
+                                : `Cierre automático en ${secondsLeft}s`
+                        "
                     >
-                        <Pause v-if="isPaused" class="size-2.5 animate-pulse text-amber-600 dark:text-amber-400" />
+                        <Pause
+                            v-if="isPaused"
+                            class="size-2.5 animate-pulse text-amber-600 dark:text-amber-400"
+                        />
                         <Clock v-else class="size-2.5 text-slate-400" />
-                        <span>{{ isPaused ? 'Pausa' : `${secondsLeft}s` }}</span>
+                        <span>{{
+                            isPaused ? 'Pausa' : `${secondsLeft}s`
+                        }}</span>
                     </div>
 
                     <!-- Botón cerrar discreto -->
                     <button
                         type="button"
-                        class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-md transition-colors cursor-pointer"
+                        class="cursor-pointer rounded-md p-1 text-slate-400 transition-colors hover:text-slate-700 dark:hover:text-slate-200"
                         title="Cerrar notificación"
                         @click="removeToast(currentToast.id)"
                     >
@@ -235,8 +255,10 @@ function progressBarColor(icon: string) {
 
                 <!-- LÍNEA DE TIEMPO / BARRA DE PROGRESO INFERIOR -->
                 <div
-                    v-if="currentToast.timerProgressBar && currentToast.timer > 0"
-                    class="absolute bottom-0 left-0 right-0 h-[3.5px] bg-slate-100 dark:bg-slate-800 overflow-hidden"
+                    v-if="
+                        currentToast.timerProgressBar && currentToast.timer > 0
+                    "
+                    class="absolute right-0 bottom-0 left-0 h-[3.5px] overflow-hidden bg-slate-100 dark:bg-slate-800"
                 >
                     <div
                         class="h-full origin-left transition-[width] duration-75 ease-linear"

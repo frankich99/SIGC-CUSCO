@@ -85,8 +85,12 @@ const submitError = ref<string | null>(null);
 
 // Validation computed properties
 const isDniFormatValid = computed(() => /^[0-9]{8}$/.test(dni.value.trim()));
-const isEmailValid = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()));
-const isPhoneValid = computed(() => !phone.value || /^9[0-9]{8}$/.test(phone.value.trim()));
+const isEmailValid = computed(() =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()),
+);
+const isPhoneValid = computed(
+    () => !phone.value || /^9[0-9]{8}$/.test(phone.value.trim()),
+);
 
 function onPhoneInput(e: Event) {
     const target = e.target as HTMLInputElement;
@@ -99,7 +103,18 @@ function onDniInput(e: Event) {
 }
 
 function allowOnlyNumbers(e: KeyboardEvent) {
-    if (['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Enter'].includes(e.key)) {
+    if (
+        [
+            'Backspace',
+            'Delete',
+            'Tab',
+            'ArrowLeft',
+            'ArrowRight',
+            'Home',
+            'End',
+            'Enter',
+        ].includes(e.key)
+    ) {
         return;
     }
     if (e.ctrlKey || e.metaKey) return;
@@ -155,14 +170,15 @@ watch(
                 dniLookupSuccess.value = false;
             }
         }
-    }
+    },
 );
 
 // Consulta DNI en API RENIEC
 async function lookupDni() {
     const cleanDni = dni.value.trim();
     if (!/^[0-9]{8}$/.test(cleanDni)) {
-        dniLookupError.value = 'El DNI debe contener exactamente 8 dígitos numéricos.';
+        dniLookupError.value =
+            'El DNI debe contener exactamente 8 dígitos numéricos.';
         dniLookupSuccess.value = false;
         return;
     }
@@ -188,19 +204,33 @@ async function lookupDni() {
             dniLookupSuccess.value = true;
             dniLookupError.value = null;
             manualEntry.value = false;
-            notify.success('RENIEC Validado', `${nombres.value} ${paterno.value}`, 2000);
+            notify.success(
+                'RENIEC Validado',
+                `${nombres.value} ${paterno.value}`,
+                2000,
+            );
         } else {
             dniLookupError.value =
-                data.message || 'No se encontraron datos en RENIEC. Puedes ingresar los nombres y apellidos manualmente.';
+                data.message ||
+                'No se encontraron datos en RENIEC. Puedes ingresar los nombres y apellidos manualmente.';
             manualEntry.value = true;
             dniLookupSuccess.value = false;
-            notify.info('Ingreso manual habilitado', 'Ingrese sus nombres y apellidos manualmente.', 2500);
+            notify.info(
+                'Ingreso manual habilitado',
+                'Ingrese sus nombres y apellidos manualmente.',
+                2500,
+            );
         }
     } catch {
-        dniLookupError.value = 'Error al comunicarse con RENIEC. Puedes ingresar los datos manualmente.';
+        dniLookupError.value =
+            'Error al comunicarse con RENIEC. Puedes ingresar los datos manualmente.';
         manualEntry.value = true;
         dniLookupSuccess.value = false;
-        notify.info('Ingreso manual habilitado', 'Ingrese sus nombres y apellidos manualmente.', 2500);
+        notify.info(
+            'Ingreso manual habilitado',
+            'Ingrese sus nombres y apellidos manualmente.',
+            2500,
+        );
     } finally {
         isLookingUpDni.value = false;
     }
@@ -222,31 +252,36 @@ function submitEnrollment() {
     if (!props.course) return;
 
     if (!dniLookupSuccess.value && !manualEntry.value) {
-        submitError.value = 'Debe validar su DNI con RENIEC o habilitar ingreso manual.';
+        submitError.value =
+            'Debe validar su DNI con RENIEC o habilitar ingreso manual.';
         notify.warning('Validación requerida', submitError.value, 2500);
         return;
     }
 
     if (!nombres.value || !paterno.value) {
-        submitError.value = 'Los datos de nombres y apellidos son obligatorios.';
+        submitError.value =
+            'Los datos de nombres y apellidos son obligatorios.';
         notify.warning('Campos incompletos', submitError.value, 2500);
         return;
     }
 
     if (!isEmailValid.value) {
-        submitError.value = 'Ingrese una dirección de correo electrónico válida para recibir su comprobante.';
+        submitError.value =
+            'Ingrese una dirección de correo electrónico válida para recibir su comprobante.';
         notify.warning('Correo inválido', submitError.value, 2500);
         return;
     }
 
     if (phone.value && !isPhoneValid.value) {
-        submitError.value = 'El número de celular debe contener 9 dígitos numéricos.';
+        submitError.value =
+            'El número de celular debe contener 9 dígitos numéricos.';
         notify.warning('Teléfono inválido', submitError.value, 2500);
         return;
     }
 
     if (!termsAccepted.value) {
-        submitError.value = 'Debe aceptar la declaración jurada para confirmar su inscripción.';
+        submitError.value =
+            'Debe aceptar la declaración jurada para confirmar su inscripción.';
         notify.warning('Términos requeridos', submitError.value, 2500);
         return;
     }
@@ -269,16 +304,22 @@ function submitEnrollment() {
             onSuccess: () => {
                 isSubmitting.value = false;
                 submitSuccess.value = true;
-                notify.success('¡Inscripción Confirmada!', `Inscrito exitosamente en ${props.course?.title}`, 2500);
+                notify.success(
+                    '¡Inscripción Confirmada!',
+                    `Inscrito exitosamente en ${props.course?.title}`,
+                    2500,
+                );
                 emit('enrolled');
             },
             onError: (errors) => {
                 isSubmitting.value = false;
                 const firstKey = Object.keys(errors)[0];
-                submitError.value = errors[firstKey] || 'Ocurrió un error al procesar la inscripción.';
+                submitError.value =
+                    errors[firstKey] ||
+                    'Ocurrió un error al procesar la inscripción.';
                 notify.error('Error de inscripción', submitError.value, 3000);
             },
-        }
+        },
     );
 }
 
@@ -292,454 +333,824 @@ function closeModal() {
         <!-- MODAL AMPLIO Y ESPACIOSO (THEME_MODAL.enrollmentDialog) -->
         <DialogContent :class="THEME_MODAL.enrollmentDialog">
             <!-- Header Superior del Modal (FIJO / PINNED) -->
-            <div class="p-5 sm:px-7 sm:py-5 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-950 pr-12">
+            <div
+                class="shrink-0 border-b border-slate-200 bg-white p-5 pr-12 sm:px-7 sm:py-5 dark:border-slate-800 dark:bg-slate-950"
+            >
                 <DialogHeader class="space-y-1.5 text-left">
-                    <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div
+                        class="flex flex-wrap items-center justify-between gap-2"
+                    >
                         <div class="flex items-center gap-2">
-                            <span class="font-mono text-xs font-black px-2.5 py-0.5 rounded bg-rose-100 text-rose-950 dark:bg-rose-950 dark:text-rose-200 border border-rose-300 dark:border-rose-800">
+                            <span
+                                class="rounded border border-rose-300 bg-rose-100 px-2.5 py-0.5 font-mono text-xs font-black text-rose-950 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                            >
                                 {{ course?.code }}
                             </span>
-                            <span v-if="course?.institution" class="text-xs font-bold text-rose-900 bg-rose-50 dark:bg-rose-950/60 dark:text-rose-200 border border-rose-200 dark:border-rose-800 px-2.5 py-0.5 rounded">
+                            <span
+                                v-if="course?.institution"
+                                class="rounded border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-xs font-bold text-rose-900 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-200"
+                            >
                                 {{ course.institution }}
                             </span>
                         </div>
 
-                        <div class="flex items-center gap-1.5 text-xs font-black text-rose-900 dark:text-rose-300 bg-rose-50 dark:bg-rose-950 px-3 py-1 rounded-full border border-rose-200 dark:border-rose-800">
+                        <div
+                            class="flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-black text-rose-900 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                        >
                             <ShieldCheck class="size-4 text-rose-800" />
-                            <span>Inscripción Oficial con Validación RENIEC</span>
+                            <span
+                                >Inscripción Oficial con Validación RENIEC</span
+                            >
                         </div>
                     </div>
 
-                    <DialogTitle class="text-xl sm:text-2xl font-black text-slate-950 dark:text-white pt-1 leading-snug">
+                    <DialogTitle
+                        class="pt-1 text-xl leading-snug font-black text-slate-950 sm:text-2xl dark:text-white"
+                    >
                         Ficha de Inscripción: {{ course?.title }}
                     </DialogTitle>
-                    <DialogDescription class="text-xs text-slate-600 dark:text-slate-400 font-medium">
-                        Completa la verificación de tu DNI para reservar tu vacante oficial en el sistema académico.
+                    <DialogDescription
+                        class="text-xs font-medium text-slate-600 dark:text-slate-400"
+                    >
+                        Completa la verificación de tu DNI para reservar tu
+                        vacante oficial en el sistema académico.
                     </DialogDescription>
                 </DialogHeader>
             </div>
 
             <!-- Contenedor Scrollable Interno con scrollbar redondeado y limpio -->
-            <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-5 sm:p-7">
+            <div
+                class="custom-scrollbar flex-1 overflow-y-auto overscroll-contain p-5 sm:p-7"
+            >
                 <!-- Success State -->
-                <div v-if="submitSuccess" class="py-6 text-center space-y-6">
-                <div class="size-20 bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 rounded-full flex items-center justify-center mx-auto shadow-inner ring-8 ring-rose-50 dark:ring-rose-900/40">
-                    <CheckCircle2 class="size-10" />
-                </div>
-                <div class="space-y-1.5">
-                    <h3 class="text-2xl font-black text-slate-950 dark:text-white">¡Inscripción Confirmada Exitosamente!</h3>
-                    <p class="text-sm font-semibold text-slate-700 dark:text-slate-300 max-w-lg mx-auto">
-                        Has quedado registrado formalmente en la capacitación <strong class="text-rose-900 dark:text-rose-300">{{ course?.title }}</strong>.
-                    </p>
-                </div>
-
-                <div class="max-w-lg mx-auto p-5 bg-rose-50/80 dark:bg-rose-950/40 rounded-2xl text-xs text-slate-900 dark:text-slate-200 space-y-2.5 text-left border border-rose-200 dark:border-rose-800 font-semibold shadow-xs">
-                    <div class="flex justify-between border-b border-rose-200/80 pb-2">
-                        <span class="text-slate-600 dark:text-slate-400 font-medium">Participante:</span>
-                        <strong class="text-slate-950 dark:text-white text-sm">{{ nombres }} {{ paterno }} {{ materno }}</strong>
+                <div v-if="submitSuccess" class="space-y-6 py-6 text-center">
+                    <div
+                        class="mx-auto flex size-20 items-center justify-center rounded-full bg-rose-100 text-rose-800 shadow-inner ring-8 ring-rose-50 dark:bg-rose-950 dark:text-rose-300 dark:ring-rose-900/40"
+                    >
+                        <CheckCircle2 class="size-10" />
                     </div>
-                    <div class="flex justify-between border-b border-rose-200/80 pb-2">
-                        <span class="text-slate-600 dark:text-slate-400 font-medium">DNI Registrado:</span>
-                        <strong class="font-mono text-slate-950 dark:text-white">{{ dni }}</strong>
-                    </div>
-                    <div class="flex justify-between border-b border-rose-200/80 pb-2">
-                        <span class="text-slate-600 dark:text-slate-400 font-medium">Correo Electrónico:</span>
-                        <span class="font-bold text-slate-950 dark:text-white">{{ email }}</span>
-                    </div>
-                    <div v-if="phone" class="flex justify-between border-b border-rose-200/80 pb-2">
-                        <span class="text-slate-600 dark:text-slate-400 font-medium">Teléfono / WhatsApp:</span>
-                        <span class="font-bold text-slate-950 dark:text-white">{{ phone }}</span>
-                    </div>
-                    <div class="flex items-center gap-2 pt-2 text-rose-950 dark:text-rose-200 font-bold text-xs">
-                        <QrCode class="size-5 shrink-0 text-rose-800" />
-                        <span>Podrás marcar tu asistencia con código QR en cada clase y descargar tu diploma digital.</span>
-                    </div>
-                </div>
-
-                <div class="pt-2">
-                    <Button @click="closeModal" class="bg-rose-900 hover:bg-rose-950 text-white font-black px-8 py-2.5 text-xs shadow-md">
-                        Entendido / Cerrar Ventana
-                    </Button>
-                </div>
-            </div>
-
-            <!-- Form State: Distribución Amplia de 2 Columnas -->
-            <form v-else @submit.prevent="submitEnrollment" class="py-2 space-y-5">
-                <!-- Banner de Error General -->
-                <div v-if="submitError" class="p-3 rounded-xl bg-rose-100 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-900 text-rose-950 dark:text-rose-200 text-xs font-bold flex items-start gap-2.5">
-                    <AlertCircle class="size-4 shrink-0 mt-0.5 text-rose-800" />
-                    <span>{{ submitError }}</span>
-                </div>
-
-                <!-- Grilla Principal: Izquierda (Resumen) + Derecha (Formulario) -->
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-                    <!-- Columna Izquierda (5 cols): Resumen del Programa -->
-                    <div class="md:col-span-5 space-y-4 bg-slate-50 dark:bg-slate-900/60 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
-                        <div class="text-xs font-black uppercase tracking-wider text-rose-900 dark:text-rose-400 flex items-center gap-1.5 border-b pb-2">
-                            <GraduationCap class="size-4 text-rose-800" />
-                            <span>Detalles de la Capacitación</span>
-                        </div>
-
-                        <div class="space-y-3 text-xs">
-                            <div>
-                                <span class="text-slate-600 dark:text-slate-400 block text-[11px] font-medium">Programa Académico:</span>
-                                <h4 class="font-bold text-slate-950 dark:text-white leading-tight">
-                                    {{ course?.title }}
-                                </h4>
-                            </div>
-
-                            <div v-if="course?.institution" class="flex items-center gap-2 text-slate-800 dark:text-slate-200">
-                                <Building2 class="size-4 text-rose-800 shrink-0" />
-                                <div>
-                                    <span class="text-slate-600 dark:text-slate-400 block text-[10px]">Entidad Convocante:</span>
-                                    <strong class="font-semibold">{{ course.institution }}</strong>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-2 text-slate-800 dark:text-slate-200">
-                                <Calendar class="size-4 text-rose-800 shrink-0" />
-                                <div>
-                                    <span class="text-slate-600 dark:text-slate-400 block text-[10px]">Periodo de Clases:</span>
-                                    <strong class="font-semibold">{{ formatDateRange(course?.start_date, course?.end_date, 'compact') }}</strong>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-2 text-slate-800 dark:text-slate-200">
-                                <Clock class="size-4 text-amber-600 shrink-0" />
-                                <div>
-                                    <span class="text-slate-600 dark:text-slate-400 block text-[10px]">Carga Horaria:</span>
-                                    <strong class="font-semibold">{{ formatHours(course?.hours) }}</strong>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-2 text-slate-800 dark:text-slate-200">
-                                <Users class="size-4 text-blue-600 shrink-0" />
-                                <div>
-                                    <span class="text-slate-600 dark:text-slate-400 block text-[10px]">Vacantes Oficiales:</span>
-                                    <strong class="font-bold text-rose-900 dark:text-rose-300">
-                                        {{ course?.capacity ? `${course.capacity} vacantes programadas` : 'Disponibilidad abierta' }}
-                                    </strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Garantías Institucionales -->
-                        <div class="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2 text-[11px] text-slate-700 dark:text-slate-300">
-                            <div class="flex items-start gap-2">
-                                <QrCode class="size-3.5 text-rose-800 shrink-0 mt-0.5" />
-                                <span>Asistencia controlada mediante QR individual.</span>
-                            </div>
-                            <div class="flex items-start gap-2">
-                                <Award class="size-3.5 text-amber-600 shrink-0 mt-0.5" />
-                                <span>Certificado digital con código de verificación web.</span>
-                            </div>
-                            <div class="flex items-start gap-2">
-                                <ShieldCheck class="size-3.5 text-blue-600 shrink-0 mt-0.5" />
-                                <span>Conexión en línea con RENIEC para validar nombres.</span>
-                            </div>
-                        </div>
+                    <div class="space-y-1.5">
+                        <h3
+                            class="text-2xl font-black text-slate-950 dark:text-white"
+                        >
+                            ¡Inscripción Confirmada Exitosamente!
+                        </h3>
+                        <p
+                            class="mx-auto max-w-lg text-sm font-semibold text-slate-700 dark:text-slate-300"
+                        >
+                            Has quedado registrado formalmente en la
+                            capacitación
+                            <strong class="text-rose-900 dark:text-rose-300">{{
+                                course?.title
+                            }}</strong
+                            >.
+                        </p>
                     </div>
 
-                    <!-- Columna Derecha (7 cols): Formulario de Matrícula y Validación -->
-                    <div class="md:col-span-7 space-y-5">
-                        <!-- Paso 1: Verificación de DNI con RENIEC -->
-                        <div class="space-y-2.5 p-4 rounded-xl border border-rose-200/90 dark:border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/20">
-                            <div class="flex items-center justify-between">
-                                <Label for="dni-input" class="text-xs font-black text-slate-950 dark:text-white flex items-center gap-1.5">
-                                    <IdCard class="size-4 text-rose-800" />
-                                    <span>Paso 1: DNI del Participante</span>
-                                    <span class="text-rose-600">*</span>
-                                </Label>
-                                <span class="text-[10px] font-black px-2 py-0.5 rounded bg-rose-900 text-white">
-                                    RENIEC PERÚ
-                                </span>
-                            </div>
-
-                            <div class="flex gap-2">
-                                <Input
-                                    id="dni-input"
-                                    v-model="dni"
-                                    type="text"
-                                    inputmode="numeric"
-                                    pattern="[0-9]*"
-                                    maxlength="8"
-                                    placeholder="Ingresa 8 dígitos numéricos"
-                                    class="font-mono text-sm tracking-wider font-bold bg-white dark:bg-slate-950"
-                                    :disabled="isSubmitting || dniLookupSuccess"
-                                    @keypress="allowOnlyNumbers"
-                                    @input="onDniInput"
-                                    @keyup.enter.prevent="lookupDni"
-                                />
-                                <Button
-                                    v-if="!dniLookupSuccess"
-                                    type="button"
-                                    :disabled="isLookingUpDni || !isDniFormatValid"
-                                    @click="lookupDni"
-                                    class="shrink-0 text-xs font-black bg-rose-900 hover:bg-rose-950 text-white px-4 shadow-xs"
-                                >
-                                    <Loader2 v-if="isLookingUpDni" class="size-3.5 mr-1.5 animate-spin" />
-                                    <Search v-else class="size-3.5 mr-1.5" />
-                                    Validar RENIEC
-                                </Button>
-                                <Button
-                                    v-else
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    @click="resetDni"
-                                    class="shrink-0 text-xs font-bold border-slate-300 hover:bg-rose-50 text-rose-900"
-                                >
-                                    <RefreshCw class="size-3.5 mr-1.5" />
-                                    Cambiar DNI
-                                </Button>
-                            </div>
-
-                            <!-- Estado: Error al buscar DNI -->
-                            <div v-if="dniLookupError" class="text-xs font-bold text-rose-700 dark:text-rose-400 flex flex-col gap-1 pt-1">
-                                <div class="flex items-center gap-1.5">
-                                    <AlertCircle class="size-4 text-rose-600 shrink-0" />
-                                    <span>{{ dniLookupError }}</span>
-                                </div>
-                                <button
-                                    type="button"
-                                    @click="manualEntry = true"
-                                    class="text-left text-xs font-bold text-rose-900 dark:text-rose-300 underline pl-5 cursor-pointer hover:text-rose-950"
-                                >
-                                    ✍️ Ingresar nombres y apellidos manualmente para continuar
-                                </button>
-                            </div>
-
-                            <!-- Estado: Mensaje cuando aún no se validó -->
-                            <div v-if="!dniLookupSuccess && !dniLookupError" class="flex flex-col gap-1.5 pt-0.5">
-                                <div class="text-[11px] font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                                    <Info class="size-3.5 text-slate-500 shrink-0" />
-                                    <span>Ingresa los 8 dígitos y pulsa «Validar RENIEC». Los nombres se cargarán automáticamente.</span>
-                                </div>
-                                <button
-                                    type="button"
-                                    @click="manualEntry = !manualEntry"
-                                    class="text-left text-[11px] font-bold text-rose-900 dark:text-rose-400 hover:underline cursor-pointer"
-                                >
-                                    {{ manualEntry ? 'Volver a validación automática RENIEC' : '¿Problemas con el servicio RENIEC? Habilitar ingreso manual' }}
-                                </button>
-                            </div>
-
-                            <!-- Estado: Éxito en RENIEC (Tarjeta de confirmación) -->
-                            <div
-                                v-if="dniLookupSuccess"
-                                class="p-3 bg-rose-100/90 dark:bg-rose-950/70 border border-rose-300 dark:border-rose-700 rounded-xl flex items-center gap-3 mt-2"
+                    <div
+                        class="mx-auto max-w-lg space-y-2.5 rounded-2xl border border-rose-200 bg-rose-50/80 p-5 text-left text-xs font-semibold text-slate-900 shadow-xs dark:border-rose-800 dark:bg-rose-950/40 dark:text-slate-200"
+                    >
+                        <div
+                            class="flex justify-between border-b border-rose-200/80 pb-2"
+                        >
+                            <span
+                                class="font-medium text-slate-600 dark:text-slate-400"
+                                >Participante:</span
                             >
-                                <div class="size-9 rounded-full bg-rose-900 text-white flex items-center justify-center font-black shrink-0 shadow-xs">
-                                    <UserCheck class="size-5 text-amber-300" />
-                                </div>
-                                <div class="min-w-0 flex-1 text-xs">
-                                    <div class="font-black text-slate-950 dark:text-white truncate text-sm">
-                                        {{ nombres }} {{ paterno }} {{ materno }}
-                                    </div>
-                                    <div class="text-[11px] font-bold text-rose-900 dark:text-rose-300 flex items-center gap-1 mt-0.5">
-                                        <ShieldCheck class="size-3.5" />
-                                        <span>Identidad verificada exitosamente en la base de datos nacional.</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <strong
+                                class="text-sm text-slate-950 dark:text-white"
+                                >{{ nombres }} {{ paterno }}
+                                {{ materno }}</strong
+                            >
                         </div>
+                        <div
+                            class="flex justify-between border-b border-rose-200/80 pb-2"
+                        >
+                            <span
+                                class="font-medium text-slate-600 dark:text-slate-400"
+                                >DNI Registrado:</span
+                            >
+                            <strong
+                                class="font-mono text-slate-950 dark:text-white"
+                                >{{ dni }}</strong
+                            >
+                        </div>
+                        <div
+                            class="flex justify-between border-b border-rose-200/80 pb-2"
+                        >
+                            <span
+                                class="font-medium text-slate-600 dark:text-slate-400"
+                                >Correo Electrónico:</span
+                            >
+                            <span
+                                class="font-bold text-slate-950 dark:text-white"
+                                >{{ email }}</span
+                            >
+                        </div>
+                        <div
+                            v-if="phone"
+                            class="flex justify-between border-b border-rose-200/80 pb-2"
+                        >
+                            <span
+                                class="font-medium text-slate-600 dark:text-slate-400"
+                                >Teléfono / WhatsApp:</span
+                            >
+                            <span
+                                class="font-bold text-slate-950 dark:text-white"
+                                >{{ phone }}</span
+                            >
+                        </div>
+                        <div
+                            class="flex items-center gap-2 pt-2 text-xs font-bold text-rose-950 dark:text-rose-200"
+                        >
+                            <QrCode class="size-5 shrink-0 text-rose-800" />
+                            <span
+                                >Podrás marcar tu asistencia con código QR en
+                                cada clase y descargar tu diploma digital.</span
+                            >
+                        </div>
+                    </div>
 
-                        <!-- Paso 2: Datos de Identidad -->
-                        <div class="space-y-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-                            <div class="flex items-center justify-between border-b pb-2">
-                                <div class="text-xs font-black text-slate-950 dark:text-white flex items-center gap-1.5">
-                                    <Lock v-if="dniLookupSuccess" class="size-3.5 text-rose-900" />
-                                    <UserCheck v-else class="size-3.5 text-amber-600" />
-                                    <span>Paso 2: Datos de Identidad</span>
+                    <div class="pt-2">
+                        <Button
+                            @click="closeModal"
+                            class="bg-rose-900 px-8 py-2.5 text-xs font-black text-white shadow-md hover:bg-rose-950"
+                        >
+                            Entendido / Cerrar Ventana
+                        </Button>
+                    </div>
+                </div>
+
+                <!-- Form State: Distribución Amplia de 2 Columnas -->
+                <form
+                    v-else
+                    @submit.prevent="submitEnrollment"
+                    class="space-y-5 py-2"
+                >
+                    <!-- Banner de Error General -->
+                    <div
+                        v-if="submitError"
+                        class="flex items-start gap-2.5 rounded-xl border border-rose-300 bg-rose-100 p-3 text-xs font-bold text-rose-950 dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-200"
+                    >
+                        <AlertCircle
+                            class="mt-0.5 size-4 shrink-0 text-rose-800"
+                        />
+                        <span>{{ submitError }}</span>
+                    </div>
+
+                    <!-- Grilla Principal: Izquierda (Resumen) + Derecha (Formulario) -->
+                    <div
+                        class="grid grid-cols-1 items-start gap-6 md:grid-cols-12"
+                    >
+                        <!-- Columna Izquierda (5 cols): Resumen del Programa -->
+                        <div
+                            class="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5 md:col-span-5 dark:border-slate-800 dark:bg-slate-900/60"
+                        >
+                            <div
+                                class="flex items-center gap-1.5 border-b pb-2 text-xs font-black tracking-wider text-rose-900 uppercase dark:text-rose-400"
+                            >
+                                <GraduationCap class="size-4 text-rose-800" />
+                                <span>Detalles de la Capacitación</span>
+                            </div>
+
+                            <div class="space-y-3 text-xs">
+                                <div>
+                                    <span
+                                        class="block text-[11px] font-medium text-slate-600 dark:text-slate-400"
+                                        >Programa Académico:</span
+                                    >
+                                    <h4
+                                        class="leading-tight font-bold text-slate-950 dark:text-white"
+                                    >
+                                        {{ course?.title }}
+                                    </h4>
                                 </div>
-                                <span
-                                    class="text-[10px] font-bold px-2 py-0.5 rounded"
-                                    :class="dniLookupSuccess ? 'bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200' : (manualEntry ? 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300')"
+
+                                <div
+                                    v-if="course?.institution"
+                                    class="flex items-center gap-2 text-slate-800 dark:text-slate-200"
                                 >
-                                    {{ dniLookupSuccess ? '🔒 Verificado (RENIEC)' : (manualEntry ? '✍️ Ingreso Manual Habilitado' : 'Pendiente de DNI') }}
-                                </span>
+                                    <Building2
+                                        class="size-4 shrink-0 text-rose-800"
+                                    />
+                                    <div>
+                                        <span
+                                            class="block text-[10px] text-slate-600 dark:text-slate-400"
+                                            >Entidad Convocante:</span
+                                        >
+                                        <strong class="font-semibold">{{
+                                            course.institution
+                                        }}</strong>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="flex items-center gap-2 text-slate-800 dark:text-slate-200"
+                                >
+                                    <Calendar
+                                        class="size-4 shrink-0 text-rose-800"
+                                    />
+                                    <div>
+                                        <span
+                                            class="block text-[10px] text-slate-600 dark:text-slate-400"
+                                            >Periodo de Clases:</span
+                                        >
+                                        <strong class="font-semibold">{{
+                                            formatDateRange(
+                                                course?.start_date,
+                                                course?.end_date,
+                                                'compact',
+                                            )
+                                        }}</strong>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="flex items-center gap-2 text-slate-800 dark:text-slate-200"
+                                >
+                                    <Clock
+                                        class="size-4 shrink-0 text-amber-600"
+                                    />
+                                    <div>
+                                        <span
+                                            class="block text-[10px] text-slate-600 dark:text-slate-400"
+                                            >Carga Horaria:</span
+                                        >
+                                        <strong class="font-semibold">{{
+                                            formatHours(course?.hours)
+                                        }}</strong>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="flex items-center gap-2 text-slate-800 dark:text-slate-200"
+                                >
+                                    <Users
+                                        class="size-4 shrink-0 text-blue-600"
+                                    />
+                                    <div>
+                                        <span
+                                            class="block text-[10px] text-slate-600 dark:text-slate-400"
+                                            >Vacantes Oficiales:</span
+                                        >
+                                        <strong
+                                            class="font-bold text-rose-900 dark:text-rose-300"
+                                        >
+                                            {{
+                                                course?.capacity
+                                                    ? `${course.capacity} vacantes programadas`
+                                                    : 'Disponibilidad abierta'
+                                            }}
+                                        </strong>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div class="space-y-1 sm:col-span-2">
-                                    <Label for="nombres" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                                        <span>Nombres Completos <span class="text-rose-600">*</span></span>
-                                        <span v-if="dniLookupSuccess" class="text-[10px] text-rose-800 font-bold">Oficial RENIEC</span>
-                                        <span v-else-if="manualEntry" class="text-[10px] text-amber-700 font-bold">Ingreso Manual</span>
-                                    </Label>
-                                    <div class="relative">
-                                        <Input
-                                            id="nombres"
-                                            v-model="nombres"
-                                            type="text"
-                                            :readonly="dniLookupSuccess"
-                                            :tabindex="dniLookupSuccess ? -1 : 0"
-                                            :placeholder="dniLookupSuccess ? 'Nombres oficiales' : (manualEntry ? 'Ingresa los nombres del participante' : 'Pendiente de consulta DNI')"
-                                            :class="[
-                                                'text-xs font-bold pr-8',
-                                                dniLookupSuccess
-                                                    ? 'bg-slate-100/90 dark:bg-slate-950/80 cursor-not-allowed border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white'
-                                                    : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-800'
-                                            ]"
-                                        />
-                                        <Lock v-if="dniLookupSuccess" class="size-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                                    </div>
+                            <!-- Garantías Institucionales -->
+                            <div
+                                class="space-y-2 border-t border-slate-200 pt-3 text-[11px] text-slate-700 dark:border-slate-800 dark:text-slate-300"
+                            >
+                                <div class="flex items-start gap-2">
+                                    <QrCode
+                                        class="mt-0.5 size-3.5 shrink-0 text-rose-800"
+                                    />
+                                    <span
+                                        >Asistencia controlada mediante QR
+                                        individual.</span
+                                    >
                                 </div>
-
-                                <div class="space-y-1">
-                                    <Label for="paterno" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                                        <span>Apellido Paterno <span class="text-rose-600">*</span></span>
-                                        <span v-if="manualEntry" class="text-[10px] text-amber-700 font-bold">Manual</span>
-                                    </Label>
-                                    <div class="relative">
-                                        <Input
-                                            id="paterno"
-                                            v-model="paterno"
-                                            type="text"
-                                            :readonly="dniLookupSuccess"
-                                            :tabindex="dniLookupSuccess ? -1 : 0"
-                                            :placeholder="dniLookupSuccess ? 'Apellido paterno' : (manualEntry ? 'Primer apellido' : 'Pendiente de DNI')"
-                                            :class="[
-                                                'text-xs font-bold pr-8',
-                                                dniLookupSuccess
-                                                    ? 'bg-slate-100/90 dark:bg-slate-950/80 cursor-not-allowed border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white'
-                                                    : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-800'
-                                            ]"
-                                        />
-                                        <Lock v-if="dniLookupSuccess" class="size-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                                    </div>
+                                <div class="flex items-start gap-2">
+                                    <Award
+                                        class="mt-0.5 size-3.5 shrink-0 text-amber-600"
+                                    />
+                                    <span
+                                        >Certificado digital con código de
+                                        verificación web.</span
+                                    >
                                 </div>
-
-                                <div class="space-y-1">
-                                    <Label for="materno" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                                        <span>Apellido Materno</span>
-                                        <span v-if="manualEntry" class="text-[10px] text-slate-500 font-normal">Opcional</span>
-                                    </Label>
-                                    <div class="relative">
-                                        <Input
-                                            id="materno"
-                                            v-model="materno"
-                                            type="text"
-                                            :readonly="dniLookupSuccess"
-                                            :tabindex="dniLookupSuccess ? -1 : 0"
-                                            :placeholder="dniLookupSuccess ? 'Apellido materno' : (manualEntry ? 'Segundo apellido' : 'Pendiente de DNI')"
-                                            :class="[
-                                                'text-xs font-bold pr-8',
-                                                dniLookupSuccess
-                                                    ? 'bg-slate-100/90 dark:bg-slate-950/80 cursor-not-allowed border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white'
-                                                    : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-800'
-                                            ]"
-                                        />
-                                        <Lock v-if="dniLookupSuccess" class="size-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                                    </div>
+                                <div class="flex items-start gap-2">
+                                    <ShieldCheck
+                                        class="mt-0.5 size-3.5 shrink-0 text-blue-600"
+                                    />
+                                    <span
+                                        >Conexión en línea con RENIEC para
+                                        validar nombres.</span
+                                    >
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Paso 3: Datos de Contacto (EDITABLES) -->
-                        <div class="space-y-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-                            <div class="text-xs font-black text-slate-950 dark:text-white border-b pb-2 flex items-center gap-1.5">
-                                <Mail class="size-3.5 text-rose-900" />
-                                <span>Paso 3: Información de Contacto</span>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div class="space-y-1 sm:col-span-2">
-                                    <Label for="email" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                                        <span class="flex items-center gap-1">
-                                            <Mail class="size-3 text-rose-800" />
-                                            Correo Electrónico <span class="text-rose-600">*</span>
-                                        </span>
-                                        <span class="text-[10px] text-slate-500 font-normal">Para envío de confirmación y diplomas</span>
+                        <!-- Columna Derecha (7 cols): Formulario de Matrícula y Validación -->
+                        <div class="space-y-5 md:col-span-7">
+                            <!-- Paso 1: Verificación de DNI con RENIEC -->
+                            <div
+                                class="space-y-2.5 rounded-xl border border-rose-200/90 bg-rose-50/40 p-4 dark:border-rose-900/60 dark:bg-rose-950/20"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <Label
+                                        for="dni-input"
+                                        class="flex items-center gap-1.5 text-xs font-black text-slate-950 dark:text-white"
+                                    >
+                                        <IdCard class="size-4 text-rose-800" />
+                                        <span
+                                            >Paso 1: DNI del Participante</span
+                                        >
+                                        <span class="text-rose-600">*</span>
                                     </Label>
-                                    <Input
-                                        id="email"
-                                        v-model="email"
-                                        type="email"
-                                        placeholder="ejemplo@correo.com"
-                                        class="text-xs font-medium text-slate-900 dark:text-white"
-                                        :class="{ 'border-rose-500 ring-rose-500/20': email && !isEmailValid }"
-                                        required
-                                    />
-                                    <span v-if="email && !isEmailValid" class="text-[11px] font-bold text-rose-600">
-                                        Ingrese un correo válido con formato usuario@dominio.com
+                                    <span
+                                        class="rounded bg-rose-900 px-2 py-0.5 text-[10px] font-black text-white"
+                                    >
+                                        RENIEC PERÚ
                                     </span>
                                 </div>
 
-                                <div class="space-y-1 sm:col-span-2">
-                                    <Label for="phone" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
-                                        <Phone class="size-3 text-rose-800" />
-                                        <span>Celular / WhatsApp (Perú)</span>
-                                    </Label>
+                                <div class="flex gap-2">
                                     <Input
-                                        id="phone"
-                                        v-model="phone"
-                                        type="tel"
+                                        id="dni-input"
+                                        v-model="dni"
+                                        type="text"
                                         inputmode="numeric"
                                         pattern="[0-9]*"
-                                        maxlength="9"
-                                        placeholder="9XXXXXXXX (9 dígitos numéricos)"
-                                        class="text-xs font-medium text-slate-900 dark:text-white font-mono"
-                                        :class="{ 'border-rose-500 ring-rose-500/20': phone && !isPhoneValid }"
+                                        maxlength="8"
+                                        placeholder="Ingresa 8 dígitos numéricos"
+                                        class="bg-white font-mono text-sm font-bold tracking-wider dark:bg-slate-950"
+                                        :disabled="
+                                            isSubmitting || dniLookupSuccess
+                                        "
                                         @keypress="allowOnlyNumbers"
-                                        @input="onPhoneInput"
+                                        @input="onDniInput"
+                                        @keyup.enter.prevent="lookupDni"
                                     />
-                                    <span v-if="phone && !isPhoneValid" class="text-[11px] font-bold text-rose-600">
-                                        El número de celular debe contener 9 dígitos numéricos e iniciar con 9.
-                                    </span>
+                                    <Button
+                                        v-if="!dniLookupSuccess"
+                                        type="button"
+                                        :disabled="
+                                            isLookingUpDni || !isDniFormatValid
+                                        "
+                                        @click="lookupDni"
+                                        class="shrink-0 bg-rose-900 px-4 text-xs font-black text-white shadow-xs hover:bg-rose-950"
+                                    >
+                                        <Loader2
+                                            v-if="isLookingUpDni"
+                                            class="mr-1.5 size-3.5 animate-spin"
+                                        />
+                                        <Search
+                                            v-else
+                                            class="mr-1.5 size-3.5"
+                                        />
+                                        Validar RENIEC
+                                    </Button>
+                                    <Button
+                                        v-else
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        @click="resetDni"
+                                        class="shrink-0 border-slate-300 text-xs font-bold text-rose-900 hover:bg-rose-50"
+                                    >
+                                        <RefreshCw class="mr-1.5 size-3.5" />
+                                        Cambiar DNI
+                                    </Button>
+                                </div>
+
+                                <!-- Estado: Error al buscar DNI -->
+                                <div
+                                    v-if="dniLookupError"
+                                    class="flex flex-col gap-1 pt-1 text-xs font-bold text-rose-700 dark:text-rose-400"
+                                >
+                                    <div class="flex items-center gap-1.5">
+                                        <AlertCircle
+                                            class="size-4 shrink-0 text-rose-600"
+                                        />
+                                        <span>{{ dniLookupError }}</span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        @click="manualEntry = true"
+                                        class="cursor-pointer pl-5 text-left text-xs font-bold text-rose-900 underline hover:text-rose-950 dark:text-rose-300"
+                                    >
+                                        ✍️ Ingresar nombres y apellidos
+                                        manualmente para continuar
+                                    </button>
+                                </div>
+
+                                <!-- Estado: Mensaje cuando aún no se validó -->
+                                <div
+                                    v-if="!dniLookupSuccess && !dniLookupError"
+                                    class="flex flex-col gap-1.5 pt-0.5"
+                                >
+                                    <div
+                                        class="flex items-center gap-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-400"
+                                    >
+                                        <Info
+                                            class="size-3.5 shrink-0 text-slate-500"
+                                        />
+                                        <span
+                                            >Ingresa los 8 dígitos y pulsa
+                                            «Validar RENIEC». Los nombres se
+                                            cargarán automáticamente.</span
+                                        >
+                                    </div>
+                                    <button
+                                        type="button"
+                                        @click="manualEntry = !manualEntry"
+                                        class="cursor-pointer text-left text-[11px] font-bold text-rose-900 hover:underline dark:text-rose-400"
+                                    >
+                                        {{
+                                            manualEntry
+                                                ? 'Volver a validación automática RENIEC'
+                                                : '¿Problemas con el servicio RENIEC? Habilitar ingreso manual'
+                                        }}
+                                    </button>
+                                </div>
+
+                                <!-- Estado: Éxito en RENIEC (Tarjeta de confirmación) -->
+                                <div
+                                    v-if="dniLookupSuccess"
+                                    class="mt-2 flex items-center gap-3 rounded-xl border border-rose-300 bg-rose-100/90 p-3 dark:border-rose-700 dark:bg-rose-950/70"
+                                >
+                                    <div
+                                        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-rose-900 font-black text-white shadow-xs"
+                                    >
+                                        <UserCheck
+                                            class="size-5 text-amber-300"
+                                        />
+                                    </div>
+                                    <div class="min-w-0 flex-1 text-xs">
+                                        <div
+                                            class="truncate text-sm font-black text-slate-950 dark:text-white"
+                                        >
+                                            {{ nombres }} {{ paterno }}
+                                            {{ materno }}
+                                        </div>
+                                        <div
+                                            class="mt-0.5 flex items-center gap-1 text-[11px] font-bold text-rose-900 dark:text-rose-300"
+                                        >
+                                            <ShieldCheck class="size-3.5" />
+                                            <span
+                                                >Identidad verificada
+                                                exitosamente en la base de datos
+                                                nacional.</span
+                                            >
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Declaración Jurada Obligatoria -->
-                        <div
-                            class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border transition-colors"
-                            :class="!termsAccepted ? 'border-amber-300 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20' : 'border-slate-200 dark:border-slate-800'"
-                        >
-                            <label class="flex items-start gap-3 cursor-pointer text-xs text-slate-800 dark:text-slate-200 select-none">
-                                <input
-                                    type="checkbox"
-                                    v-model="termsAccepted"
-                                    class="mt-0.5 size-4 rounded text-rose-900 border-slate-300 focus:ring-rose-800 focus:ring-2 cursor-pointer accent-rose-900 shrink-0"
+                            <!-- Paso 2: Datos de Identidad -->
+                            <div
+                                class="space-y-3 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+                            >
+                                <div
+                                    class="flex items-center justify-between border-b pb-2"
+                                >
+                                    <div
+                                        class="flex items-center gap-1.5 text-xs font-black text-slate-950 dark:text-white"
+                                    >
+                                        <Lock
+                                            v-if="dniLookupSuccess"
+                                            class="size-3.5 text-rose-900"
+                                        />
+                                        <UserCheck
+                                            v-else
+                                            class="size-3.5 text-amber-600"
+                                        />
+                                        <span>Paso 2: Datos de Identidad</span>
+                                    </div>
+                                    <span
+                                        class="rounded px-2 py-0.5 text-[10px] font-bold"
+                                        :class="
+                                            dniLookupSuccess
+                                                ? 'bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200'
+                                                : manualEntry
+                                                  ? 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200'
+                                                  : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                                        "
+                                    >
+                                        {{
+                                            dniLookupSuccess
+                                                ? '🔒 Verificado (RENIEC)'
+                                                : manualEntry
+                                                  ? '✍️ Ingreso Manual Habilitado'
+                                                  : 'Pendiente de DNI'
+                                        }}
+                                    </span>
+                                </div>
+
+                                <div
+                                    class="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                                >
+                                    <div class="space-y-1 sm:col-span-2">
+                                        <Label
+                                            for="nombres"
+                                            class="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200"
+                                        >
+                                            <span
+                                                >Nombres Completos
+                                                <span class="text-rose-600"
+                                                    >*</span
+                                                ></span
+                                            >
+                                            <span
+                                                v-if="dniLookupSuccess"
+                                                class="text-[10px] font-bold text-rose-800"
+                                                >Oficial RENIEC</span
+                                            >
+                                            <span
+                                                v-else-if="manualEntry"
+                                                class="text-[10px] font-bold text-amber-700"
+                                                >Ingreso Manual</span
+                                            >
+                                        </Label>
+                                        <div class="relative">
+                                            <Input
+                                                id="nombres"
+                                                v-model="nombres"
+                                                type="text"
+                                                :readonly="dniLookupSuccess"
+                                                :tabindex="
+                                                    dniLookupSuccess ? -1 : 0
+                                                "
+                                                :placeholder="
+                                                    dniLookupSuccess
+                                                        ? 'Nombres oficiales'
+                                                        : manualEntry
+                                                          ? 'Ingresa los nombres del participante'
+                                                          : 'Pendiente de consulta DNI'
+                                                "
+                                                :class="[
+                                                    'pr-8 text-xs font-bold',
+                                                    dniLookupSuccess
+                                                        ? 'cursor-not-allowed border-slate-300 bg-slate-100/90 text-slate-900 dark:border-slate-700 dark:bg-slate-950/80 dark:text-white'
+                                                        : 'border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-rose-800 dark:border-slate-700 dark:bg-slate-950 dark:text-white',
+                                                ]"
+                                            />
+                                            <Lock
+                                                v-if="dniLookupSuccess"
+                                                class="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-slate-400"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <Label
+                                            for="paterno"
+                                            class="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200"
+                                        >
+                                            <span
+                                                >Apellido Paterno
+                                                <span class="text-rose-600"
+                                                    >*</span
+                                                ></span
+                                            >
+                                            <span
+                                                v-if="manualEntry"
+                                                class="text-[10px] font-bold text-amber-700"
+                                                >Manual</span
+                                            >
+                                        </Label>
+                                        <div class="relative">
+                                            <Input
+                                                id="paterno"
+                                                v-model="paterno"
+                                                type="text"
+                                                :readonly="dniLookupSuccess"
+                                                :tabindex="
+                                                    dniLookupSuccess ? -1 : 0
+                                                "
+                                                :placeholder="
+                                                    dniLookupSuccess
+                                                        ? 'Apellido paterno'
+                                                        : manualEntry
+                                                          ? 'Primer apellido'
+                                                          : 'Pendiente de DNI'
+                                                "
+                                                :class="[
+                                                    'pr-8 text-xs font-bold',
+                                                    dniLookupSuccess
+                                                        ? 'cursor-not-allowed border-slate-300 bg-slate-100/90 text-slate-900 dark:border-slate-700 dark:bg-slate-950/80 dark:text-white'
+                                                        : 'border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-rose-800 dark:border-slate-700 dark:bg-slate-950 dark:text-white',
+                                                ]"
+                                            />
+                                            <Lock
+                                                v-if="dniLookupSuccess"
+                                                class="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-slate-400"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <Label
+                                            for="materno"
+                                            class="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200"
+                                        >
+                                            <span>Apellido Materno</span>
+                                            <span
+                                                v-if="manualEntry"
+                                                class="text-[10px] font-normal text-slate-500"
+                                                >Opcional</span
+                                            >
+                                        </Label>
+                                        <div class="relative">
+                                            <Input
+                                                id="materno"
+                                                v-model="materno"
+                                                type="text"
+                                                :readonly="dniLookupSuccess"
+                                                :tabindex="
+                                                    dniLookupSuccess ? -1 : 0
+                                                "
+                                                :placeholder="
+                                                    dniLookupSuccess
+                                                        ? 'Apellido materno'
+                                                        : manualEntry
+                                                          ? 'Segundo apellido'
+                                                          : 'Pendiente de DNI'
+                                                "
+                                                :class="[
+                                                    'pr-8 text-xs font-bold',
+                                                    dniLookupSuccess
+                                                        ? 'cursor-not-allowed border-slate-300 bg-slate-100/90 text-slate-900 dark:border-slate-700 dark:bg-slate-950/80 dark:text-white'
+                                                        : 'border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-rose-800 dark:border-slate-700 dark:bg-slate-950 dark:text-white',
+                                                ]"
+                                            />
+                                            <Lock
+                                                v-if="dniLookupSuccess"
+                                                class="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-slate-400"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Paso 3: Datos de Contacto (EDITABLES) -->
+                            <div
+                                class="space-y-3 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+                            >
+                                <div
+                                    class="flex items-center gap-1.5 border-b pb-2 text-xs font-black text-slate-950 dark:text-white"
+                                >
+                                    <Mail class="size-3.5 text-rose-900" />
+                                    <span>Paso 3: Información de Contacto</span>
+                                </div>
+
+                                <div
+                                    class="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                                >
+                                    <div class="space-y-1 sm:col-span-2">
+                                        <Label
+                                            for="email"
+                                            class="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200"
+                                        >
+                                            <span
+                                                class="flex items-center gap-1"
+                                            >
+                                                <Mail
+                                                    class="size-3 text-rose-800"
+                                                />
+                                                Correo Electrónico
+                                                <span class="text-rose-600"
+                                                    >*</span
+                                                >
+                                            </span>
+                                            <span
+                                                class="text-[10px] font-normal text-slate-500"
+                                                >Para envío de confirmación y
+                                                diplomas</span
+                                            >
+                                        </Label>
+                                        <Input
+                                            id="email"
+                                            v-model="email"
+                                            type="email"
+                                            placeholder="ejemplo@correo.com"
+                                            class="text-xs font-medium text-slate-900 dark:text-white"
+                                            :class="{
+                                                'border-rose-500 ring-rose-500/20':
+                                                    email && !isEmailValid,
+                                            }"
+                                            required
+                                        />
+                                        <span
+                                            v-if="email && !isEmailValid"
+                                            class="text-[11px] font-bold text-rose-600"
+                                        >
+                                            Ingrese un correo válido con formato
+                                            usuario@dominio.com
+                                        </span>
+                                    </div>
+
+                                    <div class="space-y-1 sm:col-span-2">
+                                        <Label
+                                            for="phone"
+                                            class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
+                                        >
+                                            <Phone
+                                                class="size-3 text-rose-800"
+                                            />
+                                            <span
+                                                >Celular / WhatsApp (Perú)</span
+                                            >
+                                        </Label>
+                                        <Input
+                                            id="phone"
+                                            v-model="phone"
+                                            type="tel"
+                                            inputmode="numeric"
+                                            pattern="[0-9]*"
+                                            maxlength="9"
+                                            placeholder="9XXXXXXXX (9 dígitos numéricos)"
+                                            class="font-mono text-xs font-medium text-slate-900 dark:text-white"
+                                            :class="{
+                                                'border-rose-500 ring-rose-500/20':
+                                                    phone && !isPhoneValid,
+                                            }"
+                                            @keypress="allowOnlyNumbers"
+                                            @input="onPhoneInput"
+                                        />
+                                        <span
+                                            v-if="phone && !isPhoneValid"
+                                            class="text-[11px] font-bold text-rose-600"
+                                        >
+                                            El número de celular debe contener 9
+                                            dígitos numéricos e iniciar con 9.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Declaración Jurada Obligatoria -->
+                            <div
+                                class="rounded-xl border bg-slate-50 p-3 transition-colors dark:bg-slate-900/60"
+                                :class="
+                                    !termsAccepted
+                                        ? 'border-amber-300 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20'
+                                        : 'border-slate-200 dark:border-slate-800'
+                                "
+                            >
+                                <label
+                                    class="flex cursor-pointer items-start gap-3 text-xs text-slate-800 select-none dark:text-slate-200"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        v-model="termsAccepted"
+                                        class="mt-0.5 size-4 shrink-0 cursor-pointer rounded border-slate-300 text-rose-900 accent-rose-900 focus:ring-2 focus:ring-rose-800"
+                                    />
+                                    <span class="leading-relaxed font-medium">
+                                        Declaro bajo juramento que los datos de
+                                        DNI y contacto son legítimos y acepto
+                                        participar cumpliendo con la asistencia
+                                        por código QR y evaluaciones de la
+                                        capacitación.
+                                    </span>
+                                </label>
+                            </div>
+
+                            <!-- Banner de Error antes de enviar si existe -->
+                            <div
+                                v-if="submitError"
+                                class="flex animate-in items-start gap-2.5 rounded-xl border border-rose-300 bg-rose-100 p-3 text-xs font-bold text-rose-950 fade-in dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-200"
+                            >
+                                <AlertCircle
+                                    class="mt-0.5 size-4 shrink-0 text-rose-800"
                                 />
-                                <span class="font-medium leading-relaxed">
-                                    Declaro bajo juramento que los datos de DNI y contacto son legítimos y acepto participar cumpliendo con la asistencia por código QR y evaluaciones de la capacitación.
-                                </span>
-                            </label>
-                        </div>
+                                <span>{{ submitError }}</span>
+                            </div>
 
-                        <!-- Banner de Error antes de enviar si existe -->
-                        <div v-if="submitError" class="p-3 rounded-xl bg-rose-100 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-900 text-rose-950 dark:text-rose-200 text-xs font-bold flex items-start gap-2.5 animate-in fade-in">
-                            <AlertCircle class="size-4 shrink-0 mt-0.5 text-rose-800" />
-                            <span>{{ submitError }}</span>
-                        </div>
-
-                        <!-- Botones de Acción -->
-                        <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-2">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="default"
-                                @click="closeModal"
-                                :disabled="isSubmitting"
-                                class="w-full sm:w-auto text-xs font-bold border-slate-300"
+                            <!-- Botones de Acción -->
+                            <div
+                                class="flex flex-col-reverse items-center justify-end gap-3 pt-2 sm:flex-row"
                             >
-                                Cancelar
-                            </Button>
-                            <Button
-                                type="submit"
-                                size="default"
-                                :class="['w-full sm:w-auto h-10 px-6 text-xs font-black shadow-md cursor-pointer', THEME_BUTTONS.primary]"
-                                :disabled="isSubmitting"
-                            >
-                                <Loader2 v-if="isSubmitting" class="size-4 mr-2 animate-spin" />
-                                <CheckCircle2 v-else class="size-4 mr-2" />
-                                Confirmar Inscripción Oficial
-                            </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="default"
+                                    @click="closeModal"
+                                    :disabled="isSubmitting"
+                                    class="w-full border-slate-300 text-xs font-bold sm:w-auto"
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    size="default"
+                                    :class="[
+                                        'h-10 w-full cursor-pointer px-6 text-xs font-black shadow-md sm:w-auto',
+                                        THEME_BUTTONS.primary,
+                                    ]"
+                                    :disabled="isSubmitting"
+                                >
+                                    <Loader2
+                                        v-if="isSubmitting"
+                                        class="mr-2 size-4 animate-spin"
+                                    />
+                                    <CheckCircle2 v-else class="mr-2 size-4" />
+                                    Confirmar Inscripción Oficial
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
             </div>
         </DialogContent>
     </Dialog>

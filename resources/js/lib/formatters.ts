@@ -4,13 +4,33 @@
  */
 
 const MONTHS_ES_SHORT = [
-    'ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.',
-    'jul.', 'ago.', 'set.', 'oct.', 'nov.', 'dic.',
+    'ene.',
+    'feb.',
+    'mar.',
+    'abr.',
+    'may.',
+    'jun.',
+    'jul.',
+    'ago.',
+    'set.',
+    'oct.',
+    'nov.',
+    'dic.',
 ];
 
 const MONTHS_ES_FULL = [
-    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-    'julio', 'agosto', 'setiembre', 'octubre', 'noviembre', 'diciembre',
+    'enero',
+    'febrero',
+    'marzo',
+    'abril',
+    'mayo',
+    'junio',
+    'julio',
+    'agosto',
+    'setiembre',
+    'octubre',
+    'noviembre',
+    'diciembre',
 ];
 
 /**
@@ -41,7 +61,9 @@ function parseDateParts(dateInput: string | Date | null | undefined): {
     if (!str) return null;
 
     // Matches YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss...
-    const match = str.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2}))?/);
+    const match = str.match(
+        /^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2}))?/,
+    );
     if (match) {
         return {
             year: parseInt(match[1], 10),
@@ -72,7 +94,7 @@ function parseDateParts(dateInput: string | Date | null | undefined): {
  */
 export function formatDate(
     dateInput: string | Date | null | undefined,
-    style: 'compact' | 'medium' | 'full' = 'compact'
+    style: 'compact' | 'medium' | 'full' = 'compact',
 ): string {
     const parts = parseDateParts(dateInput);
     if (!parts) return 'Por definir';
@@ -97,7 +119,9 @@ export function formatDate(
 /**
  * Formats a date and time string: '17/10/2026 • 08:30 hrs'
  */
-export function formatDateTime(dateInput: string | Date | null | undefined): string {
+export function formatDateTime(
+    dateInput: string | Date | null | undefined,
+): string {
     const parts = parseDateParts(dateInput);
     if (!parts) return 'Por definir';
 
@@ -116,10 +140,11 @@ export function formatDateTime(dateInput: string | Date | null | undefined): str
 export function formatDateRange(
     startInput?: string | null,
     endInput?: string | null,
-    style: 'compact' | 'medium' = 'compact'
+    style: 'compact' | 'medium' = 'compact',
 ): string {
     if (!startInput && !endInput) return 'Fechas por definir';
-    if (startInput && !endInput) return `Desde ${formatDate(startInput, style)}`;
+    if (startInput && !endInput)
+        return `Desde ${formatDate(startInput, style)}`;
     if (!startInput && endInput) return `Hasta ${formatDate(endInput, style)}`;
 
     if (style === 'compact') {
@@ -147,4 +172,3 @@ export {
     formatCurrencyPEN,
     getCurrentPeruTime,
 } from '@/lib/peru';
-

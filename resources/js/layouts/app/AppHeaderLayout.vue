@@ -26,13 +26,26 @@ withDefaults(defineProps<Props>(), {
         </AppContent>
 
         <!-- PIE DE PÁGINA INSTITUCIONAL CON GEOLOCALIZACIÓN Y HORA PERÚ -->
-        <footer class="mt-auto border-t border-slate-200/90 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 py-4 text-xs text-slate-600 dark:text-slate-400">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div class="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-200">
-                    <GraduationCap class="size-4 text-rose-900 dark:text-rose-400" />
+        <footer
+            class="mt-auto border-t border-slate-200/90 bg-white/90 py-4 text-xs text-slate-600 dark:border-slate-800 dark:bg-slate-950/90 dark:text-slate-400"
+        >
+            <div
+                class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 sm:flex-row sm:px-6 lg:px-8"
+            >
+                <div
+                    class="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-200"
+                >
+                    <GraduationCap
+                        class="size-4 text-rose-900 dark:text-rose-400"
+                    />
                     <span>SIGC-CUSCO</span>
-                    <span class="text-slate-400 dark:text-slate-600 font-normal">•</span>
-                    <span class="text-xs font-semibold text-slate-600 dark:text-slate-400">Sistema Integral de Gestión de Capacitaciones</span>
+                    <span class="font-normal text-slate-400 dark:text-slate-600"
+                        >•</span
+                    >
+                    <span
+                        class="text-xs font-semibold text-slate-600 dark:text-slate-400"
+                        >Sistema Integral de Gestión de Capacitaciones</span
+                    >
                 </div>
                 <div class="flex items-center">
                     <PeruGeoBadge />

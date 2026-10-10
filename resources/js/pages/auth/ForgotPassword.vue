@@ -13,7 +13,8 @@ import { email } from '@/routes/password';
 defineOptions({
     layout: {
         title: 'Recuperar Contraseña',
-        description: 'Ingresa tu correo institucional o personal para recibir un enlace de restablecimiento seguro',
+        description:
+            'Ingresa tu correo institucional o personal para recibir un enlace de restablecimiento seguro',
     },
 });
 
@@ -27,15 +28,22 @@ defineProps<{
 
     <div
         v-if="status"
-        class="mb-4 text-center text-xs font-bold text-rose-900 bg-rose-50 p-2.5 rounded-lg border border-rose-200"
+        class="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-center text-xs font-bold text-rose-900"
     >
         {{ status }}
     </div>
 
     <div class="space-y-5">
-        <Form v-bind="email.form()" v-slot="{ errors, processing }" class="space-y-4">
+        <Form
+            v-bind="email.form()"
+            v-slot="{ errors, processing }"
+            class="space-y-4"
+        >
             <div class="grid gap-1.5">
-                <Label for="email" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                <Label
+                    for="email"
+                    class="text-xs font-bold text-slate-800 dark:text-slate-200"
+                >
                     Correo electrónico
                 </Label>
                 <Input
@@ -45,25 +53,30 @@ defineProps<{
                     autocomplete="off"
                     v-focus
                     placeholder="correo@ejemplo.com"
-                    class="text-xs text-slate-900 font-medium"
+                    class="text-xs font-medium text-slate-900"
                 />
                 <InputError :message="errors.email" />
             </div>
 
             <Button
-                class="w-full bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs h-10 shadow-xs cursor-pointer"
+                class="h-10 w-full cursor-pointer bg-rose-900 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
                 :disabled="processing"
                 data-test="email-password-reset-link-button"
             >
                 <Spinner v-if="processing" />
-                <Mail v-else class="size-4 mr-1.5" />
+                <Mail v-else class="mr-1.5 size-4" />
                 Enviar enlace de recuperación
             </Button>
         </Form>
 
-        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 text-center text-xs text-slate-600 dark:text-slate-400 font-medium">
+        <div
+            class="border-t border-slate-100 pt-3 text-center text-xs font-medium text-slate-600 dark:border-slate-800 dark:text-slate-400"
+        >
             <span>¿Recordaste tu contraseña?</span>
-            <TextLink :href="login()" class="text-rose-900 dark:text-rose-400 font-bold hover:underline ml-1">
+            <TextLink
+                :href="login()"
+                class="ml-1 font-bold text-rose-900 hover:underline dark:text-rose-400"
+            >
                 Iniciar sesión
             </TextLink>
         </div>

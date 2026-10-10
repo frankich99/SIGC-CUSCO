@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -84,7 +90,8 @@ async function searchCertificates(targetCode?: string) {
     const code = targetCode?.trim() || '';
 
     if (!code && !/^\d{8}$/.test(clean)) {
-        error.value = 'Ingrese un número de DNI válido de exactamente 8 dígitos numéricos.';
+        error.value =
+            'Ingrese un número de DNI válido de exactamente 8 dígitos numéricos.';
         return;
     }
 
@@ -98,11 +105,14 @@ async function searchCertificates(targetCode?: string) {
         if (clean) queryParams.set('dni', clean);
         if (code) queryParams.set('code', code);
 
-        const response = await fetch(`/api/certificates/lookup?${queryParams.toString()}`, {
-            headers: {
-                Accept: 'application/json',
+        const response = await fetch(
+            `/api/certificates/lookup?${queryParams.toString()}`,
+            {
+                headers: {
+                    Accept: 'application/json',
+                },
             },
-        });
+        );
 
         const data = await response.json();
 
@@ -115,7 +125,9 @@ async function searchCertificates(targetCode?: string) {
                 studentName.value = records.value[0].student_name;
                 if (code) {
                     const matched = records.value.find(
-                        (r) => r.certificate_code.toLowerCase() === code.toLowerCase()
+                        (r) =>
+                            r.certificate_code.toLowerCase() ===
+                            code.toLowerCase(),
                     );
                     if (matched) {
                         selectedCert.value = matched;
@@ -127,10 +139,13 @@ async function searchCertificates(targetCode?: string) {
                 studentName.value = null;
             }
         } else {
-            error.value = data.message || 'No se pudo consultar el registro de certificados.';
+            error.value =
+                data.message ||
+                'No se pudo consultar el registro de certificados.';
         }
     } catch {
-        error.value = 'Error al comunicarse con el servidor. Intente nuevamente.';
+        error.value =
+            'Error al comunicarse con el servidor. Intente nuevamente.';
     } finally {
         loading.value = false;
     }
@@ -355,159 +370,269 @@ function copyVerificationUrl(url: string) {
 </script>
 
 <template>
-    <Card class="border border-slate-200 dark:border-neutral-800 shadow-sm overflow-hidden bg-white dark:bg-neutral-900">
-        <CardHeader class="bg-gradient-to-r from-rose-50/90 via-amber-50/30 to-transparent dark:from-rose-950/40 dark:to-neutral-900 border-b pb-4">
-            <div class="flex items-center gap-1.5 text-xs font-bold text-rose-900 dark:text-rose-300 uppercase tracking-wider mb-1">
+    <Card
+        class="overflow-hidden border border-slate-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
+    >
+        <CardHeader
+            class="border-b bg-gradient-to-r from-rose-50/90 via-amber-50/30 to-transparent pb-4 dark:from-rose-950/40 dark:to-neutral-900"
+        >
+            <div
+                class="mb-1 flex items-center gap-1.5 text-xs font-bold tracking-wider text-rose-900 uppercase dark:text-rose-300"
+            >
                 <Award class="size-4 text-rose-800" />
                 <span>Acreditación Digital Oficial • Cusco, Perú</span>
             </div>
-            <CardTitle class="text-lg sm:text-xl font-bold tracking-tight text-slate-950 dark:text-white">
+            <CardTitle
+                class="text-lg font-bold tracking-tight text-slate-950 sm:text-xl dark:text-white"
+            >
                 Consulta y Descarga de Certificados Oficiales
             </CardTitle>
-            <CardDescription class="text-xs text-slate-600 dark:text-neutral-400 font-medium">
-                Ingresa tu número de DNI para consultar las capacitaciones aprobadas y descargar tu diploma digital oficial con código de verificación.
+            <CardDescription
+                class="text-xs font-medium text-slate-600 dark:text-neutral-400"
+            >
+                Ingresa tu número de DNI para consultar las capacitaciones
+                aprobadas y descargar tu diploma digital oficial con código de
+                verificación.
             </CardDescription>
         </CardHeader>
 
-        <CardContent class="p-4 sm:p-6 space-y-6">
+        <CardContent class="space-y-6 p-4 sm:p-6">
             <!-- Barra de búsqueda por DNI -->
-            <form @submit.prevent="() => searchCertificates()" class="flex flex-col sm:flex-row gap-2 max-w-md">
+            <form
+                @submit.prevent="() => searchCertificates()"
+                class="flex max-w-md flex-col gap-2 sm:flex-row"
+            >
                 <div class="relative flex-1">
-                    <Search class="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <Search
+                        class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
+                    />
                     <Input
                         v-model="dniQuery"
                         type="text"
                         maxlength="8"
                         placeholder="Ingresa tu DNI (8 dígitos)"
-                        class="pl-9 font-mono text-sm tracking-wider font-bold bg-white dark:bg-slate-950"
+                        class="bg-white pl-9 font-mono text-sm font-bold tracking-wider dark:bg-slate-950"
                         :disabled="loading"
                         @input="onDniInput"
                     />
                 </div>
                 <Button
                     type="submit"
-                    class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs shrink-0 shadow-xs cursor-pointer h-10 px-5"
+                    class="h-10 shrink-0 cursor-pointer bg-rose-900 px-5 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
                     :disabled="loading || dniQuery.trim().length !== 8"
                 >
-                    <Loader2 v-if="loading" class="size-3.5 mr-1.5 animate-spin" />
-                    <Search v-else class="size-3.5 mr-1.5" />
+                    <Loader2
+                        v-if="loading"
+                        class="mr-1.5 size-3.5 animate-spin"
+                    />
+                    <Search v-else class="mr-1.5 size-3.5" />
                     Consultar DNI
                 </Button>
             </form>
 
             <!-- Error message -->
-            <div v-if="error" class="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200 text-xs flex items-center gap-2.5 font-bold">
+            <div
+                v-if="error"
+                class="flex items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-bold text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
+            >
                 <AlertCircle class="size-4 shrink-0 text-rose-700" />
                 <span>{{ error }}</span>
             </div>
 
             <!-- Empty result state -->
-            <div v-else-if="searched && !loading && records.length === 0" class="p-8 text-center border border-dashed rounded-2xl space-y-2.5 bg-slate-50/50 dark:bg-neutral-900/40">
-                <div class="size-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
+            <div
+                v-else-if="searched && !loading && records.length === 0"
+                class="space-y-2.5 rounded-2xl border border-dashed bg-slate-50/50 p-8 text-center dark:bg-neutral-900/40"
+            >
+                <div
+                    class="mx-auto flex size-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800"
+                >
                     <Award class="size-6" />
                 </div>
                 <h4 class="text-sm font-bold text-slate-900 dark:text-white">
-                    No se encontraron certificados para el DNI <span class="font-mono text-rose-900 dark:text-rose-400">{{ dniQuery }}</span>
+                    No se encontraron certificados para el DNI
+                    <span class="font-mono text-rose-900 dark:text-rose-400">{{
+                        dniQuery
+                    }}</span>
                 </h4>
-                <p class="text-xs text-slate-600 dark:text-neutral-400 max-w-sm mx-auto font-medium">
-                    Verifica que los 8 dígitos sean correctos o inscríbete en una de las capacitaciones disponibles para obtener tu certificación oficial.
+                <p
+                    class="mx-auto max-w-sm text-xs font-medium text-slate-600 dark:text-neutral-400"
+                >
+                    Verifica que los 8 dígitos sean correctos o inscríbete en
+                    una de las capacitaciones disponibles para obtener tu
+                    certificación oficial.
                 </p>
             </div>
 
             <!-- Records Results -->
             <div v-else-if="records.length > 0" class="space-y-6">
-                <PdfIntegrityVerifier :expected-hash="selectedCert?.certificate_hash || records[0]?.certificate_hash" />
-                <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-neutral-800">
-                    <div class="text-xs flex items-center gap-2">
-                        <span class="text-slate-600 dark:text-neutral-400 font-medium">Participante Titular:</span>
-                        <strong class="text-slate-950 dark:text-white text-sm font-bold">{{ studentName }}</strong>
+                <PdfIntegrityVerifier
+                    :expected-hash="
+                        selectedCert?.certificate_hash ||
+                        records[0]?.certificate_hash
+                    "
+                />
+                <div
+                    class="flex items-center justify-between border-b border-slate-200 pb-2 dark:border-neutral-800"
+                >
+                    <div class="flex items-center gap-2 text-xs">
+                        <span
+                            class="font-medium text-slate-600 dark:text-neutral-400"
+                            >Participante Titular:</span
+                        >
+                        <strong
+                            class="text-sm font-bold text-slate-950 dark:text-white"
+                            >{{ studentName }}</strong
+                        >
                     </div>
-                    <Badge variant="outline" class="border-rose-300 text-rose-900 dark:border-rose-800 dark:text-rose-300 font-black text-xs bg-rose-50 dark:bg-rose-950">
-                        {{ records.length }} {{ records.length === 1 ? 'registro encontrado' : 'registros encontrados' }}
+                    <Badge
+                        variant="outline"
+                        class="border-rose-300 bg-rose-50 text-xs font-black text-rose-900 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                    >
+                        {{ records.length }}
+                        {{
+                            records.length === 1
+                                ? 'registro encontrado'
+                                : 'registros encontrados'
+                        }}
                     </Badge>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div
                         v-for="cert in records"
                         :key="cert.id"
-                        class="p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex flex-col justify-between space-y-4 hover:border-rose-400/80 transition-all shadow-xs"
+                        class="flex flex-col justify-between space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs transition-all hover:border-rose-400/80 sm:p-5 dark:border-neutral-800 dark:bg-neutral-900"
                     >
                         <div class="space-y-2.5">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-mono text-[11px] font-black bg-rose-100 text-rose-950 dark:bg-rose-950 dark:text-rose-200 px-2.5 py-0.5 rounded border border-rose-300 dark:border-rose-800">
+                            <div
+                                class="flex items-center justify-between gap-2"
+                            >
+                                <span
+                                    class="rounded border border-rose-300 bg-rose-100 px-2.5 py-0.5 font-mono text-[11px] font-black text-rose-950 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                                >
                                     {{ cert.course_code }}
                                 </span>
                                 <Badge
                                     variant="outline"
                                     class="text-[11px] font-black capitalize"
-                                    :class="cert.status === 'aprobado' ? 'bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800' : 'bg-sky-100 text-sky-900 border-sky-300 dark:bg-sky-950 dark:text-sky-200'"
+                                    :class="
+                                        cert.status === 'aprobado'
+                                            ? 'border-rose-300 bg-rose-100 text-rose-950 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200'
+                                            : 'border-sky-300 bg-sky-100 text-sky-900 dark:bg-sky-950 dark:text-sky-200'
+                                    "
                                 >
-                                    <CheckCircle2 class="size-3 mr-1 text-rose-800" />
+                                    <CheckCircle2
+                                        class="mr-1 size-3 text-rose-800"
+                                    />
                                     {{ cert.status }}
                                 </Badge>
                             </div>
 
-                            <h4 class="text-sm font-black text-slate-950 dark:text-white line-clamp-2 leading-snug">
+                            <h4
+                                class="line-clamp-2 text-sm leading-snug font-black text-slate-950 dark:text-white"
+                            >
                                 {{ cert.course_title }}
                             </h4>
 
                             <!-- Entidad convocante -->
-                            <div class="flex items-center gap-1.5 text-xs text-slate-700 dark:text-neutral-300">
-                                <Building2 class="size-3.5 text-rose-800 dark:text-rose-400 shrink-0" />
-                                <span class="font-semibold text-slate-900 dark:text-neutral-100 truncate">
+                            <div
+                                class="flex items-center gap-1.5 text-xs text-slate-700 dark:text-neutral-300"
+                            >
+                                <Building2
+                                    class="size-3.5 shrink-0 text-rose-800 dark:text-rose-400"
+                                />
+                                <span
+                                    class="truncate font-semibold text-slate-900 dark:text-neutral-100"
+                                >
                                     {{ cert.institution }}
                                 </span>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-800 dark:text-slate-200 pt-1">
+                            <div
+                                class="grid grid-cols-2 gap-2 pt-1 text-[11px] font-bold text-slate-800 dark:text-slate-200"
+                            >
                                 <span class="flex items-center gap-1">
-                                    <Clock class="size-3.5 text-amber-700 dark:text-amber-400" />
+                                    <Clock
+                                        class="size-3.5 text-amber-700 dark:text-amber-400"
+                                    />
                                     {{ formatHours(cert.hours) }}
                                 </span>
                                 <span class="flex items-center gap-1">
-                                    <Calendar class="size-3.5 text-rose-800 dark:text-rose-400" />
+                                    <Calendar
+                                        class="size-3.5 text-rose-800 dark:text-rose-400"
+                                    />
                                     {{ formatDate(cert.start_date, 'compact') }}
                                 </span>
                             </div>
 
                             <div class="flex items-center gap-2">
-                                <Badge class="bg-emerald-100 text-emerald-950 dark:bg-emerald-950 dark:text-emerald-200 border-emerald-300 font-bold text-xs py-0.5 px-2.5">
-                                    <CheckCircle2 class="size-3 mr-1 text-emerald-700" />
-                                    Calificación: {{ cert.final_grade }} / 20.00 ({{ cert.final_grade_text || 'Aprobado' }})
+                                <Badge
+                                    class="border-emerald-300 bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-950 dark:bg-emerald-950 dark:text-emerald-200"
+                                >
+                                    <CheckCircle2
+                                        class="mr-1 size-3 text-emerald-700"
+                                    />
+                                    Calificación: {{ cert.final_grade }} / 20.00
+                                    ({{ cert.final_grade_text || 'Aprobado' }})
                                 </Badge>
                             </div>
 
-                            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] space-y-1 font-mono text-slate-800 dark:text-slate-200">
-                                <div>Ponente / Docente: <strong class="text-slate-950 dark:text-white">{{ cert.instructor_name }}</strong></div>
-                                <div>Código Verif.: <strong class="text-rose-900 dark:text-rose-300 font-black">{{ cert.certificate_code }}</strong></div>
+                            <div
+                                class="space-y-1 rounded-xl border border-slate-200 bg-slate-50 p-2.5 font-mono text-[11px] text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200"
+                            >
+                                <div>
+                                    Ponente / Docente:
+                                    <strong
+                                        class="text-slate-950 dark:text-white"
+                                        >{{ cert.instructor_name }}</strong
+                                    >
+                                </div>
+                                <div>
+                                    Código Verif.:
+                                    <strong
+                                        class="font-black text-rose-900 dark:text-rose-300"
+                                        >{{ cert.certificate_code }}</strong
+                                    >
+                                </div>
                             </div>
                         </div>
 
                         <!-- Acciones: Ver Diploma Oficial + Descargar PDF -->
-                        <div class="pt-3 border-t border-slate-100 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-2">
-                            <span class="text-[11px] text-slate-600 dark:text-neutral-400 font-medium">
-                                Expedición: <strong>{{ cert.certificate_issued_at || cert.end_date || 'Oficial' }}</strong>
+                        <div
+                            class="flex flex-col items-center justify-between gap-2 border-t border-slate-100 pt-3 sm:flex-row dark:border-neutral-800"
+                        >
+                            <span
+                                class="text-[11px] font-medium text-slate-600 dark:text-neutral-400"
+                            >
+                                Expedición:
+                                <strong>{{
+                                    cert.certificate_issued_at ||
+                                    cert.end_date ||
+                                    'Oficial'
+                                }}</strong>
                             </span>
 
-                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <div
+                                class="flex w-full items-center gap-2 sm:w-auto"
+                            >
                                 <Button
                                     type="button"
                                     variant="outline"
                                     size="sm"
-                                    class="flex-1 sm:flex-none text-xs h-8.5 font-bold border-slate-300 hover:bg-rose-50 text-slate-800 hover:text-rose-900 cursor-pointer"
+                                    class="h-8.5 flex-1 cursor-pointer border-slate-300 text-xs font-bold text-slate-800 hover:bg-rose-50 hover:text-rose-900 sm:flex-none"
                                     @click="openPreview(cert)"
                                 >
-                                    <Eye class="size-3.5 mr-1 text-slate-600" />
+                                    <Eye class="mr-1 size-3.5 text-slate-600" />
                                     Ver Diploma
                                 </Button>
                                 <Button
                                     type="button"
                                     size="sm"
-                                    class="flex-1 sm:flex-none bg-rose-900 hover:bg-rose-950 text-white text-xs h-8.5 shadow-xs font-black cursor-pointer"
+                                    class="h-8.5 flex-1 cursor-pointer bg-rose-900 text-xs font-black text-white shadow-xs hover:bg-rose-950 sm:flex-none"
                                     @click="printOrDownloadCertificate(cert)"
                                 >
-                                    <Download class="size-3.5 mr-1" />
+                                    <Download class="mr-1 size-3.5" />
                                     Descargar PDF (2 Páginas)
                                 </Button>
                             </div>
@@ -520,35 +645,55 @@ function copyVerificationUrl(url: string) {
 
     <!-- MODAL DE VISTA PREVIA Y DESCARGA DEL DIPLOMA (SIN ESQUINAS CORTADAS) -->
     <Dialog v-model:open="isPreviewModalOpen">
-        <DialogContent class="w-[96vw] sm:max-w-4xl max-h-[92vh] flex flex-col p-0 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+        <DialogContent
+            class="flex max-h-[92vh] w-[96vw] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl sm:max-w-4xl dark:border-slate-800 dark:bg-slate-900"
+        >
             <!-- Header Institucional -->
-            <div class="p-4 sm:p-5 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50/90 dark:bg-slate-900/90">
-                <DialogHeader class="text-left space-y-1">
+            <div
+                class="shrink-0 border-b border-slate-200 bg-slate-50/90 p-4 pb-3 sm:p-5 dark:border-slate-800 dark:bg-slate-900/90"
+            >
+                <DialogHeader class="space-y-1 text-left">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <Award class="size-4 text-[#800020]" />
-                            <DialogTitle class="text-sm sm:text-base font-black text-slate-950 dark:text-white">
+                            <DialogTitle
+                                class="text-sm font-black text-slate-950 sm:text-base dark:text-white"
+                            >
                                 Diploma Oficial Acreditado
                             </DialogTitle>
                         </div>
-                        <Badge variant="outline" class="font-mono text-xs font-black text-[#800020] border-[#800020]/40">
+                        <Badge
+                            variant="outline"
+                            class="border-[#800020]/40 font-mono text-xs font-black text-[#800020]"
+                        >
                             {{ selectedCert?.certificate_code }}
                         </Badge>
                     </div>
-                    <DialogDescription class="text-xs text-slate-500 font-medium">
-                        Universidad Nacional de San Antonio Abad del Cusco • Registro Oficial de Fe Pública
+                    <DialogDescription
+                        class="text-xs font-medium text-slate-500"
+                    >
+                        Universidad Nacional de San Antonio Abad del Cusco •
+                        Registro Oficial de Fe Pública
                     </DialogDescription>
                 </DialogHeader>
             </div>
 
             <!-- Selector de Cara: Anverso vs Reverso -->
-            <div class="flex items-center justify-center p-2.5 bg-slate-100/90 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0">
-                <div class="inline-flex p-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs">
+            <div
+                class="flex shrink-0 items-center justify-center border-b border-slate-200 bg-slate-100/90 p-2.5 dark:border-slate-800 dark:bg-slate-900"
+            >
+                <div
+                    class="inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-xs dark:border-slate-700 dark:bg-slate-800"
+                >
                     <button
                         type="button"
                         @click="previewTab = 'anverso'"
-                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
-                        :class="previewTab === 'anverso' ? 'bg-[#800020] text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:text-[#800020]'"
+                        class="flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-bold transition-all"
+                        :class="
+                            previewTab === 'anverso'
+                                ? 'bg-[#800020] text-white shadow-xs'
+                                : 'text-slate-700 hover:text-[#800020] dark:text-slate-300'
+                        "
                     >
                         <Award class="size-3.5" />
                         <span>Anverso (Diploma)</span>
@@ -556,8 +701,12 @@ function copyVerificationUrl(url: string) {
                     <button
                         type="button"
                         @click="previewTab = 'reverso'"
-                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
-                        :class="previewTab === 'reverso' ? 'bg-[#800020] text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:text-[#800020]'"
+                        class="flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-bold transition-all"
+                        :class="
+                            previewTab === 'reverso'
+                                ? 'bg-[#800020] text-white shadow-xs'
+                                : 'text-slate-700 hover:text-[#800020] dark:text-slate-300'
+                        "
                     >
                         <QrCode class="size-3.5" />
                         <span>Reverso (Plan, Notas y QR)</span>
@@ -566,103 +715,219 @@ function copyVerificationUrl(url: string) {
             </div>
 
             <!-- Cuerpo Scrollable Interno -->
-            <div class="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 bg-slate-100/80 dark:bg-slate-950/60 flex items-start justify-center">
+            <div
+                class="flex flex-1 items-start justify-center overflow-y-auto overscroll-contain bg-slate-100/80 p-4 sm:p-6 dark:bg-slate-950/60"
+            >
                 <div v-if="selectedCert" class="w-full max-w-2xl">
                     <!-- CARA 1: ANVERSO -->
                     <div
                         v-if="previewTab === 'anverso'"
-                        class="bg-white dark:bg-slate-900 border-2 border-[#800020] p-6 sm:p-8 text-center space-y-4 rounded-2xl shadow-md"
+                        class="space-y-4 rounded-2xl border-2 border-[#800020] bg-white p-6 text-center shadow-md sm:p-8 dark:bg-slate-900"
                     >
-                        <div class="border border-[#b45309] p-4 sm:p-6 rounded-xl">
+                        <div
+                            class="rounded-xl border border-[#b45309] p-4 sm:p-6"
+                        >
                             <!-- Cabecera con 3 Logos -->
-                            <div class="flex items-center justify-between border-b-2 border-[#800020] pb-3 mb-4">
-                                <div class="w-14 flex justify-center">
-                                    <img src="/images/unsaac-logo.png" alt="UNSAAC" class="h-12 object-contain" />
+                            <div
+                                class="mb-4 flex items-center justify-between border-b-2 border-[#800020] pb-3"
+                            >
+                                <div class="flex w-14 justify-center">
+                                    <img
+                                        src="/images/unsaac-logo.png"
+                                        alt="UNSAAC"
+                                        class="h-12 object-contain"
+                                    />
                                 </div>
                                 <div class="flex-1 px-2 text-center">
-                                    <div class="text-[9px] font-black text-[#800020] tracking-widest uppercase">
+                                    <div
+                                        class="text-[9px] font-black tracking-widest text-[#800020] uppercase"
+                                    >
                                         REPÚBLICA DEL PERÚ • REGIÓN CUSCO
                                     </div>
-                                    <div class="text-xs sm:text-sm font-black text-slate-950 dark:text-white uppercase tracking-tight">
-                                        Universidad Nacional de San Antonio Abad del Cusco
+                                    <div
+                                        class="text-xs font-black tracking-tight text-slate-950 uppercase sm:text-sm dark:text-white"
+                                    >
+                                        Universidad Nacional de San Antonio Abad
+                                        del Cusco
                                     </div>
-                                    <div class="text-[9px] text-slate-600 dark:text-slate-400 uppercase tracking-wider font-semibold">
-                                        Facultad de Ing. Eléctrica, Electrónica, Informática y Mecánica
+                                    <div
+                                        class="text-[9px] font-semibold tracking-wider text-slate-600 uppercase dark:text-slate-400"
+                                    >
+                                        Facultad de Ing. Eléctrica, Electrónica,
+                                        Informática y Mecánica
                                     </div>
-                                    <div class="inline-block bg-[#800020] text-white text-[8px] font-bold px-2.5 py-0.5 rounded-full mt-1 uppercase tracking-wider">
+                                    <div
+                                        class="mt-1 inline-block rounded-full bg-[#800020] px-2.5 py-0.5 text-[8px] font-bold tracking-wider text-white uppercase"
+                                    >
                                         SIGC-CUSCO • ACREDITACIÓN OFICIAL
                                     </div>
                                 </div>
-                                <div class="w-14 flex justify-center">
-                                    <div class="size-12 rounded-full bg-gradient-to-tr from-amber-600 to-amber-300 text-[#800020] border-2 border-amber-600 flex flex-col items-center justify-center p-1 text-center shadow-xs">
-                                        <Sparkles class="size-3 text-amber-950" />
-                                        <span class="text-[7px] font-black text-[#800020] leading-none">CALIDAD</span>
+                                <div class="flex w-14 justify-center">
+                                    <div
+                                        class="flex size-12 flex-col items-center justify-center rounded-full border-2 border-amber-600 bg-gradient-to-tr from-amber-600 to-amber-300 p-1 text-center text-[#800020] shadow-xs"
+                                    >
+                                        <Sparkles
+                                            class="size-3 text-amber-950"
+                                        />
+                                        <span
+                                            class="text-[7px] leading-none font-black text-[#800020]"
+                                            >CALIDAD</span
+                                        >
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Título -->
-                            <div class="space-y-1 my-3">
-                                <h2 class="text-2xl font-black text-[#800020] uppercase tracking-widest font-serif">
+                            <div class="my-3 space-y-1">
+                                <h2
+                                    class="font-serif text-2xl font-black tracking-widest text-[#800020] uppercase"
+                                >
                                     CERTIFICADO
                                 </h2>
-                                <p class="text-[11px] text-slate-600 dark:text-slate-400 italic">
-                                    Por culminación académica satisfactoria y acreditación de competencias
+                                <p
+                                    class="text-[11px] text-slate-600 italic dark:text-slate-400"
+                                >
+                                    Por culminación académica satisfactoria y
+                                    acreditación de competencias
                                 </p>
                             </div>
 
                             <!-- Otorgado a -->
                             <div class="my-4">
-                                <p class="text-[11px] text-slate-600 uppercase tracking-wider font-bold">Conferido a:</p>
-                                <div class="text-xl font-black text-slate-950 dark:text-white uppercase tracking-tight py-1 border-b-2 border-[#800020] inline-block px-4">
+                                <p
+                                    class="text-[11px] font-bold tracking-wider text-slate-600 uppercase"
+                                >
+                                    Conferido a:
+                                </p>
+                                <div
+                                    class="inline-block border-b-2 border-[#800020] px-4 py-1 text-xl font-black tracking-tight text-slate-950 uppercase dark:text-white"
+                                >
                                     {{ selectedCert.student_name }}
                                 </div>
                                 <div class="mt-2">
-                                    <span class="text-xs font-mono font-bold bg-rose-50 dark:bg-rose-950/60 text-[#800020] border border-rose-200 px-3.5 py-1 rounded-full">
+                                    <span
+                                        class="rounded-full border border-rose-200 bg-rose-50 px-3.5 py-1 font-mono text-xs font-bold text-[#800020] dark:bg-rose-950/60"
+                                    >
                                         D.N.I. N° {{ selectedCert.dni }}
                                     </span>
                                 </div>
                             </div>
 
                             <!-- Motivo -->
-                            <div class="text-xs text-slate-700 dark:text-slate-300 max-w-lg mx-auto leading-relaxed my-3 font-serif">
-                                Por haber aprobado el programa de capacitación en:
-                                <strong class="text-[#800020] block my-1 text-sm font-black">
+                            <div
+                                class="mx-auto my-3 max-w-lg font-serif text-xs leading-relaxed text-slate-700 dark:text-slate-300"
+                            >
+                                Por haber aprobado el programa de capacitación
+                                en:
+                                <strong
+                                    class="my-1 block text-sm font-black text-[#800020]"
+                                >
                                     "{{ selectedCert.course_title }}"
                                 </strong>
-                                desarrollado <strong>{{ selectedCert.date_range_formal || formatSpanishDateRange(selectedCert.start_date, selectedCert.end_date) }}</strong>,
-                                con un total de <strong>{{ formatHours(selectedCert.hours) }}</strong> lectivas.
+                                desarrollado
+                                <strong>{{
+                                    selectedCert.date_range_formal ||
+                                    formatSpanishDateRange(
+                                        selectedCert.start_date,
+                                        selectedCert.end_date,
+                                    )
+                                }}</strong
+                                >, con un total de
+                                <strong>{{
+                                    formatHours(selectedCert.hours)
+                                }}</strong>
+                                lectivas.
                             </div>
 
                             <!-- Calificación -->
-                            <div class="my-3 inline-flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-4 py-1.5 rounded-full text-xs font-bold text-slate-900 dark:text-white">
+                            <div
+                                class="my-3 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-slate-50 px-4 py-1.5 text-xs font-bold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                            >
                                 <span>Calificación:</span>
-                                <span class="text-emerald-700 dark:text-emerald-400 font-black">{{ selectedCert.final_grade }} / 20.00</span>
-                                <span class="text-slate-600 dark:text-slate-400 font-semibold">({{ selectedCert.final_grade_text || 'Aprobado' }})</span>
+                                <span
+                                    class="font-black text-emerald-700 dark:text-emerald-400"
+                                    >{{ selectedCert.final_grade }} /
+                                    20.00</span
+                                >
+                                <span
+                                    class="font-semibold text-slate-600 dark:text-slate-400"
+                                    >({{
+                                        selectedCert.final_grade_text ||
+                                        'Aprobado'
+                                    }})</span
+                                >
                             </div>
 
                             <!-- Fecha Formal -->
-                            <div class="text-right text-[11px] font-serif font-bold text-slate-600 dark:text-slate-400 italic pr-2 my-1">
-                                {{ selectedCert.city_issued_formal || ('Cusco, ' + formatSpanishDate(selectedCert.certificate_issued_at || selectedCert.end_date)) }}
+                            <div
+                                class="my-1 pr-2 text-right font-serif text-[11px] font-bold text-slate-600 italic dark:text-slate-400"
+                            >
+                                {{
+                                    selectedCert.city_issued_formal ||
+                                    'Cusco, ' +
+                                        formatSpanishDate(
+                                            selectedCert.certificate_issued_at ||
+                                                selectedCert.end_date,
+                                        )
+                                }}
                             </div>
 
                             <!-- Firmas -->
-                            <div class="pt-5 grid grid-cols-2 gap-6 text-xs border-t border-slate-300 dark:border-slate-800 mt-4">
+                            <div
+                                class="mt-4 grid grid-cols-2 gap-6 border-t border-slate-300 pt-5 text-xs dark:border-slate-800"
+                            >
                                 <div>
-                                    <div class="font-black text-slate-900 dark:text-white uppercase">{{ selectedCert.instructor_name }}</div>
-                                    <div class="text-[10px] text-slate-500 uppercase">{{ selectedCert.instructor_title || 'Docente Responsable' }}</div>
+                                    <div
+                                        class="font-black text-slate-900 uppercase dark:text-white"
+                                    >
+                                        {{ selectedCert.instructor_name }}
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-slate-500 uppercase"
+                                    >
+                                        {{
+                                            selectedCert.instructor_title ||
+                                            'Docente Responsable'
+                                        }}
+                                    </div>
                                 </div>
                                 <div>
-                                    <div class="font-black text-slate-900 dark:text-white uppercase">Dirección Académica</div>
-                                    <div class="text-[10px] text-slate-500 uppercase">Coordinación General SIGC</div>
+                                    <div
+                                        class="font-black text-slate-900 uppercase dark:text-white"
+                                    >
+                                        Dirección Académica
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-slate-500 uppercase"
+                                    >
+                                        Coordinación General SIGC
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Pie -->
-                            <div class="pt-3 text-[10px] font-mono text-slate-500 flex justify-between items-center border-t border-dashed border-slate-300 dark:border-slate-800 mt-4">
-                                <span>Cód: <strong>{{ selectedCert.certificate_code }}</strong></span>
-                                <span>Emisión: <strong>{{ selectedCert.issued_date_formal || formatSpanishDate(selectedCert.certificate_issued_at || selectedCert.end_date) }}</strong></span>
-                                <span class="text-[#800020] font-bold">VÁLIDO OFICIALMENTE • CUSCO</span>
+                            <div
+                                class="mt-4 flex items-center justify-between border-t border-dashed border-slate-300 pt-3 font-mono text-[10px] text-slate-500 dark:border-slate-800"
+                            >
+                                <span
+                                    >Cód:
+                                    <strong>{{
+                                        selectedCert.certificate_code
+                                    }}</strong></span
+                                >
+                                <span
+                                    >Emisión:
+                                    <strong>{{
+                                        selectedCert.issued_date_formal ||
+                                        formatSpanishDate(
+                                            selectedCert.certificate_issued_at ||
+                                                selectedCert.end_date,
+                                        )
+                                    }}</strong></span
+                                >
+                                <span class="font-bold text-[#800020]"
+                                    >VÁLIDO OFICIALMENTE • CUSCO</span
+                                >
                             </div>
                         </div>
                     </div>
@@ -670,42 +935,71 @@ function copyVerificationUrl(url: string) {
                     <!-- CARA 2: REVERSO -->
                     <div
                         v-else
-                        class="bg-white dark:bg-slate-900 border-2 border-[#800020] p-6 text-left space-y-4 rounded-2xl shadow-md"
+                        class="space-y-4 rounded-2xl border-2 border-[#800020] bg-white p-6 text-left shadow-md dark:bg-slate-900"
                     >
                         <div class="border-b-2 border-[#800020] pb-2">
-                            <div class="text-[10px] font-black text-[#800020] uppercase">
-                                UNIVERSIDAD NACIONAL DE SAN ANTONIO ABAD DEL CUSCO • SIGC
+                            <div
+                                class="text-[10px] font-black text-[#800020] uppercase"
+                            >
+                                UNIVERSIDAD NACIONAL DE SAN ANTONIO ABAD DEL
+                                CUSCO • SIGC
                             </div>
-                            <h3 class="text-base font-black text-slate-950 dark:text-white uppercase">
+                            <h3
+                                class="text-base font-black text-slate-950 uppercase dark:text-white"
+                            >
                                 Plan Curricular y Registro de Calificación
                             </h3>
-                            <p class="text-xs text-slate-600 dark:text-slate-400">
-                                Curso: <strong>{{ selectedCert.course_title }}</strong> ({{ selectedCert.course_code }})
+                            <p
+                                class="text-xs text-slate-600 dark:text-slate-400"
+                            >
+                                Curso:
+                                <strong>{{ selectedCert.course_title }}</strong>
+                                ({{ selectedCert.course_code }})
                             </p>
                         </div>
 
                         <!-- Módulos -->
                         <div class="space-y-2">
-                            <div class="text-xs font-black text-[#800020] uppercase flex items-center justify-between">
+                            <div
+                                class="flex items-center justify-between text-xs font-black text-[#800020] uppercase"
+                            >
                                 <span class="flex items-center gap-1">
                                     <BookOpen class="size-3.5" />
                                     Módulos Académicos
                                 </span>
-                                <span class="text-[10px] text-slate-500">{{ selectedCert.hours }} Horas</span>
+                                <span class="text-[10px] text-slate-500"
+                                    >{{ selectedCert.hours }} Horas</span
+                                >
                             </div>
 
-                            <div class="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+                            <div
+                                class="custom-scrollbar max-h-48 space-y-2 overflow-y-auto pr-1"
+                            >
                                 <div
-                                    v-for="(module, index) in selectedCert.modules"
+                                    v-for="(
+                                        module, index
+                                    ) in selectedCert.modules"
                                     :key="index"
-                                    class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border-l-4 border-l-[#800020] text-xs"
+                                    class="rounded-xl border-l-4 border-l-[#800020] bg-slate-50 p-2.5 text-xs dark:bg-slate-800"
                                 >
-                                    <div class="flex items-center justify-between font-bold text-slate-900 dark:text-white">
-                                        <span class="text-[#800020] font-black mr-2">{{ module.number }}</span>
-                                        <span class="flex-1 truncate">{{ module.title }}</span>
-                                        <span class="text-[10px] text-slate-500 font-mono">{{ module.hours }}</span>
+                                    <div
+                                        class="flex items-center justify-between font-bold text-slate-900 dark:text-white"
+                                    >
+                                        <span
+                                            class="mr-2 font-black text-[#800020]"
+                                            >{{ module.number }}</span
+                                        >
+                                        <span class="flex-1 truncate">{{
+                                            module.title
+                                        }}</span>
+                                        <span
+                                            class="font-mono text-[10px] text-slate-500"
+                                            >{{ module.hours }}</span
+                                        >
                                     </div>
-                                    <p class="text-[10px] text-slate-600 dark:text-slate-400 mt-0.5">
+                                    <p
+                                        class="mt-0.5 text-[10px] text-slate-600 dark:text-slate-400"
+                                    >
                                         {{ module.topics }}
                                     </p>
                                 </div>
@@ -713,88 +1007,167 @@ function copyVerificationUrl(url: string) {
                         </div>
 
                         <!-- Calificación y Docente -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                            <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 flex items-center justify-between">
+                        <div class="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
+                            <div
+                                class="flex items-center justify-between rounded-xl border border-emerald-300 bg-emerald-50 p-3 dark:border-emerald-800 dark:bg-emerald-950/40"
+                            >
                                 <div>
-                                    <div class="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 uppercase">Calificación</div>
-                                    <div class="text-2xl font-black text-emerald-950 dark:text-emerald-100">{{ selectedCert.final_grade }}</div>
-                                    <div class="text-[9px] font-bold text-emerald-700">{{ selectedCert.final_grade_text || 'Sobresaliente' }}</div>
+                                    <div
+                                        class="text-[10px] font-bold text-emerald-800 uppercase dark:text-emerald-300"
+                                    >
+                                        Calificación
+                                    </div>
+                                    <div
+                                        class="text-2xl font-black text-emerald-950 dark:text-emerald-100"
+                                    >
+                                        {{ selectedCert.final_grade }}
+                                    </div>
+                                    <div
+                                        class="text-[9px] font-bold text-emerald-700"
+                                    >
+                                        {{
+                                            selectedCert.final_grade_text ||
+                                            'Sobresaliente'
+                                        }}
+                                    </div>
                                 </div>
-                                <Badge class="bg-emerald-700 text-white font-black text-xs">✓ APROBADO</Badge>
+                                <Badge
+                                    class="bg-emerald-700 text-xs font-black text-white"
+                                    >✓ APROBADO</Badge
+                                >
                             </div>
 
-                            <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                <div class="text-[10px] font-bold text-slate-500 uppercase">Docente:</div>
-                                <div class="text-xs font-black text-slate-900 dark:text-white uppercase mt-0.5">{{ selectedCert.instructor_name }}</div>
-                                <div class="text-[10px] text-slate-600">{{ selectedCert.institution || 'UNSAAC' }}</div>
+                            <div
+                                class="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800"
+                            >
+                                <div
+                                    class="text-[10px] font-bold text-slate-500 uppercase"
+                                >
+                                    Docente:
+                                </div>
+                                <div
+                                    class="mt-0.5 text-xs font-black text-slate-900 uppercase dark:text-white"
+                                >
+                                    {{ selectedCert.instructor_name }}
+                                </div>
+                                <div class="text-[10px] text-slate-600">
+                                    {{ selectedCert.institution || 'UNSAAC' }}
+                                </div>
                             </div>
                         </div>
 
                         <!-- QR Permanente -->
-                        <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border-2 border-[#800020] flex items-center gap-3">
-                            <div class="size-20 bg-white border border-slate-200 rounded p-1 shrink-0 flex items-center justify-center">
-                                <div v-html="selectedCert.qr_svg" class="size-full [&>svg]:size-full"></div>
+                        <div
+                            class="flex items-center gap-3 rounded-xl border-2 border-[#800020] bg-white p-3 dark:bg-slate-800"
+                        >
+                            <div
+                                class="flex size-20 shrink-0 items-center justify-center rounded border border-slate-200 bg-white p-1"
+                            >
+                                <div
+                                    v-html="selectedCert.qr_svg"
+                                    class="size-full [&>svg]:size-full"
+                                ></div>
                             </div>
-                            <div class="flex-1 min-w-0 space-y-1">
-                                <div class="text-xs font-black text-[#800020] uppercase flex items-center gap-1">
+                            <div class="min-w-0 flex-1 space-y-1">
+                                <div
+                                    class="flex items-center gap-1 text-xs font-black text-[#800020] uppercase"
+                                >
                                     <QrCode class="size-3.5" />
                                     QR Permanente de Verificación
                                 </div>
-                                <p class="text-[10px] text-slate-600 dark:text-slate-400">
-                                    Escanee para validar en tiempo real la autenticidad e integridad del certificado.
+                                <p
+                                    class="text-[10px] text-slate-600 dark:text-slate-400"
+                                >
+                                    Escanee para validar en tiempo real la
+                                    autenticidad e integridad del certificado.
                                 </p>
-                                <a :href="selectedCert.verification_url" target="_blank" class="text-[9px] font-mono text-blue-700 hover:underline truncate block">
+                                <a
+                                    :href="selectedCert.verification_url"
+                                    target="_blank"
+                                    class="block truncate font-mono text-[9px] text-blue-700 hover:underline"
+                                >
                                     {{ selectedCert.verification_url }}
                                 </a>
                             </div>
                         </div>
 
                         <!-- Hash SHA-256 -->
-                        <div v-if="selectedCert.certificate_hash" class="p-2 rounded bg-slate-50 dark:bg-slate-800 border text-[9px] font-mono break-all text-slate-600">
-                            <strong>SHA-256:</strong> {{ selectedCert.certificate_hash }}
+                        <div
+                            v-if="selectedCert.certificate_hash"
+                            class="rounded border bg-slate-50 p-2 font-mono text-[9px] break-all text-slate-600 dark:bg-slate-800"
+                        >
+                            <strong>SHA-256:</strong>
+                            {{ selectedCert.certificate_hash }}
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Footer Fijo -->
-            <DialogFooter class="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50/90 dark:bg-slate-900/90">
+            <DialogFooter
+                class="flex shrink-0 flex-col items-center justify-between gap-3 border-t border-slate-200 bg-slate-50/90 p-4 sm:flex-row dark:border-slate-800 dark:bg-slate-900/90"
+            >
                 <div class="flex items-center gap-2">
                     <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        class="text-xs font-bold border-slate-300"
-                        @click="selectedCert && copyVerificationCode(selectedCert.certificate_code)"
+                        class="border-slate-300 text-xs font-bold"
+                        @click="
+                            selectedCert &&
+                            copyVerificationCode(selectedCert.certificate_code)
+                        "
                     >
-                        <Check v-if="copiedCode" class="size-3.5 mr-1 text-[#800020]" />
-                        <Copy v-else class="size-3.5 mr-1" />
-                        <span>{{ copiedCode ? '¡Código Copiado!' : 'Copiar Código' }}</span>
+                        <Check
+                            v-if="copiedCode"
+                            class="mr-1 size-3.5 text-[#800020]"
+                        />
+                        <Copy v-else class="mr-1 size-3.5" />
+                        <span>{{
+                            copiedCode ? '¡Código Copiado!' : 'Copiar Código'
+                        }}</span>
                     </Button>
                     <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        class="text-xs font-bold border-slate-300"
-                        @click="selectedCert && copyVerificationUrl(selectedCert.verification_url)"
+                        class="border-slate-300 text-xs font-bold"
+                        @click="
+                            selectedCert &&
+                            copyVerificationUrl(selectedCert.verification_url)
+                        "
                     >
-                        <Check v-if="copiedUrl" class="size-3.5 mr-1 text-[#800020]" />
-                        <Share2 v-else class="size-3.5 mr-1" />
-                        <span>{{ copiedUrl ? '¡Enlace Copiado!' : 'Copiar Enlace QR' }}</span>
+                        <Check
+                            v-if="copiedUrl"
+                            class="mr-1 size-3.5 text-[#800020]"
+                        />
+                        <Share2 v-else class="mr-1 size-3.5" />
+                        <span>{{
+                            copiedUrl ? '¡Enlace Copiado!' : 'Copiar Enlace QR'
+                        }}</span>
                     </Button>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <Button type="button" variant="ghost" size="sm" class="text-xs" @click="isPreviewModalOpen = false">
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        class="text-xs"
+                        @click="isPreviewModalOpen = false"
+                    >
                         Cerrar
                     </Button>
                     <Button
                         type="button"
                         size="sm"
-                        class="bg-[#800020] hover:bg-[#5a0017] text-white font-bold text-xs shadow-xs cursor-pointer"
-                        @click="selectedCert && printOrDownloadCertificate(selectedCert)"
+                        class="cursor-pointer bg-[#800020] text-xs font-bold text-white shadow-xs hover:bg-[#5a0017]"
+                        @click="
+                            selectedCert &&
+                            printOrDownloadCertificate(selectedCert)
+                        "
                     >
-                        <Printer class="size-3.5 mr-1.5" />
+                        <Printer class="mr-1.5 size-3.5" />
                         Imprimir / Guardar en PDF (2 Páginas)
                     </Button>
                 </div>

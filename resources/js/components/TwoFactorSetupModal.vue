@@ -56,7 +56,8 @@ const modalConfig = computed<TwoFactorConfigContent>(() => {
     if (showVerificationStep.value) {
         return {
             title: 'Verificar código de autenticación',
-            description: 'Ingresa el código de 6 dígitos generado por tu aplicación autenticadora',
+            description:
+                'Ingresa el código de 6 dígitos generado por tu aplicación autenticadora',
             buttonText: 'Continuar',
         };
     }

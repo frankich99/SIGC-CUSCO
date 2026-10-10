@@ -84,7 +84,8 @@ const handleCancel = () => {
                 v-focus
             />
             <p class="text-xs text-muted-foreground">
-                Un nombre claro te ayudará a identificar este dispositivo más adelante.
+                Un nombre claro te ayudará a identificar este dispositivo más
+                adelante.
             </p>
         </div>
 

@@ -18,7 +18,8 @@ defineProps<{
 defineOptions({
     layout: {
         title: 'Crear una Cuenta',
-        description: 'Ingresa tus datos a continuación para registrarte en el sistema de capacitaciones',
+        description:
+            'Ingresa tus datos a continuación para registrarte en el sistema de capacitaciones',
     },
 });
 </script>
@@ -34,7 +35,10 @@ defineOptions({
     >
         <div class="grid gap-4">
             <div class="grid gap-1.5">
-                <Label for="name" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                <Label
+                    for="name"
+                    class="text-xs font-bold text-slate-800 dark:text-slate-200"
+                >
                     Nombre completo
                 </Label>
                 <Input
@@ -46,13 +50,16 @@ defineOptions({
                     autocomplete="name"
                     name="name"
                     placeholder="Nombres y Apellidos"
-                    class="text-xs text-slate-900 font-medium"
+                    class="text-xs font-medium text-slate-900"
                 />
                 <InputError :message="errors.name" />
             </div>
 
             <div class="grid gap-1.5">
-                <Label for="email" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                <Label
+                    for="email"
+                    class="text-xs font-bold text-slate-800 dark:text-slate-200"
+                >
                     Correo electrónico
                 </Label>
                 <Input
@@ -63,14 +70,17 @@ defineOptions({
                     autocomplete="email"
                     name="email"
                     placeholder="correo@ejemplo.com"
-                    class="text-xs text-slate-900 font-medium"
+                    class="text-xs font-medium text-slate-900"
                 />
                 <InputError :message="errors.email" />
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div class="grid gap-1.5">
-                    <Label for="password" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    <Label
+                        for="password"
+                        class="text-xs font-bold text-slate-800 dark:text-slate-200"
+                    >
                         Contraseña
                     </Label>
                     <PasswordInput
@@ -87,7 +97,10 @@ defineOptions({
                 </div>
 
                 <div class="grid gap-1.5">
-                    <Label for="password_confirmation" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    <Label
+                        for="password_confirmation"
+                        class="text-xs font-bold text-slate-800 dark:text-slate-200"
+                    >
                         Confirmar
                     </Label>
                     <PasswordInput
@@ -106,22 +119,24 @@ defineOptions({
 
             <Button
                 type="submit"
-                class="mt-2 w-full bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs h-10 shadow-xs cursor-pointer"
+                class="mt-2 h-10 w-full cursor-pointer bg-rose-900 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
                 tabindex="5"
                 :disabled="processing"
                 data-test="register-user-button"
             >
                 <Spinner v-if="processing" />
-                <UserPlus v-else class="size-4 mr-1.5" />
+                <UserPlus v-else class="mr-1.5 size-4" />
                 Registrar Cuenta
             </Button>
         </div>
 
-        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 text-center text-xs text-slate-600 dark:text-slate-400 font-medium">
+        <div
+            class="border-t border-slate-100 pt-3 text-center text-xs font-medium text-slate-600 dark:border-slate-800 dark:text-slate-400"
+        >
             ¿Ya tienes una cuenta registrada?
             <TextLink
                 :href="login()"
-                class="text-rose-900 dark:text-rose-400 font-bold hover:underline ml-1"
+                class="ml-1 font-bold text-rose-900 hover:underline dark:text-rose-400"
                 :tabindex="6"
             >
                 Inicia sesión aquí

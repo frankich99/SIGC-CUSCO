@@ -34,7 +34,8 @@ const passwordInput = useTemplateRef('passwordInput');
             <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
                 <p class="font-medium">Advertencia</p>
                 <p class="text-sm">
-                    Por favor procede con precaución, esta acción no se puede deshacer.
+                    Por favor procede con precaución, esta acción no se puede
+                    deshacer.
                 </p>
             </div>
             <Dialog>
@@ -56,12 +57,14 @@ const passwordInput = useTemplateRef('passwordInput');
                     >
                         <DialogHeader class="space-y-3">
                             <DialogTitle
-                                >¿Estás seguro de que deseas eliminar tu cuenta?</DialogTitle
+                                >¿Estás seguro de que deseas eliminar tu
+                                cuenta?</DialogTitle
                             >
                             <DialogDescription>
-                                Una vez que tu cuenta sea eliminada, todos sus datos
-                                y recursos se borrarán permanentemente. Por favor,
-                                ingresa tu contraseña para confirmar la eliminación.
+                                Una vez que tu cuenta sea eliminada, todos sus
+                                datos y recursos se borrarán permanentemente.
+                                Por favor, ingresa tu contraseña para confirmar
+                                la eliminación.
                             </DialogDescription>
                         </DialogHeader>
 

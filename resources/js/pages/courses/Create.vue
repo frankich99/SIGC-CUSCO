@@ -5,7 +5,13 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import {
@@ -69,28 +75,32 @@ const statusOptions = [
         value: 'abierto',
         label: 'Abierto',
         dotClass: 'bg-emerald-500 shadow-xs shadow-emerald-500/50',
-        activeClass: 'bg-emerald-50/90 dark:bg-emerald-950/60 border-emerald-500 text-emerald-950 dark:text-emerald-100 ring-2 ring-emerald-500/20 shadow-xs',
+        activeClass:
+            'bg-emerald-50/90 dark:bg-emerald-950/60 border-emerald-500 text-emerald-950 dark:text-emerald-100 ring-2 ring-emerald-500/20 shadow-xs',
         checkBadgeClass: 'bg-emerald-600 text-white',
     },
     {
         value: 'en_curso',
         label: 'En Curso',
         dotClass: 'bg-blue-500 shadow-xs shadow-blue-500/50',
-        activeClass: 'bg-blue-50/90 dark:bg-blue-950/60 border-blue-500 text-blue-950 dark:text-blue-100 ring-2 ring-blue-500/20 shadow-xs',
+        activeClass:
+            'bg-blue-50/90 dark:bg-blue-950/60 border-blue-500 text-blue-950 dark:text-blue-100 ring-2 ring-blue-500/20 shadow-xs',
         checkBadgeClass: 'bg-blue-600 text-white',
     },
     {
         value: 'concluido',
         label: 'Concluido',
         dotClass: 'bg-purple-500 shadow-xs shadow-purple-500/50',
-        activeClass: 'bg-purple-50/90 dark:bg-purple-950/60 border-purple-500 text-purple-950 dark:text-purple-100 ring-2 ring-purple-500/20 shadow-xs',
+        activeClass:
+            'bg-purple-50/90 dark:bg-purple-950/60 border-purple-500 text-purple-950 dark:text-purple-100 ring-2 ring-purple-500/20 shadow-xs',
         checkBadgeClass: 'bg-purple-600 text-white',
     },
     {
         value: 'cancelado',
         label: 'Cancelado',
         dotClass: 'bg-rose-500 shadow-xs shadow-rose-500/50',
-        activeClass: 'bg-rose-50/90 dark:bg-rose-950/60 border-rose-500 text-rose-950 dark:text-rose-100 ring-2 ring-rose-500/20 shadow-xs',
+        activeClass:
+            'bg-rose-50/90 dark:bg-rose-950/60 border-rose-500 text-rose-950 dark:text-rose-100 ring-2 ring-rose-500/20 shadow-xs',
         checkBadgeClass: 'bg-rose-600 text-white',
     },
 ];
@@ -105,7 +115,10 @@ const isDateOrderInvalid = computed(() => {
 function submit() {
     form.post('/courses', {
         onError: () => {
-            notify.error('Errores en el formulario', 'Revise los campos requeridos marcados en rojo.');
+            notify.error(
+                'Errores en el formulario',
+                'Revise los campos requeridos marcados en rojo.',
+            );
         },
     });
 }
@@ -115,32 +128,50 @@ function submit() {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Registrar Nueva Capacitación - SIGC-CUSCO" />
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        <div
+            class="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
+        >
             <!-- CABECERA INSTITUCIONAL GRANATE CUSCO -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/90 dark:border-slate-800 pb-5">
+            <div
+                class="flex flex-col justify-between gap-4 border-b border-slate-200/90 pb-5 sm:flex-row sm:items-center dark:border-slate-800"
+            >
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
-                        <div class="size-10 rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] text-white flex items-center justify-center shadow-xs shrink-0 ring-1 ring-rose-950/20">
+                        <div
+                            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] text-white shadow-xs ring-1 ring-rose-950/20"
+                        >
                             <GraduationCap class="size-5 text-amber-300" />
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-950 dark:text-white">
+                                <h1
+                                    class="text-xl font-black tracking-tight text-slate-950 sm:text-2xl dark:text-white"
+                                >
                                     Registrar Nueva Capacitación
                                 </h1>
-                                <span class="hidden sm:inline-flex text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-rose-100 text-rose-950 dark:bg-rose-950 dark:text-rose-200 border border-rose-300 dark:border-rose-800">
+                                <span
+                                    class="hidden rounded-full border border-rose-300 bg-rose-100 px-2 py-0.5 text-[10px] font-black text-rose-950 uppercase sm:inline-flex dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                                >
                                     Oficial UNSAAC
                                 </span>
                             </div>
-                            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-                                Apertura y configuración del programa académico institucional.
+                            <p
+                                class="text-xs font-medium text-slate-600 sm:text-sm dark:text-slate-400"
+                            >
+                                Apertura y configuración del programa académico
+                                institucional.
                             </p>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2.5">
-                    <Button as-child variant="outline" size="sm" class="text-xs font-bold border-slate-300 hover:text-rose-900 hover:bg-rose-50 cursor-pointer shadow-2xs">
+                    <Button
+                        as-child
+                        variant="outline"
+                        size="sm"
+                        class="cursor-pointer border-slate-300 text-xs font-bold shadow-2xs hover:bg-rose-50 hover:text-rose-900"
+                    >
                         <Link href="/courses">
                             <ArrowLeft class="mr-1.5 size-3.5 text-rose-800" />
                             Volver al Catálogo
@@ -152,31 +183,50 @@ function submit() {
             <!-- FORMULARIO INSTITUCIONAL -->
             <form @submit.prevent="submit" class="space-y-6">
                 <!-- SECCIÓN 1: IDENTIFICACIÓN Y CONVOCATORIA -->
-                <Card class="border border-slate-200/90 dark:border-slate-800 shadow-xs bg-white dark:bg-slate-900 rounded-2xl overflow-hidden">
-                    <CardHeader class="bg-slate-50/70 dark:bg-slate-900/80 border-b pb-3.5 px-5 sm:px-6">
-                        <div class="flex items-center gap-2 text-xs font-black text-rose-900 dark:text-rose-400 uppercase tracking-wider">
+                <Card
+                    class="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900"
+                >
+                    <CardHeader
+                        class="border-b bg-slate-50/70 px-5 pb-3.5 sm:px-6 dark:bg-slate-900/80"
+                    >
+                        <div
+                            class="flex items-center gap-2 text-xs font-black tracking-wider text-rose-900 uppercase dark:text-rose-400"
+                        >
                             <BookOpen class="size-4 text-rose-800" />
                             <span>1. Identificación y Convocatoria</span>
                         </div>
-                        <CardTitle class="text-base font-bold text-slate-950 dark:text-white">
+                        <CardTitle
+                            class="text-base font-bold text-slate-950 dark:text-white"
+                        >
                             Datos Generales del Programa
                         </CardTitle>
-                        <CardDescription class="text-xs text-slate-600 dark:text-slate-400">
-                            El código institucional es asignado automáticamente y el título figurará en las certificaciones emitidas.
+                        <CardDescription
+                            class="text-xs text-slate-600 dark:text-slate-400"
+                        >
+                            El código institucional es asignado automáticamente
+                            y el título figurará en las certificaciones
+                            emitidas.
                         </CardDescription>
                     </CardHeader>
 
-                    <CardContent class="p-5 sm:p-6 space-y-5">
+                    <CardContent class="space-y-5 p-5 sm:p-6">
                         <!-- Fila 1: Código Autogenerado + Estado Inicial -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <!-- Código del Curso (Autogenerado Incremental, Readonly) -->
                             <div class="space-y-1.5">
                                 <div class="flex items-center justify-between">
-                                    <Label for="code" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                                        <Sparkles class="size-3.5 text-amber-600" />
+                                    <Label
+                                        for="code"
+                                        class="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200"
+                                    >
+                                        <Sparkles
+                                            class="size-3.5 text-amber-600"
+                                        />
                                         <span>Código Institucional</span>
                                     </Label>
-                                    <span class="text-[10px] font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-800 flex items-center gap-1">
+                                    <span
+                                        class="flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-800 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+                                    >
                                         <Lock class="size-2.5" />
                                         Autogenerado Incremental
                                     </span>
@@ -187,31 +237,47 @@ function submit() {
                                         :value="form.code"
                                         readonly
                                         tabindex="-1"
-                                        class="font-mono text-sm font-black tracking-wider h-10 border-slate-300 dark:border-slate-700 bg-slate-100/90 dark:bg-slate-800/80 text-rose-950 dark:text-rose-200 cursor-not-allowed select-none pl-3 pr-10"
+                                        class="h-10 cursor-not-allowed border-slate-300 bg-slate-100/90 pr-10 pl-3 font-mono text-sm font-black tracking-wider text-rose-950 select-none dark:border-slate-700 dark:bg-slate-800/80 dark:text-rose-200"
                                     />
-                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                                    <div
+                                        class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-slate-400"
+                                    >
                                         <Lock class="size-4" />
                                     </div>
                                 </div>
-                                <p class="text-[11px] text-slate-500 font-medium">
-                                    Generado automáticamente en orden correlativo oficial. No modificable.
+                                <p
+                                    class="text-[11px] font-medium text-slate-500"
+                                >
+                                    Generado automáticamente en orden
+                                    correlativo oficial. No modificable.
                                 </p>
                             </div>
 
                             <!-- Estado Inicial de la Convocatoria -->
                             <div class="space-y-1.5">
                                 <div class="flex items-center justify-between">
-                                    <Label class="text-xs font-bold text-slate-800 dark:text-slate-200">
-                                        Estado de la Convocatoria <span class="text-rose-700">*</span>
+                                    <Label
+                                        class="text-xs font-bold text-slate-800 dark:text-slate-200"
+                                    >
+                                        Estado de la Convocatoria
+                                        <span class="text-rose-700">*</span>
                                     </Label>
                                     <Badge
-                                        class="text-[10px] font-bold capitalize py-0.5 px-2.5 rounded-full"
-                                        :class="THEME_BADGES[form.status as keyof typeof THEME_BADGES] || 'bg-slate-100 text-slate-800'"
+                                        class="rounded-full px-2.5 py-0.5 text-[10px] font-bold capitalize"
+                                        :class="
+                                            THEME_BADGES[
+                                                form.status as keyof typeof THEME_BADGES
+                                            ] || 'bg-slate-100 text-slate-800'
+                                        "
                                     >
                                         {{ form.status.replace('_', ' ') }}
                                     </Badge>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Estado de la convocatoria">
+                                <div
+                                    class="grid grid-cols-2 gap-2"
+                                    role="radiogroup"
+                                    aria-label="Estado de la convocatoria"
+                                >
                                     <button
                                         v-for="st in statusOptions"
                                         :key="st.value"
@@ -219,28 +285,44 @@ function submit() {
                                         role="radio"
                                         :aria-checked="form.status === st.value"
                                         @click="form.status = st.value"
-                                        class="h-10 px-3 flex items-center justify-between rounded-xl border text-xs font-bold transition-all duration-150 select-none shadow-2xs cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-rose-800/30"
-                                        :class="form.status === st.value
-                                            ? st.activeClass
-                                            : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50'"
+                                        class="flex h-10 cursor-pointer items-center justify-between rounded-xl border px-3 text-xs font-bold shadow-2xs transition-all duration-150 select-none focus:ring-2 focus:ring-rose-800/30 focus:outline-hidden"
+                                        :class="
+                                            form.status === st.value
+                                                ? st.activeClass
+                                                : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:bg-slate-800/50'
+                                        "
                                     >
-                                        <div class="flex items-center gap-2 truncate">
-                                            <span class="size-2 rounded-full shrink-0" :class="st.dotClass" />
-                                            <span class="truncate font-semibold">{{ st.label }}</span>
+                                        <div
+                                            class="flex items-center gap-2 truncate"
+                                        >
+                                            <span
+                                                class="size-2 shrink-0 rounded-full"
+                                                :class="st.dotClass"
+                                            />
+                                            <span
+                                                class="truncate font-semibold"
+                                                >{{ st.label }}</span
+                                            >
                                         </div>
                                         <div
                                             v-if="form.status === st.value"
-                                            class="size-4.5 rounded-full flex items-center justify-center shrink-0"
+                                            class="flex size-4.5 shrink-0 items-center justify-center rounded-full"
                                             :class="st.checkBadgeClass"
                                         >
                                             <Check class="size-3 stroke-[3]" />
                                         </div>
                                     </button>
                                 </div>
-                                <p class="text-[11px] text-slate-500 font-medium">
-                                    Selección táctil directa. Define el estado operativo de inicio.
+                                <p
+                                    class="text-[11px] font-medium text-slate-500"
+                                >
+                                    Selección táctil directa. Define el estado
+                                    operativo de inicio.
                                 </p>
-                                <span v-if="form.errors.status" class="text-xs text-red-600 font-semibold block">
+                                <span
+                                    v-if="form.errors.status"
+                                    class="block text-xs font-semibold text-red-600"
+                                >
                                     {{ form.errors.status }}
                                 </span>
                             </div>
@@ -248,52 +330,81 @@ function submit() {
 
                         <!-- Fila 2: Nombre Completo de la Capacitación -->
                         <div class="space-y-1.5">
-                            <Label for="title" class="text-xs font-bold text-slate-800 dark:text-slate-200">
-                                Nombre Oficial de la Capacitación <span class="text-rose-700">*</span>
+                            <Label
+                                for="title"
+                                class="text-xs font-bold text-slate-800 dark:text-slate-200"
+                            >
+                                Nombre Oficial de la Capacitación
+                                <span class="text-rose-700">*</span>
                             </Label>
                             <Input
                                 id="title"
                                 v-model="form.title"
                                 placeholder="Ej: Especialización en Desarrollo Web Fullstack e Inteligencia Artificial"
-                                class="h-10 text-sm font-bold border-slate-300 focus-visible:ring-rose-900 rounded-xl"
+                                class="h-10 rounded-xl border-slate-300 text-sm font-bold focus-visible:ring-rose-900"
                                 required
                             />
-                            <span v-if="form.errors.title" class="text-xs text-red-600 font-semibold block">
+                            <span
+                                v-if="form.errors.title"
+                                class="block text-xs font-semibold text-red-600"
+                            >
                                 {{ form.errors.title }}
                             </span>
                         </div>
 
                         <!-- Fila 3: Entidad Responsable + Ponente / Docente a Cargo -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div class="space-y-1.5">
-                                <Label for="institution" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                                <Label
+                                    for="institution"
+                                    class="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200"
+                                >
                                     <Building2 class="size-3.5 text-rose-800" />
-                                    <span>Entidad u Organización Responsable</span>
+                                    <span
+                                        >Entidad u Organización
+                                        Responsable</span
+                                    >
                                 </Label>
                                 <Input
                                     id="institution"
                                     v-model="form.institution"
                                     placeholder="Ej: Colegio de Ingenieros del Perú - CD Cusco"
-                                    class="h-10 text-xs sm:text-sm border-slate-300 focus-visible:ring-rose-900 rounded-xl"
+                                    class="h-10 rounded-xl border-slate-300 text-xs focus-visible:ring-rose-900 sm:text-sm"
                                 />
-                                <span v-if="form.errors.institution" class="text-xs text-red-600 font-semibold block">
+                                <span
+                                    v-if="form.errors.institution"
+                                    class="block text-xs font-semibold text-red-600"
+                                >
                                     {{ form.errors.institution }}
                                 </span>
                             </div>
 
                             <div class="space-y-1.5">
-                                <Label for="instructor_name" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                                    <GraduationCap class="size-3.5 text-rose-800" />
-                                    <span>Ponente / Docente a Cargo <span class="text-rose-700">*</span></span>
+                                <Label
+                                    for="instructor_name"
+                                    class="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200"
+                                >
+                                    <GraduationCap
+                                        class="size-3.5 text-rose-800"
+                                    />
+                                    <span
+                                        >Ponente / Docente a Cargo
+                                        <span class="text-rose-700"
+                                            >*</span
+                                        ></span
+                                    >
                                 </Label>
                                 <Input
                                     id="instructor_name"
                                     v-model="form.instructor_name"
                                     placeholder="Ej: Ing. Carlos Alberto Quispe Pérez"
-                                    class="h-10 text-xs sm:text-sm font-bold border-slate-300 focus-visible:ring-rose-900 rounded-xl"
+                                    class="h-10 rounded-xl border-slate-300 text-xs font-bold focus-visible:ring-rose-900 sm:text-sm"
                                     required
                                 />
-                                <span v-if="form.errors.instructor_name" class="text-xs text-red-600 font-semibold block">
+                                <span
+                                    v-if="form.errors.instructor_name"
+                                    class="block text-xs font-semibold text-red-600"
+                                >
                                     {{ form.errors.instructor_name }}
                                 </span>
                             </div>
@@ -302,10 +413,15 @@ function submit() {
                         <!-- Fila 4: Descripción y Temario -->
                         <div class="space-y-1.5">
                             <div class="flex items-center justify-between">
-                                <Label for="description" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                <Label
+                                    for="description"
+                                    class="text-xs font-bold text-slate-800 dark:text-slate-200"
+                                >
                                     Descripción y Temario del Programa
                                 </Label>
-                                <span class="text-[10px] text-slate-500 font-mono">
+                                <span
+                                    class="font-mono text-[10px] text-slate-500"
+                                >
                                     {{ form.description.length }} caracteres
                                 </span>
                             </div>
@@ -313,10 +429,13 @@ function submit() {
                                 id="description"
                                 v-model="form.description"
                                 rows="3"
-                                class="w-full rounded-xl border border-slate-300 bg-white p-3 text-xs sm:text-sm shadow-2xs focus:border-rose-900 focus:ring-2 focus:ring-rose-900/20 focus:outline-hidden dark:border-slate-700 dark:bg-slate-950 leading-relaxed font-normal"
+                                class="w-full rounded-xl border border-slate-300 bg-white p-3 text-xs leading-relaxed font-normal shadow-2xs focus:border-rose-900 focus:ring-2 focus:ring-rose-900/20 focus:outline-hidden sm:text-sm dark:border-slate-700 dark:bg-slate-950"
                                 placeholder="Describe brevemente los módulos temáticos, competencias a desarrollar y prerrequisitos del curso..."
                             ></textarea>
-                            <span v-if="form.errors.description" class="text-xs text-red-600 font-semibold block">
+                            <span
+                                v-if="form.errors.description"
+                                class="block text-xs font-semibold text-red-600"
+                            >
                                 {{ form.errors.description }}
                             </span>
                         </div>
@@ -324,59 +443,90 @@ function submit() {
                 </Card>
 
                 <!-- SECCIÓN 2: PLANIFICACIÓN, AFORO Y ACREDITACIÓN (REGLAMENTO UNSAAC) -->
-                <Card class="border border-slate-200/90 dark:border-slate-800 shadow-xs bg-white dark:bg-slate-900 rounded-2xl overflow-hidden">
-                    <CardHeader class="bg-slate-50/70 dark:bg-slate-900/80 border-b pb-3.5 px-5 sm:px-6">
-                        <div class="flex items-center gap-2 text-xs font-black text-rose-900 dark:text-rose-400 uppercase tracking-wider">
+                <Card
+                    class="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900"
+                >
+                    <CardHeader
+                        class="border-b bg-slate-50/70 px-5 pb-3.5 sm:px-6 dark:bg-slate-900/80"
+                    >
+                        <div
+                            class="flex items-center gap-2 text-xs font-black tracking-wider text-rose-900 uppercase dark:text-rose-400"
+                        >
                             <Calendar class="size-4 text-rose-800" />
                             <span>2. Cronograma, Aforo y Acreditación</span>
                         </div>
-                        <CardTitle class="text-base font-bold text-slate-950 dark:text-white">
+                        <CardTitle
+                            class="text-base font-bold text-slate-950 dark:text-white"
+                        >
                             Parámetros Lectivos y Reglas de Evaluación
                         </CardTitle>
-                        <CardDescription class="text-xs text-slate-600 dark:text-slate-400">
-                            Determinan la vigencia de la convocatoria, la matriz de asistencia y el criterio de certificación.
+                        <CardDescription
+                            class="text-xs text-slate-600 dark:text-slate-400"
+                        >
+                            Determinan la vigencia de la convocatoria, la matriz
+                            de asistencia y el criterio de certificación.
                         </CardDescription>
                     </CardHeader>
 
-                    <CardContent class="p-5 sm:p-6 space-y-5">
+                    <CardContent class="space-y-5 p-5 sm:p-6">
                         <!-- Fechas, Horas y Capacidad en 4 columnas -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div
+                            class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+                        >
                             <div class="space-y-1.5">
-                                <Label for="start_date" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
-                                    <span>Fecha de Inicio</span> <span class="text-rose-700">*</span>
+                                <Label
+                                    for="start_date"
+                                    class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
+                                >
+                                    <span>Fecha de Inicio</span>
+                                    <span class="text-rose-700">*</span>
                                 </Label>
                                 <Input
                                     id="start_date"
                                     type="date"
                                     v-model="form.start_date"
-                                    class="h-10 text-xs sm:text-sm font-medium border-slate-300 focus-visible:ring-rose-900 rounded-xl cursor-pointer"
+                                    class="h-10 cursor-pointer rounded-xl border-slate-300 text-xs font-medium focus-visible:ring-rose-900 sm:text-sm"
                                     required
                                 />
-                                <span v-if="form.errors.start_date" class="text-xs text-red-600 font-semibold block">
+                                <span
+                                    v-if="form.errors.start_date"
+                                    class="block text-xs font-semibold text-red-600"
+                                >
                                     {{ form.errors.start_date }}
                                 </span>
                             </div>
 
                             <div class="space-y-1.5">
-                                <Label for="end_date" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
-                                    <span>Fecha de Fin</span> <span class="text-rose-700">*</span>
+                                <Label
+                                    for="end_date"
+                                    class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
+                                >
+                                    <span>Fecha de Fin</span>
+                                    <span class="text-rose-700">*</span>
                                 </Label>
                                 <Input
                                     id="end_date"
                                     type="date"
                                     v-model="form.end_date"
-                                    class="h-10 text-xs sm:text-sm font-medium border-slate-300 focus-visible:ring-rose-900 rounded-xl cursor-pointer"
+                                    class="h-10 cursor-pointer rounded-xl border-slate-300 text-xs font-medium focus-visible:ring-rose-900 sm:text-sm"
                                     required
                                 />
-                                <span v-if="form.errors.end_date" class="text-xs text-red-600 font-semibold block">
+                                <span
+                                    v-if="form.errors.end_date"
+                                    class="block text-xs font-semibold text-red-600"
+                                >
                                     {{ form.errors.end_date }}
                                 </span>
                             </div>
 
                             <div class="space-y-1.5">
-                                <Label for="hours" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                                <Label
+                                    for="hours"
+                                    class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
+                                >
                                     <Clock class="size-3.5 text-amber-700" />
-                                    <span>Horas Lectivas</span> <span class="text-rose-700">*</span>
+                                    <span>Horas Lectivas</span>
+                                    <span class="text-rose-700">*</span>
                                 </Label>
                                 <Input
                                     id="hours"
@@ -384,18 +534,25 @@ function submit() {
                                     min="1"
                                     v-model.number="form.hours"
                                     placeholder="30"
-                                    class="h-10 font-bold border-slate-300 focus-visible:ring-rose-900"
+                                    class="h-10 border-slate-300 font-bold focus-visible:ring-rose-900"
                                     required
                                 />
-                                <span v-if="form.errors.hours" class="text-xs text-red-600 font-semibold block">
+                                <span
+                                    v-if="form.errors.hours"
+                                    class="block text-xs font-semibold text-red-600"
+                                >
                                     {{ form.errors.hours }}
                                 </span>
                             </div>
 
                             <div class="space-y-1.5">
-                                <Label for="capacity" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                                <Label
+                                    for="capacity"
+                                    class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
+                                >
                                     <Users class="size-3.5 text-rose-800" />
-                                    <span>Aforo / Vacantes</span> <span class="text-rose-700">*</span>
+                                    <span>Aforo / Vacantes</span>
+                                    <span class="text-rose-700">*</span>
                                 </Label>
                                 <Input
                                     id="capacity"
@@ -403,27 +560,44 @@ function submit() {
                                     min="1"
                                     v-model.number="form.capacity"
                                     placeholder="30"
-                                    class="h-10 font-bold border-slate-300 focus-visible:ring-rose-900"
+                                    class="h-10 border-slate-300 font-bold focus-visible:ring-rose-900"
                                     required
                                 />
-                                <span v-if="form.errors.capacity" class="text-xs text-red-600 font-semibold block">
+                                <span
+                                    v-if="form.errors.capacity"
+                                    class="block text-xs font-semibold text-red-600"
+                                >
                                     {{ form.errors.capacity }}
                                 </span>
                             </div>
                         </div>
 
                         <!-- Alerta visual si las fechas son incongruentes -->
-                        <div v-if="isDateOrderInvalid" class="flex items-center gap-2 rounded-xl bg-rose-50 p-3 text-xs text-rose-900 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-200 dark:border-rose-900 font-bold">
-                            <AlertCircle class="size-4 shrink-0 text-rose-700" />
-                            <span>La fecha de fin no puede ser anterior a la fecha de inicio.</span>
+                        <div
+                            v-if="isDateOrderInvalid"
+                            class="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-bold text-rose-900 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
+                        >
+                            <AlertCircle
+                                class="size-4 shrink-0 text-rose-700"
+                            />
+                            <span
+                                >La fecha de fin no puede ser anterior a la
+                                fecha de inicio.</span
+                            >
                         </div>
 
                         <!-- Sesiones Programadas y Asistencia Mínima (2 columnas) -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <div
+                            class="grid grid-cols-1 gap-4 border-t border-slate-100 pt-3 sm:grid-cols-2 dark:border-slate-800"
+                        >
                             <div class="space-y-1.5">
-                                <Label for="total_sessions" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                                <Label
+                                    for="total_sessions"
+                                    class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
+                                >
                                     <BookOpen class="size-3.5 text-rose-800" />
-                                    <span>N° Sesiones Programadas</span> <span class="text-rose-700">*</span>
+                                    <span>N° Sesiones Programadas</span>
+                                    <span class="text-rose-700">*</span>
                                 </Label>
                                 <Input
                                     id="total_sessions"
@@ -432,68 +606,114 @@ function submit() {
                                     max="200"
                                     v-model.number="form.total_sessions"
                                     placeholder="4"
-                                    class="h-10 font-bold border-slate-300 focus-visible:ring-rose-900"
+                                    class="h-10 border-slate-300 font-bold focus-visible:ring-rose-900"
                                     required
                                 />
                                 <p class="text-[11px] text-slate-500">
-                                    Total de clases para la matriz de asistencia y control QR.
+                                    Total de clases para la matriz de asistencia
+                                    y control QR.
                                 </p>
-                                <span v-if="form.errors.total_sessions" class="text-xs text-red-600 font-semibold block">
+                                <span
+                                    v-if="form.errors.total_sessions"
+                                    class="block text-xs font-semibold text-red-600"
+                                >
                                     {{ form.errors.total_sessions }}
                                 </span>
                             </div>
 
                             <div class="space-y-1.5">
-                                <Label for="min_attendance_percentage" class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
-                                    <CheckCircle2 class="size-3.5 text-emerald-700" />
-                                    <span>Asistencia Mínima Exigida (%)</span> <span class="text-rose-700">*</span>
+                                <Label
+                                    for="min_attendance_percentage"
+                                    class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
+                                >
+                                    <CheckCircle2
+                                        class="size-3.5 text-emerald-700"
+                                    />
+                                    <span>Asistencia Mínima Exigida (%)</span>
+                                    <span class="text-rose-700">*</span>
                                 </Label>
                                 <Input
                                     id="min_attendance_percentage"
                                     type="number"
                                     min="0"
                                     max="100"
-                                    v-model.number="form.min_attendance_percentage"
+                                    v-model.number="
+                                        form.min_attendance_percentage
+                                    "
                                     placeholder="75"
-                                    class="h-10 font-bold border-slate-300 focus-visible:ring-rose-900"
+                                    class="h-10 border-slate-300 font-bold focus-visible:ring-rose-900"
                                     required
                                 />
                                 <p class="text-[11px] text-slate-500">
-                                    Mínimo reglamentario UNSAAC: 75% de asistencia.
+                                    Mínimo reglamentario UNSAAC: 75% de
+                                    asistencia.
                                 </p>
-                                <span v-if="form.errors.min_attendance_percentage" class="text-xs text-red-600 font-semibold block">
+                                <span
+                                    v-if="form.errors.min_attendance_percentage"
+                                    class="block text-xs font-semibold text-red-600"
+                                >
                                     {{ form.errors.min_attendance_percentage }}
                                 </span>
                             </div>
                         </div>
 
                         <!-- Nota institucional reglamentaria -->
-                        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 flex items-start gap-2.5">
-                            <ShieldCheck class="size-4.5 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5" />
+                        <div
+                            class="flex items-start gap-2.5 rounded-xl border border-slate-200 bg-slate-50 p-3.5 text-xs text-slate-700 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300"
+                        >
+                            <ShieldCheck
+                                class="mt-0.5 size-4.5 shrink-0 text-emerald-700 dark:text-emerald-400"
+                            />
                             <div class="leading-relaxed">
-                                <strong class="text-slate-900 dark:text-white">Criterio Oficial de Acreditación UNSAAC:</strong>
-                                Al cerrar el acta académica, calificarán a certificación únicamente los participantes con asistencia $\ge {{ form.min_attendance_percentage || 75 }}%$ y nota vigesimal $\ge 11.00$.
+                                <strong class="text-slate-900 dark:text-white"
+                                    >Criterio Oficial de Acreditación
+                                    UNSAAC:</strong
+                                >
+                                Al cerrar el acta académica, calificarán a
+                                certificación únicamente los participantes con
+                                asistencia $\ge
+                                {{ form.min_attendance_percentage || 75 }}%$ y
+                                nota vigesimal $\ge 11.00$.
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
                 <!-- BARRA DE ACCIÓN Y GUARDADO -->
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <div class="text-xs text-slate-600 dark:text-slate-400 font-medium">
-                        El código institucional <strong class="font-mono text-rose-900 dark:text-rose-300">{{ form.code }}</strong> se registrará en el sistema.
+                <div
+                    class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row dark:border-slate-800 dark:bg-slate-900"
+                >
+                    <div
+                        class="text-xs font-medium text-slate-600 dark:text-slate-400"
+                    >
+                        El código institucional
+                        <strong
+                            class="font-mono text-rose-900 dark:text-rose-300"
+                            >{{ form.code }}</strong
+                        >
+                        se registrará en el sistema.
                     </div>
 
-                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                        <Button as-child variant="ghost" size="sm" class="text-xs font-bold text-slate-700 hover:text-rose-900 cursor-pointer">
+                    <div
+                        class="flex w-full items-center justify-end gap-3 sm:w-auto"
+                    >
+                        <Button
+                            as-child
+                            variant="ghost"
+                            size="sm"
+                            class="cursor-pointer text-xs font-bold text-slate-700 hover:text-rose-900"
+                        >
                             <Link href="/courses">Cancelar</Link>
                         </Button>
                         <Button
                             type="submit"
                             :disabled="form.processing || isDateOrderInvalid"
-                            class="bg-rose-900 hover:bg-rose-950 text-white font-bold text-xs h-10 px-6 shadow-xs cursor-pointer"
+                            class="h-10 cursor-pointer bg-rose-900 px-6 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
                         >
-                            <Spinner v-if="form.processing" class="mr-2 size-4" />
+                            <Spinner
+                                v-if="form.processing"
+                                class="mr-2 size-4"
+                            />
                             <Check v-else class="mr-2 size-4" />
                             <span>Guardar Capacitación</span>
                         </Button>

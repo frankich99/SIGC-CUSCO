@@ -32,8 +32,11 @@ defineProps<Props>();
     <DropdownMenuSeparator />
     <DropdownMenuGroup>
         <DropdownMenuItem v-if="user.role === 'admin'" :as-child="true">
-            <Link class="block w-full cursor-pointer font-bold text-rose-950 dark:text-rose-200" href="/users">
-                <ShieldCheck class="mr-2 h-4 w-4 text-emerald-600 inline" />
+            <Link
+                class="block w-full cursor-pointer font-bold text-rose-950 dark:text-rose-200"
+                href="/users"
+            >
+                <ShieldCheck class="mr-2 inline h-4 w-4 text-emerald-600" />
                 Usuarios y Roles
             </Link>
         </DropdownMenuItem>

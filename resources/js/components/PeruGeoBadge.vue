@@ -18,13 +18,20 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="inline-flex items-center gap-2 text-[11px] font-bold text-slate-800 dark:text-slate-200 bg-white/90 dark:bg-slate-900/90 px-3 py-1 rounded-full border border-slate-300 dark:border-slate-700 shadow-2xs">
+    <div
+        class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white/90 px-3 py-1 text-[11px] font-bold text-slate-800 shadow-2xs dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-200"
+    >
         <div class="flex items-center gap-1 text-rose-900 dark:text-rose-300">
             <MapPin class="size-3.5 shrink-0" />
-            <span>{{ PERU_CONFIG.institution.city }}, {{ PERU_CONFIG.country }}</span>
+            <span
+                >{{ PERU_CONFIG.institution.city }},
+                {{ PERU_CONFIG.country }}</span
+            >
         </div>
         <span class="text-slate-300 dark:text-slate-700">|</span>
-        <div class="flex items-center gap-1 text-blue-700 dark:text-blue-400 font-mono">
+        <div
+            class="flex items-center gap-1 font-mono text-blue-700 dark:text-blue-400"
+        >
             <Clock class="size-3 shrink-0" />
             <span>{{ currentPeruTime }} (UTC-5)</span>
         </div>

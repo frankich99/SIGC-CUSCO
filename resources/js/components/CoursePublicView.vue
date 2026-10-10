@@ -3,7 +3,13 @@ import { ref, computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import {
     Dialog,
     DialogContent,
@@ -13,7 +19,12 @@ import {
 } from '@/components/ui/dialog';
 import { formatDateRange, formatDate } from '@/lib/formatters';
 import { THEME_BUTTONS } from '@/lib/theme';
-import { generateOfficialCertificateHtml, printCertificate, type CertificateModule, type CertificateRecord } from '@/lib/certificateTemplate';
+import {
+    generateOfficialCertificateHtml,
+    printCertificate,
+    type CertificateModule,
+    type CertificateRecord,
+} from '@/lib/certificateTemplate';
 import { notify } from '@/lib/notify';
 import {
     Calendar,
@@ -99,10 +110,15 @@ const emit = defineEmits<{
 
 // Cálculos de aforo público
 const totalEnrolled = computed(() => props.course.enrollments_count ?? 0);
-const availableSpots = computed(() => Math.max(0, props.course.capacity - totalEnrolled.value));
+const availableSpots = computed(() =>
+    Math.max(0, props.course.capacity - totalEnrolled.value),
+);
 const enrollmentPercentage = computed(() => {
     if (!props.course.capacity || props.course.capacity <= 0) return 0;
-    return Math.min(100, Math.round((totalEnrolled.value / props.course.capacity) * 100));
+    return Math.min(
+        100,
+        Math.round((totalEnrolled.value / props.course.capacity) * 100),
+    );
 });
 
 // Nombre y detalles del docente
@@ -112,7 +128,11 @@ const instructorDisplayName = computed(() => {
         const full = `${u.name} ${u.paterno || ''} ${u.materno || ''}`.trim();
         return full || u.name;
     }
-    return props.course.instructor_display_name || props.course.instructor_name || 'Docente Titular UNSAAC';
+    return (
+        props.course.instructor_display_name ||
+        props.course.instructor_name ||
+        'Docente Titular UNSAAC'
+    );
 });
 
 // Estado badge
@@ -121,25 +141,29 @@ const statusConfig = computed(() => {
         case 'abierto':
             return {
                 label: 'Inscripciones Abiertas',
-                badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200',
+                badgeClass:
+                    'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200',
                 canEnroll: true,
             };
         case 'en_curso':
             return {
                 label: 'Capacitación En Curso',
-                badgeClass: 'bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950 dark:text-amber-200',
+                badgeClass:
+                    'bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950 dark:text-amber-200',
                 canEnroll: false,
             };
         case 'concluido':
             return {
                 label: 'Capacitación Concluida',
-                badgeClass: 'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-300',
+                badgeClass:
+                    'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-300',
                 canEnroll: false,
             };
         case 'cancelado':
             return {
                 label: 'Capacitación Cancelada',
-                badgeClass: 'bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200',
+                badgeClass:
+                    'bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200',
                 canEnroll: false,
             };
         default:
@@ -153,7 +177,9 @@ const statusConfig = computed(() => {
 
 // Modal de Credencial QR Personal del Alumno
 const isCredentialModalOpen = ref(false);
-const credentialQrSvg = computed(() => props.myEnrollment?.credential_qr_svg || '');
+const credentialQrSvg = computed(
+    () => props.myEnrollment?.credential_qr_svg || '',
+);
 
 // Modal y Visor de Certificado Oficial (Anverso / Reverso)
 const isCertificateModalOpen = ref(false);
@@ -183,38 +209,63 @@ async function copyCode(code: string) {
 <template>
     <div class="space-y-8">
         <!-- 1. HERO INFORMATIVO INSTITUCIONAL -->
-        <div class="relative overflow-hidden rounded-2xl border border-rose-900/20 bg-gradient-to-br from-rose-950 via-[#4a0011] to-slate-950 text-white p-6 sm:p-8 lg:p-10 shadow-lg">
+        <div
+            class="relative overflow-hidden rounded-2xl border border-rose-900/20 bg-gradient-to-br from-rose-950 via-[#4a0011] to-slate-950 p-6 text-white shadow-lg sm:p-8 lg:p-10"
+        >
             <!-- Efecto decorativo de fondo -->
-            <div class="absolute -right-16 -top-16 size-72 rounded-full bg-rose-500/10 blur-3xl pointer-events-none" />
-            <div class="absolute -left-16 -bottom-16 size-72 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+            <div
+                class="pointer-events-none absolute -top-16 -right-16 size-72 rounded-full bg-rose-500/10 blur-3xl"
+            />
+            <div
+                class="pointer-events-none absolute -bottom-16 -left-16 size-72 rounded-full bg-amber-500/10 blur-3xl"
+            />
 
             <div class="relative z-10 space-y-4">
                 <div class="flex flex-wrap items-center gap-2">
-                    <span class="font-mono text-xs font-black tracking-wider uppercase px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-xs border border-white/20 text-rose-200">
+                    <span
+                        class="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 font-mono text-xs font-black tracking-wider text-rose-200 uppercase backdrop-blur-xs"
+                    >
                         {{ course.code }}
                     </span>
-                    <Badge variant="outline" :class="[statusConfig.badgeClass, 'text-xs font-black border']">
+                    <Badge
+                        variant="outline"
+                        :class="[
+                            statusConfig.badgeClass,
+                            'border text-xs font-black',
+                        ]"
+                    >
                         {{ statusConfig.label }}
                     </Badge>
-                    <span v-if="course.institution" class="flex items-center gap-1.5 text-xs text-rose-200/90 font-medium">
+                    <span
+                        v-if="course.institution"
+                        class="flex items-center gap-1.5 text-xs font-medium text-rose-200/90"
+                    >
                         <Building2 class="size-3.5 text-amber-300" />
                         {{ course.institution }}
                     </span>
                 </div>
 
                 <div class="max-w-4xl space-y-2">
-                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight">
+                    <h1
+                        class="text-2xl leading-tight font-black tracking-tight text-white sm:text-3xl lg:text-4xl"
+                    >
                         {{ course.title }}
                     </h1>
-                    <p v-if="course.description" class="text-sm sm:text-base text-rose-100/90 leading-relaxed font-normal pt-1">
+                    <p
+                        v-if="course.description"
+                        class="pt-1 text-sm leading-relaxed font-normal text-rose-100/90 sm:text-base"
+                    >
                         {{ course.description }}
                     </p>
                 </div>
 
                 <!-- Call to action principal -->
-                <div class="pt-2 flex flex-wrap items-center gap-3">
+                <div class="flex flex-wrap items-center gap-3 pt-2">
                     <!-- Si el usuario logueado ya está matriculado -->
-                    <div v-if="myEnrollment" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-200 text-xs font-bold">
+                    <div
+                        v-if="myEnrollment"
+                        class="flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-950/80 px-3.5 py-2 text-xs font-bold text-emerald-200"
+                    >
                         <CheckCircle2 class="size-4 text-emerald-400" />
                         <span>Ya te encuentras matriculado en este curso</span>
                     </div>
@@ -223,7 +274,7 @@ async function copyCode(code: string) {
                     <Button
                         v-else-if="statusConfig.canEnroll && availableSpots > 0"
                         size="lg"
-                        class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-black shadow-md text-sm px-6 cursor-pointer"
+                        class="cursor-pointer bg-amber-600 px-6 text-sm font-black text-slate-950 shadow-md hover:bg-amber-500"
                         @click="emit('openEnrollment')"
                     >
                         <Plus class="mr-2 size-4" />
@@ -231,18 +282,33 @@ async function copyCode(code: string) {
                     </Button>
 
                     <!-- Si está abierto pero no hay vacantes -->
-                    <div v-else-if="statusConfig.canEnroll && availableSpots <= 0" class="px-4 py-2 rounded-xl bg-rose-900/60 border border-rose-500/30 text-rose-200 text-xs font-bold">
+                    <div
+                        v-else-if="
+                            statusConfig.canEnroll && availableSpots <= 0
+                        "
+                        class="rounded-xl border border-rose-500/30 bg-rose-900/60 px-4 py-2 text-xs font-bold text-rose-200"
+                    >
                         Vacantes agotadas (Aforo completo)
                     </div>
 
                     <!-- Si no está abierto -->
-                    <div v-else class="px-4 py-2 rounded-xl bg-white/10 text-white/80 text-xs font-bold">
+                    <div
+                        v-else
+                        class="rounded-xl bg-white/10 px-4 py-2 text-xs font-bold text-white/80"
+                    >
                         Inscripciones no disponibles actualmente
                     </div>
 
-                    <Button as-child variant="ghost" size="sm" class="text-rose-200 hover:text-white hover:bg-white/10 text-xs">
+                    <Button
+                        as-child
+                        variant="ghost"
+                        size="sm"
+                        class="text-xs text-rose-200 hover:bg-white/10 hover:text-white"
+                    >
                         <Link href="/certificates">
-                            <ShieldCheck class="mr-1.5 size-3.5 text-amber-300" />
+                            <ShieldCheck
+                                class="mr-1.5 size-3.5 text-amber-300"
+                            />
                             Verificar Certificaciones Oficiales
                         </Link>
                     </Button>
@@ -251,17 +317,25 @@ async function copyCode(code: string) {
         </div>
 
         <!-- 2. TARJETAS DE MÉTRICAS PÚBLICAS Y SEGURAS (FICHA TÉCNICA RÁPIDA) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <!-- Horas Lectivas -->
-            <Card class="border-slate-200 dark:border-slate-800 shadow-xs hover:border-rose-300 transition-all">
+            <Card
+                class="border-slate-200 shadow-xs transition-all hover:border-rose-300 dark:border-slate-800"
+            >
                 <CardHeader class="pb-2">
-                    <CardDescription class="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center justify-between">
+                    <CardDescription
+                        class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400"
+                    >
                         <span>Horas Académicas</span>
-                        <div class="size-8 rounded-lg bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200 flex items-center justify-center">
+                        <div
+                            class="flex size-8 items-center justify-center rounded-lg bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200"
+                        >
                             <Clock class="size-4" />
                         </div>
                     </CardDescription>
-                    <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1">
+                    <CardTitle
+                        class="pt-1 text-2xl font-black text-slate-900 dark:text-white"
+                    >
                         {{ course.hours }} hrs.
                     </CardTitle>
                 </CardHeader>
@@ -271,15 +345,23 @@ async function copyCode(code: string) {
             </Card>
 
             <!-- Sesiones y Calendario -->
-            <Card class="border-slate-200 dark:border-slate-800 shadow-xs hover:border-amber-300 transition-all">
+            <Card
+                class="border-slate-200 shadow-xs transition-all hover:border-amber-300 dark:border-slate-800"
+            >
                 <CardHeader class="pb-2">
-                    <CardDescription class="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center justify-between">
+                    <CardDescription
+                        class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400"
+                    >
                         <span>Sesiones de Clase</span>
-                        <div class="size-8 rounded-lg bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 flex items-center justify-center">
+                        <div
+                            class="flex size-8 items-center justify-center rounded-lg bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200"
+                        >
                             <Calendar class="size-4" />
                         </div>
                     </CardDescription>
-                    <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1">
+                    <CardTitle
+                        class="pt-1 text-2xl font-black text-slate-900 dark:text-white"
+                    >
                         {{ course.total_sessions }} sesiones
                     </CardTitle>
                 </CardHeader>
@@ -289,15 +371,23 @@ async function copyCode(code: string) {
             </Card>
 
             <!-- Asistencia Mínima Requerida -->
-            <Card class="border-slate-200 dark:border-slate-800 shadow-xs hover:border-emerald-300 transition-all">
+            <Card
+                class="border-slate-200 shadow-xs transition-all hover:border-emerald-300 dark:border-slate-800"
+            >
                 <CardHeader class="pb-2">
-                    <CardDescription class="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center justify-between">
+                    <CardDescription
+                        class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400"
+                    >
                         <span>Asistencia Requerida</span>
-                        <div class="size-8 rounded-lg bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200 flex items-center justify-center">
+                        <div
+                            class="flex size-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200"
+                        >
                             <UserCheck class="size-4" />
                         </div>
                     </CardDescription>
-                    <CardTitle class="text-2xl font-black text-slate-900 dark:text-white pt-1">
+                    <CardTitle
+                        class="pt-1 text-2xl font-black text-slate-900 dark:text-white"
+                    >
                         {{ course.min_attendance_percentage }}% mínimo
                     </CardTitle>
                 </CardHeader>
@@ -307,23 +397,37 @@ async function copyCode(code: string) {
             </Card>
 
             <!-- Vacantes y Disponibilidad -->
-            <Card class="border-slate-200 dark:border-slate-800 shadow-xs hover:border-rose-300 transition-all">
+            <Card
+                class="border-slate-200 shadow-xs transition-all hover:border-rose-300 dark:border-slate-800"
+            >
                 <CardHeader class="pb-2">
-                    <CardDescription class="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center justify-between">
+                    <CardDescription
+                        class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400"
+                    >
                         <span>Vacantes Disponibles</span>
-                        <div class="size-8 rounded-lg bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200 flex items-center justify-center">
+                        <div
+                            class="flex size-8 items-center justify-center rounded-lg bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200"
+                        >
                             <Users class="size-4" />
                         </div>
                     </CardDescription>
-                    <CardTitle class="text-2xl font-black text-rose-950 dark:text-rose-300 pt-1 flex items-baseline gap-2">
+                    <CardTitle
+                        class="flex items-baseline gap-2 pt-1 text-2xl font-black text-rose-950 dark:text-rose-300"
+                    >
                         <span>{{ availableSpots }}</span>
-                        <span class="text-xs font-normal text-slate-500">de {{ course.capacity }} cupos</span>
+                        <span class="text-xs font-normal text-slate-500"
+                            >de {{ course.capacity }} cupos</span
+                        >
                     </CardTitle>
                 </CardHeader>
-                <CardContent class="text-xs text-slate-600 dark:text-slate-400 space-y-1.5">
-                    <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <CardContent
+                    class="space-y-1.5 text-xs text-slate-600 dark:text-slate-400"
+                >
+                    <div
+                        class="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"
+                    >
                         <div
-                            class="h-full bg-rose-900 dark:bg-rose-600 rounded-full transition-all"
+                            class="h-full rounded-full bg-rose-900 transition-all dark:bg-rose-600"
                             :style="{ width: `${enrollmentPercentage}%` }"
                         />
                     </div>
@@ -335,24 +439,40 @@ async function copyCode(code: string) {
         </div>
 
         <!-- 3. SI EL PARTICIPANTE ESTÁ AUTENTICADO Y MATRICULADO: TARJETA CONFIDENCIAL PERSONAL -->
-        <Card v-if="myEnrollment" class="border-2 border-emerald-400 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/20 shadow-md">
-            <CardHeader class="p-5 border-b border-emerald-200 dark:border-emerald-900/60 bg-emerald-100/50 dark:bg-emerald-900/30">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <Card
+            v-if="myEnrollment"
+            class="border-2 border-emerald-400 bg-emerald-50/40 shadow-md dark:border-emerald-800 dark:bg-emerald-950/20"
+        >
+            <CardHeader
+                class="border-b border-emerald-200 bg-emerald-100/50 p-5 dark:border-emerald-900/60 dark:bg-emerald-900/30"
+            >
+                <div
+                    class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                >
                     <div class="space-y-1">
                         <div class="flex items-center gap-2">
-                            <Badge class="bg-emerald-700 text-white font-bold text-xs">
-                                <Check class="size-3 mr-1" />
+                            <Badge
+                                class="bg-emerald-700 text-xs font-bold text-white"
+                            >
+                                <Check class="mr-1 size-3" />
                                 Matrícula Activa
                             </Badge>
-                            <span class="text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
+                            <span
+                                class="font-mono text-xs font-bold text-slate-600 dark:text-slate-400"
+                            >
                                 DNI: {{ myEnrollment.dni }}
                             </span>
                         </div>
-                        <CardTitle class="text-lg font-black text-slate-900 dark:text-white">
+                        <CardTitle
+                            class="text-lg font-black text-slate-900 dark:text-white"
+                        >
                             Tu Estado Académico en este Curso
                         </CardTitle>
-                        <CardDescription class="text-xs text-slate-700 dark:text-slate-300">
-                            Participante: <strong>{{ myEnrollment.full_name }}</strong>
+                        <CardDescription
+                            class="text-xs text-slate-700 dark:text-slate-300"
+                        >
+                            Participante:
+                            <strong>{{ myEnrollment.full_name }}</strong>
                         </CardDescription>
                     </div>
 
@@ -362,10 +482,12 @@ async function copyCode(code: string) {
                         <Button
                             variant="outline"
                             size="sm"
-                            class="bg-white dark:bg-slate-900 text-xs font-bold border-emerald-300 dark:border-emerald-800 hover:bg-emerald-50"
+                            class="border-emerald-300 bg-white text-xs font-bold hover:bg-emerald-50 dark:border-emerald-800 dark:bg-slate-900"
                             @click="isCredentialModalOpen = true"
                         >
-                            <QrCode class="mr-1.5 size-3.5 text-rose-900 dark:text-rose-400" />
+                            <QrCode
+                                class="mr-1.5 size-3.5 text-rose-900 dark:text-rose-400"
+                            />
                             Mi Credencial QR
                         </Button>
 
@@ -373,7 +495,7 @@ async function copyCode(code: string) {
                         <Button
                             v-if="myEnrollment.certificate"
                             size="sm"
-                            class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-black shadow-xs"
+                            class="bg-emerald-700 text-xs font-black text-white shadow-xs hover:bg-emerald-800"
                             @click="openCertificatePreview"
                         >
                             <Award class="mr-1.5 size-4 text-amber-300" />
@@ -383,39 +505,90 @@ async function copyCode(code: string) {
                 </div>
             </CardHeader>
 
-            <CardContent class="p-5 space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <CardContent class="space-y-4 p-5">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <!-- Estado Académico -->
-                    <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Estado Académico</div>
-                        <div class="mt-1 text-sm font-black capitalize text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <span class="size-2 rounded-full" :class="myEnrollment.status === 'aprobado' ? 'bg-emerald-500' : 'bg-amber-500'" />
+                    <div
+                        class="rounded-xl border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-900"
+                    >
+                        <div
+                            class="text-xs font-bold tracking-wider text-slate-500 uppercase"
+                        >
+                            Estado Académico
+                        </div>
+                        <div
+                            class="mt-1 flex items-center gap-1.5 text-sm font-black text-slate-900 capitalize dark:text-white"
+                        >
+                            <span
+                                class="size-2 rounded-full"
+                                :class="
+                                    myEnrollment.status === 'aprobado'
+                                        ? 'bg-emerald-500'
+                                        : 'bg-amber-500'
+                                "
+                            />
                             {{ myEnrollment.status.replace('_', ' ') }}
                         </div>
                     </div>
 
                     <!-- Asistencia Acumulada -->
-                    <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Asistencia Registrada</div>
-                        <div class="mt-1 text-sm font-black text-slate-900 dark:text-white">
-                            {{ myEnrollment.attended_sessions }} de {{ course.total_sessions }} sesiones ({{ myEnrollment.attendance_percentage }}%)
+                    <div
+                        class="rounded-xl border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-900"
+                    >
+                        <div
+                            class="text-xs font-bold tracking-wider text-slate-500 uppercase"
+                        >
+                            Asistencia Registrada
                         </div>
-                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5">
+                        <div
+                            class="mt-1 text-sm font-black text-slate-900 dark:text-white"
+                        >
+                            {{ myEnrollment.attended_sessions }} de
+                            {{ course.total_sessions }} sesiones ({{
+                                myEnrollment.attendance_percentage
+                            }}%)
+                        </div>
+                        <div
+                            class="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+                        >
                             <div
                                 class="h-full rounded-full transition-all"
-                                :class="myEnrollment.attendance_percentage >= course.min_attendance_percentage ? 'bg-emerald-600' : 'bg-amber-500'"
-                                :style="{ width: `${Math.min(100, myEnrollment.attendance_percentage)}%` }"
+                                :class="
+                                    myEnrollment.attendance_percentage >=
+                                    course.min_attendance_percentage
+                                        ? 'bg-emerald-600'
+                                        : 'bg-amber-500'
+                                "
+                                :style="{
+                                    width: `${Math.min(100, myEnrollment.attendance_percentage)}%`,
+                                }"
                             />
                         </div>
                     </div>
 
                     <!-- Calificación Final -->
-                    <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Calificación Final</div>
-                        <div v-if="myEnrollment.final_grade !== null && myEnrollment.final_grade !== undefined" class="mt-1 text-base font-black text-rose-950 dark:text-rose-300">
-                            {{ Number(myEnrollment.final_grade).toFixed(2) }} / 20.00
+                    <div
+                        class="rounded-xl border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-900"
+                    >
+                        <div
+                            class="text-xs font-bold tracking-wider text-slate-500 uppercase"
+                        >
+                            Calificación Final
                         </div>
-                        <div v-else class="mt-1 text-xs font-bold text-slate-500 italic">
+                        <div
+                            v-if="
+                                myEnrollment.final_grade !== null &&
+                                myEnrollment.final_grade !== undefined
+                            "
+                            class="mt-1 text-base font-black text-rose-950 dark:text-rose-300"
+                        >
+                            {{ Number(myEnrollment.final_grade).toFixed(2) }} /
+                            20.00
+                        </div>
+                        <div
+                            v-else
+                            class="mt-1 text-xs font-bold text-slate-500 italic"
+                        >
                             Pendiente de calificación final
                         </div>
                     </div>
@@ -424,40 +597,59 @@ async function copyCode(code: string) {
         </Card>
 
         <!-- 4. CONTENIDO PRINCIPAL: 2 COLUMNAS (CURRÍCULO Y DOCENTE) -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <!-- Columna Izquierda (2/3): Malla Curricular y Certificación -->
-            <div class="lg:col-span-2 space-y-6">
+            <div class="space-y-6 lg:col-span-2">
                 <!-- Malla Curricular / Temario Oficial -->
-                <Card class="border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                    <CardHeader class="p-5 border-b bg-slate-50/80 dark:bg-slate-900/80">
-                        <CardTitle class="text-base font-black flex items-center gap-2">
-                            <Layers class="size-4 text-rose-900 dark:text-rose-400" />
+                <Card
+                    class="overflow-hidden border-slate-200 shadow-sm dark:border-slate-800"
+                >
+                    <CardHeader
+                        class="border-b bg-slate-50/80 p-5 dark:bg-slate-900/80"
+                    >
+                        <CardTitle
+                            class="flex items-center gap-2 text-base font-black"
+                        >
+                            <Layers
+                                class="size-4 text-rose-900 dark:text-rose-400"
+                            />
                             Plan de Estudios y Malla Curricular Oficial
                         </CardTitle>
                         <CardDescription class="text-xs">
-                            Estructura académica organizada en módulos temáticos con horas pedagógicas acreditadas.
+                            Estructura académica organizada en módulos temáticos
+                            con horas pedagógicas acreditadas.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent class="p-5 space-y-4">
+                    <CardContent class="space-y-4 p-5">
                         <div
                             v-for="(mod, idx) in modules"
                             :key="idx"
-                            class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2 hover:border-rose-300 transition-all"
+                            class="space-y-2 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-rose-300 dark:border-slate-800 dark:bg-slate-900"
                         >
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                            <div
+                                class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
+                            >
                                 <div class="flex items-center gap-2">
-                                    <span class="font-mono text-xs font-black text-rose-950 dark:text-rose-200 bg-rose-100 dark:bg-rose-950 px-2 py-0.5 rounded border border-rose-300 dark:border-rose-800">
+                                    <span
+                                        class="rounded border border-rose-300 bg-rose-100 px-2 py-0.5 font-mono text-xs font-black text-rose-950 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                                    >
                                         {{ mod.number }}
                                     </span>
-                                    <h3 class="text-sm font-black text-slate-900 dark:text-white">
+                                    <h3
+                                        class="text-sm font-black text-slate-900 dark:text-white"
+                                    >
                                         {{ mod.title }}
                                     </h3>
                                 </div>
-                                <span class="text-xs font-bold text-slate-500 shrink-0">
+                                <span
+                                    class="shrink-0 text-xs font-bold text-slate-500"
+                                >
                                     {{ mod.hours }}
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed pl-1">
+                            <p
+                                class="pl-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400"
+                            >
                                 {{ mod.topics }}
                             </p>
                         </div>
@@ -465,28 +657,63 @@ async function copyCode(code: string) {
                 </Card>
 
                 <!-- Garantía de Calidad y Certificación UNSAAC -->
-                <Card class="border-rose-200 dark:border-rose-900/40 bg-gradient-to-br from-rose-50/40 via-white to-amber-50/30 dark:from-rose-950/20 dark:via-slate-900 dark:to-amber-950/10 shadow-sm">
-                    <CardHeader class="p-5 border-b border-rose-100 dark:border-rose-900/40">
-                        <CardTitle class="text-base font-black flex items-center gap-2 text-rose-950 dark:text-rose-200">
+                <Card
+                    class="border-rose-200 bg-gradient-to-br from-rose-50/40 via-white to-amber-50/30 shadow-sm dark:border-rose-900/40 dark:from-rose-950/20 dark:via-slate-900 dark:to-amber-950/10"
+                >
+                    <CardHeader
+                        class="border-b border-rose-100 p-5 dark:border-rose-900/40"
+                    >
+                        <CardTitle
+                            class="flex items-center gap-2 text-base font-black text-rose-950 dark:text-rose-200"
+                        >
                             <Sparkles class="size-4 text-amber-600" />
                             Certificación Oficial con Validez Nacional
                         </CardTitle>
-                        <CardDescription class="text-xs text-rose-900/80 dark:text-rose-300/80">
-                            Garantía académica institucional respaldada por la Universidad Nacional de San Antonio Abad del Cusco.
+                        <CardDescription
+                            class="text-xs text-rose-900/80 dark:text-rose-300/80"
+                        >
+                            Garantía académica institucional respaldada por la
+                            Universidad Nacional de San Antonio Abad del Cusco.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent class="p-5 space-y-3 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                    <CardContent
+                        class="space-y-3 p-5 text-xs leading-relaxed text-slate-700 dark:text-slate-300"
+                    >
                         <div class="flex items-start gap-2.5">
-                            <CheckCircle2 class="size-4 text-emerald-600 shrink-0 mt-0.5" />
-                            <span><strong>Requisito de Aprobación:</strong> Haber alcanzado una calificación vigesimal mínima de 11.00 puntos y cumplir con al menos el {{ course.min_attendance_percentage }}% de asistencias a las clases programadas.</span>
+                            <CheckCircle2
+                                class="mt-0.5 size-4 shrink-0 text-emerald-600"
+                            />
+                            <span
+                                ><strong>Requisito de Aprobación:</strong> Haber
+                                alcanzado una calificación vigesimal mínima de
+                                11.00 puntos y cumplir con al menos el
+                                {{ course.min_attendance_percentage }}% de
+                                asistencias a las clases programadas.</span
+                            >
                         </div>
                         <div class="flex items-start gap-2.5">
-                            <CheckCircle2 class="size-4 text-emerald-600 shrink-0 mt-0.5" />
-                            <span><strong>Código QR Perpetuo e Inalterable:</strong> Cada diploma incorpora un código QR vectorial nativo de validación permanente que redirige a los registros oficiales en vivo.</span>
+                            <CheckCircle2
+                                class="mt-0.5 size-4 shrink-0 text-emerald-600"
+                            />
+                            <span
+                                ><strong
+                                    >Código QR Perpetuo e Inalterable:</strong
+                                >
+                                Cada diploma incorpora un código QR vectorial
+                                nativo de validación permanente que redirige a
+                                los registros oficiales en vivo.</span
+                            >
                         </div>
                         <div class="flex items-start gap-2.5">
-                            <CheckCircle2 class="size-4 text-emerald-600 shrink-0 mt-0.5" />
-                            <span><strong>Formato Oficial de 2 Caras:</strong> Diploma de Honor institucional en el anverso y detalle completo de la malla curricular con firma digital en el reverso.</span>
+                            <CheckCircle2
+                                class="mt-0.5 size-4 shrink-0 text-emerald-600"
+                            />
+                            <span
+                                ><strong>Formato Oficial de 2 Caras:</strong>
+                                Diploma de Honor institucional en el anverso y
+                                detalle completo de la malla curricular con
+                                firma digital en el reverso.</span
+                            >
                         </div>
                     </CardContent>
                 </Card>
@@ -495,26 +722,42 @@ async function copyCode(code: string) {
             <!-- Columna Derecha (1/3): Docente Responsable y Admisión -->
             <div class="space-y-6">
                 <!-- Tarjeta del Docente Responsable -->
-                <Card class="border-slate-200 dark:border-slate-800 shadow-sm">
-                    <CardHeader class="p-5 border-b bg-slate-50/80 dark:bg-slate-900/80">
-                        <CardTitle class="text-sm font-black flex items-center gap-2">
-                            <GraduationCap class="size-4 text-rose-900 dark:text-rose-400" />
+                <Card class="border-slate-200 shadow-sm dark:border-slate-800">
+                    <CardHeader
+                        class="border-b bg-slate-50/80 p-5 dark:bg-slate-900/80"
+                    >
+                        <CardTitle
+                            class="flex items-center gap-2 text-sm font-black"
+                        >
+                            <GraduationCap
+                                class="size-4 text-rose-900 dark:text-rose-400"
+                            />
                             Docente Responsable
                         </CardTitle>
                         <CardDescription class="text-xs">
                             Catedrático o especialista a cargo de la cátedra
                         </CardDescription>
                     </CardHeader>
-                    <CardContent class="p-5 space-y-3">
+                    <CardContent class="space-y-3 p-5">
                         <div class="flex items-center gap-3">
-                            <div class="size-12 rounded-full bg-rose-900 text-amber-300 flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
-                                {{ instructorDisplayName.slice(0, 2).toUpperCase() }}
+                            <div
+                                class="flex size-12 shrink-0 items-center justify-center rounded-full bg-rose-900 text-sm font-black text-amber-300 shadow-xs"
+                            >
+                                {{
+                                    instructorDisplayName
+                                        .slice(0, 2)
+                                        .toUpperCase()
+                                }}
                             </div>
                             <div>
-                                <div class="text-sm font-black text-slate-900 dark:text-white">
+                                <div
+                                    class="text-sm font-black text-slate-900 dark:text-white"
+                                >
                                     {{ instructorDisplayName }}
                                 </div>
-                                <div class="text-xs font-bold text-rose-900 dark:text-rose-400">
+                                <div
+                                    class="text-xs font-bold text-rose-900 dark:text-rose-400"
+                                >
                                     Docente Titular / Especialista
                                 </div>
                                 <div class="text-[11px] text-slate-500">
@@ -523,46 +766,81 @@ async function copyCode(code: string) {
                             </div>
                         </div>
 
-                        <div v-if="course.instructor?.email" class="pt-2 border-t text-xs flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                        <div
+                            v-if="course.instructor?.email"
+                            class="flex items-center gap-2 border-t pt-2 text-xs text-slate-600 dark:text-slate-400"
+                        >
                             <Mail class="size-3.5 text-slate-400" />
-                            <span class="truncate">{{ course.instructor.email }}</span>
+                            <span class="truncate">{{
+                                course.instructor.email
+                            }}</span>
                         </div>
                     </CardContent>
                 </Card>
 
                 <!-- Requisitos y Admisión -->
-                <Card class="border-slate-200 dark:border-slate-800 shadow-sm">
-                    <CardHeader class="p-5 border-b bg-slate-50/80 dark:bg-slate-900/80">
-                        <CardTitle class="text-sm font-black flex items-center gap-2">
-                            <BookOpen class="size-4 text-rose-900 dark:text-rose-400" />
+                <Card class="border-slate-200 shadow-sm dark:border-slate-800">
+                    <CardHeader
+                        class="border-b bg-slate-50/80 p-5 dark:bg-slate-900/80"
+                    >
+                        <CardTitle
+                            class="flex items-center gap-2 text-sm font-black"
+                        >
+                            <BookOpen
+                                class="size-4 text-rose-900 dark:text-rose-400"
+                            />
                             Requisitos de Participación
                         </CardTitle>
                     </CardHeader>
-                    <CardContent class="p-5 space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+                    <CardContent
+                        class="space-y-2.5 p-5 text-xs text-slate-700 dark:text-slate-300"
+                    >
                         <div class="flex items-center gap-2">
-                            <div class="size-1.5 rounded-full bg-rose-900 shrink-0" />
-                            <span>Documento Nacional de Identidad (DNI) vigente.</span>
+                            <div
+                                class="size-1.5 shrink-0 rounded-full bg-rose-900"
+                            />
+                            <span
+                                >Documento Nacional de Identidad (DNI)
+                                vigente.</span
+                            >
                         </div>
                         <div class="flex items-center gap-2">
-                            <div class="size-1.5 rounded-full bg-rose-900 shrink-0" />
-                            <span>Disponibilidad horaria para las {{ course.total_sessions }} sesiones.</span>
+                            <div
+                                class="size-1.5 shrink-0 rounded-full bg-rose-900"
+                            />
+                            <span
+                                >Disponibilidad horaria para las
+                                {{ course.total_sessions }} sesiones.</span
+                            >
                         </div>
                         <div class="flex items-center gap-2">
-                            <div class="size-1.5 rounded-full bg-rose-900 shrink-0" />
-                            <span>Compromiso de asistencia mínima del {{ course.min_attendance_percentage }}%.</span>
+                            <div
+                                class="size-1.5 shrink-0 rounded-full bg-rose-900"
+                            />
+                            <span
+                                >Compromiso de asistencia mínima del
+                                {{ course.min_attendance_percentage }}%.</span
+                            >
                         </div>
                     </CardContent>
                 </Card>
 
                 <!-- Banner de Inscripción Rápida -->
-                <div v-if="statusConfig.canEnroll && availableSpots > 0" class="p-5 rounded-2xl bg-gradient-to-br from-rose-900 to-rose-950 text-white space-y-3 shadow-md">
-                    <div class="font-black text-sm">¿Deseas participar en esta capacitación?</div>
+                <div
+                    v-if="statusConfig.canEnroll && availableSpots > 0"
+                    class="space-y-3 rounded-2xl bg-gradient-to-br from-rose-900 to-rose-950 p-5 text-white shadow-md"
+                >
+                    <div class="text-sm font-black">
+                        ¿Deseas participar en esta capacitación?
+                    </div>
                     <p class="text-xs text-rose-200">
-                        Quedan únicamente <strong>{{ availableSpots }} vacantes</strong> disponibles para este curso.
+                        Quedan únicamente
+                        <strong>{{ availableSpots }} vacantes</strong>
+                        disponibles para este curso.
                     </p>
                     <Button
                         size="sm"
-                        class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs cursor-pointer"
+                        class="w-full cursor-pointer bg-amber-500 text-xs font-black text-slate-950 hover:bg-amber-400"
                         @click="emit('openEnrollment')"
                     >
                         <Plus class="mr-1.5 size-3.5" />
@@ -573,30 +851,49 @@ async function copyCode(code: string) {
         </div>
 
         <!-- MODAL: CREDENCIAL QR DEL ALUMNO -->
-        <Dialog :open="isCredentialModalOpen" @update:open="isCredentialModalOpen = $event">
+        <Dialog
+            :open="isCredentialModalOpen"
+            @update:open="isCredentialModalOpen = $event"
+        >
             <DialogContent class="max-w-md p-6">
                 <DialogHeader>
-                    <DialogTitle class="text-center font-black text-lg flex items-center justify-center gap-2">
+                    <DialogTitle
+                        class="flex items-center justify-center gap-2 text-center text-lg font-black"
+                    >
                         <QrCode class="size-5 text-rose-900" />
                         Credencial Digital del Alumno
                     </DialogTitle>
                     <DialogDescription class="text-center text-xs">
-                        Código QR personal de acreditación para registro de asistencia en aula.
+                        Código QR personal de acreditación para registro de
+                        asistencia en aula.
                     </DialogDescription>
                 </DialogHeader>
 
-                <div v-if="myEnrollment" class="py-4 flex flex-col items-center space-y-4">
-                    <div class="p-3 bg-white rounded-xl shadow-inner border border-slate-200" v-html="credentialQrSvg" />
-                    <div class="text-center space-y-1">
-                        <div class="font-black text-base text-slate-900 dark:text-white">
+                <div
+                    v-if="myEnrollment"
+                    class="flex flex-col items-center space-y-4 py-4"
+                >
+                    <div
+                        class="rounded-xl border border-slate-200 bg-white p-3 shadow-inner"
+                        v-html="credentialQrSvg"
+                    />
+                    <div class="space-y-1 text-center">
+                        <div
+                            class="text-base font-black text-slate-900 dark:text-white"
+                        >
                             {{ myEnrollment.full_name }}
                         </div>
                         <div class="text-xs text-slate-500">
                             DNI: {{ myEnrollment.dni }}
                         </div>
                         <div class="pt-2">
-                            <span class="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border">
-                                {{ myEnrollment.credential_code || `INS-${course.id}-${myEnrollment.dni.slice(-4)}` }}
+                            <span
+                                class="rounded-full border bg-slate-100 px-2.5 py-1 font-mono text-xs font-bold dark:bg-slate-800"
+                            >
+                                {{
+                                    myEnrollment.credential_code ||
+                                    `INS-${course.id}-${myEnrollment.dni.slice(-4)}`
+                                }}
                             </span>
                         </div>
                     </div>
@@ -605,23 +902,31 @@ async function copyCode(code: string) {
         </Dialog>
 
         <!-- MODAL: VISOR DE CERTIFICADO OFICIAL DEL ALUMNO (ANVERSO / REVERSO) -->
-        <Dialog :open="isCertificateModalOpen" @update:open="isCertificateModalOpen = $event">
+        <Dialog
+            :open="isCertificateModalOpen"
+            @update:open="isCertificateModalOpen = $event"
+        >
             <DialogContent class="max-w-5xl p-6">
                 <DialogHeader class="border-b pb-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div
+                        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                    >
                         <div>
-                            <DialogTitle class="text-lg font-black flex items-center gap-2">
+                            <DialogTitle
+                                class="flex items-center gap-2 text-lg font-black"
+                            >
                                 <Award class="size-5 text-amber-500" />
                                 Certificado Digital Oficial UNSAAC
                             </DialogTitle>
-                            <DialogDescription class="text-xs mt-0.5">
-                                Diploma oficial de 2 caras (Anverso / Reverso) emitido con código QR perpetuo.
+                            <DialogDescription class="mt-0.5 text-xs">
+                                Diploma oficial de 2 caras (Anverso / Reverso)
+                                emitido con código QR perpetuo.
                             </DialogDescription>
                         </div>
                         <div class="flex items-center gap-2">
                             <Button
                                 size="sm"
-                                class="bg-rose-900 hover:bg-rose-950 text-white font-black text-xs cursor-pointer shadow-xs"
+                                class="cursor-pointer bg-rose-900 text-xs font-black text-white shadow-xs hover:bg-rose-950"
                                 @click="handlePrintCertificate"
                             >
                                 <Download class="mr-1.5 size-3.5" />
@@ -635,16 +940,24 @@ async function copyCode(code: string) {
                 <div class="flex items-center justify-center gap-2 pt-2">
                     <button
                         type="button"
-                        class="px-4 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
-                        :class="activeCertificateFace === 'front' ? 'bg-rose-900 text-white shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600'"
+                        class="cursor-pointer rounded-lg px-4 py-1.5 text-xs font-black transition-all"
+                        :class="
+                            activeCertificateFace === 'front'
+                                ? 'bg-rose-900 text-white shadow-xs'
+                                : 'bg-slate-100 text-slate-600 dark:bg-slate-800'
+                        "
                         @click="activeCertificateFace = 'front'"
                     >
                         Anverso (Diploma Oficial)
                     </button>
                     <button
                         type="button"
-                        class="px-4 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer"
-                        :class="activeCertificateFace === 'back' ? 'bg-rose-900 text-white shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600'"
+                        class="cursor-pointer rounded-lg px-4 py-1.5 text-xs font-black transition-all"
+                        :class="
+                            activeCertificateFace === 'back'
+                                ? 'bg-rose-900 text-white shadow-xs'
+                                : 'bg-slate-100 text-slate-600 dark:bg-slate-800'
+                        "
                         @click="activeCertificateFace = 'back'"
                     >
                         Reverso (Malla y Calificación)
@@ -656,62 +969,130 @@ async function copyCode(code: string) {
                     <!-- Cara 1: Anverso -->
                     <div
                         v-if="activeCertificateFace === 'front'"
-                        class="p-6 rounded-2xl border-2 border-[#800020] bg-gradient-to-br from-amber-50/60 via-white to-amber-50/40 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 text-center space-y-4 shadow-inner"
+                        class="space-y-4 rounded-2xl border-2 border-[#800020] bg-gradient-to-br from-amber-50/60 via-white to-amber-50/40 p-6 text-center shadow-inner dark:from-slate-900 dark:via-slate-950 dark:to-slate-900"
                     >
                         <div class="flex items-center justify-between px-4">
-                            <img src="/images/unsaac-logo.png" alt="UNSAAC" class="h-14 object-contain" />
+                            <img
+                                src="/images/unsaac-logo.png"
+                                alt="UNSAAC"
+                                class="h-14 object-contain"
+                            />
                             <div class="text-center">
-                                <div class="text-[11px] font-black tracking-widest uppercase text-rose-900 dark:text-rose-400">
-                                    Universidad Nacional de San Antonio Abad del Cusco
+                                <div
+                                    class="text-[11px] font-black tracking-widest text-rose-900 uppercase dark:text-rose-400"
+                                >
+                                    Universidad Nacional de San Antonio Abad del
+                                    Cusco
                                 </div>
-                                <div class="text-[10px] font-bold text-slate-600 dark:text-slate-400">
-                                    Dirección de Extensión Cultural y Proyección Social
+                                <div
+                                    class="text-[10px] font-bold text-slate-600 dark:text-slate-400"
+                                >
+                                    Dirección de Extensión Cultural y Proyección
+                                    Social
                                 </div>
                             </div>
-                            <img src="/images/escudo.png" alt="Escudo" class="h-14 object-contain" />
+                            <img
+                                src="/images/escudo.png"
+                                alt="Escudo"
+                                class="h-14 object-contain"
+                            />
                         </div>
 
-                        <div class="py-4 space-y-2">
-                            <div class="text-xs uppercase font-serif tracking-widest text-amber-700 dark:text-amber-400 font-bold">
+                        <div class="space-y-2 py-4">
+                            <div
+                                class="font-serif text-xs font-bold tracking-widest text-amber-700 uppercase dark:text-amber-400"
+                            >
                                 Otorga el presente
                             </div>
-                            <h2 class="text-2xl sm:text-3xl font-serif font-black text-rose-950 dark:text-rose-200 uppercase tracking-wider">
+                            <h2
+                                class="font-serif text-2xl font-black tracking-wider text-rose-950 uppercase sm:text-3xl dark:text-rose-200"
+                            >
                                 Diploma de Certificación
                             </h2>
-                            <div class="text-xs text-slate-600 dark:text-slate-400">a favor de:</div>
-                            <div class="text-xl sm:text-2xl font-serif font-black text-slate-900 dark:text-white underline decoration-amber-600/50 underline-offset-8">
-                                {{ myEnrollment.certificate.student_name || myEnrollment.certificate.full_name }}
+                            <div
+                                class="text-xs text-slate-600 dark:text-slate-400"
+                            >
+                                a favor de:
                             </div>
-                            <div class="text-xs font-mono font-bold text-slate-600 dark:text-slate-400 pt-1">
-                                Documento Nacional de Identidad N° {{ myEnrollment.certificate.dni }}
+                            <div
+                                class="font-serif text-xl font-black text-slate-900 underline decoration-amber-600/50 underline-offset-8 sm:text-2xl dark:text-white"
+                            >
+                                {{
+                                    myEnrollment.certificate.student_name ||
+                                    myEnrollment.certificate.full_name
+                                }}
+                            </div>
+                            <div
+                                class="pt-1 font-mono text-xs font-bold text-slate-600 dark:text-slate-400"
+                            >
+                                Documento Nacional de Identidad N°
+                                {{ myEnrollment.certificate.dni }}
                             </div>
                         </div>
 
-                        <div class="max-w-2xl mx-auto text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-serif">
-                            Por haber aprobado satisfactoriamente el curso de especialización profesional:
-                            <div class="font-bold text-sm text-rose-950 dark:text-rose-200 py-1">
+                        <div
+                            class="mx-auto max-w-2xl font-serif text-xs leading-relaxed text-slate-700 dark:text-slate-300"
+                        >
+                            Por haber aprobado satisfactoriamente el curso de
+                            especialización profesional:
+                            <div
+                                class="py-1 text-sm font-bold text-rose-950 dark:text-rose-200"
+                            >
                                 "{{ myEnrollment.certificate.course_title }}"
                             </div>
-                            Desarrollado <strong>{{ myEnrollment.certificate.date_range_formal || formatDateRange(course.start_date, course.end_date) }}</strong>,
-                            con una duración lectiva de <strong>{{ myEnrollment.certificate.hours }} horas académicas</strong>.
+                            Desarrollado
+                            <strong>{{
+                                myEnrollment.certificate.date_range_formal ||
+                                formatDateRange(
+                                    course.start_date,
+                                    course.end_date,
+                                )
+                            }}</strong
+                            >, con una duración lectiva de
+                            <strong
+                                >{{ myEnrollment.certificate.hours }} horas
+                                académicas</strong
+                            >.
                         </div>
 
-                        <div class="text-right text-[11px] font-serif font-bold text-slate-600 dark:text-slate-400 italic max-w-lg mx-auto pr-2 my-1">
-                            {{ myEnrollment.certificate.city_issued_formal || ('Cusco, ' + formatDate(myEnrollment.certificate.certificate_issued_at || course.end_date)) }}
+                        <div
+                            class="mx-auto my-1 max-w-lg pr-2 text-right font-serif text-[11px] font-bold text-slate-600 italic dark:text-slate-400"
+                        >
+                            {{
+                                myEnrollment.certificate.city_issued_formal ||
+                                'Cusco, ' +
+                                    formatDate(
+                                        myEnrollment.certificate
+                                            .certificate_issued_at ||
+                                            course.end_date,
+                                    )
+                            }}
                         </div>
 
-                        <div class="pt-4 grid grid-cols-2 gap-8 text-center text-xs font-serif border-t max-w-lg mx-auto">
+                        <div
+                            class="mx-auto grid max-w-lg grid-cols-2 gap-8 border-t pt-4 text-center font-serif text-xs"
+                        >
                             <div>
-                                <div class="font-bold border-t border-slate-400 pt-1 text-[11px]">
-                                    {{ myEnrollment.certificate.instructor_name }}
+                                <div
+                                    class="border-t border-slate-400 pt-1 text-[11px] font-bold"
+                                >
+                                    {{
+                                        myEnrollment.certificate.instructor_name
+                                    }}
                                 </div>
-                                <div class="text-[9px] text-slate-500">Docente Responsable</div>
+                                <div class="text-[9px] text-slate-500">
+                                    Docente Responsable
+                                </div>
                             </div>
                             <div>
-                                <div class="font-bold border-t border-slate-400 pt-1 text-[11px]">
+                                <div
+                                    class="border-t border-slate-400 pt-1 text-[11px] font-bold"
+                                >
                                     Dirección Académica
                                 </div>
-                                <div class="text-[9px] text-slate-500">UNSAAC - Cusco</div>
+                                <div class="text-[9px] text-slate-500">
+                                    UNSAAC - Cusco
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -719,41 +1100,87 @@ async function copyCode(code: string) {
                     <!-- Cara 2: Reverso -->
                     <div
                         v-else
-                        class="p-6 rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs space-y-4 shadow-sm"
+                        class="space-y-4 rounded-2xl border-2 border-slate-300 bg-white p-6 text-xs shadow-sm dark:border-slate-700 dark:bg-slate-900"
                     >
-                        <div class="border-b pb-2 flex items-center justify-between">
-                            <span class="font-black text-sm text-slate-900 dark:text-white">Plan Curricular y Calificación Oficial</span>
-                            <span class="font-mono text-[10px] text-slate-500">Código: {{ myEnrollment.certificate.certificate_code }}</span>
+                        <div
+                            class="flex items-center justify-between border-b pb-2"
+                        >
+                            <span
+                                class="text-sm font-black text-slate-900 dark:text-white"
+                                >Plan Curricular y Calificación Oficial</span
+                            >
+                            <span class="font-mono text-[10px] text-slate-500"
+                                >Código:
+                                {{
+                                    myEnrollment.certificate.certificate_code
+                                }}</span
+                            >
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                             <!-- Módulos -->
-                            <div class="md:col-span-2 space-y-2">
-                                <div class="font-bold text-xs text-rose-950 dark:text-rose-300">Contenido Temático Cursado:</div>
+                            <div class="space-y-2 md:col-span-2">
                                 <div
-                                    v-for="(mod, i) in myEnrollment.certificate.modules"
-                                    :key="i"
-                                    class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border text-[11px]"
+                                    class="text-xs font-bold text-rose-950 dark:text-rose-300"
                                 >
-                                    <div class="font-bold text-slate-900 dark:text-white">{{ mod.number }}: {{ mod.title }}</div>
-                                    <div class="text-[10px] text-slate-500">{{ mod.topics }}</div>
+                                    Contenido Temático Cursado:
+                                </div>
+                                <div
+                                    v-for="(mod, i) in myEnrollment.certificate
+                                        .modules"
+                                    :key="i"
+                                    class="rounded-xl border bg-slate-50 p-2.5 text-[11px] dark:bg-slate-800"
+                                >
+                                    <div
+                                        class="font-bold text-slate-900 dark:text-white"
+                                    >
+                                        {{ mod.number }}: {{ mod.title }}
+                                    </div>
+                                    <div class="text-[10px] text-slate-500">
+                                        {{ mod.topics }}
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Calificación y QR -->
-                            <div class="space-y-4 flex flex-col items-center text-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border">
+                            <div
+                                class="flex flex-col items-center space-y-4 rounded-xl border bg-slate-50 p-3 text-center dark:bg-slate-800"
+                            >
                                 <div class="space-y-1">
-                                    <div class="text-[10px] font-bold text-slate-500 uppercase">Calificación Obtenida</div>
-                                    <div class="text-xl font-black text-rose-950 dark:text-rose-300">
-                                        {{ myEnrollment.certificate.final_grade || myEnrollment.certificate.grade_numeric }} / 20.00
+                                    <div
+                                        class="text-[10px] font-bold text-slate-500 uppercase"
+                                    >
+                                        Calificación Obtenida
                                     </div>
-                                    <div class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
-                                        {{ myEnrollment.certificate.final_grade_text || myEnrollment.certificate.grade_text }}
+                                    <div
+                                        class="text-xl font-black text-rose-950 dark:text-rose-300"
+                                    >
+                                        {{
+                                            myEnrollment.certificate
+                                                .final_grade ||
+                                            myEnrollment.certificate
+                                                .grade_numeric
+                                        }}
+                                        / 20.00
+                                    </div>
+                                    <div
+                                        class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400"
+                                    >
+                                        {{
+                                            myEnrollment.certificate
+                                                .final_grade_text ||
+                                            myEnrollment.certificate.grade_text
+                                        }}
                                     </div>
                                 </div>
 
-                                <div class="p-2 bg-white rounded-md border" v-html="myEnrollment.certificate.qr_svg" />
-                                <div class="text-[10px] font-mono text-slate-500">
+                                <div
+                                    class="rounded-md border bg-white p-2"
+                                    v-html="myEnrollment.certificate.qr_svg"
+                                />
+                                <div
+                                    class="font-mono text-[10px] text-slate-500"
+                                >
                                     Validación QR en tiempo real
                                 </div>
                             </div>

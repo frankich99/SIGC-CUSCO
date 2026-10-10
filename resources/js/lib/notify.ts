@@ -2,7 +2,14 @@ import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 export type ToastIcon = 'success' | 'error' | 'warning' | 'info' | 'question';
-export type ToastPosition = 'top-end' | 'top-start' | 'top-center' | 'bottom-end' | 'bottom-start' | 'bottom-center' | 'center';
+export type ToastPosition =
+    | 'top-end'
+    | 'top-start'
+    | 'top-center'
+    | 'bottom-end'
+    | 'bottom-start'
+    | 'bottom-center'
+    | 'center';
 
 export interface ToastOptions {
     id?: string | number;
@@ -35,7 +42,8 @@ let lastToastSignature: string = '';
 let lastToastTimestamp: number = 0;
 
 export function addToast(options: ToastOptions | string): number {
-    const opts: ToastOptions = typeof options === 'string' ? { title: options } : options;
+    const opts: ToastOptions =
+        typeof options === 'string' ? { title: options } : options;
     const title = (opts.title || '').trim();
     const text = (opts.text || '').trim();
     const icon = opts.icon || 'success';
@@ -76,7 +84,8 @@ export function addToast(options: ToastOptions | string): number {
         icon,
         position: opts.position || 'top-end',
         timer: duration,
-        timerProgressBar: opts.timerProgressBar !== undefined ? opts.timerProgressBar : true,
+        timerProgressBar:
+            opts.timerProgressBar !== undefined ? opts.timerProgressBar : true,
         remaining: duration,
         createdAt: now,
     };
@@ -130,11 +139,14 @@ if (typeof window !== 'undefined') {
         fire: (opts: ToastOptions | string) => notify.fire(opts),
         mixin: (baseOpts: Partial<ToastOptions>) => ({
             fire: (opts: ToastOptions | string) => {
-                const merged = typeof opts === 'string' ? { ...baseOpts, title: opts } : { ...baseOpts, ...opts };
+                const merged =
+                    typeof opts === 'string'
+                        ? { ...baseOpts, title: opts }
+                        : { ...baseOpts, ...opts };
                 return notify.fire(merged as ToastOptions);
             },
         }),
-        toast: notify.fire,
+        toast: (opts: ToastOptions | string) => notify.fire(opts),
     };
 }
 
@@ -146,11 +158,17 @@ export function setupInertiaFlashListener(): void {
     isListenerInitialized = true;
 
     function checkFlash(pageProps: any) {
-        const flash = pageProps?.flash as Record<string, string | null> | undefined;
+        const flash = pageProps?.flash as
+            | Record<string, string | null>
+            | undefined;
         if (!flash) return;
 
         const flashKey = JSON.stringify(flash);
-        if (flashKey === lastProcessedFlash || flashKey === '{}' || flashKey === 'null') {
+        if (
+            flashKey === lastProcessedFlash ||
+            flashKey === '{}' ||
+            flashKey === 'null'
+        ) {
             return;
         }
 
@@ -195,7 +213,9 @@ export function setupInertiaFlashListener(): void {
     };
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', checkInitialFlash, { once: true });
+        document.addEventListener('DOMContentLoaded', checkInitialFlash, {
+            once: true,
+        });
     } else {
         setTimeout(checkInitialFlash, 50);
     }

@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import { Award, FolderGit2, Globe, GraduationCap, LayoutGrid, ShieldCheck } from '@lucide/vue';
+import {
+    Award,
+    FolderGit2,
+    Globe,
+    GraduationCap,
+    LayoutGrid,
+    ShieldCheck,
+} from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';

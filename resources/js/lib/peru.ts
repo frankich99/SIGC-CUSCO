@@ -31,7 +31,8 @@ export const PERU_CONFIG = {
             longitude: -71.96734,
         },
         googleMapsUrl: 'https://maps.google.com/?q=-13.52264,-71.96734',
-        openStreetMapUrl: 'https://www.openstreetmap.org/?mlat=-13.52264&mlon=-71.96734#map=17/-13.52264/-71.96734',
+        openStreetMapUrl:
+            'https://www.openstreetmap.org/?mlat=-13.52264&mlon=-71.96734#map=17/-13.52264/-71.96734',
     },
 } as const;
 

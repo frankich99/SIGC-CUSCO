@@ -84,7 +84,9 @@ defineOptions({
             </div>
 
             <div class="grid gap-2">
-                <Label for="password_confirmation">Confirmar nueva contraseña</Label>
+                <Label for="password_confirmation"
+                    >Confirmar nueva contraseña</Label
+                >
                 <PasswordInput
                     id="password_confirmation"
                     name="password_confirmation"
