@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.9.18)  7 OCT 2026 05:46
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.9.18)  10 OCT 2026 18:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -643,7 +643,7 @@ Package babel Info: Main language set to 'spanish'.
 Package hyperref Info: Option `pageanchor' set `false' on input line 12.
 
 (secciones/00_portada.tex
-<imagenes/escudo.png, id=119, 555.07375pt x 714.67pt>
+<imagenes/escudo.png, id=171, 555.07375pt x 714.67pt>
 File: imagenes/escudo.png Graphic file (type png)
 <use imagenes/escudo.png>
 Package pdftex.def Info: imagenes/escudo.png  used on input line 9.
@@ -711,43 +711,95 @@ Package hyperref Info: Option `pageanchor' set `true' on input line 19.
 LaTeX Info: Redefining \. on input line 1.
 LaTeX Info: Redefining \% on input line 1.
 Package cleveref Info: loaded `spanish' language definitions on input line 1.
-)
+ [1])
 \tf@toc=\write4
 \openout4 = `main.toc'.
 
- [1] (secciones/01_datos_generales.tex) [1]
+ [2] (secciones/01_datos_generales.tex) [1]
 (secciones/02_contexto_restricciones.tex
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `cmtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-) [2]
-(secciones/03_enfoque_desarrollo.tex) (secciones/04_roles_coordinacion.tex
-[3]) (secciones/05_flujo_trabajo.tex [4])
-(secciones/06_incrementos_proyecto.tex [5]
-LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 22.
 
-Overfull \hbox (20.4941pt too wide) in paragraph at lines 24--25
-[]\T1/ptm/b/n/12 (-20) Implementación con Re-si-lien-cia (\T1/cmtt/m/n/12 PeruD
-evsDniService\T1/ptm/b/n/12 (-20) ): \T1/ptm/m/n/12 (-20) Ser-vi-cio en \T1/cmt
-t/m/n/12 app/Services/Dni/
+Overfull \hbox (34.52635pt too wide) in paragraph at lines 12--13
+[]\T1/ptm/b/n/12 (-20) API REST Pe-ru-Devs\T1/ptm/m/n/12 (-20) , des-aco-pla-da
+ me-dian-te el con-tra-to \T1/cmtt/m/n/12 DniLookupService
  []
 
-[6]
-<imagenes/captura-verificacion-correo.png, id=204, 576.1525pt x 531.9875pt>
+) [2] (secciones/03_enfoque_desarrollo.tex)
+(secciones/04_roles_coordinacion.tex [3]) (secciones/05_flujo_trabajo.tex
+[4]) (secciones/06_incrementos_proyecto.tex [5]
+<imagenes/captura_login.png, id=272, 1284.8pt x 853.1875pt>
+File: imagenes/captura_login.png Graphic file (type png)
+<use imagenes/captura_login.png>
+Package pdftex.def Info: imagenes/captura_login.png  used on input line 26.
+(pdftex.def)             Requested size: 398.61427pt x 264.70671pt.
+ [6]
+<imagenes/captura_catalogo.png, id=278, 1284.8pt x 853.1875pt>
+File: imagenes/captura_catalogo.png Graphic file (type png)
+<use imagenes/captura_catalogo.png>
+Package pdftex.def Info: imagenes/captura_catalogo.png  used on input line 35.
+(pdftex.def)             Requested size: 398.61427pt x 264.70671pt.
+<imagenes/captura-verificacion-correo.png, id=280, 576.1525pt x 531.9875pt>
 File: imagenes/captura-verificacion-correo.png Graphic file (type png)
 <use imagenes/captura-verificacion-correo.png>
 Package pdftex.def Info: imagenes/captura-verificacion-correo.png  used on inpu
-t line 39.
-(pdftex.def)             Requested size: 407.66867pt x 376.43121pt.
- [7 <./imagenes/captura-verificacion-correo.png (PNG copy)>]
-Underfull \hbox (badness 10000) in paragraph at lines 86--99
-\T1/cmtt/m/n/12 Tests\Feature\CourseTest ...................................
+t line 44.
+(pdftex.def)             Requested size: 371.43729pt x 342.97914pt.
+ [7 <./imagenes/captura_login.png (PNG copy)> <./imagenes/captura_catalogo.png 
+(PNG copy)>] [8 <./imagenes/captura-verificacion-correo.png (PNG copy)>] [9]
+LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 108.
+
+Underfull \hbox (badness 2556) in paragraph at lines 109--110
+[]\T1/ptm/b/n/12 (+20) Generación de QR di-ná-mi-co tem-po-ral (\T1/cmtt/m/n/12
+ AttendanceQrService\T1/ptm/b/n/12 (+20) ): \T1/ptm/m/n/12 (+20) El do-cen-te
  []
 
-[8] [9]) (secciones/07_politica_registro_ia.tex) [10]
-(secciones/08_conclusiones.tex) [11] (main.aux
+
+Underfull \hbox (badness 1014) in paragraph at lines 109--110
+\T1/cmtt/m/n/12 bacon/bacon-qr-code\T1/ptm/m/n/12 (+20) . Ca-da QR con-tie-ne u
+na URL fir-ma-da crip-to-grá-fi-ca-men-te
+ []
+
+<imagenes/captura_curso_detalle.png, id=298, 1284.8pt x 853.1875pt>
+File: imagenes/captura_curso_detalle.png Graphic file (type png)
+<use imagenes/captura_curso_detalle.png>
+Package pdftex.def Info: imagenes/captura_curso_detalle.png  used on input line
+ 119.
+(pdftex.def)             Requested size: 398.61427pt x 264.70671pt.
+[10] [11 <./imagenes/captura_curso_detalle.png (PNG copy)>] [12]
+<imagenes/captura_acta_oficial.png, id=319, 1284.8pt x 853.1875pt>
+File: imagenes/captura_acta_oficial.png Graphic file (type png)
+<use imagenes/captura_acta_oficial.png>
+Package pdftex.def Info: imagenes/captura_acta_oficial.png  used on input line 
+191.
+(pdftex.def)             Requested size: 398.61427pt x 264.70671pt.
+ [13]
+<imagenes/captura_nomina_acta.png, id=326, 1384.42218pt x 237.13594pt>
+File: imagenes/captura_nomina_acta.png Graphic file (type png)
+<use imagenes/captura_nomina_acta.png>
+Package pdftex.def Info: imagenes/captura_nomina_acta.png  used on input line 2
+00.
+(pdftex.def)             Requested size: 398.61427pt x 68.27554pt.
+<imagenes/captura_certificados.png, id=329, 1284.8pt x 853.1875pt>
+File: imagenes/captura_certificados.png Graphic file (type png)
+<use imagenes/captura_certificados.png>
+Package pdftex.def Info: imagenes/captura_certificados.png  used on input line 
+209.
+(pdftex.def)             Requested size: 398.61427pt x 264.70671pt.
+ [14 <./imagenes/captura_acta_oficial.png (PNG copy)> <./imagenes/captura_nomin
+a_acta.png>]
+<imagenes/captura_matriz_calidad.png, id=338, 512.66531pt x 266.49562pt>
+File: imagenes/captura_matriz_calidad.png Graphic file (type png)
+<use imagenes/captura_matriz_calidad.png>
+Package pdftex.def Info: imagenes/captura_matriz_calidad.png  used on input lin
+e 218.
+(pdftex.def)             Requested size: 385.02577pt x 200.14774pt.
+ [15 <./imagenes/captura_certificados.png (PNG copy)> <./imagenes/captura_matri
+z_calidad.png>] [16]) (secciones/07_politica_registro_ia.tex [17]) [18]
+(secciones/08_conclusiones.tex [19]) [20] (main.aux
 LaTeX Info: Redefining \. on input line 11.
 LaTeX Info: Redefining \% on input line 11.
 Package cleveref Info: loaded `spanish' language definitions on input line 11.
@@ -757,26 +809,28 @@ LaTeX2e <2026-06-01>
 L3 programming layer <2026-08-10>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: A559AC69050A232540AD233187682AD4;6893.
+(rerunfilecheck)             Checksum: F79343BF5399551C101EA90CD9464B7C;10851.
  ) 
 Here is how much of TeX's memory you used:
- 19196 strings out of 467441
- 328976 string characters out of 5407591
- 808362 words of memory out of 5000000
- 47835 multiletter control sequences out of 15000+600000
- 704148 words of font info for 316 fonts, out of 8000000 for 9000
+ 19392 strings out of 467441
+ 332894 string characters out of 5407591
+ 812362 words of memory out of 5000000
+ 47930 multiletter control sequences out of 15000+600000
+ 710030 words of font info for 364 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 79i,12n,86p,1003b,762s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 79i,13n,86p,1003b,1211s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\madar\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt
 1095.pk> <C:\Users\madar\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
-0\ectt1200.pk><C:/Users/madar/AppData/Local/Programs/MiKTeX/fonts/type1/urw/tim
-es/utmb8a.pfb><C:/Users/madar/AppData/Local/Programs/MiKTeX/fonts/type1/urw/tim
-es/utmbi8a.pfb><C:/Users/madar/AppData/Local/Programs/MiKTeX/fonts/type1/urw/ti
-mes/utmr8a.pfb><C:/Users/madar/AppData/Local/Programs/MiKTeX/fonts/type1/urw/ti
-mes/utmri8a.pfb>
-Output written on main.pdf (13 pages, 317912 bytes).
+0\ectt1200.pk><C:/Users/madar/AppData/Local/Programs/MiKTeX/fonts/type1/public/
+amsfonts/cm/cmmi10.pfb><C:/Users/madar/AppData/Local/Programs/MiKTeX/fonts/type
+1/public/amsfonts/cm/cmsy10.pfb><C:/Users/madar/AppData/Local/Programs/MiKTeX/f
+onts/type1/urw/times/utmb8a.pfb><C:/Users/madar/AppData/Local/Programs/MiKTeX/f
+onts/type1/urw/times/utmbi8a.pfb><C:/Users/madar/AppData/Local/Programs/MiKTeX/
+fonts/type1/urw/times/utmr8a.pfb><C:/Users/madar/AppData/Local/Programs/MiKTeX/
+fonts/type1/urw/times/utmri8a.pfb>
+Output written on main.pdf (23 pages, 1064772 bytes).
 PDF statistics:
- 371 PDF objects out of 1000 (max. 8388607)
- 71 named destinations out of 1000 (max. 500000)
- 88307 words of extra memory for PDF output out of 89155 (max. 10000000)
+ 543 PDF objects out of 1000 (max. 8388607)
+ 106 named destinations out of 1000 (max. 500000)
+ 88446 words of extra memory for PDF output out of 89155 (max. 10000000)
 

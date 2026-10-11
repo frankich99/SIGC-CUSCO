@@ -1,61 +1,55 @@
 \section{Incrementos presentados del proyecto}
 
-El desarrollo se realiza mediante entregas periódicas de software utilizable. A continuación se reporta el primer incremento concluido:
+El desarrollo de SIGC-CUSCO se estructuró bajo una estrategia ágil e incremental, entregando software funcional, probado y validado en cada ciclo de trabajo. A continuación se reportan los tres incrementos desarrollados que integran la plataforma académica completa.
 
-\subsection{Incremento 1: Autenticación RBAC y Gestión de Capacitaciones}
+% ==============================================================================
+% 6.1. INCREMENTO 1
+% ==============================================================================
+\subsection{Incremento 1: Autenticación RBAC, Catálogo y Validación DNI RENIEC}
 
-El objetivo de este primer ciclo fue montar la base técnica del sistema en Laravel 13, conectar la base de datos MySQL 8.0 y permitir que los administradores gestionen cursos de forma segura.
+El objetivo del primer ciclo fue construir la base arquitectónica del sistema en Laravel 13 con PHP 8.3, establecer la persistencia en MySQL 8.0, configurar la seguridad basada en roles (RBAC) y habilitar el catálogo público de capacitaciones con consulta de identidad ante RENIEC.
 
 \subsubsection{Funcionalidad desarrollada}
 \begin{itemize}[nosep]
-    \item \textbf{Estructura base:} Proyecto Laravel 13 con tablas y migraciones vinculadas en MySQL 8.0.
-    \item \textbf{Seguridad y roles (RBAC):} Inicio de sesión con permisos diferenciados para Administrador, Docente y Participante mediante políticas (\texttt{CoursePolicy}).
-    \item \textbf{Gestión de cursos:} Formulario para crear y editar cursos con código único, título, fechas de inicio/fin, horas académicas, límite de vacantes y docente asignado.
-    \item \textbf{Catálogo de cursos:} Interfaz con buscador reactivo y filtros por estado (Abierto, En curso, Concluido, Cancelado).
-    \item \textbf{Integración con API RENIEC / PeruDevs:} Servicio desacoplado \texttt{DniLookupService} y controlador REST que consulta en tiempo real nombres y apellidos ante PeruDevs, con caché local de 30 días para evitar latencia y consumo reiterativo.
-    \item \textbf{Frontend SPA Reactivo (Inertia.js v3 + Vue 3):} Vistas dinámicas con Tailwind CSS, navegación fluida sin recargas y componente de consulta DNI en tiempo real.
-\end{itemize}
-
-\subsubsection{Arquitectura unificada del servicio de consulta DNI}
-Para garantizar que la verificación de ciudadanos sea reutilizable en todos los módulos (registro, matrícula y emisión de certificados) sin duplicar código, se implementó el patrón de inversión de dependencias:
-\begin{itemize}[nosep]
-    \item \textbf{Objeto de Transferencia (\texttt{DniPerson}):} DTO inmutable con tipado estricto que encapsula los datos retornados por la API oficial (DNI, nombres, apellidos paterno/materno, género y código verificador).
-    \item \textbf{Contrato (\texttt{DniLookupService}):} Interfaz en \texttt{app/Contracts/} que desacopla la lógica de negocio del proveedor externo.
-    \item \textbf{Implementación con Resiliencia (\texttt{PeruDevsDniService}):} Servicio en \texttt{app/Services/Dni/} que pre-valida el formato de 8 dígitos, aplica un tiempo de espera controlado (15 segundos) y almacena en la caché de Laravel los resultados válidos por 30 días.
-    \item \textbf{Controlador REST y Componente Vue:} Endpoint \texttt{GET /api/dni/\{dni\}} consumido asíncronamente por el componente \texttt{DniSearchCard.vue} integrado en el catálogo de capacitaciones y el panel de control.
+    \item \textbf{Estructura base del sistema:} Configuración del entorno monolítico moderno en Laravel 13, migraciones relacionales con motor InnoDB y configuración de la base de datos MySQL 8.0 con cotejamiento \texttt{utf8mb4\_unicode\_ci}.
+    \item \textbf{Seguridad y roles institucionales (RBAC):} Sistema de autenticación con Laravel Fortify para Administrador, Docente y Participante, reforzado con políticas de autorización (\texttt{CoursePolicy}).
+    \item \textbf{Catálogo reactivo de capacitaciones:} Portal público construido con Inertia.js v3 y Vue 3, con buscador reactivo en tiempo real y filtrado por estado (Abierto, En curso, Concluido, Cancelado).
+    \item \textbf{Integración con API RENIEC / PeruDevs:} Servicio desacoplado mediante el contrato \texttt{DniLookupService} y DTO inmutable \texttt{DniPerson}, con memoria caché de 30 días para optimizar tiempos de respuesta y evitar costos de consulta repetitiva.
+    \item \textbf{Verificación de correo institucional:} Flujo de confirmación de cuenta mediante correos electrónicos con enlaces temporales firmados para evitar registros con direcciones falsas.
 \end{itemize}
 
 \subsubsection{Evidencia de funcionamiento}
-La plataforma ya funciona en el entorno local, permitiendo iniciar sesión y crear capacitaciones.
-
-\paragraph{Verificación de correo electrónico.}
-Como parte del flujo de autenticación, el sistema envía al usuario un correo
-con un enlace temporal para confirmar su dirección de correo electrónico.
-Esta evidencia demuestra que la verificación de cuentas se encuentra integrada
-en el primer incremento.
+En este primer incremento se logró poner en marcha la navegación institucional, el catálogo público y el módulo de acceso.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{captura-verificacion-correo.png}
-    \caption{Correo de verificación enviado por SIGC-CUSCO.}
+    \includegraphics[width=0.88\textwidth]{captura_login.png}
+    \caption{Pantalla institucional de inicio de sesión de SIGC-CUSCO con soporte para correo, DNI y llaves de acceso (\textit{Passkeys}).}
+    \label{fig:login}
+\end{figure}
+
+En la \cref{fig:login} se observa el formulario de autenticación institucional seguro con validación de credenciales y compatibilidad con estándares de acceso sin contraseña.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{captura_catalogo.png}
+    \caption{Catálogo interactivo de cursos y capacitaciones con buscador reactivo y selector de tema claro/oscuro.}
+    \label{fig:catalogo}
+\end{figure}
+
+La \cref{fig:catalogo} muestra el portal principal donde los participantes visualizan las convocatorias vigentes, el número de vacantes y el estado del curso en tiempo real.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{captura-verificacion-correo.png}
+    \caption{Notificación y enlace temporal de verificación de correo electrónico institucional emitido por SIGC-CUSCO.}
     \label{fig:correo-verificacion}
 \end{figure}
 
-En la \cref{fig:correo-verificacion} se observa el botón \enquote{Verify Email
-Address} y el enlace alternativo que puede copiarse en el navegador. El enlace
-se genera de forma temporal para evitar que la confirmación permanezca válida
-indefinidamente.
-
-\begin{cajaevidencia}{Capturas de pantalla del sistema}
-    \textbf{¿Qué debe ingresar aquí?:}
-    Capturas de pantalla de la aplicación web: formulario de login, formulario para crear una capacitación y tabla de cursos guardados en la base de datos.
-    \vspace{0.15cm}
-    \textbf{Ejemplo sugerido:}
-    Pegar una o dos imágenes mostrando la pantalla de login y el listado de capacitaciones activas en \texttt{http://localhost:8000/cursos}.
-\end{cajaevidencia}
+La \cref{fig:correo-verificacion} ilustra el correo generado automáticamente para garantizar que los participantes registrados certifiquen la titularidad de su bandeja de entrada antes de matricularse.
 
 \subsubsection{Pruebas o validaciones realizadas}
-Se implementó una suite integral de pruebas automáticas con Pest PHP y PHPUnit sobre una base de datos MySQL dedicada (\texttt{SIGC\_testing}), garantizando el aislamiento del entorno de producción y desarrollo:
+Se diseñaron e implementaron pruebas automáticas de regresión sobre una base de datos MySQL dedicada (\texttt{SIGC\_testing}):
 
 \begin{table}[H]
 \centering
@@ -64,65 +58,232 @@ Se implementó una suite integral de pruebas automáticas con Pest PHP y PHPUnit
 \toprule
 \textbf{Código} & \textbf{Prueba realizada} & \textbf{Resultado esperado} & \textbf{Estado} \\
 \midrule
-\textbf{CP-01} & Alumno intenta entrar a la pantalla de crear cursos. & Acceso denegado (Error HTTP 403 vía \texttt{CoursePolicy}). & \textbf{Aprobado} \\
+\textbf{CP-01} & Alumno o usuario anónimo intenta acceder al formulario de creación de cursos. & Acceso bloqueado con error HTTP 403 mediante la política \texttt{CoursePolicy}. & \textbf{Aprobado} \\
 \addlinespace
-\textbf{CP-02} & Se intenta guardar un curso con vacantes en 0 o negativo. & Formulario bloquea y muestra mensaje de alerta en español. & \textbf{Aprobado} \\
+\textbf{CP-02} & Se envía una solicitud de curso con vacantes menores o iguales a cero. & Rechazo con error de validación en español indicando cupo positivo obligatorio. & \textbf{Aprobado} \\
 \addlinespace
-\textbf{CP-03} & Se ingresa una fecha de fin menor a la fecha de inicio. & Error de validación por fechas incoherentes (\texttt{after\_or\_equal}). & \textbf{Aprobado} \\
+\textbf{CP-03} & Se ingresa una fecha de fin anterior a la fecha de inicio del curso. & Validación \texttt{after\_or\_equal} rechaza el envío antes de tocar la base de datos. & \textbf{Aprobado} \\
 \addlinespace
-\textbf{CP-04} & Se completa el formulario con datos válidos y docente. & Curso persistido en base de datos MySQL y visible en catálogo. & \textbf{Aprobado} \\
+\textbf{CP-04} & El administrador registra un curso válido con docente asignado. & Registro persistido en MySQL e inmediatamente disponible en el catálogo SPA. & \textbf{Aprobado} \\
 \addlinespace
-\textbf{CP-05} & Consulta de DNI mediante servicio externo PeruDevs. & Retorna objeto estructurado \texttt{DniPerson} y almacena en caché 30 días. & \textbf{Aprobado} \\
+\textbf{CP-05} & Consulta de DNI ante el servicio desacoplado PeruDevs. & Retorno del DTO estructurado \texttt{DniPerson} y almacenamiento en caché por 30 días. & \textbf{Aprobado} \\
 \bottomrule
 \end{tabularx}
-\caption{Pruebas automáticas ejecutadas en el Incremento 1.}
+\caption{Pruebas automatizadas ejecutadas en el Incremento 1.}
 \label{tab:pruebas_inc1}
 \end{table}
 
-\paragraph{Resultado de ejecución de la suite de pruebas.}
-A continuación se reporta la ejecución de la batería completa de pruebas automatizadas:
-
-\begin{quote}
-    \texttt{\$ php artisan test} \\
-    \texttt{Tests\textbackslash Feature\textbackslash Auth\textbackslash RegistrationTest ................. PASS} \\
-    \texttt{Tests\textbackslash Feature\textbackslash CourseTest ................................... PASS} \\
-    \texttt{  [OK] no autenticado o no admin no puede acceder a crear cursos} \\
-    \texttt{  [OK] capacidad debe ser un entero positivo} \\
-    \texttt{  [OK] fecha de fin debe ser posterior o igual a fecha de inicio} \\
-    \texttt{  [OK] admin puede registrar curso valido en mysql} \\
-    \texttt{  [OK] endpoint dni retorna 422 para dni invalido} \\
-    \texttt{Tests\textbackslash Feature\textbackslash Services\textbackslash DniLookupServiceTest ............ PASS} \\
-    \texttt{  [OK] consulta exitosa retorna DniPerson estructurado} \\
-    \texttt{  [OK] respuesta exitosa se almacena en cache 30 dias} \\
-    \texttt{\textbf{Tests: 50 passed (166 assertions)}} \\
-    \texttt{Duration: 2.50s}
-\end{quote}
-
 \subsubsection{Cambios realizados respecto al avance anterior}
 \begin{itemize}[nosep]
-    \item \textbf{Uso formal de Jira:} Se abandonaron notas externas para controlar cada tarea con tickets de Jira (\texttt{SIGC-XX}).
-    \item \textbf{Tablas ordenadas en MySQL:} Se separaron las tablas de usuarios, roles y cursos para no duplicar datos y asegurar relaciones limpias.
-    \item \textbf{Validación estricta en Laravel:} Se configuraron reglas automáticas para impedir que se ingresen cupos negativos o fechas erróneas.
+    \item \textbf{Adopción de Jira Software:} Se formalizó el seguimiento de historias de usuario (\texttt{SIGC-1} y \texttt{SIGC-2}) con criterios en formato Gherkin.
+    \item \textbf{Estructura relacional limpia:} Normalización de tablas \texttt{users}, \texttt{courses} y \texttt{roles} en MySQL con claves foráneas estrictas.
+    \item \textbf{Arquitectura desacoplada de DNI:} Reemplazo de llamadas directas a cURL por el contrato \texttt{DniLookupService}.
 \end{itemize}
 
 \subsubsection{Métricas y seguimiento del proceso}
 \begin{itemize}[nosep]
-    \item \textbf{Tiempo por tarea (\textit{Cycle Time}):} En promedio, cada historia tomó 2 días desde que se empezó a programar hasta que se aprobó.
-    \item \textbf{Control de tareas en curso:} Se respetó el tope de 2 tareas simultáneas, evitando amontonar trabajo sin terminar.
-    \item \textbf{Cumplimiento:} Se terminaron al 100\% las dos historias comprometidas (\texttt{SIGC-1} y \texttt{SIGC-2}).
+    \item \textbf{Tiempo de ciclo (\textit{Cycle Time}):} Promedio de 2.2 días por historia de usuario desde el inicio de desarrollo hasta la aprobación del Pull Request.
+    \item \textbf{Límite WIP respetado:} Se mantuvo el tope estricto de máximo 2 tareas simultáneas en desarrollo.
+    \item \textbf{Tasa de entrega:} 100\% de las historias comprometidas cerradas con pruebas verdes.
 \end{itemize}
-
-\begin{cajaevidencia}{Captura del tablero Jira}
-    \textbf{¿Qué debe ingresar aquí?:}
-    Captura de pantalla de Jira mostrando las tarjetas en la columna \textbf{Done} (Hecho).
-    \vspace{0.15cm}
-    \textbf{Ejemplo sugerido:}
-    Pegar imagen del tablero mostrando los tickets \texttt{SIGC-1} (Roles) y \texttt{SIGC-2} (Cursos) en la columna \textbf{Done}.
-\end{cajaevidencia}
 
 \subsubsection{Acuerdos de mejora para el siguiente incremento}
 \begin{enumerate}[nosep]
-    \item \textbf{Revisión rápida de código:} Atender los Pull Requests en menos de 24 horas para no frenar a los compañeros.
-    \item \textbf{Escribir pruebas antes del código:} Aplicar TDD para la matrícula de alumnos y control de aforo antes de diseñar la pantalla.
-    \item \textbf{Alistar la lectura de QR:} Probar la librería de escaneo con cámara antes de empezar el segundo incremento.
+    \item \textbf{Concurrencia en matrículas:} Incorporar bloqueo pesimista en base de datos para impedir que dos personas ocupen la última vacante simultáneamente.
+    \item \textbf{Asistencia por QR seguro:} Generar códigos QR firmados temporalmente en el servidor para evitar clonación de asistencias.
+\end{enumerate}
+
+\vspace{0.4cm}
+
+% ==============================================================================
+% 6.2. INCREMENTO 2
+% ==============================================================================
+\subsection{Incremento 2: Matrícula Transaccional, Asistencia por QR Dinámico y Sincronización Offline}
+
+El segundo incremento se enfocó en el núcleo operativo de las capacitaciones: el proceso de inscripción formal, el control atómico de vacantes y la marcación de asistencia de alumnos en aula mediante códigos QR dinámicos con URLs firmadas temporalmente.
+
+\subsubsection{Funcionalidad desarrollada}
+\begin{itemize}[nosep]
+    \item \textbf{Matrícula transaccional con bloqueo pesimista:} Implementación de transacciones de base de datos con \texttt{DB::transaction()} y \texttt{lockForUpdate()} sobre el curso y la matrícula. Si el aforo se agota durante inscripciones simultáneas, la transacción secundaria revierte de forma limpia (\textit{rollback}) sin sobrevender cupos.
+    \item \textbf{Servicio atómico de asistencia (\texttt{AttendanceService}):} Servicio centralizado que valida límites de sesiones, unicidad de marcación por participante y actualiza la tabla \texttt{attendance\_records} como fuente de verdad inmutable.
+    \item \textbf{Generación de QR dinámico temporal (\texttt{AttendanceQrService}):} El docente proyecta un código QR en pantalla generado como SVG vectorial puro mediante \texttt{bacon/bacon-qr-code}. Cada QR contiene una URL firmada criptográficamente (\texttt{URL::temporarySignedRoute}) con vigencia estricta de 5 minutos, impidiendo que alumnos ausentes marquen asistencia desde fotos o capturas enviadas por mensajería.
+    \item \textbf{Pantalla de escaneo y confirmación (\texttt{Scan.vue}):} Vista reactiva donde el alumno confirma su marcación de clase con retroalimentación inmediata de éxito o error.
+    \item \textbf{Sincronización de asistencia \textit{offline}:} Endpoint protegido para envío de asistencias en lote con validación de rangos cuando falla la conexión a Internet en el aula.
+\end{itemize}
+
+\subsubsection{Evidencia de funcionamiento}
+Se logró comprobar el registro de participantes y la proyección del control de clases en vivo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{captura_curso_detalle.png}
+    \caption{Detalle de la capacitación en SIGC-CUSCO con desglose de sesiones, horas lectivas, regla de asistencia mínima del 75\% y control de aforo en tiempo real.}
+    \label{fig:curso-detalle}
+\end{figure}
+
+En la \cref{fig:curso-detalle} se evidencia la vista institucional del curso, detallando las 40 horas académicas, las 4 sesiones programadas, el requisito universitario de asistencia y el control de los 25 cupos restantes sobre los 30 ofertados.
+
+\subsubsection{Pruebas o validaciones realizadas}
+Se incorporaron pruebas de integración y concurrencia ejecutadas con Pest PHP:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{P{1.8cm} P{4.8cm} P{4.5cm} Y}
+\toprule
+\textbf{Código} & \textbf{Prueba realizada} & \textbf{Resultado esperado} & \textbf{Estado} \\
+\midrule
+\textbf{CP-06} & Intento de inscripción cuando el aforo del curso está completo (capacidad = 0). & La transacción con \texttt{lockForUpdate} bloquea el registro e informa que no hay vacantes. & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-07} & El participante ya se encuentra matriculado en el mismo curso con su DNI. & Validación de duplicidad rechaza la inscripción duplicada con mensaje claro. & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-08} & Escaneo de código QR de sesión con URL expirada (mayor a 5 minutos). & Laravel bloquea la petición mediante middleware \texttt{signed} (Error HTTP 403). & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-09} & Marcación exitosa de asistencia por QR firmado para alumno matriculado. & Se inserta fila en \texttt{attendance\_records} y se recalcula el porcentaje de asistencia. & \textbf{Aprobado} \\
+\bottomrule
+\end{tabularx}
+\caption{Pruebas automatizadas ejecutadas en el Incremento 2.}
+\label{tab:pruebas_inc2}
+\end{table}
+
+\subsubsection{Cambios realizados respecto al avance anterior}
+\begin{itemize}[nosep]
+    \item \textbf{Protección contra carreras de datos:} Se eliminó el conteo de aforo en memoria; ahora se utiliza bloqueo a nivel de fila (\texttt{FOR UPDATE}) en MySQL.
+    \item \textbf{Sustitución de QR simulado por QR SVG real:} Se integró \texttt{bacon/bacon-qr-code} v3.1 eliminando generadores JavaScript de terceros.
+    \item \textbf{Desacoplamiento de asistencia:} La tabla \texttt{attendance\_records} pasó a ser la fuente de auditoría estricta.
+\end{itemize}
+
+\subsubsection{Métricas y seguimiento del proceso}
+\begin{itemize}[nosep]
+    \item \textbf{Tiempo de ciclo (\textit{Cycle Time}):} 1.8 días promedio por historia.
+    \item \textbf{Historias cerradas:} Se completaron con éxito los tickets \texttt{SIGC-3} (Matrícula segura) y \texttt{SIGC-4} (Asistencia por QR).
+\end{itemize}
+
+\subsubsection{Acuerdos de mejora para el siguiente incremento}
+\begin{enumerate}[nosep]
+    \item \textbf{Cierre de actas inmutable:} El acta de calificaciones debe congelarse definitivamente impidiendo cualquier edición posterior una vez cerrada.
+    \item \textbf{Firma criptográfica de diplomas:} Generar sellos digitales HMAC-SHA-256 para que los diplomas sean legalmente auditables y no puedan adulterarse.
+\end{enumerate}
+
+\vspace{0.4cm}
+
+% ==============================================================================
+% 6.3. INCREMENTO 3
+% ==============================================================================
+\subsection{Incremento 3: Cierre Oficial de Actas, Certificación HMAC-SHA-256, Validación Pública y Formato Institucional A4}
+
+El tercer incremento completó el ciclo integral de la plataforma, abordando el cierre académico de cursos, la aplicación del reglamento de evaluación de la UNSAAC, la certificación digital con sellos criptográficos, la verificación pública ciudadana y la presentación institucional para auditoría universitaria.
+
+\subsubsection{Funcionalidad desarrollada}
+\begin{itemize}[nosep]
+    \item \textbf{Cierre oficial e inmutabilidad de actas:} Módulo en \texttt{CourseAcademicController} que evalúa las condiciones de aprobación según el estatuto académico de la UNSAAC: \textbf{asistencia $\ge$ 75\%} y \textbf{calificación vigesimal $\ge$ 11.00}. Al cerrar el acta, se recalculan atómicamente todos los registros y se bloquean permanentemente modificaciones a notas, asistencias o matrículas. La reapertura de un acta queda estrictamente reservada para el rol Administrador mediante registro de auditoría.
+    \item \textbf{Emisión de certificados con firma criptográfica HMAC-SHA-256:} Implementado en \texttt{CertificateService}. Cada diploma emitido recibe un código único institucional (\texttt{CERT-2026-XXXXXXXX}) y una firma digital calculada con \texttt{hash\_hmac('sha256')} utilizando una clave secreta del servidor (\texttt{SIGC\_SIGNING\_KEY}). Cualquier intento de alterar nombres, horas o notas invalida instantáneamente el sello digital.
+    \item \textbf{Portal público de consulta y validación (\texttt{/certificates}):} Página web pública donde empresas, instituciones y egresados consultan la autenticidad de diplomas mediante DNI, código de certificado y comprobador criptográfico SHA-256, con enlace directo al padrón de RENIEC.
+    \item \textbf{Reporte oficial institucional del acta (Formato A4):} Vista imprimible y exportable (\texttt{/courses/\{course\}/reports/acta}) con encabezado oficial de la UNSAAC, resumen estadístico (total de matriculados, porcentaje de aprobación, reprobados y nota promedio), nómina alfabética con notas vigesimales, transcripción a letras (por ejemplo, \enquote{Veinte (20) - Sobresaliente Con Excelencia}) y hash criptográfico individual de auditoría.
+    \item \textbf{Experiencia de usuario y tema unificado:} Selector de tema oscuro/claro integrado en la barra de navegación institucional, con bordes redondeados y badges de estado semánticos centralizados en \texttt{theme.ts}.
+\end{itemize}
+
+\subsubsection{Evidencia de funcionamiento}
+A continuación se exhiben las pantallas del sistema operando con datos oficiales y firmas criptográficas verificadas:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{captura_acta_oficial.png}
+    \caption{Acta oficial de evaluación y asistencia de SIGC-CUSCO en formato estándar A4 institucional, con calificaciones vigesimales, notas en letras, condición y firmas digitales HMAC-SHA-256.}
+    \label{fig:acta-oficial}
+\end{figure}
+
+En la \cref{fig:acta-oficial} se aprecia el documento académico oficial generado para el curso de Desarrollo Web con Laravel 13, con docente a cargo, estadísticas (80\% de aprobación, promedio 17.9) y la firma HMAC calculada para cada estudiante participante.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{captura_nomina_acta.png}
+    \caption{Panel académico del docente y administrador mostrando la nómina de calificaciones vigesimales y la confirmación de acta cerrada oficialmente según reglamento UNSAAC.}
+    \label{fig:nomina-acta}
+\end{figure}
+
+La \cref{fig:nomina-acta} evidencia la confirmación visual de acta cerrada y la opción de descarga de datos en formato CSV para la secretaría académica de la facultad.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{captura_certificados.png}
+    \caption{Portal público de consulta y comprobación de certificados digitales con validación ante RENIEC y verificador criptográfico SHA-256.}
+    \label{fig:certificados}
+\end{figure}
+
+La \cref{fig:certificados} presenta el portal público ciudadano donde cualquier empleador o institución puede verificar la legitimidad de un diploma emitido por la UNSAAC.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{captura_matriz_calidad.png}
+    \caption{Resultados de la matriz de validaciones de calidad técnica: pruebas Pest pasadas al 100\%, análisis estático PHPStan Nivel 7 sin errores y chequeo de tipos TypeScript estricto.}
+    \label{fig:matriz-calidad}
+\end{figure}
+
+La \cref{fig:matriz-calidad} demuestra la rigurosidad técnica del proyecto, consolidando la ejecución de la batería completa de pruebas automatizadas y herramientas de análisis estático sin ninguna advertencia ni error.
+
+\subsubsection{Pruebas o validaciones realizadas}
+Para garantizar la fiabilidad del cierre académico y la seguridad criptográfica, se expandió la suite de pruebas automatizadas con Pest PHP:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{P{1.8cm} P{4.8cm} P{4.5cm} Y}
+\toprule
+\textbf{Código} & \textbf{Prueba realizada} & \textbf{Resultado esperado} & \textbf{Estado} \\
+\midrule
+\textbf{CP-10} & Cierre de acta con alumnos con nota $\ge 11.00$ y asistencia $\ge 75\%$. & Estado pasa automáticamente a \enquote{aprobado} y habilita emisión de diploma. & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-11} & Participante con asistencia menor a 75\% o nota menor a 11.00. & Estado pasa a \enquote{reprobado} y se bloquea la emisión de diploma digital. & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-12} & Intento de registrar o editar notas cuando el acta del curso ya fue cerrada. & Solicitud rechazada con error de negocio; el acta cerrada es inmutable. & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-13} & Emisión masiva de certificados tras el cierre oficial del acta. & Se generan códigos únicos y sellos HMAC-SHA-256 válidos verificables en base de datos. & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-14} & Docente no administrador intenta reabrir un acta cerrada. & Denegación de acceso con error HTTP 403 (solo administrador autorizado). & \textbf{Aprobado} \\
+\addlinespace
+\textbf{CP-15} & Consulta pública de certificado por DNI con código válido y hash correspondiente. & Retorna el diploma con firma auténtica; códigos o hashes alterados son rechazados. & \textbf{Aprobado} \\
+\bottomrule
+\end{tabularx}
+\caption{Pruebas automatizadas ejecutadas en el Incremento 3.}
+\label{tab:pruebas_inc3}
+\end{table}
+
+\paragraph{Resultado real de la batería de pruebas del sistema.}
+La ejecución formal de la suite de pruebas mediante el ejecutor de Pest PHP confirma el estado óptimo del código fuente en la rama de integración:
+
+\begin{quote}
+    \texttt{\$ php artisan test --compact} \\
+    \texttt{...................................................} \\
+    \texttt{...................................................} \\
+    \texttt{.............} \\
+    \texttt{\textbf{Tests: 115 passed (470 assertions)}} \\
+    \texttt{\textbf{Duration: 16.32s}}
+\end{quote}
+
+Adicionalmente, se superaron con éxito los siguientes controles de aseguramiento de calidad:
+\begin{itemize}[nosep]
+    \item \textbf{PHPStan (Nivel 7):} 0 errores de análisis estático sobre todos los modelos, controladores y servicios.
+    \item \textbf{TypeScript (\texttt{vue-tsc}):} 0 errores de tipos en la totalidad de componentes de la interfaz Vue 3.
+    \item \textbf{Formato de código (\texttt{Laravel Pint}):} 100\% del código PHP alineado a las convenciones PSR-12 y directrices de Laravel.
+\end{itemize}
+
+\subsubsection{Cambios realizados respecto al avance anterior}
+\begin{itemize}[nosep]
+    \item \textbf{Integridad criptográfica:} Implementación de HMAC-SHA-256 para impedir la falsificación de diplomas digitales.
+    \item \textbf{Inmutabilidad académica:} Blindaje del acta oficial ante cualquier intento de adulteración posterior al cierre.
+    \item \textbf{Formato estándar A4 institucional:} Estilización con Tailwind CSS preparada para impresión limpia en PDF y archivo físico.
+\end{itemize}
+
+\subsubsection{Métricas y seguimiento del proceso}
+\begin{itemize}[nosep]
+    \item \textbf{Tiempo de ciclo (\textit{Cycle Time}):} 1.5 días por historia en el Incremento 3 gracias a la reutilización de servicios modulares.
+    \item \textbf{Cobertura de pruebas:} 115 pruebas automáticas activas cubriendo todos los flujos críticos de negocio.
+    \item \textbf{Cumplimiento de objetivos:} 100\% de los requerimientos y compromisos del proyecto completados exitosamente.
+\end{itemize}
+
+\subsubsection{Acuerdos de entrega final y sostenibilidad}
+\begin{enumerate}[nosep]
+    \item \textbf{Despliegue institucional:} Mantener la configuración de variables de entorno seguras (\texttt{SIGC\_SIGNING\_KEY}) en servidores de producción.
+    \item \textbf{Respaldo periódico:} Programar copias de seguridad automáticas de MySQL para salvaguardar las actas y sellos criptográficos generados.
 \end{enumerate}

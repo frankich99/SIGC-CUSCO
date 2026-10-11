@@ -1,14 +1,14 @@
 \section{Política de uso de IA y registro de uso}
 
-En SIGC-CUSCO la Inteligencia Artificial se utiliza como una herramienta de apoyo para consultas técnicas. La autoría y responsabilidad del software es 100\% del equipo de estudiantes.
+En el desarrollo de SIGC-CUSCO la Inteligencia Artificial se utiliza como una herramienta de apoyo y consulta técnica. La autoría, diseño de arquitectura, verificación rigurosa y responsabilidad del software recae en su totalidad en el equipo de estudiantes.
 
 \subsection{Política de uso de IA}
 
-\begin{itemize}[nosep]
-    \item \textbf{Uso permitido:} Ayuda para ordenar historias de usuario, consultas puntuales de sintaxis en Laravel 13 y sugerencias de casos de prueba para PHPUnit.
-    \item \textbf{Uso prohibido:} Copiar y pegar código sin revisarlo; dejar que la IA decida la estructura del sistema o la base de datos; y subir datos privados o contraseñas a herramientas públicas.
-    \item \textbf{Regla obligatoria:} Toda ayuda de la IA debe probarse con PHPUnit y revisarse en equipo antes de integrarla al proyecto.
-\end{itemize}
+\begin{description}
+    \item[Uso permitido:] Asistencia para ordenar y redactar historias de usuario en formato Gherkin, consultas puntuales de sintaxis en Laravel 13 y PHP 8.3, exploración de algoritmos criptográficos estándar y generación de casos de prueba para Pest PHP.
+    \item[Uso prohibido:] Incorporación indiscriminada de código sin revisión; delegar decisiones críticas de arquitectura o modelado de datos a la IA; y subir claves privadas, secretos institucionales o credenciales a plataformas externas.
+    \item[Regla obligatoria de verificación:] Toda sugerencia o fragmento de código debe ser auditado manualmente por el equipo y respaldado por pruebas automatizadas aprobadas antes de integrarse al repositorio.
+\end{description}
 
 \subsection{Registro de uso de IA (Bitácora)}
 
@@ -19,13 +19,19 @@ En SIGC-CUSCO la Inteligencia Artificial se utiliza como una herramienta de apoy
 \toprule
 \textbf{Fecha / Ticket} & \textbf{Herramienta} & \textbf{¿Qué se consultó?} & \textbf{¿Cómo se revisó y aprobó?} \\
 \midrule
-\textbf{28/09/2026} \newline \texttt{SIGC-1} & Claude 3.5 Sonnet & Mejorar redacción de historias de usuario para roles en formato Gherkin. & Se quitaron supuestos que no pedía el docente y se subieron a Jira. \textit{Revisó: N. Choquenaira.} \\
+\textbf{28/09/2026} \newline \texttt{SIGC-1} & Claude 3.5 Sonnet & Mejorar redacción de historias de usuario para roles en formato Gherkin. & Se quitaron supuestos innecesarios y se validaron con la rúbrica docente. \textit{Revisó: N. Choquenaira.} \\
 \addlinespace
-\textbf{02/10/2026} \newline \texttt{SIGC-2} & ChatGPT (GPT-4o) & Sintaxis de validación en Laravel para que la fecha final no sea antes del inicio. & Se usó la regla nativa de Laravel y se probó con el caso CP-03. \textit{Revisó: C. Ccama.} \\
+\textbf{02/10/2026} \newline \texttt{SIGC-2} & ChatGPT (GPT-4o) & Sintaxis de validación en Laravel para coherencia cronológica de cursos. & Se aplicó la regla nativa \texttt{after\_or\_equal} y se comprobó con la prueba CP-03. \textit{Revisó: C. Ccama.} \\
 \addlinespace
-\textbf{07/10/2026} \newline \texttt{SIGC-3} & Google Antigravity & Diseño de servicio desacoplado y caché para la API REST de DNI PeruDevs. & Se implementó el contrato \texttt{DniLookupService}, DTO inmutable y se validó con suite de pruebas Pest. \textit{Revisó: F. Choquenaira.} \\
+\textbf{07/10/2026} \newline \texttt{SIGC-3} & Google Antigravity & Diseño de servicio desacoplado y caché para la API REST de DNI PeruDevs. & Se implementó el contrato \texttt{DniLookupService}, DTO inmutable y se validó con Pest PHP. \textit{Revisó: N. Choquenaira.} \\
+\addlinespace
+\textbf{08/10/2026} \newline \texttt{SIGC-4} & Google Antigravity & Patrón de concurrencia y bloqueo pesimista en MySQL para control de vacantes. & Se integró \texttt{DB::transaction} con \texttt{lockForUpdate()} y se verificó con prueba de sobrecupo CP-06. \textit{Revisó: N. Choquenaira.} \\
+\addlinespace
+\textbf{09/10/2026} \newline \texttt{SIGC-5} & Google Antigravity & Generación de QR dinámico temporal con URLs firmadas criptográficamente. & Se utilizó \texttt{AttendanceQrService} y \texttt{URL::temporarySignedRoute} con expiración de 5 minutos. \textit{Revisó: A. Yaranga.} \\
+\addlinespace
+\textbf{10/10/2026} \newline \texttt{SIGC-6} & Google Antigravity & Algoritmo de firma digital HMAC-SHA-256 e inmutabilidad de actas oficiales. & Se implementó en \texttt{CertificateService} con clave secreta y suite de pruebas CP-10 a CP-15. \textit{Revisó: N. Choquenaira.} \\
 \bottomrule
 \end{tabularx}
-\caption{Bitácora de consultas técnicas a Inteligencia Artificial.}
+\caption{Bitácora de consultas técnicas y asistencia de Inteligencia Artificial.}
 \label{tab:registro_ia}
 \end{table}

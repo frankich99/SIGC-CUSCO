@@ -14,23 +14,35 @@
 \contentsline {subsection}{\numberline {3.1}Prácticas adoptadas del proceso}{3}{subsection.3.1}%
 \contentsline {section}{\numberline {4}Roles, responsabilidades y forma de coordinación}{4}{section.4}%
 \contentsline {subsection}{\numberline {4.1}Forma de coordinación}{4}{subsection.4.1}%
-\contentsline {section}{\numberline {5}Flujo de trabajo del equipo}{4}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Estados del tablero}{4}{subsection.5.1}%
+\contentsline {section}{\numberline {5}Flujo de trabajo del equipo}{5}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Estados del tablero}{5}{subsection.5.1}%
 \contentsline {subsection}{\numberline {5.2}Límites de Trabajo en Progreso (Límites WIP)}{5}{subsection.5.2}%
 \contentsline {subsection}{\numberline {5.3}Política de bloqueo}{5}{subsection.5.3}%
 \contentsline {subsection}{\numberline {5.4}Definición de hecho (Definition of Done - DoD)}{5}{subsection.5.4}%
-\contentsline {section}{\numberline {6}Incrementos presentados del proyecto}{5}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Incremento 1: Autenticación RBAC y Gestión de Capacitaciones}{6}{subsection.6.1}%
+\contentsline {section}{\numberline {6}Incrementos presentados del proyecto}{6}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Incremento 1: Autenticación RBAC, Catálogo y Validación DNI RENIEC}{6}{subsection.6.1}%
 \contentsline {subsubsection}{\numberline {6.1.1}Funcionalidad desarrollada}{6}{subsubsection.6.1.1}%
-\contentsline {subsubsection}{\numberline {6.1.2}Arquitectura unificada del servicio de consulta DNI}{6}{subsubsection.6.1.2}%
-\contentsline {subsubsection}{\numberline {6.1.3}Evidencia de funcionamiento}{7}{subsubsection.6.1.3}%
-\contentsline {paragraph}{Verificación de correo electrónico.}{7}{section*.8}%
-\contentsline {subsubsection}{\numberline {6.1.4}Pruebas o validaciones realizadas}{8}{subsubsection.6.1.4}%
-\contentsline {paragraph}{Resultado de ejecución de la suite de pruebas.}{8}{section*.11}%
-\contentsline {subsubsection}{\numberline {6.1.5}Cambios realizados respecto al avance anterior}{9}{subsubsection.6.1.5}%
-\contentsline {subsubsection}{\numberline {6.1.6}Métricas y seguimiento del proceso}{9}{subsubsection.6.1.6}%
-\contentsline {subsubsection}{\numberline {6.1.7}Acuerdos de mejora para el siguiente incremento}{10}{subsubsection.6.1.7}%
-\contentsline {section}{\numberline {7}Política de uso de IA y registro de uso}{10}{section.7}%
-\contentsline {subsection}{\numberline {7.1}Política de uso de IA}{10}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Registro de uso de IA (Bitácora)}{11}{subsection.7.2}%
-\contentsline {section}{\numberline {8}Conclusiones}{11}{section.8}%
+\contentsline {subsubsection}{\numberline {6.1.2}Evidencia de funcionamiento}{6}{subsubsection.6.1.2}%
+\contentsline {subsubsection}{\numberline {6.1.3}Pruebas o validaciones realizadas}{8}{subsubsection.6.1.3}%
+\contentsline {subsubsection}{\numberline {6.1.4}Cambios realizados respecto al avance anterior}{9}{subsubsection.6.1.4}%
+\contentsline {subsubsection}{\numberline {6.1.5}Métricas y seguimiento del proceso}{9}{subsubsection.6.1.5}%
+\contentsline {subsubsection}{\numberline {6.1.6}Acuerdos de mejora para el siguiente incremento}{10}{subsubsection.6.1.6}%
+\contentsline {subsection}{\numberline {6.2}Incremento 2: Matrícula Transaccional, Asistencia por QR Dinámico y Sincronización Offline}{10}{subsection.6.2}%
+\contentsline {subsubsection}{\numberline {6.2.1}Funcionalidad desarrollada}{10}{subsubsection.6.2.1}%
+\contentsline {subsubsection}{\numberline {6.2.2}Evidencia de funcionamiento}{10}{subsubsection.6.2.2}%
+\contentsline {subsubsection}{\numberline {6.2.3}Pruebas o validaciones realizadas}{11}{subsubsection.6.2.3}%
+\contentsline {subsubsection}{\numberline {6.2.4}Cambios realizados respecto al avance anterior}{12}{subsubsection.6.2.4}%
+\contentsline {subsubsection}{\numberline {6.2.5}Métricas y seguimiento del proceso}{12}{subsubsection.6.2.5}%
+\contentsline {subsubsection}{\numberline {6.2.6}Acuerdos de mejora para el siguiente incremento}{12}{subsubsection.6.2.6}%
+\contentsline {subsection}{\numberline {6.3}Incremento 3: Cierre Oficial de Actas, Certificación HMAC-SHA-256, Validación Pública y Formato Institucional A4}{13}{subsection.6.3}%
+\contentsline {subsubsection}{\numberline {6.3.1}Funcionalidad desarrollada}{13}{subsubsection.6.3.1}%
+\contentsline {subsubsection}{\numberline {6.3.2}Evidencia de funcionamiento}{13}{subsubsection.6.3.2}%
+\contentsline {subsubsection}{\numberline {6.3.3}Pruebas o validaciones realizadas}{16}{subsubsection.6.3.3}%
+\contentsline {paragraph}{Resultado real de la batería de pruebas del sistema.}{16}{section*.19}%
+\contentsline {subsubsection}{\numberline {6.3.4}Cambios realizados respecto al avance anterior}{17}{subsubsection.6.3.4}%
+\contentsline {subsubsection}{\numberline {6.3.5}Métricas y seguimiento del proceso}{17}{subsubsection.6.3.5}%
+\contentsline {subsubsection}{\numberline {6.3.6}Acuerdos de entrega final y sostenibilidad}{17}{subsubsection.6.3.6}%
+\contentsline {section}{\numberline {7}Política de uso de IA y registro de uso}{17}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Política de uso de IA}{18}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Registro de uso de IA (Bitácora)}{19}{subsection.7.2}%
+\contentsline {section}{\numberline {8}Conclusiones}{19}{section.8}%

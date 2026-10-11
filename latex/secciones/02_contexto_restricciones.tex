@@ -4,14 +4,15 @@ El proyecto cuenta con un plazo estricto de \textbf{dos semanas} de desarrollo (
 
 \subsection{Tecnologías utilizadas}
 
-\begin{itemize}[nosep]
-    \item \textbf{Backend:} \textbf{Laravel 13} con \textbf{PHP 8.3}. Manejo modular de rutas, controladores, Form Requests tipados, políticas de autorización (RBAC) y el ORM Eloquent sobre MySQL.
-    \item \textbf{Base de Datos:} \textbf{MySQL 8.0} (motor InnoDB, cotejamiento \texttt{utf8mb4\_unicode\_ci}). Integridad referencial con claves foráneas e índices únicos para control estricto de cupos y matrículas.
-    \item \textbf{Frontend SPA:} \textbf{Inertia.js v3} con \textbf{Vue 3 (TypeScript)} y \textbf{Tailwind CSS}, ofreciendo una experiencia de aplicación de una sola página reactiva y fluida.
-    \item \textbf{Servicios externos de identidad:} \textbf{API REST PeruDevs}, desacoplada mediante la interfaz \texttt{DniLookupService} para validación oficial de DNI ante el Registro Nacional de Identificación y Estado Civil (RENIEC).
-    \item \textbf{Gestión del proyecto:} \textbf{Jira Software}. Tablero ágil para organizar el backlog de historias (\texttt{SIGC-XX}), limitar el trabajo en curso (WIP) y medir el avance del equipo.
-    \item \textbf{Control de versiones y pruebas:} \textbf{GitHub} con flujo de ramas por desarrollador (\texttt{ramaFRANKI}), Pull Requests y suite de pruebas automatizadas con \textbf{Pest PHP} y \textbf{PHPUnit}.
-\end{itemize}
+\begin{description}
+    \item[Backend:] \textbf{Laravel 13} con \textbf{PHP 8.3}. Manejo modular de rutas, controladores REST/Inertia, Form Requests tipados, políticas de autorización (RBAC), servicios atómicos de negocio y transacciones ACID pesimistas (\texttt{lockForUpdate}) sobre MySQL.
+    \item[Base de Datos:] \textbf{MySQL 8.0} (motor InnoDB, cotejamiento \texttt{utf8mb4\_unicode\_ci}). Integridad referencial estricta, claves foráneas e índices únicos para control de vacantes y unicidad de actas y matrículas.
+    \item[Frontend SPA:] \textbf{Inertia.js v3} con \textbf{Vue 3 (Composition API y TypeScript)} y \textbf{Tailwind CSS 4}. Interfaz reactiva fluida, componentes modulares, soporte unificado de modo oscuro/claro y tipado estricto.
+    \item[Seguridad Criptográfica y QR:] \textbf{BaconQrCode} para generación de códigos QR SVG institucionales, URLs firmadas temporalmente (\texttt{URL::temporarySignedRoute}) de 5 minutos para asistencia y firmas digitales \textbf{HMAC-SHA-256} para la validez de certificados.
+    \item[Servicios de Identidad:] \textbf{API REST PeruDevs}, desacoplada mediante el contrato \texttt{DniLookupService} para validación oficial ante el padrón de RENIEC.
+    \item[Gestión del Proyecto:] \textbf{Jira Software}. Tablero Kanban para organizar el backlog de historias (\texttt{SIGC-XX}), limitar el trabajo en curso (WIP) y medir el avance continuo del equipo.
+    \item[Control de Calidad y Pruebas:] Repositorio GitHub con ramas de desarrollo (\texttt{ramaFRANKI}), Pull Requests, suite de \textbf{115 pruebas automatizadas (470 aserciones)} en \textbf{Pest PHP}, análisis estático con \textbf{PHPStan (Nivel 7, 0 errores)}, chequeo de tipos con \textbf{vue-tsc} y formateador \textbf{Laravel Pint}.
+\end{description}
 
 \subsection{Stakeholders (Involucrados en el sistema)}
 
