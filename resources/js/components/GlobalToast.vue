@@ -108,7 +108,7 @@ function accentBorder(icon: string) {
         case 'success':
             return 'border-l-4 border-l-emerald-500';
         case 'error':
-            return 'border-l-4 border-l-rose-600';
+            return 'border-l-4 border-l-red-600';
         case 'warning':
             return 'border-l-4 border-l-amber-500';
         case 'info':
@@ -123,7 +123,7 @@ function progressBarColor(icon: string) {
         case 'success':
             return 'bg-emerald-500';
         case 'error':
-            return 'bg-rose-600';
+            return 'bg-red-600';
         case 'warning':
             return 'bg-amber-500';
         case 'info':
@@ -170,7 +170,7 @@ function progressBarColor(icon: string) {
                     <!-- Error -->
                     <div
                         v-else-if="currentToast.icon === 'error'"
-                        class="flex size-6 items-center justify-center rounded-full bg-rose-100 text-rose-600 shadow-xs ring-2 ring-rose-500/20 dark:bg-rose-950/80 dark:text-rose-400"
+                        class="flex size-6 items-center justify-center rounded-full bg-sky-100 text-[#296d88] shadow-xs ring-2 ring-sky-500/20 dark:bg-[#153542]/80 dark:text-[#88c0d7]"
                     >
                         <XCircle class="size-3.5 stroke-[2.8]" />
                     </div>

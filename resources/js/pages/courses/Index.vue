@@ -30,6 +30,8 @@ import {
     BookOpen,
     Building2,
     CheckCircle2,
+    XCircle,
+    AlertCircle,
 } from '@lucide/vue';
 import type { BreadcrumbItem } from '@/types';
 
@@ -149,7 +151,7 @@ function instructorName(inst?: Instructor): string {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Capacitaciones - SIGC-CUSCO" />
+        <Head title="Capacitaciones - SIGC-MDSJ" />
 
         <div
             class="mx-auto w-full max-w-7xl min-w-0 space-y-6 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
@@ -163,7 +165,7 @@ function instructorName(inst?: Instructor): string {
                         class="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-neutral-100"
                     >
                         <GraduationCap
-                            class="size-7 text-rose-900 dark:text-rose-400"
+                            class="size-7 text-[#3484a5] dark:text-[#88c0d7]"
                         />
                         Capacitaciones y Cursos
                     </h1>
@@ -177,7 +179,7 @@ function instructorName(inst?: Instructor): string {
                 <div v-if="can.create">
                     <Button
                         as-child
-                        class="h-9 bg-rose-900 px-4 text-xs font-black text-white shadow-xs hover:bg-rose-950"
+                        class="h-9 bg-[#3484a5] px-4 text-xs font-black text-white shadow-xs hover:bg-[#256883]"
                     >
                         <Link
                             href="/courses/create"
@@ -201,7 +203,7 @@ function instructorName(inst?: Instructor): string {
                         <Input
                             v-model="searchQuery"
                             placeholder="Buscar por título, código o contenido..."
-                            class="pl-9 font-medium text-slate-900"
+                            class="pl-9 font-medium text-slate-900 dark:text-slate-100"
                             @keydown.enter="applyFilters"
                         />
                     </div>
@@ -222,7 +224,7 @@ function instructorName(inst?: Instructor): string {
                             :class="[
                                 'shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors',
                                 selectedStatus === st.value
-                                    ? 'bg-rose-900 text-white shadow-xs dark:bg-rose-800'
+                                    ? 'bg-[#3484a5] text-white shadow-xs dark:bg-[#296d88]'
                                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300',
                             ]"
                         >
@@ -239,7 +241,7 @@ function instructorName(inst?: Instructor): string {
                     <Card
                         v-for="course in courses.data"
                         :key="course.id"
-                        class="flex max-w-full min-w-0 flex-col justify-between overflow-hidden border-slate-200 transition-all hover:border-rose-400/80 hover:shadow-md dark:border-neutral-800"
+                        class="flex max-w-full min-w-0 flex-col justify-between overflow-hidden border-slate-200 transition-all hover:border-[#3484a5]/60 hover:shadow-md dark:border-neutral-800"
                     >
                         <CardHeader
                             class="max-w-full min-w-0 space-y-2 p-4 pb-3 sm:p-5"
@@ -248,7 +250,7 @@ function instructorName(inst?: Instructor): string {
                                 class="flex w-full min-w-0 items-center justify-between gap-1.5"
                             >
                                 <span
-                                    class="shrink-0 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-0.5 font-mono text-xs font-bold text-rose-900 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300"
+                                    class="shrink-0 rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 font-mono text-xs font-bold text-[#3484a5] dark:border-[#296d88] dark:bg-[#153542]/60 dark:text-[#badbe9]"
                                 >
                                     {{ course.code }}
                                 </span>
@@ -262,48 +264,48 @@ function instructorName(inst?: Instructor): string {
                                 </span>
                             </div>
 
-                            <!-- Organizing Entity / Institution -->
-                            <div
-                                v-if="course.institution"
-                                class="flex w-full max-w-full min-w-0 items-center gap-1.5 overflow-hidden rounded-xl border border-rose-200/80 bg-rose-50/80 px-2.5 py-1 text-xs font-semibold text-rose-950 dark:border-rose-800/60 dark:bg-rose-950/40 dark:text-rose-200"
-                            >
-                                <Building2
-                                    class="size-3.5 shrink-0 text-rose-800 dark:text-rose-400"
-                                />
-                                <span class="block min-w-0 flex-1 truncate">{{
-                                    course.institution
-                                }}</span>
-                            </div>
-
+                            <!-- 1. Título Principal del Programa -->
                             <CardTitle
-                                class="line-clamp-2 min-w-0 text-base leading-snug font-bold break-words text-slate-900 dark:text-white"
+                                class="line-clamp-2 min-w-0 text-base leading-snug font-black break-words text-slate-950 dark:text-white"
                             >
                                 {{ course.title }}
                             </CardTitle>
+
+                            <!-- 2. Entidad Organizadora (Azul Institucional MDSJ) -->
+                            <div
+                                class="flex w-full max-w-full min-w-0 items-center gap-1.5 overflow-hidden rounded-lg border border-[#1a6b8a]/20 bg-[#1a6b8a]/5 px-2.5 py-1 text-xs font-bold text-[#1a6b8a] dark:border-[#3484a5]/40 dark:bg-[#1a6b8a]/20 dark:text-[#88c0d7]"
+                            >
+                                <Building2
+                                    class="size-3.5 shrink-0 text-[#1a6b8a] dark:text-[#3484a5]"
+                                />
+                                <span class="block min-w-0 flex-1 truncate">
+                                    <span class="font-extrabold text-[#1a6b8a] dark:text-[#88c0d7]">Organiza:</span>
+                                    {{ course.institution || 'Municipalidad de San Jerónimo' }}
+                                </span>
+                            </div>
+
                             <CardDescription
-                                class="mt-1 line-clamp-2 min-w-0 text-xs break-words"
+                                class="mt-0.5 line-clamp-2 min-w-0 text-xs break-words text-slate-600 dark:text-slate-400"
                             >
                                 {{
                                     course.description ||
-                                    'Sin descripción detallada.'
+                                    'Capacitación institucional oficial.'
                                 }}
                             </CardDescription>
                         </CardHeader>
 
                         <CardContent
-                            class="max-w-full min-w-0 space-y-2.5 overflow-hidden border-t px-4 pt-3 text-xs text-neutral-600 sm:px-5 dark:border-neutral-800 dark:text-neutral-400"
+                            class="max-w-full min-w-0 space-y-2.5 overflow-hidden border-t px-4 pt-3 text-xs sm:px-5 dark:border-slate-800/80"
                         >
+                            <!-- 3. Ponente / Docente a Cargo (Ámbar Vivo / Inconfundible) -->
                             <div
-                                class="flex max-w-full min-w-0 items-center gap-2"
+                                class="flex max-w-full min-w-0 items-center gap-2 rounded-lg border border-amber-200/90 bg-amber-50/90 px-2.5 py-1.5 text-xs font-bold text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
                             >
-                                <User
-                                    class="size-3.5 shrink-0 text-neutral-400"
+                                <GraduationCap
+                                    class="size-4 shrink-0 text-amber-600 dark:text-amber-400"
                                 />
                                 <span class="min-w-0 flex-1 truncate">
-                                    <strong
-                                        class="font-medium text-neutral-700 dark:text-neutral-300"
-                                        >Ponente / Docente:</strong
-                                    >
+                                    <span class="font-extrabold text-amber-700 dark:text-amber-400">Ponente / Docente:</span>
                                     {{
                                         instructorName(course.instructor) ||
                                         course.instructor_name ||
@@ -311,38 +313,52 @@ function instructorName(inst?: Instructor): string {
                                     }}
                                 </span>
                             </div>
-                            <div
-                                class="flex min-w-0 items-center gap-2 font-semibold text-slate-800 dark:text-slate-200"
-                            >
-                                <Calendar
-                                    class="size-3.5 shrink-0 text-rose-800 dark:text-rose-400"
-                                />
-                                <span class="truncate">{{
-                                    formatDateRange(
-                                        course.start_date,
-                                        course.end_date,
-                                        'compact',
-                                    )
-                                }}</span>
-                            </div>
-                            <div
-                                class="flex min-w-0 items-center justify-between gap-2 pt-1 text-[11px]"
-                            >
-                                <span
-                                    class="inline-flex shrink-0 items-center gap-1 font-bold text-slate-800 dark:text-slate-200"
+
+                            <!-- 4. Fechas y Duración Certificada -->
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div
+                                    class="flex min-w-0 items-center gap-1.5 rounded-md border border-slate-200/80 bg-slate-50 px-2 py-1 font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-200"
+                                >
+                                    <Calendar
+                                        class="size-3.5 shrink-0 text-sky-600 dark:text-sky-400"
+                                    />
+                                    <span class="truncate">{{
+                                        formatDateRange(
+                                            course.start_date,
+                                            course.end_date,
+                                            'compact',
+                                        )
+                                    }}</span>
+                                </div>
+                                <div
+                                    class="flex min-w-0 items-center gap-1.5 rounded-md border border-slate-200/80 bg-slate-50 px-2 py-1 font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-200"
                                 >
                                     <Clock
-                                        class="size-3 shrink-0 text-amber-700 dark:text-amber-400"
+                                        class="size-3.5 shrink-0 text-amber-600 dark:text-amber-400"
                                     />
-                                    {{ formatHours(course.hours) }}
+                                    <span class="truncate">{{ formatHours(course.hours) }}</span>
+                                </div>
+                            </div>
+
+                            <!-- 5. Cupos y Vacantes con Colores Vivos -->
+                            <div
+                                class="flex min-w-0 items-center justify-between gap-2 pt-1 text-[11px] font-bold text-slate-700 dark:text-slate-300"
+                            >
+                                <span class="inline-flex shrink-0 items-center gap-1.5">
+                                    <Users class="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                                    <span>Matriculados: <strong>{{ course.enrollments_count || 0 }} / {{ course.capacity }}</strong></span>
                                 </span>
                                 <span
-                                    class="inline-flex shrink-0 items-center gap-1 font-bold text-rose-900 dark:text-rose-300"
+                                    v-if="course.capacity - (course.enrollments_count || 0) > 0"
+                                    class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
                                 >
-                                    <Users
-                                        class="size-3 shrink-0 text-rose-800 dark:text-rose-400"
-                                    />
-                                    Cupo: {{ course.capacity }} vacantes
+                                    {{ course.capacity - (course.enrollments_count || 0) }} vacantes
+                                </span>
+                                <span
+                                    v-else
+                                    class="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-extrabold text-red-800 dark:bg-red-950 dark:text-red-300"
+                                >
+                                    Agotado
                                 </span>
                             </div>
                         </CardContent>
@@ -401,7 +417,7 @@ function instructorName(inst?: Instructor): string {
                             </Button>
 
                             <!-- Si la convocatoria está abierta pero se agotaron los cupos -->
-                            <Button
+                            <div
                                 v-else-if="
                                     course.status === 'abierto' &&
                                     course.enrollments_count !== undefined &&
@@ -409,23 +425,38 @@ function instructorName(inst?: Instructor): string {
                                         course.enrollments_count <=
                                         0
                                 "
-                                size="sm"
-                                variant="secondary"
-                                disabled
-                                class="min-w-[100px] flex-1 text-xs font-semibold opacity-75"
+                                class="flex min-w-[100px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-amber-300 bg-amber-100/90 px-3 py-1.5 text-xs font-black text-amber-900 shadow-xs select-none dark:border-amber-600 dark:bg-amber-950/80 dark:text-amber-200"
                             >
-                                Agotado
-                            </Button>
+                                <AlertCircle
+                                    class="size-3.5 shrink-0 text-amber-600 dark:text-amber-300"
+                                />
+                                <span>Agotado</span>
+                            </div>
 
                             <!-- Si la convocatoria está abierta para postulaciones -->
                             <Button
                                 v-else-if="course.status === 'abierto'"
                                 size="sm"
-                                class="min-w-[100px] flex-1 cursor-pointer bg-rose-900 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
+                                class="min-w-[100px] flex-1 cursor-pointer bg-emerald-600 text-xs font-bold text-white shadow-xs hover:bg-emerald-700"
                                 @click="openEnroll(course)"
                             >
                                 Inscribirme
                             </Button>
+
+                            <!-- Si no está abierto (concluido, cerrado o cancelado) -->
+                            <div
+                                v-else
+                                class="flex min-w-[100px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-rose-300 bg-rose-100/90 px-3 py-1.5 text-xs font-black text-rose-800 shadow-xs select-none dark:border-rose-600 dark:bg-rose-950/80 dark:text-rose-200"
+                            >
+                                <XCircle
+                                    class="size-3.5 shrink-0 text-rose-600 dark:text-rose-300"
+                                />
+                                <span>{{
+                                    course.status === 'cancelado'
+                                        ? 'Cancelado'
+                                        : 'Cerrado'
+                                }}</span>
+                            </div>
                             <div
                                 v-if="can.create"
                                 class="flex shrink-0 items-center gap-1"
@@ -434,7 +465,7 @@ function instructorName(inst?: Instructor): string {
                                     as-child
                                     variant="ghost"
                                     size="icon-sm"
-                                    class="size-7 text-slate-600 hover:text-slate-900"
+                                    class="size-7 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                                 >
                                     <Link :href="`/courses/${course.id}/edit`">
                                         <Pencil class="size-3.5" />
@@ -472,7 +503,7 @@ function instructorName(inst?: Instructor): string {
                         <Button
                             as-child
                             size="sm"
-                            class="bg-rose-900 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
+                            class="bg-[#3484a5] text-xs font-bold text-white shadow-xs hover:bg-[#256883]"
                         >
                             <Link
                                 href="/courses/create"
@@ -500,7 +531,7 @@ function instructorName(inst?: Instructor): string {
                                 :class="[
                                     'rounded-xl border px-3 py-1.5 text-xs font-bold transition-colors',
                                     link.active
-                                        ? 'border-rose-900 bg-rose-900 text-white shadow-xs'
+                                        ? 'border-[#3484a5] bg-[#3484a5] text-white shadow-xs'
                                         : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300',
                                 ]"
                                 v-html="link.label"

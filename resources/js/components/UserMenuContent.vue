@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings, ShieldCheck } from '@lucide/vue';
+import { LogOut, Settings, ShieldCheck, Palette } from '@lucide/vue';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -33,13 +33,25 @@ defineProps<Props>();
     <DropdownMenuGroup>
         <DropdownMenuItem v-if="user.role === 'admin'" :as-child="true">
             <Link
-                class="flex w-full cursor-pointer items-center rounded-xl font-bold text-rose-950 dark:text-rose-200"
+                class="flex w-full cursor-pointer items-center rounded-xl font-bold text-sky-950 dark:text-sky-200"
                 href="/users"
             >
                 <ShieldCheck
                     class="mr-2 inline h-4 w-4 text-emerald-600 dark:text-emerald-400"
                 />
                 Usuarios y Roles
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true">
+            <Link
+                class="flex w-full cursor-pointer items-center rounded-xl"
+                href="/settings/appearance"
+                prefetch
+            >
+                <Palette
+                    class="mr-2 h-4 w-4 text-[#3484a5] dark:text-[#badbe9]"
+                />
+                Apariencia e Identidad
             </Link>
         </DropdownMenuItem>
         <DropdownMenuItem :as-child="true">
@@ -58,7 +70,7 @@ defineProps<Props>();
     <DropdownMenuSeparator />
     <DropdownMenuItem :as-child="true">
         <Link
-            class="flex w-full cursor-pointer items-center rounded-xl text-rose-800 hover:text-rose-950 dark:text-rose-400 dark:hover:text-rose-200"
+            class="flex w-full cursor-pointer items-center rounded-xl text-destructive hover:bg-destructive/10 dark:text-red-400 dark:hover:text-red-300"
             method="post"
             :href="logout()"
             @click="handleLogout"

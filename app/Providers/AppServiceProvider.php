@@ -72,10 +72,10 @@ class AppServiceProvider extends ServiceProvider
             return (new MailMessage)
                 ->subject('Verifica tu correo electrónico - '.config('app.name'))
                 ->greeting('¡Hola, '.($notifiable->name ?? 'Usuario').'!')
-                ->line('Gracias por registrarte en el Sistema Integral de Gestión de Capacitaciones (SIGC-CUSCO).')
+                ->line('Gracias por registrarte en el Sistema Integral de Gestión de Capacitaciones (SIGC-MDSJ).')
                 ->line('Haz clic en el siguiente botón para confirmar tu dirección de correo:')
                 ->action('Verificar Correo Electrónico', $url)
-                ->line('Si no creaste una cuenta en SIGC-CUSCO, puedes ignorar este mensaje de forma segura.')
+                ->line('Si no creaste una cuenta en SIGC-MDSJ, puedes ignorar este mensaje de forma segura.')
                 ->salutation("Saludos cordiales,\n".config('app.name'));
         });
 
@@ -88,7 +88,7 @@ class AppServiceProvider extends ServiceProvider
             return (new MailMessage)
                 ->subject('Restablecer contraseña - '.config('app.name'))
                 ->greeting('¡Hola!')
-                ->line('Recibiste este correo porque se solicitó restablecer la contraseña de tu cuenta en SIGC-CUSCO.')
+                ->line('Recibiste este correo porque se solicitó restablecer la contraseña de tu cuenta en SIGC-MDSJ.')
                 ->action('Restablecer Contraseña', $url)
                 ->line('Este enlace de restablecimiento expirará en '.config('auth.passwords.'.config('auth.defaults.passwords').'.expire').' minutos.')
                 ->line('Si no solicitaste este cambio, puedes ignorar este mensaje.')

@@ -131,7 +131,7 @@ const instructorDisplayName = computed(() => {
     return (
         props.course.instructor_display_name ||
         props.course.instructor_name ||
-        'Docente Titular UNSAAC'
+        'Instructor Acreditado MDSJ'
     );
 });
 
@@ -142,34 +142,34 @@ const statusConfig = computed(() => {
             return {
                 label: 'Inscripciones Abiertas',
                 badgeClass:
-                    'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200',
+                    'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-600 font-bold',
                 canEnroll: true,
             };
         case 'en_curso':
             return {
                 label: 'Capacitación En Curso',
                 badgeClass:
-                    'bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950 dark:text-amber-200',
+                    'bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-600 font-bold',
                 canEnroll: false,
             };
         case 'concluido':
             return {
-                label: 'Capacitación Concluida',
+                label: 'Capacitación Concluida (Cerrado)',
                 badgeClass:
-                    'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-300',
+                    'bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950/80 dark:text-rose-200 dark:border-rose-600 font-bold',
                 canEnroll: false,
             };
         case 'cancelado':
             return {
                 label: 'Capacitación Cancelada',
                 badgeClass:
-                    'bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-200',
+                    'bg-red-100 text-red-950 border-red-300 dark:bg-red-950/90 dark:text-red-300 dark:border-red-600 font-extrabold',
                 canEnroll: false,
             };
         default:
             return {
                 label: String(props.course.status).toUpperCase(),
-                badgeClass: 'bg-slate-100 text-slate-800 border-slate-300',
+                badgeClass: 'bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950/80 dark:text-rose-200 dark:border-rose-600 font-bold',
                 canEnroll: false,
             };
     }
@@ -210,11 +210,11 @@ async function copyCode(code: string) {
     <div class="space-y-8">
         <!-- 1. HERO INFORMATIVO INSTITUCIONAL -->
         <div
-            class="relative overflow-hidden rounded-2xl border border-rose-900/20 bg-gradient-to-br from-rose-950 via-[#4a0011] to-slate-950 p-6 text-white shadow-lg sm:p-8 lg:p-10"
+            class="relative overflow-hidden rounded-2xl border border-[#3484a5]/20 bg-gradient-to-br from-[#0b1e27] via-[#153542] to-slate-950 p-6 text-white shadow-lg sm:p-8 lg:p-10"
         >
             <!-- Efecto decorativo de fondo -->
             <div
-                class="pointer-events-none absolute -top-16 -right-16 size-72 rounded-full bg-rose-500/10 blur-3xl"
+                class="pointer-events-none absolute -top-16 -right-16 size-72 rounded-full bg-sky-500/10 blur-3xl"
             />
             <div
                 class="pointer-events-none absolute -bottom-16 -left-16 size-72 rounded-full bg-amber-500/10 blur-3xl"
@@ -223,7 +223,7 @@ async function copyCode(code: string) {
             <div class="relative z-10 space-y-4">
                 <div class="flex flex-wrap items-center gap-2">
                     <span
-                        class="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 font-mono text-xs font-black tracking-wider text-rose-200 uppercase backdrop-blur-xs"
+                        class="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 font-mono text-xs font-black tracking-wider text-sky-200 uppercase backdrop-blur-xs"
                     >
                         {{ course.code }}
                     </span>
@@ -236,13 +236,21 @@ async function copyCode(code: string) {
                     >
                         {{ statusConfig.label }}
                     </Badge>
-                    <span
-                        v-if="course.institution"
-                        class="flex items-center gap-1.5 text-xs font-medium text-rose-200/90"
+                    <!-- Entidad Organizadora (Azul Institucional MDSJ) -->
+                    <div
+                        class="flex items-center gap-1.5 rounded-lg border border-[#3484a5]/40 bg-[#1a6b8a]/30 px-3 py-1 text-xs font-bold text-sky-200"
                     >
-                        <Building2 class="size-3.5 text-amber-300" />
-                        {{ course.institution }}
-                    </span>
+                        <Building2 class="size-3.5 text-sky-300" />
+                        <span><span class="font-extrabold text-sky-300">Organiza:</span> {{ course.institution || 'Municipalidad de San Jerónimo' }}</span>
+                    </div>
+
+                    <!-- Ponente / Docente a Cargo (Ámbar Vivo) -->
+                    <div
+                        class="flex items-center gap-1.5 rounded-lg border border-amber-400/50 bg-amber-950/70 px-3 py-1 text-xs font-bold text-amber-200"
+                    >
+                        <GraduationCap class="size-3.5 text-amber-300" />
+                        <span><span class="text-amber-300 font-extrabold">Ponente / Docente:</span> {{ instructorDisplayName }}</span>
+                    </div>
                 </div>
 
                 <div class="max-w-4xl space-y-2">
@@ -253,7 +261,7 @@ async function copyCode(code: string) {
                     </h1>
                     <p
                         v-if="course.description"
-                        class="pt-1 text-sm leading-relaxed font-normal text-rose-100/90 sm:text-base"
+                        class="pt-1 text-sm leading-relaxed font-normal text-sky-100/90 sm:text-base"
                     >
                         {{ course.description }}
                     </p>
@@ -274,7 +282,7 @@ async function copyCode(code: string) {
                     <Button
                         v-else-if="statusConfig.canEnroll && availableSpots > 0"
                         size="lg"
-                        class="cursor-pointer bg-amber-600 px-6 text-sm font-black text-slate-950 shadow-md hover:bg-amber-500"
+                        class="cursor-pointer bg-emerald-600 px-6 text-sm font-black text-white shadow-md hover:bg-emerald-700"
                         @click="emit('openEnrollment')"
                     >
                         <Plus class="mr-2 size-4" />
@@ -286,7 +294,7 @@ async function copyCode(code: string) {
                         v-else-if="
                             statusConfig.canEnroll && availableSpots <= 0
                         "
-                        class="rounded-xl border border-rose-500/30 bg-rose-900/60 px-4 py-2 text-xs font-bold text-rose-200"
+                        class="rounded-xl border border-amber-300 bg-amber-100/90 px-4 py-2 text-xs font-black text-amber-900 dark:border-amber-600 dark:bg-amber-950/80 dark:text-amber-200"
                     >
                         Vacantes agotadas (Aforo completo)
                     </div>
@@ -294,16 +302,16 @@ async function copyCode(code: string) {
                     <!-- Si no está abierto -->
                     <div
                         v-else
-                        class="rounded-xl bg-white/10 px-4 py-2 text-xs font-bold text-white/80"
+                        class="rounded-xl border border-rose-300 bg-rose-100/90 px-4 py-2 text-xs font-black text-rose-900 dark:border-rose-600 dark:bg-rose-950/80 dark:text-rose-200"
                     >
-                        Inscripciones no disponibles actualmente
+                        Inscripciones cerradas ({{ statusConfig.label }})
                     </div>
 
                     <Button
                         as-child
                         variant="ghost"
                         size="sm"
-                        class="text-xs text-rose-200 hover:bg-white/10 hover:text-white"
+                        class="text-xs text-sky-200 hover:bg-white/10 hover:text-white"
                     >
                         <Link href="/certificates">
                             <ShieldCheck
@@ -320,7 +328,7 @@ async function copyCode(code: string) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <!-- Horas Lectivas -->
             <Card
-                class="border-slate-200 shadow-xs transition-all hover:border-rose-300 dark:border-slate-800"
+                class="border-slate-200 shadow-xs transition-all hover:border-sky-300 dark:border-slate-800"
             >
                 <CardHeader class="pb-2">
                     <CardDescription
@@ -328,7 +336,7 @@ async function copyCode(code: string) {
                     >
                         <span>Horas Académicas</span>
                         <div
-                            class="flex size-8 items-center justify-center rounded-lg bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200"
+                            class="flex size-8 items-center justify-center rounded-lg bg-sky-100 text-[#3484a5] dark:bg-[#153542] dark:text-sky-200"
                         >
                             <Clock class="size-4" />
                         </div>
@@ -398,7 +406,7 @@ async function copyCode(code: string) {
 
             <!-- Vacantes y Disponibilidad -->
             <Card
-                class="border-slate-200 shadow-xs transition-all hover:border-rose-300 dark:border-slate-800"
+                class="border-slate-200 shadow-xs transition-all hover:border-sky-300 dark:border-slate-800"
             >
                 <CardHeader class="pb-2">
                     <CardDescription
@@ -412,7 +420,7 @@ async function copyCode(code: string) {
                         </div>
                     </CardDescription>
                     <CardTitle
-                        class="flex items-baseline gap-2 pt-1 text-2xl font-black text-rose-950 dark:text-rose-300"
+                        class="flex items-baseline gap-2 pt-1 text-2xl font-black text-sky-950 dark:text-[#badbe9]"
                     >
                         <span>{{ availableSpots }}</span>
                         <span class="text-xs font-normal text-slate-500"
@@ -427,7 +435,7 @@ async function copyCode(code: string) {
                         class="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"
                     >
                         <div
-                            class="h-full rounded-full bg-rose-900 transition-all dark:bg-rose-600"
+                            class="h-full rounded-full bg-[#3484a5] transition-all dark:bg-[#2ca792]"
                             :style="{ width: `${enrollmentPercentage}%` }"
                         />
                     </div>
@@ -486,7 +494,7 @@ async function copyCode(code: string) {
                             @click="isCredentialModalOpen = true"
                         >
                             <QrCode
-                                class="mr-1.5 size-3.5 text-rose-900 dark:text-rose-400"
+                                class="mr-1.5 size-3.5 text-[#3484a5] dark:text-[#88c0d7]"
                             />
                             Mi Credencial QR
                         </Button>
@@ -580,7 +588,7 @@ async function copyCode(code: string) {
                                 myEnrollment.final_grade !== null &&
                                 myEnrollment.final_grade !== undefined
                             "
-                            class="mt-1 text-base font-black text-rose-950 dark:text-rose-300"
+                            class="mt-1 text-base font-black text-sky-950 dark:text-[#badbe9]"
                         >
                             {{ Number(myEnrollment.final_grade).toFixed(2) }} /
                             20.00
@@ -611,7 +619,7 @@ async function copyCode(code: string) {
                             class="flex items-center gap-2 text-base font-black"
                         >
                             <Layers
-                                class="size-4 text-rose-900 dark:text-rose-400"
+                                class="size-4 text-[#3484a5] dark:text-[#88c0d7]"
                             />
                             Plan de Estudios y Malla Curricular Oficial
                         </CardTitle>
@@ -624,14 +632,14 @@ async function copyCode(code: string) {
                         <div
                             v-for="(mod, idx) in modules"
                             :key="idx"
-                            class="space-y-2 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-rose-300 dark:border-slate-800 dark:bg-slate-900"
+                            class="space-y-2 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-sky-300 dark:border-slate-800 dark:bg-slate-900"
                         >
                             <div
                                 class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
                             >
                                 <div class="flex items-center gap-2">
                                     <span
-                                        class="rounded border border-rose-300 bg-rose-100 px-2 py-0.5 font-mono text-xs font-black text-rose-950 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                                        class="rounded border border-sky-300 bg-sky-100 px-2 py-0.5 font-mono text-xs font-black text-sky-950 dark:border-[#296d88] dark:bg-[#153542] dark:text-sky-200"
                                     >
                                         {{ mod.number }}
                                     </span>
@@ -656,24 +664,24 @@ async function copyCode(code: string) {
                     </CardContent>
                 </Card>
 
-                <!-- Garantía de Calidad y Certificación UNSAAC -->
+                <!-- Garantía de Calidad y Certificación MDSJ -->
                 <Card
-                    class="border-rose-200 bg-gradient-to-br from-rose-50/40 via-white to-amber-50/30 shadow-sm dark:border-rose-900/40 dark:from-rose-950/20 dark:via-slate-900 dark:to-amber-950/10"
+                    class="border-sky-200 bg-gradient-to-br from-sky-50/40 via-sky-50/20 to-amber-50/30 shadow-sm dark:border-[#3484a5]/40 dark:from-sky-950/20 dark:via-slate-900 dark:to-amber-950/10"
                 >
                     <CardHeader
-                        class="border-b border-rose-100 p-5 dark:border-rose-900/40"
+                        class="border-b border-sky-100 p-5 dark:border-[#3484a5]/40"
                     >
                         <CardTitle
-                            class="flex items-center gap-2 text-base font-black text-rose-950 dark:text-rose-200"
+                            class="flex items-center gap-2 text-base font-black text-sky-950 dark:text-sky-200"
                         >
                             <Sparkles class="size-4 text-amber-600" />
                             Certificación Oficial con Validez Nacional
                         </CardTitle>
                         <CardDescription
-                            class="text-xs text-rose-900/80 dark:text-rose-300/80"
+                            class="text-xs text-[#3484a5]/80 dark:text-[#badbe9]/80"
                         >
                             Garantía académica institucional respaldada por la
-                            Universidad Nacional de San Antonio Abad del Cusco.
+                            Municipalidad Distrital de San Jerónimo.
                         </CardDescription>
                     </CardHeader>
                     <CardContent
@@ -730,7 +738,7 @@ async function copyCode(code: string) {
                             class="flex items-center gap-2 text-sm font-black"
                         >
                             <GraduationCap
-                                class="size-4 text-rose-900 dark:text-rose-400"
+                                class="size-4 text-[#3484a5] dark:text-[#88c0d7]"
                             />
                             Docente Responsable
                         </CardTitle>
@@ -741,7 +749,7 @@ async function copyCode(code: string) {
                     <CardContent class="space-y-3 p-5">
                         <div class="flex items-center gap-3">
                             <div
-                                class="flex size-12 shrink-0 items-center justify-center rounded-full bg-rose-900 text-sm font-black text-amber-300 shadow-xs"
+                                class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#3484a5] text-sm font-black text-amber-300 shadow-xs"
                             >
                                 {{
                                     instructorDisplayName
@@ -756,12 +764,12 @@ async function copyCode(code: string) {
                                     {{ instructorDisplayName }}
                                 </div>
                                 <div
-                                    class="text-xs font-bold text-rose-900 dark:text-rose-400"
+                                    class="text-xs font-bold text-[#3484a5] dark:text-[#88c0d7]"
                                 >
                                     Docente Titular / Especialista
                                 </div>
                                 <div class="text-[11px] text-slate-500">
-                                    UNSAAC - Cusco, Perú
+                                    Municipalidad Distrital de San Jerónimo - Cusco, Perú
                                 </div>
                             </div>
                         </div>
@@ -787,7 +795,7 @@ async function copyCode(code: string) {
                             class="flex items-center gap-2 text-sm font-black"
                         >
                             <BookOpen
-                                class="size-4 text-rose-900 dark:text-rose-400"
+                                class="size-4 text-[#3484a5] dark:text-[#88c0d7]"
                             />
                             Requisitos de Participación
                         </CardTitle>
@@ -797,7 +805,7 @@ async function copyCode(code: string) {
                     >
                         <div class="flex items-center gap-2">
                             <div
-                                class="size-1.5 shrink-0 rounded-full bg-rose-900"
+                                class="size-1.5 shrink-0 rounded-full bg-[#3484a5]"
                             />
                             <span
                                 >Documento Nacional de Identidad (DNI)
@@ -806,7 +814,7 @@ async function copyCode(code: string) {
                         </div>
                         <div class="flex items-center gap-2">
                             <div
-                                class="size-1.5 shrink-0 rounded-full bg-rose-900"
+                                class="size-1.5 shrink-0 rounded-full bg-[#3484a5]"
                             />
                             <span
                                 >Disponibilidad horaria para las
@@ -815,7 +823,7 @@ async function copyCode(code: string) {
                         </div>
                         <div class="flex items-center gap-2">
                             <div
-                                class="size-1.5 shrink-0 rounded-full bg-rose-900"
+                                class="size-1.5 shrink-0 rounded-full bg-[#3484a5]"
                             />
                             <span
                                 >Compromiso de asistencia mínima del
@@ -828,12 +836,12 @@ async function copyCode(code: string) {
                 <!-- Banner de Inscripción Rápida -->
                 <div
                     v-if="statusConfig.canEnroll && availableSpots > 0"
-                    class="space-y-3 rounded-2xl bg-gradient-to-br from-rose-900 to-rose-950 p-5 text-white shadow-md"
+                    class="space-y-3 rounded-2xl bg-gradient-to-br from-[#153542] to-[#0b1e27] p-5 text-white shadow-md"
                 >
                     <div class="text-sm font-black">
                         ¿Deseas participar en esta capacitación?
                     </div>
-                    <p class="text-xs text-rose-200">
+                    <p class="text-xs text-sky-200">
                         Quedan únicamente
                         <strong>{{ availableSpots }} vacantes</strong>
                         disponibles para este curso.
@@ -860,7 +868,7 @@ async function copyCode(code: string) {
                     <DialogTitle
                         class="flex items-center justify-center gap-2 text-center text-lg font-black"
                     >
-                        <QrCode class="size-5 text-rose-900" />
+                        <QrCode class="size-5 text-[#3484a5]" />
                         Credencial Digital del Alumno
                     </DialogTitle>
                     <DialogDescription class="text-center text-xs">
@@ -916,7 +924,7 @@ async function copyCode(code: string) {
                                 class="flex items-center gap-2 text-lg font-black"
                             >
                                 <Award class="size-5 text-amber-500" />
-                                Certificado Digital Oficial UNSAAC
+                                Certificado Digital Oficial MDSJ
                             </DialogTitle>
                             <DialogDescription class="mt-0.5 text-xs">
                                 Diploma oficial de 2 caras (Anverso / Reverso)
@@ -926,7 +934,7 @@ async function copyCode(code: string) {
                         <div class="flex items-center gap-2">
                             <Button
                                 size="sm"
-                                class="cursor-pointer bg-rose-900 text-xs font-black text-white shadow-xs hover:bg-rose-950"
+                                class="cursor-pointer bg-[#3484a5] text-xs font-black text-white shadow-xs hover:bg-[#153542]"
                                 @click="handlePrintCertificate"
                             >
                                 <Download class="mr-1.5 size-3.5" />
@@ -943,7 +951,7 @@ async function copyCode(code: string) {
                         class="cursor-pointer rounded-lg px-4 py-1.5 text-xs font-black transition-all"
                         :class="
                             activeCertificateFace === 'front'
-                                ? 'bg-rose-900 text-white shadow-xs'
+                                ? 'bg-[#3484a5] text-white shadow-xs'
                                 : 'bg-slate-100 text-slate-600 dark:bg-slate-800'
                         "
                         @click="activeCertificateFace = 'front'"
@@ -955,7 +963,7 @@ async function copyCode(code: string) {
                         class="cursor-pointer rounded-lg px-4 py-1.5 text-xs font-black transition-all"
                         :class="
                             activeCertificateFace === 'back'
-                                ? 'bg-rose-900 text-white shadow-xs'
+                                ? 'bg-[#3484a5] text-white shadow-xs'
                                 : 'bg-slate-100 text-slate-600 dark:bg-slate-800'
                         "
                         @click="activeCertificateFace = 'back'"
@@ -969,31 +977,29 @@ async function copyCode(code: string) {
                     <!-- Cara 1: Anverso -->
                     <div
                         v-if="activeCertificateFace === 'front'"
-                        class="space-y-4 rounded-2xl border-2 border-[#800020] bg-gradient-to-br from-amber-50/60 via-white to-amber-50/40 p-6 text-center shadow-inner dark:from-slate-900 dark:via-slate-950 dark:to-slate-900"
+                        class="space-y-4 rounded-2xl border-2 border-[#3484a5] bg-white p-6 text-center shadow-sm dark:border-[#3484a5]/40 dark:bg-slate-900"
                     >
                         <div class="flex items-center justify-between px-4">
                             <img
-                                src="/images/unsaac-logo.png"
-                                alt="UNSAAC"
+                                src="/images/mdsj/escudo_sm.webp"
+                                alt="MDSJ"
                                 class="h-14 object-contain"
                             />
                             <div class="text-center">
                                 <div
-                                    class="text-[11px] font-black tracking-widest text-rose-900 uppercase dark:text-rose-400"
+                                    class="text-[11px] font-black tracking-widest text-[#3484a5] uppercase dark:text-[#88c0d7]"
                                 >
-                                    Universidad Nacional de San Antonio Abad del
-                                    Cusco
+                                    Municipalidad Distrital de San Jerónimo
                                 </div>
                                 <div
                                     class="text-[10px] font-bold text-slate-600 dark:text-slate-400"
                                 >
-                                    Dirección de Extensión Cultural y Proyección
-                                    Social
+                                    Gerencia de Desarrollo Social y Humano
                                 </div>
                             </div>
                             <img
-                                src="/images/escudo.png"
-                                alt="Escudo"
+                                src="/images/mdsj/logo_mdsj_sm.webp"
+                                alt="MDSJ Logo"
                                 class="h-14 object-contain"
                             />
                         </div>
@@ -1005,7 +1011,7 @@ async function copyCode(code: string) {
                                 Otorga el presente
                             </div>
                             <h2
-                                class="font-serif text-2xl font-black tracking-wider text-rose-950 uppercase sm:text-3xl dark:text-rose-200"
+                                class="font-serif text-2xl font-black tracking-wider text-sky-950 uppercase sm:text-3xl dark:text-sky-200"
                             >
                                 Diploma de Certificación
                             </h2>
@@ -1036,7 +1042,7 @@ async function copyCode(code: string) {
                             Por haber aprobado satisfactoriamente el curso de
                             especialización profesional:
                             <div
-                                class="py-1 text-sm font-bold text-rose-950 dark:text-rose-200"
+                                class="py-1 text-sm font-bold text-sky-950 dark:text-sky-200"
                             >
                                 "{{ myEnrollment.certificate.course_title }}"
                             </div>
@@ -1091,7 +1097,7 @@ async function copyCode(code: string) {
                                     Dirección Académica
                                 </div>
                                 <div class="text-[9px] text-slate-500">
-                                    UNSAAC - Cusco
+                                    San Jerónimo - Cusco
                                 </div>
                             </div>
                         </div>
@@ -1121,7 +1127,7 @@ async function copyCode(code: string) {
                             <!-- Módulos -->
                             <div class="space-y-2 md:col-span-2">
                                 <div
-                                    class="text-xs font-bold text-rose-950 dark:text-rose-300"
+                                    class="text-xs font-bold text-sky-950 dark:text-[#badbe9]"
                                 >
                                     Contenido Temático Cursado:
                                 </div>
@@ -1153,7 +1159,7 @@ async function copyCode(code: string) {
                                         Calificación Obtenida
                                     </div>
                                     <div
-                                        class="text-xl font-black text-rose-950 dark:text-rose-300"
+                                        class="text-xl font-black text-sky-950 dark:text-[#badbe9]"
                                     >
                                         {{
                                             myEnrollment.certificate

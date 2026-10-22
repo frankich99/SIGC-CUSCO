@@ -94,7 +94,7 @@ function printDocument(): void {
                         class="hidden h-4 w-px bg-slate-300 sm:block dark:bg-slate-700"
                     />
                     <span
-                        class="hidden rounded border border-rose-300 bg-rose-100 px-2.5 py-0.5 font-mono text-xs font-black text-rose-950 sm:inline"
+                        class="hidden rounded border border-sky-300 bg-sky-100 px-2.5 py-0.5 font-mono text-xs font-black text-sky-950 sm:inline"
                     >
                         {{ course.code }}
                     </span>
@@ -109,7 +109,7 @@ function printDocument(): void {
                     <Button
                         type="button"
                         size="sm"
-                        class="cursor-pointer bg-rose-900 text-xs font-bold text-white shadow-sm hover:bg-rose-950"
+                        class="cursor-pointer bg-[#3484a5] text-xs font-bold text-white shadow-sm hover:bg-[#256883]"
                         @click="printDocument"
                     >
                         <Printer class="mr-1.5 size-4" />
@@ -124,33 +124,29 @@ function printDocument(): void {
             <article
                 class="rounded-xl border border-slate-200 bg-white p-8 text-slate-950 shadow-md sm:p-12 print:rounded-none print:border-none print:p-0 print:shadow-none"
             >
-                <!-- MEMBRETE OFICIAL UNSAAC -->
-                <header class="mb-6 border-b-2 border-rose-950 pb-6">
+                <!-- MEMBRETE OFICIAL MUNICIPALIDAD DE SAN JERÓNIMO -->
+                <header class="mb-6 border-b-2 border-[#3484a5] pb-6">
                     <div class="flex items-center justify-between gap-6">
                         <div class="flex items-center gap-4">
-                            <div
-                                class="flex size-16 items-center justify-center rounded-xl border border-rose-800 bg-gradient-to-br from-rose-950 via-rose-900 to-rose-950 font-serif text-2xl font-black text-white shadow-sm print:border-black"
-                            >
-                                U
-                            </div>
+                            <div class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-1 shadow-sm ring-1 ring-sky-950/20 print:ring-0"><picture><source srcset="/images/mdsj/escudo_sm.webp" type="image/webp" /><img src="/images/mdsj/escudo_sm.png" alt="MDSJ" class="size-full object-contain" width="60" height="60" /></picture></div>
                             <div>
                                 <h2
-                                    class="text-xs font-black tracking-widest text-rose-950 uppercase sm:text-sm"
+                                    class="text-xs font-black tracking-widest text-[#153542] uppercase sm:text-sm"
                                 >
-                                    Universidad Nacional de San Antonio Abad del
-                                    Cusco
+                                    Municipalidad Distrital de San Jerónimo
+                                    · Cusco
                                 </h2>
                                 <h3
                                     class="text-[11px] font-bold tracking-wider text-slate-600 uppercase sm:text-xs"
                                 >
                                     Sistema Integral de Gestión de
-                                    Capacitaciones — SIGC CUSCO
+                                    Capacitaciones — SIGC-MDSJ
                                 </h3>
                                 <p
                                     class="text-[10px] font-medium text-slate-500"
                                 >
-                                    Vicerrectorado Académico · Registro Oficial
-                                    de Certificaciones
+                                    Gerencia de Desarrollo Social y Humano · Registro Oficial
+                                    de Capacitaciones
                                 </p>
                             </div>
                         </div>
@@ -190,7 +186,7 @@ function printDocument(): void {
                             Acta Oficial de Evaluación y Asistencia
                         </h1>
                         <p
-                            class="mt-1 text-xs font-semibold text-rose-950 sm:text-sm"
+                            class="mt-1 text-xs font-semibold text-[#3484a5] sm:text-sm"
                         >
                             {{ course.title }}
                         </p>
@@ -269,14 +265,14 @@ function printDocument(): void {
                         </div>
                     </div>
                     <div
-                        class="rounded-lg border border-rose-200 bg-rose-50 p-3 text-center"
+                        class="rounded-lg border border-sky-200 bg-sky-50 p-3 text-center"
                     >
                         <div
-                            class="text-[10px] font-bold text-rose-800 uppercase"
+                            class="text-[10px] font-bold text-[#296d88] uppercase"
                         >
                             Reprobados
                         </div>
-                        <div class="text-lg font-black text-rose-900">
+                        <div class="text-lg font-black text-[#3484a5]">
                             {{ stats.failed_count }}
                         </div>
                     </div>
@@ -314,50 +310,50 @@ function printDocument(): void {
                         >
                             <thead>
                                 <tr
-                                    class="bg-rose-950 text-[10px] font-bold tracking-wider text-white uppercase"
+                                    class="bg-[#153542] text-[10px] font-bold tracking-wider text-white uppercase"
                                 >
                                     <th
-                                        class="w-8 border border-rose-900 px-2 py-2 text-center"
+                                        class="w-8 border border-[#22596f] px-2 py-2 text-center"
                                     >
                                         N°
                                     </th>
                                     <th
-                                        class="w-20 border border-rose-900 px-2.5 py-2 text-center font-mono"
+                                        class="w-20 border border-[#22596f] px-2.5 py-2 text-center font-mono"
                                     >
                                         DNI
                                     </th>
                                     <th
-                                        class="border border-rose-900 px-3 py-2"
+                                        class="border border-[#22596f] px-3 py-2"
                                     >
                                         Apellidos y Nombres
                                     </th>
                                     <th
-                                        class="w-16 border border-rose-900 px-2 py-2 text-center"
+                                        class="w-16 border border-[#22596f] px-2 py-2 text-center"
                                     >
                                         Asist. (%)
                                     </th>
                                     <th
-                                        class="w-14 border border-rose-900 px-2 py-2 text-center"
+                                        class="w-14 border border-[#22596f] px-2 py-2 text-center"
                                     >
                                         Nota
                                     </th>
                                     <th
-                                        class="border border-rose-900 px-3 py-2"
+                                        class="border border-[#22596f] px-3 py-2"
                                     >
                                         Nota en Letras
                                     </th>
                                     <th
-                                        class="w-24 border border-rose-900 px-2 py-2 text-center"
+                                        class="w-24 border border-[#22596f] px-2 py-2 text-center"
                                     >
                                         Condición
                                     </th>
                                     <th
-                                        class="border border-rose-900 px-3 py-2 text-center font-mono text-[9px]"
+                                        class="border border-[#22596f] px-3 py-2 text-center font-mono text-[9px]"
                                     >
                                         Código Diploma
                                     </th>
                                     <th
-                                        class="w-28 border border-rose-900 px-2 py-2 text-center font-mono text-[8px]"
+                                        class="w-28 border border-[#22596f] px-2 py-2 text-center font-mono text-[8px]"
                                     >
                                         Firma HMAC
                                     </th>
@@ -399,7 +395,7 @@ function printDocument(): void {
                                         :class="
                                             p.status === 'aprobado'
                                                 ? 'text-emerald-700'
-                                                : 'text-rose-700'
+                                                : 'text-[#22596f]'
                                         "
                                     >
                                         {{ p.final_grade }}
@@ -418,7 +414,7 @@ function printDocument(): void {
                                                 p.status === 'aprobado'
                                                     ? 'bg-emerald-100 text-emerald-900'
                                                     : p.status === 'reprobado'
-                                                      ? 'bg-rose-100 text-rose-900'
+                                                      ? 'bg-sky-100 text-[#3484a5]'
                                                       : 'bg-slate-100 text-slate-700'
                                             "
                                         >
@@ -491,7 +487,7 @@ function printDocument(): void {
                                     Coordinación Académica
                                 </div>
                                 <div class="text-[10px] text-slate-500">
-                                    Comité de Capacitaciones UNSAAC
+                                    Gerencia de Desarrollo Social - MDSJ
                                 </div>
                             </div>
                         </div>
@@ -505,7 +501,7 @@ function printDocument(): void {
                                     Dirección General
                                 </div>
                                 <div class="text-[10px] text-slate-500">
-                                    Sistema SIGC - UNSAAC
+                                    Sistema SIGC-MDSJ - San Jerónimo
                                 </div>
                             </div>
                         </div>
@@ -515,8 +511,7 @@ function printDocument(): void {
                         class="mt-8 flex items-center justify-between border-t border-slate-100 pt-4 font-mono text-[9px] text-slate-400"
                     >
                         <span
-                            >UNSAAC · Sistema Integral de Gestión de
-                            Capacitaciones</span
+                            >Municipalidad Distrital de San Jerónimo · Sistema SIGC-MDSJ</span
                         >
                         <span
                             >Documento Oficial Certificado

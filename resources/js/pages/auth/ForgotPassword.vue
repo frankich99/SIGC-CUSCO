@@ -24,11 +24,11 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Recuperar contraseña - SIGC-CUSCO" />
+    <Head title="Recuperar contraseña - SIGC-MDSJ" />
 
     <div
         v-if="status"
-        class="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-center text-xs font-bold text-rose-900"
+        class="mb-4 rounded-lg border border-sky-200 bg-sky-50 p-2.5 text-center text-xs font-bold text-sky-950"
     >
         {{ status }}
     </div>
@@ -53,13 +53,13 @@ defineProps<{
                     autocomplete="off"
                     v-focus
                     placeholder="correo@ejemplo.com"
-                    class="text-xs font-medium text-slate-900"
+                    class="text-xs font-medium text-slate-900 dark:text-slate-100"
                 />
                 <InputError :message="errors.email" />
             </div>
 
             <Button
-                class="h-10 w-full cursor-pointer bg-rose-900 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
+                class="h-10 w-full cursor-pointer bg-[#3484a5] text-xs font-bold text-white shadow-xs hover:bg-[#256883]"
                 :disabled="processing"
                 data-test="email-password-reset-link-button"
             >
@@ -75,7 +75,7 @@ defineProps<{
             <span>¿Recordaste tu contraseña?</span>
             <TextLink
                 :href="login()"
-                class="ml-1 font-bold text-rose-900 hover:underline dark:text-rose-400"
+                class="ml-1 font-bold text-[#3484a5] hover:underline dark:text-[#88c0d7]"
             >
                 Iniciar sesión
             </TextLink>

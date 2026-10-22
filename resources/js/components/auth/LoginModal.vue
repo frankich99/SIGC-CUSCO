@@ -102,12 +102,20 @@ function submitLogin() {
             <div class="shrink-0 p-5 pr-12 pb-2 sm:p-6">
                 <DialogHeader class="space-y-1 text-left">
                     <div
-                        class="flex items-center gap-1.5 text-[11px] font-black tracking-wider text-rose-900 uppercase dark:text-rose-300"
+                        class="flex items-center gap-2 text-[11px] font-black tracking-wider text-[#3484a5] uppercase dark:text-[#badbe9]"
                     >
-                        <ShieldCheck
-                            class="size-4 text-rose-800 dark:text-rose-400"
-                        />
-                        <span>Acceso al Sistema</span>
+                        <picture class="size-4.5 shrink-0">
+                            <source srcset="/images/mdsj/escudo_sm.webp" type="image/webp" />
+                            <img
+                                src="/images/mdsj/escudo_sm.png"
+                                alt="MDSJ"
+                                class="size-4.5 object-contain"
+                                width="18"
+                                height="18"
+                                loading="eager"
+                            />
+                        </picture>
+                        <span>MDSJ • Acceso al Sistema</span>
                     </div>
                     <DialogTitle
                         class="text-lg font-black text-slate-950 dark:text-white"
@@ -131,9 +139,9 @@ function submitLogin() {
                     <!-- Generic error alert -->
                     <div
                         v-if="form.errors.email || form.errors.password"
-                        class="flex items-center gap-2 rounded-lg border border-rose-300 bg-rose-100 p-2.5 text-xs font-bold text-rose-950 dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-200"
+                        class="flex items-center gap-2 rounded-lg border border-sky-300 bg-sky-100 p-2.5 text-xs font-bold text-sky-950 dark:border-sky-900 dark:bg-sky-950/60 dark:text-sky-200"
                     >
-                        <AlertCircle class="size-4 shrink-0 text-rose-800" />
+                        <AlertCircle class="size-4 shrink-0 text-[#296d88]" />
                         <span>{{
                             form.errors.email || form.errors.password
                         }}</span>
@@ -167,7 +175,7 @@ function submitLogin() {
                             </Label>
                             <a
                                 href="/forgot-password"
-                                class="text-[11px] font-semibold text-rose-900 hover:underline dark:text-rose-400"
+                                class="text-[11px] font-semibold text-[#3484a5] hover:underline dark:text-[#88c0d7]"
                             >
                                 ¿Olvidaste tu clave?
                             </a>
@@ -232,7 +240,7 @@ function submitLogin() {
                         ¿No tienes una cuenta aún?
                         <button
                             type="button"
-                            class="ml-1 cursor-pointer font-black text-rose-900 hover:underline dark:text-rose-300"
+                            class="ml-1 cursor-pointer font-black text-[#3484a5] hover:underline dark:text-[#badbe9]"
                             @click="handleSwitchToRegister"
                         >
                             Regístrate aquí

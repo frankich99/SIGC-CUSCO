@@ -32,7 +32,7 @@ const mobileMenuOpen = ref(false);
 
 <template>
     <div
-        class="flex min-h-screen flex-col justify-between bg-slate-50/70 text-slate-900 antialiased selection:bg-rose-900 selection:text-white dark:bg-slate-950 dark:text-slate-100"
+        class="flex min-h-screen flex-col justify-between bg-slate-50/70 text-slate-900 antialiased selection:bg-[#3484a5] selection:text-white dark:bg-slate-950 dark:text-slate-100"
     >
         <!-- TOP NAVBAR INSTITUCIONAL -->
         <header
@@ -41,7 +41,7 @@ const mobileMenuOpen = ref(false);
             <div
                 class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
             >
-                <!-- Logotipo Principal UNSAAC Cusco -->
+                <!-- Logotipo Principal MDSJ Cusco -->
                 <Link :href="home()" class="flex shrink-0 items-center gap-3">
                     <AppLogo />
                 </Link>
@@ -52,21 +52,21 @@ const mobileMenuOpen = ref(false);
                 >
                     <Link
                         :href="home()"
-                        class="flex items-center gap-1.5 transition-colors hover:text-rose-900 dark:hover:text-rose-400"
+                        class="flex items-center gap-1.5 transition-colors hover:text-[#3484a5] dark:hover:text-[#88c0d7]"
                     >
                         <Globe class="size-4 text-blue-600" />
                         <span>Portal Principal</span>
                     </Link>
                     <Link
                         href="/courses"
-                        class="flex items-center gap-1.5 transition-colors hover:text-rose-900 dark:hover:text-rose-400"
+                        class="flex items-center gap-1.5 transition-colors hover:text-[#3484a5] dark:hover:text-[#88c0d7]"
                     >
-                        <GraduationCap class="size-4 text-rose-800" />
+                        <GraduationCap class="size-4 text-[#296d88]" />
                         <span>Capacitaciones</span>
                     </Link>
                     <Link
                         href="/certificates"
-                        class="flex items-center gap-1.5 transition-colors hover:text-rose-900 dark:hover:text-rose-400"
+                        class="flex items-center gap-1.5 transition-colors hover:text-[#3484a5] dark:hover:text-[#88c0d7]"
                     >
                         <Award class="size-4 text-amber-600" />
                         <span>Certificados Digitales</span>
@@ -79,10 +79,10 @@ const mobileMenuOpen = ref(false);
                         as-child
                         variant="outline"
                         size="sm"
-                        class="border-slate-300 text-xs font-bold hover:bg-rose-50 hover:text-rose-900 dark:border-slate-700"
+                        class="border-slate-300 text-xs font-bold hover:bg-sky-50 hover:text-[#3484a5] dark:border-slate-700"
                     >
                         <Link :href="home()">
-                            <ArrowLeft class="mr-1 size-3.5 text-rose-900" />
+                            <ArrowLeft class="mr-1 size-3.5 text-[#3484a5]" />
                             Volver al Inicio
                         </Link>
                     </Button>
@@ -115,7 +115,7 @@ const mobileMenuOpen = ref(false);
                             <div class="space-y-4 py-4 text-sm font-bold">
                                 <Link
                                     :href="home()"
-                                    class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-800 hover:bg-rose-50"
+                                    class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-800 hover:bg-sky-50 dark:text-slate-200 dark:hover:bg-slate-900"
                                     @click="mobileMenuOpen = false"
                                 >
                                     <Globe class="size-4 text-blue-600" />
@@ -123,17 +123,17 @@ const mobileMenuOpen = ref(false);
                                 </Link>
                                 <Link
                                     href="/courses"
-                                    class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-800 hover:bg-rose-50"
+                                    class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-800 hover:bg-sky-50 dark:text-slate-200 dark:hover:bg-slate-900"
                                     @click="mobileMenuOpen = false"
                                 >
                                     <GraduationCap
-                                        class="size-4 text-rose-800"
+                                        class="size-4 text-[#296d88]"
                                     />
                                     <span>Capacitaciones</span>
                                 </Link>
                                 <Link
                                     href="/certificates"
-                                    class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-800 hover:bg-rose-50"
+                                    class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-800 hover:bg-sky-50 dark:text-slate-200 dark:hover:bg-slate-900"
                                     @click="mobileMenuOpen = false"
                                 >
                                     <Award class="size-4 text-amber-600" />
@@ -150,15 +150,15 @@ const mobileMenuOpen = ref(false);
         <main class="flex flex-1 items-center justify-center p-4 sm:p-6 lg:p-8">
             <div class="w-[92vw] sm:max-w-sm">
                 <div
-                    class="space-y-4 rounded-2xl border border-rose-200 bg-white p-5 shadow-2xl sm:p-6 dark:border-rose-900 dark:bg-slate-950"
+                    class="space-y-4 rounded-2xl border border-sky-200 bg-white p-5 shadow-2xl sm:p-6 dark:border-sky-900 dark:bg-slate-950"
                 >
-                    <!-- Encabezado de la Tarjeta con Identidad Cusco UNSAAC -->
+                    <!-- Encabezado de la Tarjeta con Identidad San Jerónimo -->
                     <div class="space-y-1.5 text-center">
                         <div
-                            class="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[11px] font-black text-rose-900 shadow-2xs dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300"
+                            class="inline-flex items-center gap-1.5 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-[11px] font-black text-[#153542] shadow-2xs dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-200"
                         >
-                            <ShieldCheck class="size-3.5 text-rose-800" />
-                            <span>Acceso Institucional UNSAAC</span>
+                            <ShieldCheck class="size-3.5 text-[#296d88]" />
+                            <span>Acceso Institucional MDSJ</span>
                         </div>
                         <h1
                             class="text-xl font-black tracking-tight text-slate-950 dark:text-white"
@@ -189,15 +189,14 @@ const mobileMenuOpen = ref(false);
                 <div
                     class="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200"
                 >
-                    <GraduationCap class="size-4 text-rose-900" />
+                    <GraduationCap class="size-4 text-[#3484a5]" />
                     <span
-                        >SIGC-CUSCO • Universidad Nacional de San Antonio Abad
-                        del Cusco</span
+                        >SIGC-MDSJ • Municipalidad Distrital de San Jerónimo</span
                     >
                 </div>
                 <div class="flex items-center gap-4">
                     <PeruGeoBadge />
-                    <span class="hidden md:inline">Cusco, Perú 2026</span>
+                    <span class="hidden md:inline">San Jerónimo, Cusco 2026</span>
                 </div>
             </div>
         </footer>

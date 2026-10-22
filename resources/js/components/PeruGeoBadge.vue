@@ -21,11 +21,11 @@ onUnmounted(() => {
     <div
         class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white/90 px-3 py-1 text-[11px] font-bold text-slate-800 shadow-2xs dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-200"
     >
-        <div class="flex items-center gap-1 text-rose-900 dark:text-rose-300">
+        <div class="flex items-center gap-1 text-[#3484a5] dark:text-[#88c0d7]">
             <MapPin class="size-3.5 shrink-0" />
             <span
-                >{{ PERU_CONFIG.institution.city }},
-                {{ PERU_CONFIG.country }}</span
+                >{{ PERU_CONFIG.institution.district }},
+                {{ PERU_CONFIG.institution.city }}</span
             >
         </div>
         <span class="text-slate-300 dark:text-slate-700">|</span>

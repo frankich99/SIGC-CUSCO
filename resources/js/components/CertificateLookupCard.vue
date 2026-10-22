@@ -203,7 +203,7 @@ function generateCertificateHtml(record: CertificateRecord): string {
             width: 100%;
             max-width: 960px;
             background: #ffffff;
-            border: 8px double #800020;
+            border: 8px double #3484a5;
             padding: 40px 50px;
             position: relative;
             text-align: center;
@@ -223,7 +223,7 @@ function generateCertificateHtml(record: CertificateRecord): string {
             font-weight: bold;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: #800020;
+            color: #3484a5;
             margin-bottom: 4px;
         }
         .inst-sub {
@@ -237,7 +237,7 @@ function generateCertificateHtml(record: CertificateRecord): string {
             font-size: 34px;
             font-weight: bold;
             letter-spacing: 3px;
-            color: #800020;
+            color: #3484a5;
             text-transform: uppercase;
             margin-bottom: 6px;
         }
@@ -260,7 +260,7 @@ function generateCertificateHtml(record: CertificateRecord): string {
             color: #0f172a;
             text-transform: uppercase;
             padding: 6px 30px;
-            border-bottom: 2px solid #800020;
+            border-bottom: 2px solid #3484a5;
             display: inline-block;
             margin-bottom: 22px;
             letter-spacing: 1px;
@@ -275,7 +275,7 @@ function generateCertificateHtml(record: CertificateRecord): string {
         .course-title {
             font-size: 20px;
             font-weight: bold;
-            color: #800020;
+            color: #3484a5;
             margin: 8px 0;
             display: block;
         }
@@ -311,15 +311,15 @@ function generateCertificateHtml(record: CertificateRecord): string {
             color: #64748b;
         }
         .badge-valid {
-            color: #800020;
+            color: #059669;
             font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="cert-card">
-        <div class="inst-header">${record.institution || 'SIGC-CUSCO'}</div>
-        <div class="inst-sub">Sistema Integral de Gestión de Capacitaciones • Cusco, Perú</div>
+        <div class="inst-header">${record.institution || 'Municipalidad Distrital de San Jerónimo'}</div>
+        <div class="inst-sub">Sistema Integral de Gestión de Capacitaciones • SIGC-MDSJ</div>
         
         <h1 class="cert-title">Certificado Oficial</h1>
         <div class="cert-subtitle">Acreditación Académica y Asistencia Digital</div>
@@ -342,7 +342,7 @@ function generateCertificateHtml(record: CertificateRecord): string {
             </div>
             <div class="sig-box">
                 <strong>Dirección Académica</strong><br>
-                <span class="sig-role">Coordinación SIGC-CUSCO</span>
+                <span class="sig-role">Coordinación General SIGC-MDSJ</span>
             </div>
         </div>
 
@@ -374,12 +374,12 @@ function copyVerificationUrl(url: string) {
         class="overflow-hidden border border-slate-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
     >
         <CardHeader
-            class="border-b bg-gradient-to-r from-rose-50/90 via-amber-50/30 to-transparent pb-4 dark:from-rose-950/40 dark:to-neutral-900"
+            class="border-b bg-gradient-to-r from-sky-50/90 via-amber-50/30 to-transparent pb-4 dark:from-sky-950/40 dark:to-neutral-900"
         >
             <div
-                class="mb-1 flex items-center gap-1.5 text-xs font-bold tracking-wider text-rose-900 uppercase dark:text-rose-300"
+                class="mb-1 flex items-center gap-1.5 text-xs font-bold tracking-wider text-[#3484a5] uppercase dark:text-[#badbe9]"
             >
-                <Award class="size-4 text-rose-800" />
+                <Award class="size-4 text-[#296d88]" />
                 <span>Acreditación Digital Oficial • Cusco, Perú</span>
             </div>
             <CardTitle
@@ -418,7 +418,7 @@ function copyVerificationUrl(url: string) {
                 </div>
                 <Button
                     type="submit"
-                    class="h-10 shrink-0 cursor-pointer bg-rose-900 px-5 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
+                    class="h-10 shrink-0 cursor-pointer bg-[#3484a5] px-5 text-xs font-bold text-white shadow-xs hover:bg-[#256883]"
                     :disabled="loading || dniQuery.trim().length !== 8"
                 >
                     <Loader2
@@ -433,9 +433,9 @@ function copyVerificationUrl(url: string) {
             <!-- Error message -->
             <div
                 v-if="error"
-                class="flex items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-bold text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
+                class="flex items-center gap-2.5 rounded-xl border border-sky-200 bg-sky-50 p-3.5 text-xs font-bold text-[#296d88] dark:border-sky-900 dark:bg-sky-950/40 dark:text-sky-200"
             >
-                <AlertCircle class="size-4 shrink-0 text-rose-700" />
+                <AlertCircle class="size-4 shrink-0 text-[#22596f]" />
                 <span>{{ error }}</span>
             </div>
 
@@ -451,7 +451,7 @@ function copyVerificationUrl(url: string) {
                 </div>
                 <h4 class="text-sm font-bold text-slate-900 dark:text-white">
                     No se encontraron certificados para el DNI
-                    <span class="font-mono text-rose-900 dark:text-rose-400">{{
+                    <span class="font-mono text-[#3484a5] dark:text-[#88c0d7]">{{
                         dniQuery
                     }}</span>
                 </h4>
@@ -487,7 +487,7 @@ function copyVerificationUrl(url: string) {
                     </div>
                     <Badge
                         variant="outline"
-                        class="border-rose-300 bg-rose-50 text-xs font-black text-rose-900 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                        class="border-sky-300 bg-sky-50 text-xs font-black text-[#3484a5] dark:border-sky-800 dark:bg-sky-950 dark:text-[#badbe9]"
                     >
                         {{ records.length }}
                         {{
@@ -502,14 +502,14 @@ function copyVerificationUrl(url: string) {
                     <div
                         v-for="cert in records"
                         :key="cert.id"
-                        class="flex flex-col justify-between space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs transition-all hover:border-rose-400/80 sm:p-5 dark:border-neutral-800 dark:bg-neutral-900"
+                        class="flex flex-col justify-between space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs transition-all hover:border-[#3484a5]/80 sm:p-5 dark:border-neutral-800 dark:bg-neutral-900"
                     >
                         <div class="space-y-2.5">
                             <div
                                 class="flex items-center justify-between gap-2"
                             >
                                 <span
-                                    class="rounded border border-rose-300 bg-rose-100 px-2.5 py-0.5 font-mono text-[11px] font-black text-rose-950 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                                    class="rounded border border-sky-300 bg-sky-100 px-2.5 py-0.5 font-mono text-[11px] font-black text-sky-950 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-200"
                                 >
                                     {{ cert.course_code }}
                                 </span>
@@ -518,12 +518,12 @@ function copyVerificationUrl(url: string) {
                                     class="text-[11px] font-black capitalize"
                                     :class="
                                         cert.status === 'aprobado'
-                                            ? 'border-rose-300 bg-rose-100 text-rose-950 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200'
+                                            ? 'border-sky-300 bg-sky-100 text-sky-950 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-200'
                                             : 'border-sky-300 bg-sky-100 text-sky-900 dark:bg-sky-950 dark:text-sky-200'
                                     "
                                 >
                                     <CheckCircle2
-                                        class="mr-1 size-3 text-rose-800"
+                                        class="mr-1 size-3 text-[#296d88]"
                                     />
                                     {{ cert.status }}
                                 </Badge>
@@ -540,7 +540,7 @@ function copyVerificationUrl(url: string) {
                                 class="flex items-center gap-1.5 text-xs text-slate-700 dark:text-neutral-300"
                             >
                                 <Building2
-                                    class="size-3.5 shrink-0 text-rose-800 dark:text-rose-400"
+                                    class="size-3.5 shrink-0 text-[#296d88] dark:text-[#88c0d7]"
                                 />
                                 <span
                                     class="truncate font-semibold text-slate-900 dark:text-neutral-100"
@@ -560,7 +560,7 @@ function copyVerificationUrl(url: string) {
                                 </span>
                                 <span class="flex items-center gap-1">
                                     <Calendar
-                                        class="size-3.5 text-rose-800 dark:text-rose-400"
+                                        class="size-3.5 text-[#296d88] dark:text-[#88c0d7]"
                                     />
                                     {{ formatDate(cert.start_date, 'compact') }}
                                 </span>
@@ -591,7 +591,7 @@ function copyVerificationUrl(url: string) {
                                 <div>
                                     Código Verif.:
                                     <strong
-                                        class="font-black text-rose-900 dark:text-rose-300"
+                                        class="font-black text-[#3484a5] dark:text-[#badbe9]"
                                         >{{ cert.certificate_code }}</strong
                                     >
                                 </div>
@@ -620,7 +620,7 @@ function copyVerificationUrl(url: string) {
                                     type="button"
                                     variant="outline"
                                     size="sm"
-                                    class="h-8.5 flex-1 cursor-pointer border-slate-300 text-xs font-bold text-slate-800 hover:bg-rose-50 hover:text-rose-900 sm:flex-none"
+                                    class="h-8.5 flex-1 cursor-pointer border-slate-300 text-xs font-bold text-slate-800 hover:bg-sky-50 hover:text-[#3484a5] sm:flex-none"
                                     @click="openPreview(cert)"
                                 >
                                     <Eye class="mr-1 size-3.5 text-slate-600" />
@@ -629,7 +629,7 @@ function copyVerificationUrl(url: string) {
                                 <Button
                                     type="button"
                                     size="sm"
-                                    class="h-8.5 flex-1 cursor-pointer bg-rose-900 text-xs font-black text-white shadow-xs hover:bg-rose-950 sm:flex-none"
+                                    class="h-8.5 flex-1 cursor-pointer bg-[#3484a5] text-xs font-black text-white shadow-xs hover:bg-[#256883] sm:flex-none"
                                     @click="printOrDownloadCertificate(cert)"
                                 >
                                     <Download class="mr-1 size-3.5" />
@@ -655,7 +655,7 @@ function copyVerificationUrl(url: string) {
                 <DialogHeader class="space-y-1 text-left">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <Award class="size-4 text-[#800020]" />
+                            <Award class="size-4 text-[#3484a5]" />
                             <DialogTitle
                                 class="text-sm font-black text-slate-950 sm:text-base dark:text-white"
                             >
@@ -664,7 +664,7 @@ function copyVerificationUrl(url: string) {
                         </div>
                         <Badge
                             variant="outline"
-                            class="border-[#800020]/40 font-mono text-xs font-black text-[#800020]"
+                            class="border-[#3484a5]/40 font-mono text-xs font-black text-[#3484a5]"
                         >
                             {{ selectedCert?.certificate_code }}
                         </Badge>
@@ -672,7 +672,7 @@ function copyVerificationUrl(url: string) {
                     <DialogDescription
                         class="text-xs font-medium text-slate-500"
                     >
-                        Universidad Nacional de San Antonio Abad del Cusco •
+                        Municipalidad Distrital de San Jerónimo •
                         Registro Oficial de Fe Pública
                     </DialogDescription>
                 </DialogHeader>
@@ -691,8 +691,8 @@ function copyVerificationUrl(url: string) {
                         class="flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-bold transition-all"
                         :class="
                             previewTab === 'anverso'
-                                ? 'bg-[#800020] text-white shadow-xs'
-                                : 'text-slate-700 hover:text-[#800020] dark:text-slate-300'
+                                ? 'bg-[#3484a5] text-white shadow-xs'
+                                : 'text-slate-700 hover:text-[#3484a5] dark:text-slate-300'
                         "
                     >
                         <Award class="size-3.5" />
@@ -704,8 +704,8 @@ function copyVerificationUrl(url: string) {
                         class="flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-bold transition-all"
                         :class="
                             previewTab === 'reverso'
-                                ? 'bg-[#800020] text-white shadow-xs'
-                                : 'text-slate-700 hover:text-[#800020] dark:text-slate-300'
+                                ? 'bg-[#3484a5] text-white shadow-xs'
+                                : 'text-slate-700 hover:text-[#3484a5] dark:text-slate-300'
                         "
                     >
                         <QrCode class="size-3.5" />
@@ -722,55 +722,54 @@ function copyVerificationUrl(url: string) {
                     <!-- CARA 1: ANVERSO -->
                     <div
                         v-if="previewTab === 'anverso'"
-                        class="space-y-4 rounded-2xl border-2 border-[#800020] bg-white p-6 text-center shadow-md sm:p-8 dark:bg-slate-900"
+                        class="space-y-4 rounded-2xl border-2 border-[#3484a5] bg-white p-6 text-center shadow-md sm:p-8 dark:bg-slate-900"
                     >
                         <div
-                            class="rounded-xl border border-[#b45309] p-4 sm:p-6"
+                            class="rounded-xl border border-[#f0c84f] p-4 sm:p-6"
                         >
                             <!-- Cabecera con 3 Logos -->
                             <div
-                                class="mb-4 flex items-center justify-between border-b-2 border-[#800020] pb-3"
+                                class="mb-4 flex items-center justify-between border-b-2 border-[#3484a5] pb-3"
                             >
                                 <div class="flex w-14 justify-center">
                                     <img
-                                        src="/images/unsaac-logo.png"
-                                        alt="UNSAAC"
+                                        src="/images/mdsj/escudo_sm.webp"
+                                        alt="MDSJ"
                                         class="h-12 object-contain"
                                     />
                                 </div>
                                 <div class="flex-1 px-2 text-center">
                                     <div
-                                        class="text-[9px] font-black tracking-widest text-[#800020] uppercase"
+                                        class="text-[9px] font-black tracking-widest text-[#3484a5] uppercase"
                                     >
                                         REPÚBLICA DEL PERÚ • REGIÓN CUSCO
                                     </div>
                                     <div
                                         class="text-xs font-black tracking-tight text-slate-950 uppercase sm:text-sm dark:text-white"
                                     >
-                                        Universidad Nacional de San Antonio Abad
-                                        del Cusco
+                                        Municipalidad Distrital de San Jerónimo
+                                        Cusco
                                     </div>
                                     <div
                                         class="text-[9px] font-semibold tracking-wider text-slate-600 uppercase dark:text-slate-400"
                                     >
-                                        Facultad de Ing. Eléctrica, Electrónica,
-                                        Informática y Mecánica
+                                        Gerencia de Desarrollo Social y Humano
                                     </div>
                                     <div
-                                        class="mt-1 inline-block rounded-full bg-[#800020] px-2.5 py-0.5 text-[8px] font-bold tracking-wider text-white uppercase"
+                                        class="mt-1 inline-block rounded-full bg-[#3484a5] px-2.5 py-0.5 text-[8px] font-bold tracking-wider text-white uppercase"
                                     >
-                                        SIGC-CUSCO • ACREDITACIÓN OFICIAL
+                                        SIGC-MDSJ • ACREDITACIÓN OFICIAL
                                     </div>
                                 </div>
                                 <div class="flex w-14 justify-center">
                                     <div
-                                        class="flex size-12 flex-col items-center justify-center rounded-full border-2 border-amber-600 bg-gradient-to-tr from-amber-600 to-amber-300 p-1 text-center text-[#800020] shadow-xs"
+                                        class="flex size-12 flex-col items-center justify-center rounded-full border-2 border-amber-600 bg-gradient-to-tr from-amber-600 to-amber-300 p-1 text-center text-[#3484a5] shadow-xs"
                                     >
                                         <Sparkles
                                             class="size-3 text-amber-950"
                                         />
                                         <span
-                                            class="text-[7px] leading-none font-black text-[#800020]"
+                                            class="text-[7px] leading-none font-black text-[#3484a5]"
                                             >CALIDAD</span
                                         >
                                     </div>
@@ -780,7 +779,7 @@ function copyVerificationUrl(url: string) {
                             <!-- Título -->
                             <div class="my-3 space-y-1">
                                 <h2
-                                    class="font-serif text-2xl font-black tracking-widest text-[#800020] uppercase"
+                                    class="font-serif text-2xl font-black tracking-widest text-[#3484a5] uppercase"
                                 >
                                     CERTIFICADO
                                 </h2>
@@ -800,13 +799,13 @@ function copyVerificationUrl(url: string) {
                                     Conferido a:
                                 </p>
                                 <div
-                                    class="inline-block border-b-2 border-[#800020] px-4 py-1 text-xl font-black tracking-tight text-slate-950 uppercase dark:text-white"
+                                    class="inline-block border-b-2 border-[#3484a5] px-4 py-1 text-xl font-black tracking-tight text-slate-950 uppercase dark:text-white"
                                 >
                                     {{ selectedCert.student_name }}
                                 </div>
                                 <div class="mt-2">
                                     <span
-                                        class="rounded-full border border-rose-200 bg-rose-50 px-3.5 py-1 font-mono text-xs font-bold text-[#800020] dark:bg-rose-950/60"
+                                        class="rounded-full border border-sky-200 bg-sky-50 px-3.5 py-1 font-mono text-xs font-bold text-[#3484a5] dark:bg-sky-950/60"
                                     >
                                         D.N.I. N° {{ selectedCert.dni }}
                                     </span>
@@ -820,7 +819,7 @@ function copyVerificationUrl(url: string) {
                                 Por haber aprobado el programa de capacitación
                                 en:
                                 <strong
-                                    class="my-1 block text-sm font-black text-[#800020]"
+                                    class="my-1 block text-sm font-black text-[#3484a5]"
                                 >
                                     "{{ selectedCert.course_title }}"
                                 </strong>
@@ -925,8 +924,8 @@ function copyVerificationUrl(url: string) {
                                         )
                                     }}</strong></span
                                 >
-                                <span class="font-bold text-[#800020]"
-                                    >VÁLIDO OFICIALMENTE • CUSCO</span
+                                <span class="font-bold text-[#3484a5]"
+                                    >VÁLIDO OFICIALMENTE • SAN JERÓNIMO</span
                                 >
                             </div>
                         </div>
@@ -935,14 +934,14 @@ function copyVerificationUrl(url: string) {
                     <!-- CARA 2: REVERSO -->
                     <div
                         v-else
-                        class="space-y-4 rounded-2xl border-2 border-[#800020] bg-white p-6 text-left shadow-md dark:bg-slate-900"
+                        class="space-y-4 rounded-2xl border-2 border-[#3484a5] bg-white p-6 text-left shadow-md dark:bg-slate-900"
                     >
-                        <div class="border-b-2 border-[#800020] pb-2">
+                        <div class="border-b-2 border-[#3484a5] pb-2">
                             <div
-                                class="text-[10px] font-black text-[#800020] uppercase"
+                                class="text-[10px] font-black text-[#3484a5] uppercase"
                             >
-                                UNIVERSIDAD NACIONAL DE SAN ANTONIO ABAD DEL
-                                CUSCO • SIGC
+                                MUNICIPALIDAD DISTRITAL DE SAN JERÓNIMO •
+                                SIGC
                             </div>
                             <h3
                                 class="text-base font-black text-slate-950 uppercase dark:text-white"
@@ -961,7 +960,7 @@ function copyVerificationUrl(url: string) {
                         <!-- Módulos -->
                         <div class="space-y-2">
                             <div
-                                class="flex items-center justify-between text-xs font-black text-[#800020] uppercase"
+                                class="flex items-center justify-between text-xs font-black text-[#3484a5] uppercase"
                             >
                                 <span class="flex items-center gap-1">
                                     <BookOpen class="size-3.5" />
@@ -980,13 +979,13 @@ function copyVerificationUrl(url: string) {
                                         module, index
                                     ) in selectedCert.modules"
                                     :key="index"
-                                    class="rounded-xl border-l-4 border-l-[#800020] bg-slate-50 p-2.5 text-xs dark:bg-slate-800"
+                                    class="rounded-xl border-l-4 border-l-emerald-600 bg-slate-50 p-2.5 text-xs dark:border-l-emerald-500 dark:bg-slate-800"
                                 >
                                     <div
                                         class="flex items-center justify-between font-bold text-slate-900 dark:text-white"
                                     >
                                         <span
-                                            class="mr-2 font-black text-[#800020]"
+                                            class="mr-2 font-black text-[#3484a5]"
                                             >{{ module.number }}</span
                                         >
                                         <span class="flex-1 truncate">{{
@@ -1023,7 +1022,7 @@ function copyVerificationUrl(url: string) {
                                         {{ selectedCert.final_grade }}
                                     </div>
                                     <div
-                                        class="text-[9px] font-bold text-emerald-700"
+                                        class="text-[9px] font-bold text-emerald-700 dark:text-emerald-300"
                                     >
                                         {{
                                             selectedCert.final_grade_text ||
@@ -1050,15 +1049,15 @@ function copyVerificationUrl(url: string) {
                                 >
                                     {{ selectedCert.instructor_name }}
                                 </div>
-                                <div class="text-[10px] text-slate-600">
-                                    {{ selectedCert.institution || 'UNSAAC' }}
+                                <div class="text-[10px] text-slate-600 dark:text-slate-400">
+                                    {{ selectedCert.institution || 'Municipalidad Distrital de San Jerónimo' }}
                                 </div>
                             </div>
                         </div>
 
                         <!-- QR Permanente -->
                         <div
-                            class="flex items-center gap-3 rounded-xl border-2 border-[#800020] bg-white p-3 dark:bg-slate-800"
+                            class="flex items-center gap-3 rounded-xl border-2 border-[#3484a5] bg-white p-3 dark:bg-slate-800"
                         >
                             <div
                                 class="flex size-20 shrink-0 items-center justify-center rounded border border-slate-200 bg-white p-1"
@@ -1070,7 +1069,7 @@ function copyVerificationUrl(url: string) {
                             </div>
                             <div class="min-w-0 flex-1 space-y-1">
                                 <div
-                                    class="flex items-center gap-1 text-xs font-black text-[#800020] uppercase"
+                                    class="flex items-center gap-1 text-xs font-black text-[#3484a5] uppercase"
                                 >
                                     <QrCode class="size-3.5" />
                                     QR Permanente de Verificación
@@ -1120,7 +1119,7 @@ function copyVerificationUrl(url: string) {
                     >
                         <Check
                             v-if="copiedCode"
-                            class="mr-1 size-3.5 text-[#800020]"
+                            class="mr-1 size-3.5 text-[#3484a5]"
                         />
                         <Copy v-else class="mr-1 size-3.5" />
                         <span>{{
@@ -1139,7 +1138,7 @@ function copyVerificationUrl(url: string) {
                     >
                         <Check
                             v-if="copiedUrl"
-                            class="mr-1 size-3.5 text-[#800020]"
+                            class="mr-1 size-3.5 text-[#3484a5]"
                         />
                         <Share2 v-else class="mr-1 size-3.5" />
                         <span>{{
@@ -1161,7 +1160,7 @@ function copyVerificationUrl(url: string) {
                     <Button
                         type="button"
                         size="sm"
-                        class="cursor-pointer bg-[#800020] text-xs font-bold text-white shadow-xs hover:bg-[#5a0017]"
+                        class="cursor-pointer bg-[#3484a5] text-xs font-bold text-white shadow-xs hover:bg-[#5a0017]"
                         @click="
                             selectedCert &&
                             printOrDownloadCertificate(selectedCert)

@@ -29,7 +29,7 @@ function toggleTheme() {
         @click="toggleTheme"
         :aria-label="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
         :title="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
-        class="group relative inline-flex cursor-pointer items-center justify-center rounded-xl border border-slate-200/90 bg-white/90 p-2 text-slate-700 shadow-2xs backdrop-blur-xs transition-all duration-200 hover:border-rose-900/40 hover:bg-rose-50 hover:text-rose-900 focus-visible:ring-2 focus-visible:ring-rose-900/40 focus-visible:outline-hidden dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-300 dark:hover:border-rose-700 dark:hover:bg-rose-950/50 dark:hover:text-rose-200"
+        class="group relative inline-flex cursor-pointer items-center justify-center rounded-xl border border-slate-200/90 bg-white/90 p-2 text-slate-700 shadow-2xs backdrop-blur-xs transition-all duration-200 hover:border-[#3484a5]/40 hover:bg-sky-50 hover:text-[#3484a5] focus-visible:ring-2 focus-visible:ring-[#3484a5]/40 focus-visible:outline-hidden dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-300 dark:hover:border-sky-700 dark:hover:bg-sky-950/50 dark:hover:text-sky-200"
         :class="[
             size === 'sm' ? 'h-8 px-2 text-xs' : 'h-9 px-2.5 text-sm',
             showLabel ? 'gap-2' : '',

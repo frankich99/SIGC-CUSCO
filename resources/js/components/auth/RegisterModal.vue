@@ -81,7 +81,7 @@ function submitRegister() {
             form.reset('password', 'password_confirmation');
             notify.success(
                 '¡Registro Exitoso!',
-                'Bienvenido a la plataforma SIGC-CUSCO.',
+                'Bienvenido a la plataforma SIGC-MDSJ.',
                 2000,
             );
             router.visit('/dashboard');
@@ -103,12 +103,20 @@ function submitRegister() {
             <div class="shrink-0 p-5 pr-12 pb-2 sm:p-6">
                 <DialogHeader class="space-y-1 text-left">
                     <div
-                        class="flex items-center gap-1.5 text-[11px] font-black tracking-wider text-rose-900 uppercase dark:text-rose-300"
+                        class="flex items-center gap-2 text-[11px] font-black tracking-wider text-[#3484a5] uppercase dark:text-[#badbe9]"
                     >
-                        <ShieldCheck
-                            class="size-4 text-rose-800 dark:text-rose-400"
-                        />
-                        <span>Registro Oficial</span>
+                        <picture class="size-4.5 shrink-0">
+                            <source srcset="/images/mdsj/escudo_sm.webp" type="image/webp" />
+                            <img
+                                src="/images/mdsj/escudo_sm.png"
+                                alt="MDSJ"
+                                class="size-4.5 object-contain"
+                                width="18"
+                                height="18"
+                                loading="eager"
+                            />
+                        </picture>
+                        <span>MDSJ • Registro Oficial</span>
                     </div>
                     <DialogTitle
                         class="text-lg font-black text-slate-950 dark:text-white"
@@ -132,9 +140,9 @@ function submitRegister() {
                     <!-- Validation error alert -->
                     <div
                         v-if="Object.keys(form.errors).length > 0"
-                        class="flex items-center gap-2 rounded-lg border border-rose-300 bg-rose-100 p-2.5 text-xs font-bold text-rose-950 dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-200"
+                        class="flex items-center gap-2 rounded-lg border border-sky-300 bg-sky-100 p-2.5 text-xs font-bold text-sky-950 dark:border-sky-900 dark:bg-sky-950/60 dark:text-sky-200"
                     >
-                        <AlertCircle class="size-4 shrink-0 text-rose-800" />
+                        <AlertCircle class="size-4 shrink-0 text-[#296d88]" />
                         <span>{{ Object.values(form.errors)[0] }}</span>
                     </div>
 
@@ -270,7 +278,7 @@ function submitRegister() {
                         ¿Ya tienes una cuenta registrada?
                         <button
                             type="button"
-                            class="ml-1 cursor-pointer font-black text-rose-900 hover:underline dark:text-rose-300"
+                            class="ml-1 cursor-pointer font-black text-[#3484a5] hover:underline dark:text-[#badbe9]"
                             @click="handleSwitchToLogin"
                         >
                             Inicia sesión aquí

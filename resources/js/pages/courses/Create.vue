@@ -98,10 +98,10 @@ const statusOptions = [
     {
         value: 'cancelado',
         label: 'Cancelado',
-        dotClass: 'bg-rose-500 shadow-xs shadow-rose-500/50',
+        dotClass: 'bg-red-500 shadow-xs shadow-red-500/50',
         activeClass:
-            'bg-rose-50/90 dark:bg-rose-950/60 border-rose-500 text-rose-950 dark:text-rose-100 ring-2 ring-rose-500/20 shadow-xs',
-        checkBadgeClass: 'bg-rose-600 text-white',
+            'bg-red-50/90 dark:bg-red-950/60 border-red-500 text-red-950 dark:text-red-100 ring-2 ring-red-500/20 shadow-xs',
+        checkBadgeClass: 'bg-red-600 text-white',
     },
 ];
 
@@ -126,19 +126,19 @@ function submit() {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Registrar Nueva Capacitación - SIGC-CUSCO" />
+        <Head title="Registrar Nueva Capacitación - SIGC-MDSJ" />
 
         <div
             class="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
         >
-            <!-- CABECERA INSTITUCIONAL GRANATE CUSCO -->
+            <!-- CABECERA INSTITUCIONAL MDSJ CUSCO -->
             <div
                 class="flex flex-col justify-between gap-4 border-b border-slate-200/90 pb-5 sm:flex-row sm:items-center dark:border-slate-800"
             >
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
                         <div
-                            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] text-white shadow-xs ring-1 ring-rose-950/20"
+                            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#3484a5] text-white shadow-xs ring-1 ring-[#3484a5]/30"
                         >
                             <GraduationCap class="size-5 text-amber-300" />
                         </div>
@@ -150,9 +150,9 @@ function submit() {
                                     Registrar Nueva Capacitación
                                 </h1>
                                 <span
-                                    class="hidden rounded-full border border-rose-300 bg-rose-100 px-2 py-0.5 text-[10px] font-black text-rose-950 uppercase sm:inline-flex dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                                    class="hidden rounded-full border border-sky-300 bg-sky-100 px-2 py-0.5 text-[10px] font-black text-sky-950 uppercase sm:inline-flex dark:border-[#296d88] dark:bg-[#153542] dark:text-sky-200"
                                 >
-                                    Oficial UNSAAC
+                                    Oficial MDSJ
                                 </span>
                             </div>
                             <p
@@ -170,10 +170,10 @@ function submit() {
                         as-child
                         variant="outline"
                         size="sm"
-                        class="cursor-pointer border-slate-300 text-xs font-bold shadow-2xs hover:bg-rose-50 hover:text-rose-900"
+                        class="cursor-pointer border-slate-300 text-xs font-bold shadow-2xs hover:bg-sky-50 hover:text-[#3484a5]"
                     >
                         <Link href="/courses">
-                            <ArrowLeft class="mr-1.5 size-3.5 text-rose-800" />
+                            <ArrowLeft class="mr-1.5 size-3.5 text-[#296d88]" />
                             Volver al Catálogo
                         </Link>
                     </Button>
@@ -190,9 +190,9 @@ function submit() {
                         class="border-b bg-slate-50/70 px-5 pb-3.5 sm:px-6 dark:bg-slate-900/80"
                     >
                         <div
-                            class="flex items-center gap-2 text-xs font-black tracking-wider text-rose-900 uppercase dark:text-rose-400"
+                            class="flex items-center gap-2 text-xs font-black tracking-wider text-[#3484a5] uppercase dark:text-[#88c0d7]"
                         >
-                            <BookOpen class="size-4 text-rose-800" />
+                            <BookOpen class="size-4 text-[#296d88]" />
                             <span>1. Identificación y Convocatoria</span>
                         </div>
                         <CardTitle
@@ -237,7 +237,7 @@ function submit() {
                                         :value="form.code"
                                         readonly
                                         tabindex="-1"
-                                        class="h-10 cursor-not-allowed border-slate-300 bg-slate-100/90 pr-10 pl-3 font-mono text-sm font-black tracking-wider text-rose-950 select-none dark:border-slate-700 dark:bg-slate-800/80 dark:text-rose-200"
+                                        class="h-10 cursor-not-allowed border-slate-300 bg-slate-100/90 pr-10 pl-3 font-mono text-sm font-black tracking-wider text-sky-950 select-none dark:border-slate-700 dark:bg-slate-800/80 dark:text-sky-200"
                                     />
                                     <div
                                         class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-slate-400"
@@ -260,7 +260,7 @@ function submit() {
                                         class="text-xs font-bold text-slate-800 dark:text-slate-200"
                                     >
                                         Estado de la Convocatoria
-                                        <span class="text-rose-700">*</span>
+                                        <span class="text-[#22596f]">*</span>
                                     </Label>
                                     <Badge
                                         class="rounded-full px-2.5 py-0.5 text-[10px] font-bold capitalize"
@@ -285,7 +285,7 @@ function submit() {
                                         role="radio"
                                         :aria-checked="form.status === st.value"
                                         @click="form.status = st.value"
-                                        class="flex h-10 cursor-pointer items-center justify-between rounded-xl border px-3 text-xs font-bold shadow-2xs transition-all duration-150 select-none focus:ring-2 focus:ring-rose-800/30 focus:outline-hidden"
+                                        class="flex h-10 cursor-pointer items-center justify-between rounded-xl border px-3 text-xs font-bold shadow-2xs transition-all duration-150 select-none focus:ring-2 focus:ring-[#3484a5]/30 focus:outline-hidden"
                                         :class="
                                             form.status === st.value
                                                 ? st.activeClass
@@ -335,13 +335,13 @@ function submit() {
                                 class="text-xs font-bold text-slate-800 dark:text-slate-200"
                             >
                                 Nombre Oficial de la Capacitación
-                                <span class="text-rose-700">*</span>
+                                <span class="text-[#22596f]">*</span>
                             </Label>
                             <Input
                                 id="title"
                                 v-model="form.title"
                                 placeholder="Ej: Especialización en Desarrollo Web Fullstack e Inteligencia Artificial"
-                                class="h-10 rounded-xl border-slate-300 text-sm font-bold focus-visible:ring-rose-900"
+                                class="h-10 rounded-xl border-slate-300 text-sm font-bold focus-visible:ring-[#3484a5]"
                                 required
                             />
                             <span
@@ -359,7 +359,7 @@ function submit() {
                                     for="institution"
                                     class="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200"
                                 >
-                                    <Building2 class="size-3.5 text-rose-800" />
+                                    <Building2 class="size-3.5 text-[#296d88]" />
                                     <span
                                         >Entidad u Organización
                                         Responsable</span
@@ -369,7 +369,7 @@ function submit() {
                                     id="institution"
                                     v-model="form.institution"
                                     placeholder="Ej: Colegio de Ingenieros del Perú - CD Cusco"
-                                    class="h-10 rounded-xl border-slate-300 text-xs focus-visible:ring-rose-900 sm:text-sm"
+                                    class="h-10 rounded-xl border-slate-300 text-xs focus-visible:ring-[#3484a5] sm:text-sm"
                                 />
                                 <span
                                     v-if="form.errors.institution"
@@ -385,11 +385,11 @@ function submit() {
                                     class="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200"
                                 >
                                     <GraduationCap
-                                        class="size-3.5 text-rose-800"
+                                        class="size-3.5 text-[#296d88]"
                                     />
                                     <span
                                         >Ponente / Docente a Cargo
-                                        <span class="text-rose-700"
+                                        <span class="text-[#22596f]"
                                             >*</span
                                         ></span
                                     >
@@ -398,7 +398,7 @@ function submit() {
                                     id="instructor_name"
                                     v-model="form.instructor_name"
                                     placeholder="Ej: Ing. Carlos Alberto Quispe Pérez"
-                                    class="h-10 rounded-xl border-slate-300 text-xs font-bold focus-visible:ring-rose-900 sm:text-sm"
+                                    class="h-10 rounded-xl border-slate-300 text-xs font-bold focus-visible:ring-[#3484a5] sm:text-sm"
                                     required
                                 />
                                 <span
@@ -429,7 +429,7 @@ function submit() {
                                 id="description"
                                 v-model="form.description"
                                 rows="3"
-                                class="w-full rounded-xl border border-slate-300 bg-white p-3 text-xs leading-relaxed font-normal shadow-2xs focus:border-rose-900 focus:ring-2 focus:ring-rose-900/20 focus:outline-hidden sm:text-sm dark:border-slate-700 dark:bg-slate-950"
+                                class="w-full rounded-xl border border-slate-300 bg-white p-3 text-xs leading-relaxed font-normal shadow-2xs focus:border-[#3484a5] focus:ring-2 focus:ring-[#3484a5]/20 focus:outline-hidden sm:text-sm dark:border-slate-700 dark:bg-slate-950"
                                 placeholder="Describe brevemente los módulos temáticos, competencias a desarrollar y prerrequisitos del curso..."
                             ></textarea>
                             <span
@@ -442,7 +442,7 @@ function submit() {
                     </CardContent>
                 </Card>
 
-                <!-- SECCIÓN 2: PLANIFICACIÓN, AFORO Y ACREDITACIÓN (REGLAMENTO UNSAAC) -->
+                <!-- SECCIÓN 2: PLANIFICACIÓN, AFORO Y ACREDITACIÓN (REGLAMENTO MDSJ) -->
                 <Card
                     class="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900"
                 >
@@ -450,9 +450,9 @@ function submit() {
                         class="border-b bg-slate-50/70 px-5 pb-3.5 sm:px-6 dark:bg-slate-900/80"
                     >
                         <div
-                            class="flex items-center gap-2 text-xs font-black tracking-wider text-rose-900 uppercase dark:text-rose-400"
+                            class="flex items-center gap-2 text-xs font-black tracking-wider text-[#3484a5] uppercase dark:text-[#88c0d7]"
                         >
-                            <Calendar class="size-4 text-rose-800" />
+                            <Calendar class="size-4 text-[#296d88]" />
                             <span>2. Cronograma, Aforo y Acreditación</span>
                         </div>
                         <CardTitle
@@ -479,13 +479,13 @@ function submit() {
                                     class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
                                 >
                                     <span>Fecha de Inicio</span>
-                                    <span class="text-rose-700">*</span>
+                                    <span class="text-[#22596f]">*</span>
                                 </Label>
                                 <Input
                                     id="start_date"
                                     type="date"
                                     v-model="form.start_date"
-                                    class="h-10 cursor-pointer rounded-xl border-slate-300 text-xs font-medium focus-visible:ring-rose-900 sm:text-sm"
+                                    class="h-10 cursor-pointer rounded-xl border-slate-300 text-xs font-medium focus-visible:ring-[#3484a5] sm:text-sm"
                                     required
                                 />
                                 <span
@@ -502,13 +502,13 @@ function submit() {
                                     class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
                                 >
                                     <span>Fecha de Fin</span>
-                                    <span class="text-rose-700">*</span>
+                                    <span class="text-[#22596f]">*</span>
                                 </Label>
                                 <Input
                                     id="end_date"
                                     type="date"
                                     v-model="form.end_date"
-                                    class="h-10 cursor-pointer rounded-xl border-slate-300 text-xs font-medium focus-visible:ring-rose-900 sm:text-sm"
+                                    class="h-10 cursor-pointer rounded-xl border-slate-300 text-xs font-medium focus-visible:ring-[#3484a5] sm:text-sm"
                                     required
                                 />
                                 <span
@@ -526,7 +526,7 @@ function submit() {
                                 >
                                     <Clock class="size-3.5 text-amber-700" />
                                     <span>Horas Lectivas</span>
-                                    <span class="text-rose-700">*</span>
+                                    <span class="text-[#22596f]">*</span>
                                 </Label>
                                 <Input
                                     id="hours"
@@ -534,7 +534,7 @@ function submit() {
                                     min="1"
                                     v-model.number="form.hours"
                                     placeholder="30"
-                                    class="h-10 border-slate-300 font-bold focus-visible:ring-rose-900"
+                                    class="h-10 border-slate-300 font-bold focus-visible:ring-[#3484a5]"
                                     required
                                 />
                                 <span
@@ -550,9 +550,9 @@ function submit() {
                                     for="capacity"
                                     class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
                                 >
-                                    <Users class="size-3.5 text-rose-800" />
+                                    <Users class="size-3.5 text-[#296d88]" />
                                     <span>Aforo / Vacantes</span>
-                                    <span class="text-rose-700">*</span>
+                                    <span class="text-[#22596f]">*</span>
                                 </Label>
                                 <Input
                                     id="capacity"
@@ -560,7 +560,7 @@ function submit() {
                                     min="1"
                                     v-model.number="form.capacity"
                                     placeholder="30"
-                                    class="h-10 border-slate-300 font-bold focus-visible:ring-rose-900"
+                                    class="h-10 border-slate-300 font-bold focus-visible:ring-[#3484a5]"
                                     required
                                 />
                                 <span
@@ -575,10 +575,10 @@ function submit() {
                         <!-- Alerta visual si las fechas son incongruentes -->
                         <div
                             v-if="isDateOrderInvalid"
-                            class="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-bold text-rose-900 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
+                            class="flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 p-3 text-xs font-bold text-[#3484a5] dark:border-[#3484a5] dark:bg-[#153542]/40 dark:text-sky-200"
                         >
                             <AlertCircle
-                                class="size-4 shrink-0 text-rose-700"
+                                class="size-4 shrink-0 text-[#22596f]"
                             />
                             <span
                                 >La fecha de fin no puede ser anterior a la
@@ -595,9 +595,9 @@ function submit() {
                                     for="total_sessions"
                                     class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
                                 >
-                                    <BookOpen class="size-3.5 text-rose-800" />
+                                    <BookOpen class="size-3.5 text-[#296d88]" />
                                     <span>N° Sesiones Programadas</span>
-                                    <span class="text-rose-700">*</span>
+                                    <span class="text-[#22596f]">*</span>
                                 </Label>
                                 <Input
                                     id="total_sessions"
@@ -606,7 +606,7 @@ function submit() {
                                     max="200"
                                     v-model.number="form.total_sessions"
                                     placeholder="4"
-                                    class="h-10 border-slate-300 font-bold focus-visible:ring-rose-900"
+                                    class="h-10 border-slate-300 font-bold focus-visible:ring-[#3484a5]"
                                     required
                                 />
                                 <p class="text-[11px] text-slate-500">
@@ -630,7 +630,7 @@ function submit() {
                                         class="size-3.5 text-emerald-700"
                                     />
                                     <span>Asistencia Mínima Exigida (%)</span>
-                                    <span class="text-rose-700">*</span>
+                                    <span class="text-[#22596f]">*</span>
                                 </Label>
                                 <Input
                                     id="min_attendance_percentage"
@@ -641,11 +641,11 @@ function submit() {
                                         form.min_attendance_percentage
                                     "
                                     placeholder="75"
-                                    class="h-10 border-slate-300 font-bold focus-visible:ring-rose-900"
+                                    class="h-10 border-slate-300 font-bold focus-visible:ring-[#3484a5]"
                                     required
                                 />
                                 <p class="text-[11px] text-slate-500">
-                                    Mínimo reglamentario UNSAAC: 75% de
+                                    Mínimo reglamentario MDSJ: 75% de
                                     asistencia.
                                 </p>
                                 <span
@@ -667,7 +667,7 @@ function submit() {
                             <div class="leading-relaxed">
                                 <strong class="text-slate-900 dark:text-white"
                                     >Criterio Oficial de Acreditación
-                                    UNSAAC:</strong
+                                    MDSJ:</strong
                                 >
                                 Al cerrar el acta académica, calificarán a
                                 certificación únicamente los participantes con
@@ -688,7 +688,7 @@ function submit() {
                     >
                         El código institucional
                         <strong
-                            class="font-mono text-rose-900 dark:text-rose-300"
+                            class="font-mono text-[#3484a5] dark:text-[#badbe9]"
                             >{{ form.code }}</strong
                         >
                         se registrará en el sistema.
@@ -701,14 +701,14 @@ function submit() {
                             as-child
                             variant="ghost"
                             size="sm"
-                            class="cursor-pointer text-xs font-bold text-slate-700 hover:text-rose-900"
+                            class="cursor-pointer text-xs font-bold text-slate-700 hover:text-[#3484a5]"
                         >
                             <Link href="/courses">Cancelar</Link>
                         </Button>
                         <Button
                             type="submit"
                             :disabled="form.processing || isDateOrderInvalid"
-                            class="h-10 cursor-pointer bg-rose-900 px-6 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
+                            class="h-10 cursor-pointer bg-[#3484a5] px-6 text-xs font-bold text-white shadow-xs hover:bg-[#153542]"
                         >
                             <Spinner
                                 v-if="form.processing"

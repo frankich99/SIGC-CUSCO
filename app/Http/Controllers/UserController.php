@@ -53,7 +53,7 @@ class UserController extends Controller
             'participantes' => User::where('role', 'participante')->count(),
         ];
 
-        // Matriz descriptiva de capacidades y permisos por rol (SIGC-CUSCO)
+        // Matriz descriptiva de capacidades y permisos por rol (SIGC-MDSJ)
         $permissionsMatrix = [
             [
                 'modulo' => 'Capacitaciones y Cursos',

@@ -1,5 +1,5 @@
 /**
- * Plantilla oficial de Certificados y Diplomas Universitarios SIGC-CUSCO / UNSAAC
+ * Plantilla oficial de Certificados y Diplomas SIGC-MDSJ / Municipalidad Distrital de San Jerónimo
  * Genera el documento de doble cara (Anverso y Reverso) en formato A4 Landscape de alta resolución.
  */
 
@@ -130,11 +130,11 @@ export const GOLD_MEDAL_SVG = `
     <svg class="gold-badge" viewBox="0 0 100 100" width="84" height="84">
         <circle cx="50" cy="50" r="46" fill="url(#goldGrad)" stroke="#854d0e" stroke-width="2.5"/>
         <circle cx="50" cy="50" r="38" fill="none" stroke="#78350f" stroke-width="1.5" stroke-dasharray="3 2"/>
-        <circle cx="50" cy="50" r="32" fill="#800020" stroke="#fbbf24" stroke-width="1"/>
+        <circle cx="50" cy="50" r="32" fill="#1a6b8a" stroke="#fbbf24" stroke-width="1"/>
         <path d="M50 24 L53 33 L62 33 L55 38 L58 47 L50 42 L42 47 L45 38 L38 33 L47 33 Z" fill="#fbbf24" stroke="#d97706" stroke-width="0.5"/>
         <text x="50" y="58" font-family="'Times New Roman', serif" font-size="6.5" font-weight="bold" fill="#fef08a" text-anchor="middle" letter-spacing="0.5">CALIDAD</text>
         <text x="50" y="65" font-family="'Times New Roman', serif" font-size="5.5" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">ACADÉMICA</text>
-        <text x="50" y="72" font-family="'Times New Roman', serif" font-size="4.5" fill="#fef08a" text-anchor="middle" letter-spacing="1">UNSAAC</text>
+        <text x="50" y="72" font-family="'Times New Roman', serif" font-size="4.5" fill="#fef08a" text-anchor="middle" letter-spacing="1">MDSJ</text>
         <defs>
             <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stop-color="#fef08a"/>
@@ -149,7 +149,7 @@ export const GOLD_MEDAL_SVG = `
 // SVG Escudo Patrio / Emblema SIGC
 export const EMBLEM_SVG = `
     <svg viewBox="0 0 100 100" width="75" height="75">
-        <circle cx="50" cy="50" r="46" fill="#f8fafc" stroke="#800020" stroke-width="2"/>
+        <circle cx="50" cy="50" r="46" fill="#f8fafc" stroke="#1a6b8a" stroke-width="2"/>
         <circle cx="50" cy="50" r="42" fill="none" stroke="#b45309" stroke-width="1"/>
         <!-- Laureles -->
         <path d="M22 65 C20 45, 30 25, 50 18 C70 25, 80 45, 78 65" fill="none" stroke="#15803d" stroke-width="2.5" stroke-linecap="round"/>
@@ -160,8 +160,8 @@ export const EMBLEM_SVG = `
         <polygon points="26,46 32,49 34,46 32,43" fill="#d97706"/>
         <polygon points="74,46 68,49 66,46 68,43" fill="#d97706"/>
         <!-- Libro abierto -->
-        <path d="M38 56 Q50 52 50 58 Q50 52 62 56 L62 46 Q50 42 50 48 Q50 42 38 46 Z" fill="#ffffff" stroke="#800020" stroke-width="1"/>
-        <text x="50" y="82" font-family="'Times New Roman', serif" font-size="6" font-weight="bold" fill="#800020" text-anchor="middle">SIGC • PERÚ</text>
+        <path d="M38 56 Q50 52 50 58 Q50 52 62 56 L62 46 Q50 42 50 48 Q50 42 38 46 Z" fill="#ffffff" stroke="#1a6b8a" stroke-width="1"/>
+        <text x="50" y="82" font-family="'Times New Roman', serif" font-size="6" font-weight="bold" fill="#1a6b8a" text-anchor="middle">SIGC • PERÚ</text>
     </svg>
 `;
 
@@ -179,7 +179,7 @@ export const DOCENTE_STAMP_SVG = `
         <path id="docenteBottom" d="M 102,60 A 42,42 0 0,1 18,60" fill="none"/>
         <text font-family="'Times New Roman', serif" font-size="6" font-weight="bold" fill="#1e3a8a" letter-spacing="1">
             <textPath href="#docenteBottom" startOffset="50%" text-anchor="middle">
-                ★ UNSAAC • CD CUSCO ★
+                ★ MDSJ • SAN JERÓNIMO • CUSCO ★
             </textPath>
         </text>
         <!-- Centro con rúbrica -->
@@ -191,22 +191,22 @@ export const DOCENTE_STAMP_SVG = `
 // SVG Sello Redondo de Dirección Académica
 export const DIRECCION_STAMP_SVG = `
     <svg viewBox="0 0 120 120" width="95" height="95" style="transform: rotate(5deg); opacity: 0.88;">
-        <circle cx="60" cy="60" r="54" fill="none" stroke="#800020" stroke-width="2.5"/>
-        <circle cx="60" cy="60" r="47" fill="none" stroke="#800020" stroke-width="1.2" stroke-dasharray="3 2"/>
+        <circle cx="60" cy="60" r="54" fill="none" stroke="#1a6b8a" stroke-width="2.5"/>
+        <circle cx="60" cy="60" r="47" fill="none" stroke="#1a6b8a" stroke-width="1.2" stroke-dasharray="3 2"/>
         <path id="dirCurve" d="M 18,60 A 42,42 0 0,1 102,60" fill="none"/>
-        <text font-family="'Times New Roman', serif" font-size="6.8" font-weight="bold" fill="#800020" letter-spacing="1.2">
+        <text font-family="'Times New Roman', serif" font-size="6.8" font-weight="bold" fill="#1a6b8a" letter-spacing="1.2">
             <textPath href="#dirCurve" startOffset="50%" text-anchor="middle">
                 DIRECCIÓN ACADÉMICA
             </textPath>
         </text>
         <path id="dirBottom" d="M 102,60 A 42,42 0 0,1 18,60" fill="none"/>
-        <text font-family="'Times New Roman', serif" font-size="5.8" font-weight="bold" fill="#800020" letter-spacing="1">
+        <text font-family="'Times New Roman', serif" font-size="5.8" font-weight="bold" fill="#1a6b8a" letter-spacing="1">
             <textPath href="#dirBottom" startOffset="50%" text-anchor="middle">
-                ★ SIGC-CUSCO • FE PÚBLICA ★
+                ★ SIGC-MDSJ • FE PÚBLICA ★
             </textPath>
         </text>
-        <polygon points="60,45 63,52 70,52 65,56 67,63 60,59 53,63 55,56 50,52 57,52" fill="#800020"/>
-        <text x="60" y="73" font-family="'Times New Roman', serif" font-size="6.5" font-weight="bold" fill="#800020" text-anchor="middle">REGISTRADO</text>
+        <polygon points="60,45 63,52 70,52 65,56 67,63 60,59 53,63 55,56 50,52 57,52" fill="#1a6b8a"/>
+        <text x="60" y="73" font-family="'Times New Roman', serif" font-size="6.5" font-weight="bold" fill="#1a6b8a" text-anchor="middle">REGISTRADO</text>
     </svg>
 `;
 
@@ -217,7 +217,7 @@ export function generateOfficialCertificateHtml(
     record: CertificateRecord,
 ): string {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const unsaacLogoUrl = `${origin}/images/unsaac-logo.png`;
+    const mdsjEscudoUrl = `${origin}/images/mdsj/escudo.webp`;
     const verificationUrl =
         record.verification_url ||
         `${origin}/certificates?dni=${record.dni}&code=${record.certificate_code}`;
@@ -358,7 +358,7 @@ export function generateOfficialCertificateHtml(
             left: 5mm;
             right: 5mm;
             bottom: 5mm;
-            border: 2.5px solid #800020;
+            border: 2.5px solid #1a6b8a;
             pointer-events: none;
             z-index: 10;
         }
@@ -411,7 +411,7 @@ export function generateOfficialCertificateHtml(
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 2px solid #800020;
+            border-bottom: 2px solid #1a6b8a;
             padding-bottom: 6px;
             margin-bottom: 8px;
         }
@@ -433,7 +433,7 @@ export function generateOfficialCertificateHtml(
         .gov-title {
             font-size: 11.5px;
             font-weight: bold;
-            color: #800020;
+            color: #1a6b8a;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
@@ -455,7 +455,7 @@ export function generateOfficialCertificateHtml(
         }
         .sigc-badge-title {
             display: inline-block;
-            background: #800020;
+            background: #1a6b8a;
             color: #ffffff;
             font-size: 8.5px;
             font-weight: bold;
@@ -473,7 +473,7 @@ export function generateOfficialCertificateHtml(
         .main-diploma-title {
             font-size: 32px;
             font-weight: 900;
-            color: #800020;
+            color: #1a6b8a;
             letter-spacing: 5px;
             text-transform: uppercase;
             margin-bottom: 2px;
@@ -503,17 +503,17 @@ export function generateOfficialCertificateHtml(
             letter-spacing: 1.5px;
             display: inline-block;
             padding: 3px 25px;
-            border-bottom: 2.5px solid #800020;
+            border-bottom: 2.5px solid #1a6b8a;
             margin: 4px 0 3px 0;
         }
         .student-dni-tag {
             font-family: 'Courier New', Courier, monospace;
             font-size: 11px;
             font-weight: bold;
-            color: #800020;
-            background: #fff1f2;
+            color: #1a6b8a;
+            background: #f0f7fa;
             padding: 3px 14px;
-            border: 1px solid #fecdd3;
+            border: 1px solid #badbe9;
             border-radius: 9999px;
             display: inline-block;
             margin-bottom: 6px;
@@ -529,7 +529,7 @@ export function generateOfficialCertificateHtml(
         .course-title-highlight {
             font-size: 18px;
             font-weight: 900;
-            color: #800020;
+            color: #1a6b8a;
             text-transform: uppercase;
             letter-spacing: 0.8px;
             display: block;
@@ -613,7 +613,7 @@ export function generateOfficialCertificateHtml(
             font-family: 'Courier New', Courier, monospace;
         }
         .meta-code {
-            color: #800020;
+            color: #1a6b8a;
             font-weight: bold;
         }
 
@@ -621,7 +621,7 @@ export function generateOfficialCertificateHtml(
            PÁGINA 2: REVERSO (SYLLABUS, NOTAS, DOCENTE Y QR PERMANENTE)
            ======================================================== */
         .back-header {
-            border-bottom: 2.5px solid #800020;
+            border-bottom: 2.5px solid #1a6b8a;
             padding-bottom: 6px;
             margin-bottom: 8px;
             display: flex;
@@ -635,7 +635,7 @@ export function generateOfficialCertificateHtml(
         .back-title-sub {
             font-size: 10px;
             font-weight: bold;
-            color: #800020;
+            color: #1a6b8a;
             letter-spacing: 1.5px;
             text-transform: uppercase;
         }
@@ -671,7 +671,7 @@ export function generateOfficialCertificateHtml(
         .section-label {
             font-size: 11.5px;
             font-weight: 900;
-            color: #800020;
+            color: #1a6b8a;
             text-transform: uppercase;
             letter-spacing: 1px;
             border-bottom: 1.5px solid #cbd5e1;
@@ -683,7 +683,7 @@ export function generateOfficialCertificateHtml(
         .module-card {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-left: 3.5px solid #800020;
+            border-left: 3.5px solid #1a6b8a;
             padding: 5px 8px;
             border-radius: 3px;
         }
@@ -697,7 +697,7 @@ export function generateOfficialCertificateHtml(
             margin-bottom: 2px;
         }
         .module-num {
-            color: #800020;
+            color: #1a6b8a;
             font-size: 9px;
             font-weight: 900;
             margin-right: 6px;
@@ -799,7 +799,7 @@ export function generateOfficialCertificateHtml(
         /* Caja de Validación QR Permanente */
         .qr-permanent-card {
             background: #ffffff;
-            border: 1.5px solid #800020;
+            border: 1.5px solid #1a6b8a;
             border-radius: 6px;
             padding: 8px;
             display: flex;
@@ -833,7 +833,7 @@ export function generateOfficialCertificateHtml(
         .qr-main-instruction {
             font-size: 9.5px;
             font-weight: 900;
-            color: #800020;
+            color: #1a6b8a;
             text-transform: uppercase;
             margin-bottom: 2px;
         }
@@ -884,19 +884,19 @@ export function generateOfficialCertificateHtml(
         <div class="page-border-inner"></div>
 
         <!-- Marca de Agua Central -->
-        <img class="watermark" src="${unsaacLogoUrl}" alt="Escudo UNSAAC" />
+        <img class="watermark" src="${mdsjEscudoUrl}" alt="Escudo MDSJ" />
 
         <div class="cert-content">
             <!-- Cabecera Oficial Superior: 3 Logos -->
             <div class="header-top">
                 <div class="header-logo-box">
-                    <img src="${unsaacLogoUrl}" class="header-logo-img" alt="UNSAAC Logo" />
+                    <img src="${mdsjEscudoUrl}" class="header-logo-img" alt="Escudo MDSJ" />
                 </div>
                 <div class="header-center-text">
                     <div class="gov-title">REPÚBLICA DEL PERÚ • REGIÓN CUSCO</div>
-                    <div class="univ-title">UNIVERSIDAD NACIONAL DE SAN ANTONIO ABAD DEL CUSCO</div>
-                    <div class="fac-title">FACULTAD DE INGENIERÍA ELÉCTRICA, ELECTRÓNICA, INFORMÁTICA Y MECÁNICA</div>
-                    <div class="sigc-badge-title">SISTEMA INTEGRAL DE GESTIÓN DE CAPACITACIONES (SIGC-CUSCO)</div>
+                    <div class="univ-title">MUNICIPALIDAD DISTRITAL DE SAN JERÓNIMO</div>
+                    <div class="fac-title">GERENCIA DE DESARROLLO SOCIAL Y HUMANO · REGISTRO DE CAPACITACIONES</div>
+                    <div class="sigc-badge-title">SISTEMA INTEGRAL DE GESTIÓN DE CAPACITACIONES (SIGC-MDSJ)</div>
                 </div>
                 <div class="header-logo-box">
                     ${goldMedalSvg}
@@ -924,7 +924,7 @@ export function generateOfficialCertificateHtml(
                 <div class="cert-details-line">
                     Desarrollado <strong>${dateRangeProse}</strong>,
                     con una duración lectiva de <strong>${record.hours} HORAS ACADÉMICAS</strong>,
-                    en cumplimiento de los estándares de acreditación universitaria de fe pública.
+                    en cumplimiento de los estándares de acreditación y fe pública municipal.
                 </div>
                 <div class="grade-badge-line">
                     Calificación Obtenida: <strong>${record.final_grade} / 20.00</strong> — ${record.final_grade_text || gradeHonor}
@@ -945,7 +945,7 @@ export function generateOfficialCertificateHtml(
                     <div class="sign-line">
                         <div class="sign-name">${record.instructor_name}</div>
                         <div class="sign-role">${record.instructor_title || 'Docente Responsable / Especialista'}</div>
-                        <div class="sign-univ">${record.institution || 'Universidad Nacional de San Antonio Abad del Cusco'}</div>
+                        <div class="sign-univ">${record.institution || 'Municipalidad Distrital de San Jerónimo'}</div>
                     </div>
                 </div>
 
@@ -959,8 +959,8 @@ export function generateOfficialCertificateHtml(
                     </div>
                     <div class="sign-line">
                         <div class="sign-name">DIRECCIÓN ACADÉMICA</div>
-                        <div class="sign-role">Coordinación General SIGC-CUSCO</div>
-                        <div class="sign-univ">Universidad Nacional de San Antonio Abad del Cusco</div>
+                        <div class="sign-role">Coordinación General SIGC-MDSJ</div>
+                        <div class="sign-univ">Municipalidad Distrital de San Jerónimo</div>
                     </div>
                 </div>
             </div>
@@ -969,7 +969,7 @@ export function generateOfficialCertificateHtml(
             <div class="cert-footer-meta">
                 <span>CÓDIGO DE REGISTRO: <strong class="meta-code">${record.certificate_code}</strong></span>
                 <span>FECHA DE EMISIÓN: <strong>${issuedDateProse}</strong></span>
-                <span>ACREDITADO • LEY UNIVERSITARIA N° 30220 • CUSCO, PERÚ</span>
+                <span>ACREDITADO • LEY N° 27972 • SAN JERÓNIMO, CUSCO, PERÚ</span>
             </div>
         </div>
     </div>
@@ -986,11 +986,11 @@ export function generateOfficialCertificateHtml(
             <!-- Cabecera del Reverso -->
             <div class="back-header">
                 <div class="back-header-left">
-                    <div class="back-title-sub">UNIVERSIDAD NACIONAL DE SAN ANTONIO ABAD DEL CUSCO • SIGC</div>
+                    <div class="back-title-sub">MUNICIPALIDAD DISTRITAL DE SAN JERÓNIMO • SIGC</div>
                     <div class="back-title-main">PLAN DE ESTUDIOS Y REGISTRO OFICIAL DE CALIFICACIONES</div>
                     <div class="back-course-tag">Curso: <strong>${record.course_title}</strong> (Código: ${record.course_code})</div>
                 </div>
-                <div style="text-align: right; font-family: monospace; font-size: 9.5px; color: #800020;">
+                <div style="text-align: right; font-family: monospace; font-size: 9.5px; color: #1a6b8a;">
                     <div>REGISTRO N°: <strong>${record.certificate_code}</strong></div>
                     <div>TOTAL: <strong>${record.hours} HORAS ACADÉMICAS</strong></div>
                 </div>
@@ -1025,7 +1025,7 @@ export function generateOfficialCertificateHtml(
                     <div class="docente-info-card">
                         <div class="docente-label">DOCENTE ASIGNADO / PONENTE:</div>
                         <div class="docente-val">${record.instructor_name}</div>
-                        <div class="docente-subval">${record.instructor_title || 'Docente Principal e Investigador'} • ${record.institution || 'UNSAAC'}</div>
+                        <div class="docente-subval">${record.instructor_title || 'Docente Principal e Investigador'} • ${record.institution || 'Municipalidad Distrital de San Jerónimo'}</div>
                     </div>
 
                     <!-- Código QR Permanente de Validación en Línea -->

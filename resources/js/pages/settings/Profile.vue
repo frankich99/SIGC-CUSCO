@@ -32,75 +32,88 @@ const user = computed(() => page.props.auth.user);
 
     <h1 class="sr-only">Configuración del perfil</h1>
 
-    <div class="flex flex-col space-y-6">
-        <Heading
-            variant="small"
-            title="Perfil"
-            description="Actualiza tu nombre completo y dirección de correo electrónico"
-        />
-
-        <Form
-            v-bind="ProfileController.update.form()"
-            class="space-y-6"
-            v-slot="{ errors, processing }"
+    <div class="max-w-3xl space-y-8">
+        <!-- Tarjeta de Datos del Perfil -->
+        <div
+            class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs sm:p-7 dark:border-slate-800 dark:bg-slate-900 space-y-6"
         >
-            <div class="grid gap-2">
-                <Label for="name">Nombre completo</Label>
-                <Input
-                    id="name"
-                    class="mt-1 block w-full"
-                    name="name"
-                    :default-value="user.name"
-                    required
-                    autocomplete="name"
-                    placeholder="Tu nombre completo"
-                />
-                <InputError class="mt-2" :message="errors.name" />
-            </div>
+            <Heading
+                variant="small"
+                title="Información Personal"
+                description="Actualiza tu nombre completo y dirección de correo electrónico institucional"
+            />
 
-            <div class="grid gap-2">
-                <Label for="email">Correo electrónico</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    name="email"
-                    :default-value="user.email"
-                    required
-                    autocomplete="username"
-                    placeholder="correo@ejemplo.com"
-                />
-                <InputError class="mt-2" :message="errors.email" />
-            </div>
-
-            <div v-if="page.props.mustVerifyEmail && !user.email_verified_at">
-                <p class="-mt-4 text-sm text-muted-foreground">
-                    Tu dirección de correo no está verificada.
-                    <Link
-                        :href="send()"
-                        as="button"
-                        class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
-                    >
-                        Haz clic aquí para reenviar el correo de verificación.
-                    </Link>
-                </p>
-
-                <div
-                    v-if="page.props.status === 'verification-link-sent'"
-                    class="mt-2 text-sm font-medium text-green-600"
-                >
-                    Se ha enviado un nuevo enlace de verificación a tu dirección
-                    de correo.
+            <Form
+                v-bind="ProfileController.update.form()"
+                class="space-y-6"
+                v-slot="{ errors, processing }"
+            >
+                <div class="grid gap-2">
+                    <Label for="name" class="text-xs font-bold">Nombre completo</Label>
+                    <Input
+                        id="name"
+                        class="h-10 text-xs font-semibold"
+                        name="name"
+                        :default-value="user.name"
+                        required
+                        autocomplete="name"
+                        placeholder="Tu nombre completo"
+                    />
+                    <InputError class="mt-1" :message="errors.name" />
                 </div>
-            </div>
 
-            <div class="flex items-center gap-4">
-                <Button :disabled="processing" data-test="update-profile-button"
-                    >Guardar cambios</Button
-                >
-            </div>
-        </Form>
+                <div class="grid gap-2">
+                    <Label for="email" class="text-xs font-bold">Correo electrónico</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        class="h-10 text-xs font-semibold"
+                        name="email"
+                        :default-value="user.email"
+                        required
+                        autocomplete="username"
+                        placeholder="correo@ejemplo.com"
+                    />
+                    <InputError class="mt-1" :message="errors.email" />
+                </div>
+
+                <div v-if="page.props.mustVerifyEmail && !user.email_verified_at">
+                    <p class="-mt-4 text-xs text-muted-foreground">
+                        Tu dirección de correo no está verificada.
+                        <Link
+                            :href="send()"
+                            as="button"
+                            class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                        >
+                            Haz clic aquí para reenviar el correo de verificación.
+                        </Link>
+                    </p>
+
+                    <div
+                        v-if="page.props.status === 'verification-link-sent'"
+                        class="mt-2 text-xs font-medium text-emerald-600"
+                    >
+                        Se ha enviado un nuevo enlace de verificación a tu dirección de correo.
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 pt-2">
+                    <Button
+                        :disabled="processing"
+                        class="bg-[#3484a5] text-xs font-black text-white hover:bg-[#256883]"
+                        data-test="update-profile-button"
+                    >
+                        Guardar cambios
+                    </Button>
+                </div>
+            </Form>
+        </div>
+
+        <!-- Zona de Eliminación de Cuenta -->
+        <div
+            class="rounded-2xl border border-rose-200/90 bg-white p-6 shadow-xs sm:p-7 dark:border-rose-950/60 dark:bg-slate-900"
+        >
+            <DeleteUser />
+        </div>
     </div>
-
-    <DeleteUser />
 </template>

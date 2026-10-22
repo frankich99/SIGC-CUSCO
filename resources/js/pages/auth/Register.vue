@@ -25,7 +25,7 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Registro de Usuario - SIGC-CUSCO" />
+    <Head title="Registro de Usuario - SIGC-MDSJ" />
 
     <Form
         v-bind="store.form()"
@@ -50,7 +50,7 @@ defineOptions({
                     autocomplete="name"
                     name="name"
                     placeholder="Nombres y Apellidos"
-                    class="text-xs font-medium text-slate-900"
+                    class="text-xs font-medium text-slate-900 dark:text-slate-100"
                 />
                 <InputError :message="errors.name" />
             </div>
@@ -70,7 +70,7 @@ defineOptions({
                     autocomplete="email"
                     name="email"
                     placeholder="correo@ejemplo.com"
-                    class="text-xs font-medium text-slate-900"
+                    class="text-xs font-medium text-slate-900 dark:text-slate-100"
                 />
                 <InputError :message="errors.email" />
             </div>
@@ -91,7 +91,7 @@ defineOptions({
                         name="password"
                         placeholder="••••••••"
                         :passwordrules="passwordRules"
-                        class="text-xs text-slate-900"
+                        class="text-xs text-slate-900 dark:text-slate-100"
                     />
                     <InputError :message="errors.password" />
                 </div>
@@ -111,7 +111,7 @@ defineOptions({
                         name="password_confirmation"
                         placeholder="••••••••"
                         :passwordrules="passwordRules"
-                        class="text-xs text-slate-900"
+                        class="text-xs text-slate-900 dark:text-slate-100"
                     />
                     <InputError :message="errors.password_confirmation" />
                 </div>
@@ -119,7 +119,7 @@ defineOptions({
 
             <Button
                 type="submit"
-                class="mt-2 h-10 w-full cursor-pointer bg-rose-900 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
+                class="mt-2 h-10 w-full cursor-pointer bg-[#3484a5] text-xs font-bold text-white shadow-xs hover:bg-[#256883]"
                 tabindex="5"
                 :disabled="processing"
                 data-test="register-user-button"
@@ -136,7 +136,7 @@ defineOptions({
             ¿Ya tienes una cuenta registrada?
             <TextLink
                 :href="login()"
-                class="ml-1 font-bold text-rose-900 hover:underline dark:text-rose-400"
+                class="ml-1 font-bold text-[#3484a5] hover:underline dark:text-[#88c0d7]"
                 :tabindex="6"
             >
                 Inicia sesión aquí

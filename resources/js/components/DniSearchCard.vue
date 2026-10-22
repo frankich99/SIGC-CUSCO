@@ -70,13 +70,13 @@ async function consultDni() {
 
 <template>
     <Card
-        class="border-rose-200/80 bg-gradient-to-br from-rose-50/40 to-transparent dark:border-rose-900/60 dark:from-rose-950/20"
+        class="border-sky-200/80 bg-gradient-to-br from-sky-50/40 to-transparent dark:border-[#3484a5]/60 dark:from-sky-950/20"
     >
         <CardHeader class="pb-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <div
-                        class="rounded-lg bg-rose-900/10 p-2 text-rose-900 dark:bg-rose-500/10 dark:text-rose-300"
+                        class="rounded-lg bg-[#3484a5]/10 p-2 text-[#3484a5] dark:bg-sky-500/10 dark:text-[#badbe9]"
                     >
                         <UserCheck class="size-5" />
                     </div>
@@ -94,7 +94,7 @@ async function consultDni() {
                 </div>
                 <Badge
                     variant="outline"
-                    class="border-rose-300 bg-rose-50 text-[10px] font-bold text-rose-900 dark:border-rose-700 dark:bg-rose-950 dark:text-rose-300"
+                    class="border-sky-300 bg-sky-50 text-[10px] font-bold text-[#3484a5] dark:border-sky-700 dark:bg-[#153542] dark:text-[#badbe9]"
                 >
                     En línea
                 </Badge>
@@ -125,19 +125,19 @@ async function consultDni() {
             <!-- Error -->
             <div
                 v-if="error"
-                class="flex items-center gap-2 rounded-md border border-rose-300 bg-rose-100 p-2.5 text-xs font-bold text-rose-950 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-200"
+                class="flex items-center gap-2 rounded-md border border-sky-300 bg-sky-100 p-2.5 text-xs font-bold text-sky-950 dark:border-[#296d88] dark:bg-[#153542]/60 dark:text-sky-200"
             >
-                <AlertCircle class="size-4 shrink-0 text-rose-800" />
+                <AlertCircle class="size-4 shrink-0 text-[#296d88]" />
                 <span>{{ error }}</span>
             </div>
 
             <!-- Resultado encontrado -->
             <div
                 v-if="person"
-                class="space-y-1.5 rounded-lg border border-rose-200 bg-white p-3 shadow-xs dark:border-rose-800 dark:bg-neutral-900"
+                class="space-y-1.5 rounded-lg border border-sky-200 bg-white p-3 shadow-xs dark:border-[#296d88] dark:bg-neutral-900"
             >
                 <div
-                    class="flex items-center gap-2 text-xs font-bold text-rose-900 dark:text-rose-300"
+                    class="flex items-center gap-2 text-xs font-bold text-[#3484a5] dark:text-[#badbe9]"
                 >
                     <CheckCircle2 class="size-4" />
                     <span>Ciudadano validado correctamente</span>

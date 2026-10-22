@@ -196,7 +196,7 @@ function roleBadge(role: string) {
         case 'admin':
             return {
                 label: 'Administrador',
-                class: 'bg-rose-950 text-white font-extrabold border-rose-800 shadow-2xs',
+                class: 'bg-[#153542] text-white font-extrabold border-[#296d88] shadow-2xs',
                 icon: ShieldCheck,
             };
         case 'docente':
@@ -231,7 +231,7 @@ function formatDate(dateStr?: string): string {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Gestión de Usuarios y Roles - SIGC-CUSCO" />
+        <Head title="Gestión de Usuarios y Roles - SIGC-MDSJ" />
 
         <div
             class="mx-auto w-full max-w-7xl min-w-0 space-y-8 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
@@ -243,7 +243,7 @@ function formatDate(dateStr?: string): string {
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
                         <div
-                            class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#701a31] to-[#800020] text-white shadow-sm"
+                            class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-[#3484a5] text-white shadow-sm ring-1 ring-[#3484a5]/30"
                         >
                             <ShieldCheck class="size-5 text-amber-300" />
                         </div>
@@ -255,7 +255,7 @@ function formatDate(dateStr?: string): string {
                                     Usuarios, Roles y Permisos
                                 </h1>
                                 <span
-                                    class="hidden items-center rounded-full border border-rose-300 bg-rose-100 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-rose-950 uppercase sm:inline-flex dark:border-rose-800 dark:bg-rose-950/80 dark:text-rose-200"
+                                    class="hidden items-center rounded-full border border-emerald-300 bg-emerald-100 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-emerald-950 uppercase sm:inline-flex dark:border-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-200"
                                 >
                                     Admin Oficial
                                 </span>
@@ -264,7 +264,7 @@ function formatDate(dateStr?: string): string {
                                 class="text-xs font-medium text-slate-600 sm:text-sm dark:text-slate-400"
                             >
                                 Control de accesos institucionales, reasignación
-                                de roles y matriz de capacidades SIGC-CUSCO.
+                                de roles y matriz de capacidades SIGC-MDSJ.
                             </p>
                         </div>
                     </div>
@@ -279,7 +279,7 @@ function formatDate(dateStr?: string): string {
                         class="flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-black transition-all"
                         :class="
                             activeTab === 'directorio'
-                                ? 'bg-white text-rose-950 shadow-xs dark:bg-slate-800 dark:text-rose-200'
+                                ? 'bg-white text-slate-950 shadow-xs dark:bg-slate-800 dark:text-white'
                                 : 'text-slate-600 hover:text-slate-900 dark:text-slate-400'
                         "
                         @click="activeTab = 'directorio'"
@@ -292,7 +292,7 @@ function formatDate(dateStr?: string): string {
                         class="flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-black transition-all"
                         :class="
                             activeTab === 'matriz'
-                                ? 'bg-white text-rose-950 shadow-xs dark:bg-slate-800 dark:text-rose-200'
+                                ? 'bg-white text-slate-950 shadow-xs dark:bg-slate-800 dark:text-white'
                                 : 'text-slate-600 hover:text-slate-900 dark:text-slate-400'
                         "
                         @click="activeTab = 'matriz'"
@@ -330,25 +330,25 @@ function formatDate(dateStr?: string): string {
                 </Card>
 
                 <Card
-                    class="space-y-2 rounded-2xl border border-rose-200 bg-rose-50/40 p-5 shadow-xs dark:border-rose-900/40 dark:bg-rose-950/20"
+                    class="space-y-2 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs transition-all hover:border-[#3484a5] dark:border-slate-800/90 dark:bg-slate-900/60"
                 >
                     <div class="flex items-center justify-between">
                         <span
-                            class="text-xs font-bold text-rose-950 dark:text-rose-300"
+                            class="text-xs font-bold text-slate-700 dark:text-slate-300"
                             >Administradores</span
                         >
                         <div
-                            class="flex size-8 items-center justify-center rounded-xl bg-rose-900 text-white"
+                            class="flex size-8 items-center justify-center rounded-xl bg-[#3484a5] text-white shadow-xs"
                         >
                             <ShieldCheck class="size-4 text-amber-300" />
                         </div>
                     </div>
                     <div
-                        class="text-2xl font-black text-rose-950 dark:text-rose-200"
+                        class="text-2xl font-black text-slate-950 dark:text-white"
                     >
                         {{ stats.admins }}
                     </div>
-                    <p class="text-[11px] text-rose-800 dark:text-rose-400">
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
                         Control total del sistema
                     </p>
                 </Card>
@@ -447,7 +447,7 @@ function formatDate(dateStr?: string): string {
 
                     <Button
                         type="button"
-                        class="h-10 cursor-pointer rounded-xl bg-rose-900 px-5 text-xs font-extrabold text-white shadow-xs hover:bg-rose-950"
+                        class="h-10 cursor-pointer rounded-xl bg-[#3484a5] px-5 text-xs font-extrabold text-white shadow-xs hover:bg-[#153542]"
                         @click="applyFilters"
                     >
                         Filtrar
@@ -507,7 +507,7 @@ function formatDate(dateStr?: string): string {
                                                 class="size-9 shrink-0 rounded-full ring-1 ring-slate-200 dark:ring-slate-700"
                                             >
                                                 <AvatarFallback
-                                                    class="bg-rose-900 text-xs font-black text-white"
+                                                    class="bg-[#3484a5] text-xs font-black text-white"
                                                 >
                                                     {{ getInitials(u.name) }}
                                                 </AvatarFallback>
@@ -593,7 +593,7 @@ function formatDate(dateStr?: string): string {
                                         </div>
                                         <div
                                             v-else-if="u.role === 'admin'"
-                                            class="font-black text-rose-900 dark:text-rose-400"
+                                            class="font-black text-[#3484a5] dark:text-[#88c0d7]"
                                         >
                                             Administrador General
                                         </div>
@@ -621,11 +621,11 @@ function formatDate(dateStr?: string): string {
                                             type="button"
                                             size="sm"
                                             variant="outline"
-                                            class="cursor-pointer rounded-xl border-slate-300 text-xs font-bold hover:border-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                            class="cursor-pointer rounded-xl border-slate-300 text-xs font-bold hover:border-sky-300 hover:bg-sky-50 dark:hover:bg-[#153542]/40"
                                             @click="openRoleModal(u)"
                                         >
                                             <UserCog
-                                                class="mr-1 size-3.5 text-rose-800"
+                                                class="mr-1 size-3.5 text-[#296d88]"
                                             />
                                             <span>Cambiar Rol</span>
                                         </Button>
@@ -680,7 +680,7 @@ function formatDate(dateStr?: string): string {
                                     class="h-8 min-w-8 rounded-lg px-2 text-xs font-bold"
                                     :class="
                                         link.active
-                                            ? 'bg-rose-900 text-white'
+                                            ? 'bg-[#3484a5] text-white'
                                             : ''
                                     "
                                 >
@@ -705,17 +705,17 @@ function formatDate(dateStr?: string): string {
             <div v-else-if="activeTab === 'matriz'" class="space-y-6">
                 <!-- Tarjeta de Introducción Institucional -->
                 <Card
-                    class="space-y-3 rounded-2xl border-2 border-rose-900/20 bg-gradient-to-r from-rose-50/70 via-white to-amber-50/40 p-6 shadow-xs dark:border-rose-900/40 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950"
+                    class="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900/60"
                 >
                     <div class="flex items-center gap-2">
                         <ShieldCheck
-                            class="size-5 text-rose-900 dark:text-rose-400"
+                            class="size-5 text-[#3484a5] dark:text-[#88c0d7]"
                         />
                         <h2
                             class="text-base font-black text-slate-950 dark:text-white"
                         >
                             Políticas de Control de Acceso Basadas en Roles
-                            (RBAC) - SIGC-CUSCO
+                            (RBAC) - SIGC-MDSJ
                         </h2>
                     </div>
                     <p
@@ -732,11 +732,11 @@ function formatDate(dateStr?: string): string {
                 <!-- Resumen Visual de los 3 Roles -->
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <Card
-                        class="space-y-3 rounded-2xl border border-rose-200 bg-white p-5 shadow-xs dark:border-rose-900/60 dark:bg-slate-900"
+                        class="space-y-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition-all hover:border-[#3484a5] dark:border-slate-800 dark:bg-slate-900"
                     >
                         <div class="flex items-center gap-2.5">
                             <div
-                                class="flex size-8 items-center justify-center rounded-xl bg-rose-900 text-white"
+                                class="flex size-8 items-center justify-center rounded-xl bg-[#3484a5] text-white shadow-xs"
                             >
                                 <ShieldCheck class="size-4 text-amber-300" />
                             </div>
@@ -747,7 +747,7 @@ function formatDate(dateStr?: string): string {
                                     Administrador
                                 </h3>
                                 <span
-                                    class="text-[10px] font-bold text-rose-800 uppercase dark:text-rose-400"
+                                    class="text-[10px] font-bold text-[#3484a5] uppercase dark:text-[#badbe9]"
                                     >Nivel Superior</span
                                 >
                             </div>
@@ -884,7 +884,7 @@ function formatDate(dateStr?: string): string {
                                     </td>
                                     <td class="px-4 py-4">
                                         <div
-                                            class="flex items-start gap-1.5 font-bold text-rose-950 dark:text-rose-200"
+                                            class="flex items-start gap-1.5 font-bold text-sky-950 dark:text-sky-200"
                                         >
                                             <CheckCircle2
                                                 class="mt-0.5 size-4 shrink-0 text-emerald-600"
@@ -930,7 +930,7 @@ function formatDate(dateStr?: string): string {
                         class="flex items-center gap-2 text-base font-black text-slate-950 dark:text-white"
                     >
                         <UserCog
-                            class="size-5 text-rose-900 dark:text-rose-400"
+                            class="size-5 text-[#3484a5] dark:text-[#88c0d7]"
                         />
                         Reasignar Rol Institucional
                     </DialogTitle>
@@ -938,7 +938,7 @@ function formatDate(dateStr?: string): string {
                         class="text-xs font-medium text-slate-600 dark:text-slate-400"
                     >
                         Actualiza los privilegios y nivel de acceso para este
-                        usuario en el sistema SIGC-CUSCO.
+                        usuario en el sistema SIGC-MDSJ.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -988,7 +988,7 @@ function formatDate(dateStr?: string): string {
                                 <SelectItem value="admin">
                                     <div class="flex items-center gap-2">
                                         <ShieldCheck
-                                            class="size-4 text-rose-900"
+                                            class="size-4 text-[#3484a5]"
                                         />
                                         <span
                                             >Administrador (Control Total)</span
@@ -1023,7 +1023,7 @@ function formatDate(dateStr?: string): string {
 
                     <!-- Explicación del Rol Seleccionado -->
                     <div
-                        class="space-y-1 rounded-xl border border-rose-200 bg-rose-50/60 p-3 text-xs text-rose-900 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-200"
+                        class="space-y-1 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300"
                     >
                         <div class="flex items-center gap-1.5 font-bold">
                             <ShieldAlert class="size-3.5" />
@@ -1064,7 +1064,7 @@ function formatDate(dateStr?: string): string {
                     </Button>
                     <Button
                         type="button"
-                        class="cursor-pointer rounded-xl bg-rose-900 px-4 text-xs font-extrabold text-white shadow-xs hover:bg-rose-950"
+                        class="cursor-pointer rounded-xl bg-[#3484a5] px-4 text-xs font-extrabold text-white shadow-xs hover:bg-[#153542]"
                         :disabled="isUpdatingRole"
                         @click="saveRoleChange"
                     >

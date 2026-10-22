@@ -342,22 +342,22 @@ function closeModal() {
                     >
                         <div class="flex items-center gap-2">
                             <span
-                                class="rounded border border-rose-300 bg-rose-100 px-2.5 py-0.5 font-mono text-xs font-black text-rose-950 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                                class="rounded border border-sky-300 bg-sky-100 px-2.5 py-0.5 font-mono text-xs font-black text-sky-950 dark:border-[#296d88] dark:bg-[#153542] dark:text-sky-200"
                             >
                                 {{ course?.code }}
                             </span>
                             <span
                                 v-if="course?.institution"
-                                class="rounded border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-xs font-bold text-rose-900 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-200"
+                                class="rounded border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-xs font-bold text-[#3484a5] dark:border-[#296d88] dark:bg-[#153542]/60 dark:text-sky-200"
                             >
                                 {{ course.institution }}
                             </span>
                         </div>
 
                         <div
-                            class="flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-black text-rose-900 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                            class="flex items-center gap-1.5 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-black text-[#3484a5] dark:border-[#296d88] dark:bg-[#153542] dark:text-[#badbe9]"
                         >
-                            <ShieldCheck class="size-4 text-rose-800" />
+                            <ShieldCheck class="size-4 text-[#296d88]" />
                             <span
                                 >Inscripción Oficial con Validación RENIEC</span
                             >
@@ -385,7 +385,7 @@ function closeModal() {
                 <!-- Success State -->
                 <div v-if="submitSuccess" class="space-y-6 py-6 text-center">
                     <div
-                        class="mx-auto flex size-20 items-center justify-center rounded-full bg-rose-100 text-rose-800 shadow-inner ring-8 ring-rose-50 dark:bg-rose-950 dark:text-rose-300 dark:ring-rose-900/40"
+                        class="mx-auto flex size-20 items-center justify-center rounded-full bg-sky-100 text-[#296d88] shadow-inner ring-8 ring-sky-50 dark:bg-[#153542] dark:text-[#badbe9] dark:ring-[#3484a5]/40"
                     >
                         <CheckCircle2 class="size-10" />
                     </div>
@@ -400,7 +400,7 @@ function closeModal() {
                         >
                             Has quedado registrado formalmente en la
                             capacitación
-                            <strong class="text-rose-900 dark:text-rose-300">{{
+                            <strong class="text-[#3484a5] dark:text-[#badbe9]">{{
                                 course?.title
                             }}</strong
                             >.
@@ -408,10 +408,10 @@ function closeModal() {
                     </div>
 
                     <div
-                        class="mx-auto max-w-lg space-y-2.5 rounded-2xl border border-rose-200 bg-rose-50/80 p-5 text-left text-xs font-semibold text-slate-900 shadow-xs dark:border-rose-800 dark:bg-rose-950/40 dark:text-slate-200"
+                        class="mx-auto max-w-lg space-y-2.5 rounded-2xl border border-sky-200 bg-sky-50/80 p-5 text-left text-xs font-semibold text-slate-900 shadow-xs dark:border-[#296d88] dark:bg-[#153542]/40 dark:text-slate-200"
                     >
                         <div
-                            class="flex justify-between border-b border-rose-200/80 pb-2"
+                            class="flex justify-between border-b border-sky-200/80 pb-2"
                         >
                             <span
                                 class="font-medium text-slate-600 dark:text-slate-400"
@@ -424,7 +424,7 @@ function closeModal() {
                             >
                         </div>
                         <div
-                            class="flex justify-between border-b border-rose-200/80 pb-2"
+                            class="flex justify-between border-b border-sky-200/80 pb-2"
                         >
                             <span
                                 class="font-medium text-slate-600 dark:text-slate-400"
@@ -436,7 +436,7 @@ function closeModal() {
                             >
                         </div>
                         <div
-                            class="flex justify-between border-b border-rose-200/80 pb-2"
+                            class="flex justify-between border-b border-sky-200/80 pb-2"
                         >
                             <span
                                 class="font-medium text-slate-600 dark:text-slate-400"
@@ -449,7 +449,7 @@ function closeModal() {
                         </div>
                         <div
                             v-if="phone"
-                            class="flex justify-between border-b border-rose-200/80 pb-2"
+                            class="flex justify-between border-b border-sky-200/80 pb-2"
                         >
                             <span
                                 class="font-medium text-slate-600 dark:text-slate-400"
@@ -461,9 +461,9 @@ function closeModal() {
                             >
                         </div>
                         <div
-                            class="flex items-center gap-2 pt-2 text-xs font-bold text-rose-950 dark:text-rose-200"
+                            class="flex items-center gap-2 pt-2 text-xs font-bold text-sky-950 dark:text-sky-200"
                         >
-                            <QrCode class="size-5 shrink-0 text-rose-800" />
+                            <QrCode class="size-5 shrink-0 text-[#296d88]" />
                             <span
                                 >Podrás marcar tu asistencia con código QR en
                                 cada clase y descargar tu diploma digital.</span
@@ -474,7 +474,7 @@ function closeModal() {
                     <div class="pt-2">
                         <Button
                             @click="closeModal"
-                            class="bg-rose-900 px-8 py-2.5 text-xs font-black text-white shadow-md hover:bg-rose-950"
+                            class="bg-[#3484a5] px-8 py-2.5 text-xs font-black text-white shadow-md hover:bg-[#153542]"
                         >
                             Entendido / Cerrar Ventana
                         </Button>
@@ -490,10 +490,10 @@ function closeModal() {
                     <!-- Banner de Error General -->
                     <div
                         v-if="submitError"
-                        class="flex items-start gap-2.5 rounded-xl border border-rose-300 bg-rose-100 p-3 text-xs font-bold text-rose-950 dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-200"
+                        class="flex items-start gap-2.5 rounded-xl border border-sky-300 bg-sky-100 p-3 text-xs font-bold text-sky-950 dark:border-[#3484a5] dark:bg-[#153542]/60 dark:text-sky-200"
                     >
                         <AlertCircle
-                            class="mt-0.5 size-4 shrink-0 text-rose-800"
+                            class="mt-0.5 size-4 shrink-0 text-[#296d88]"
                         />
                         <span>{{ submitError }}</span>
                     </div>
@@ -507,9 +507,9 @@ function closeModal() {
                             class="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5 md:col-span-5 dark:border-slate-800 dark:bg-slate-900/60"
                         >
                             <div
-                                class="flex items-center gap-1.5 border-b pb-2 text-xs font-black tracking-wider text-rose-900 uppercase dark:text-rose-400"
+                                class="flex items-center gap-1.5 border-b pb-2 text-xs font-black tracking-wider text-[#3484a5] uppercase dark:text-[#88c0d7]"
                             >
-                                <GraduationCap class="size-4 text-rose-800" />
+                                <GraduationCap class="size-4 text-[#296d88]" />
                                 <span>Detalles de la Capacitación</span>
                             </div>
 
@@ -531,7 +531,7 @@ function closeModal() {
                                     class="flex items-center gap-2 text-slate-800 dark:text-slate-200"
                                 >
                                     <Building2
-                                        class="size-4 shrink-0 text-rose-800"
+                                        class="size-4 shrink-0 text-[#296d88]"
                                     />
                                     <div>
                                         <span
@@ -548,7 +548,7 @@ function closeModal() {
                                     class="flex items-center gap-2 text-slate-800 dark:text-slate-200"
                                 >
                                     <Calendar
-                                        class="size-4 shrink-0 text-rose-800"
+                                        class="size-4 shrink-0 text-[#296d88]"
                                     />
                                     <div>
                                         <span
@@ -594,7 +594,7 @@ function closeModal() {
                                             >Vacantes Oficiales:</span
                                         >
                                         <strong
-                                            class="font-bold text-rose-900 dark:text-rose-300"
+                                            class="font-bold text-[#3484a5] dark:text-[#badbe9]"
                                         >
                                             {{
                                                 course?.capacity
@@ -612,7 +612,7 @@ function closeModal() {
                             >
                                 <div class="flex items-start gap-2">
                                     <QrCode
-                                        class="mt-0.5 size-3.5 shrink-0 text-rose-800"
+                                        class="mt-0.5 size-3.5 shrink-0 text-[#296d88]"
                                     />
                                     <span
                                         >Asistencia controlada mediante QR
@@ -644,21 +644,21 @@ function closeModal() {
                         <div class="space-y-5 md:col-span-7">
                             <!-- Paso 1: Verificación de DNI con RENIEC -->
                             <div
-                                class="space-y-2.5 rounded-xl border border-rose-200/90 bg-rose-50/40 p-4 dark:border-rose-900/60 dark:bg-rose-950/20"
+                                class="space-y-2.5 rounded-xl border border-sky-200/90 bg-sky-50/40 p-4 dark:border-[#3484a5]/60 dark:bg-[#153542]/20"
                             >
                                 <div class="flex items-center justify-between">
                                     <Label
                                         for="dni-input"
                                         class="flex items-center gap-1.5 text-xs font-black text-slate-950 dark:text-white"
                                     >
-                                        <IdCard class="size-4 text-rose-800" />
+                                        <IdCard class="size-4 text-[#296d88]" />
                                         <span
                                             >Paso 1: DNI del Participante</span
                                         >
-                                        <span class="text-rose-600">*</span>
+                                        <span class="text-[#296d88]">*</span>
                                     </Label>
                                     <span
-                                        class="rounded bg-rose-900 px-2 py-0.5 text-[10px] font-black text-white"
+                                        class="rounded bg-[#3484a5] px-2 py-0.5 text-[10px] font-black text-white"
                                     >
                                         RENIEC PERÚ
                                     </span>
@@ -688,7 +688,7 @@ function closeModal() {
                                             isLookingUpDni || !isDniFormatValid
                                         "
                                         @click="lookupDni"
-                                        class="shrink-0 bg-rose-900 px-4 text-xs font-black text-white shadow-xs hover:bg-rose-950"
+                                        class="shrink-0 bg-[#3484a5] px-4 text-xs font-black text-white shadow-xs hover:bg-[#153542]"
                                     >
                                         <Loader2
                                             v-if="isLookingUpDni"
@@ -706,7 +706,7 @@ function closeModal() {
                                         variant="outline"
                                         size="sm"
                                         @click="resetDni"
-                                        class="shrink-0 border-slate-300 text-xs font-bold text-rose-900 hover:bg-rose-50"
+                                        class="shrink-0 border-slate-300 text-xs font-bold text-[#3484a5] hover:bg-sky-50"
                                     >
                                         <RefreshCw class="mr-1.5 size-3.5" />
                                         Cambiar DNI
@@ -716,18 +716,18 @@ function closeModal() {
                                 <!-- Estado: Error al buscar DNI -->
                                 <div
                                     v-if="dniLookupError"
-                                    class="flex flex-col gap-1 pt-1 text-xs font-bold text-rose-700 dark:text-rose-400"
+                                    class="flex flex-col gap-1 pt-1 text-xs font-bold text-[#22596f] dark:text-[#88c0d7]"
                                 >
                                     <div class="flex items-center gap-1.5">
                                         <AlertCircle
-                                            class="size-4 shrink-0 text-rose-600"
+                                            class="size-4 shrink-0 text-[#296d88]"
                                         />
                                         <span>{{ dniLookupError }}</span>
                                     </div>
                                     <button
                                         type="button"
                                         @click="manualEntry = true"
-                                        class="cursor-pointer pl-5 text-left text-xs font-bold text-rose-900 underline hover:text-rose-950 dark:text-rose-300"
+                                        class="cursor-pointer pl-5 text-left text-xs font-bold text-[#3484a5] underline hover:text-sky-950 dark:text-[#badbe9]"
                                     >
                                         ✍️ Ingresar nombres y apellidos
                                         manualmente para continuar
@@ -754,7 +754,7 @@ function closeModal() {
                                     <button
                                         type="button"
                                         @click="manualEntry = !manualEntry"
-                                        class="cursor-pointer text-left text-[11px] font-bold text-rose-900 hover:underline dark:text-rose-400"
+                                        class="cursor-pointer text-left text-[11px] font-bold text-[#3484a5] hover:underline dark:text-[#88c0d7]"
                                     >
                                         {{
                                             manualEntry
@@ -767,10 +767,10 @@ function closeModal() {
                                 <!-- Estado: Éxito en RENIEC (Tarjeta de confirmación) -->
                                 <div
                                     v-if="dniLookupSuccess"
-                                    class="mt-2 flex items-center gap-3 rounded-xl border border-rose-300 bg-rose-100/90 p-3 dark:border-rose-700 dark:bg-rose-950/70"
+                                    class="mt-2 flex items-center gap-3 rounded-xl border border-sky-300 bg-sky-100/90 p-3 dark:border-sky-700 dark:bg-[#153542]/70"
                                 >
                                     <div
-                                        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-rose-900 font-black text-white shadow-xs"
+                                        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#3484a5] font-black text-white shadow-xs"
                                     >
                                         <UserCheck
                                             class="size-5 text-amber-300"
@@ -784,7 +784,7 @@ function closeModal() {
                                             {{ materno }}
                                         </div>
                                         <div
-                                            class="mt-0.5 flex items-center gap-1 text-[11px] font-bold text-rose-900 dark:text-rose-300"
+                                            class="mt-0.5 flex items-center gap-1 text-[11px] font-bold text-[#3484a5] dark:text-[#badbe9]"
                                         >
                                             <ShieldCheck class="size-3.5" />
                                             <span
@@ -809,7 +809,7 @@ function closeModal() {
                                     >
                                         <Lock
                                             v-if="dniLookupSuccess"
-                                            class="size-3.5 text-rose-900"
+                                            class="size-3.5 text-[#3484a5]"
                                         />
                                         <UserCheck
                                             v-else
@@ -821,7 +821,7 @@ function closeModal() {
                                         class="rounded px-2 py-0.5 text-[10px] font-bold"
                                         :class="
                                             dniLookupSuccess
-                                                ? 'bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200'
+                                                ? 'bg-sky-100 text-[#3484a5] dark:bg-[#153542] dark:text-sky-200'
                                                 : manualEntry
                                                   ? 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200'
                                                   : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
@@ -847,13 +847,13 @@ function closeModal() {
                                         >
                                             <span
                                                 >Nombres Completos
-                                                <span class="text-rose-600"
+                                                <span class="text-[#296d88]"
                                                     >*</span
                                                 ></span
                                             >
                                             <span
                                                 v-if="dniLookupSuccess"
-                                                class="text-[10px] font-bold text-rose-800"
+                                                class="text-[10px] font-bold text-[#296d88]"
                                                 >Oficial RENIEC</span
                                             >
                                             <span
@@ -882,7 +882,7 @@ function closeModal() {
                                                     'pr-8 text-xs font-bold',
                                                     dniLookupSuccess
                                                         ? 'cursor-not-allowed border-slate-300 bg-slate-100/90 text-slate-900 dark:border-slate-700 dark:bg-slate-950/80 dark:text-white'
-                                                        : 'border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-rose-800 dark:border-slate-700 dark:bg-slate-950 dark:text-white',
+                                                        : 'border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-[#3484a5] dark:border-slate-700 dark:bg-slate-950 dark:text-white',
                                                 ]"
                                             />
                                             <Lock
@@ -899,7 +899,7 @@ function closeModal() {
                                         >
                                             <span
                                                 >Apellido Paterno
-                                                <span class="text-rose-600"
+                                                <span class="text-[#296d88]"
                                                     >*</span
                                                 ></span
                                             >
@@ -929,7 +929,7 @@ function closeModal() {
                                                     'pr-8 text-xs font-bold',
                                                     dniLookupSuccess
                                                         ? 'cursor-not-allowed border-slate-300 bg-slate-100/90 text-slate-900 dark:border-slate-700 dark:bg-slate-950/80 dark:text-white'
-                                                        : 'border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-rose-800 dark:border-slate-700 dark:bg-slate-950 dark:text-white',
+                                                        : 'border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-[#3484a5] dark:border-slate-700 dark:bg-slate-950 dark:text-white',
                                                 ]"
                                             />
                                             <Lock
@@ -971,7 +971,7 @@ function closeModal() {
                                                     'pr-8 text-xs font-bold',
                                                     dniLookupSuccess
                                                         ? 'cursor-not-allowed border-slate-300 bg-slate-100/90 text-slate-900 dark:border-slate-700 dark:bg-slate-950/80 dark:text-white'
-                                                        : 'border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-rose-800 dark:border-slate-700 dark:bg-slate-950 dark:text-white',
+                                                        : 'border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-[#3484a5] dark:border-slate-700 dark:bg-slate-950 dark:text-white',
                                                 ]"
                                             />
                                             <Lock
@@ -990,7 +990,7 @@ function closeModal() {
                                 <div
                                     class="flex items-center gap-1.5 border-b pb-2 text-xs font-black text-slate-950 dark:text-white"
                                 >
-                                    <Mail class="size-3.5 text-rose-900" />
+                                    <Mail class="size-3.5 text-[#3484a5]" />
                                     <span>Paso 3: Información de Contacto</span>
                                 </div>
 
@@ -1006,10 +1006,10 @@ function closeModal() {
                                                 class="flex items-center gap-1"
                                             >
                                                 <Mail
-                                                    class="size-3 text-rose-800"
+                                                    class="size-3 text-[#296d88]"
                                                 />
                                                 Correo Electrónico
-                                                <span class="text-rose-600"
+                                                <span class="text-[#296d88]"
                                                     >*</span
                                                 >
                                             </span>
@@ -1026,14 +1026,14 @@ function closeModal() {
                                             placeholder="ejemplo@correo.com"
                                             class="text-xs font-medium text-slate-900 dark:text-white"
                                             :class="{
-                                                'border-rose-500 ring-rose-500/20':
+                                                'border-red-500 ring-red-500/20':
                                                     email && !isEmailValid,
                                             }"
                                             required
                                         />
                                         <span
                                             v-if="email && !isEmailValid"
-                                            class="text-[11px] font-bold text-rose-600"
+                                            class="text-[11px] font-bold text-[#296d88]"
                                         >
                                             Ingrese un correo válido con formato
                                             usuario@dominio.com
@@ -1046,7 +1046,7 @@ function closeModal() {
                                             class="flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200"
                                         >
                                             <Phone
-                                                class="size-3 text-rose-800"
+                                                class="size-3 text-[#296d88]"
                                             />
                                             <span
                                                 >Celular / WhatsApp (Perú)</span
@@ -1062,7 +1062,7 @@ function closeModal() {
                                             placeholder="9XXXXXXXX (9 dígitos numéricos)"
                                             class="font-mono text-xs font-medium text-slate-900 dark:text-white"
                                             :class="{
-                                                'border-rose-500 ring-rose-500/20':
+                                                'border-red-500 ring-red-500/20':
                                                     phone && !isPhoneValid,
                                             }"
                                             @keypress="allowOnlyNumbers"
@@ -1070,7 +1070,7 @@ function closeModal() {
                                         />
                                         <span
                                             v-if="phone && !isPhoneValid"
-                                            class="text-[11px] font-bold text-rose-600"
+                                            class="text-[11px] font-bold text-[#296d88]"
                                         >
                                             El número de celular debe contener 9
                                             dígitos numéricos e iniciar con 9.
@@ -1094,7 +1094,7 @@ function closeModal() {
                                     <input
                                         type="checkbox"
                                         v-model="termsAccepted"
-                                        class="mt-0.5 size-4 shrink-0 cursor-pointer rounded border-slate-300 text-rose-900 accent-rose-900 focus:ring-2 focus:ring-rose-800"
+                                        class="mt-0.5 size-4 shrink-0 cursor-pointer rounded border-slate-300 text-[#3484a5] accent-[#3484a5] focus:ring-2 focus:ring-[#3484a5]/30"
                                     />
                                     <span class="leading-relaxed font-medium">
                                         Declaro bajo juramento que los datos de
@@ -1109,10 +1109,10 @@ function closeModal() {
                             <!-- Banner de Error antes de enviar si existe -->
                             <div
                                 v-if="submitError"
-                                class="flex animate-in items-start gap-2.5 rounded-xl border border-rose-300 bg-rose-100 p-3 text-xs font-bold text-rose-950 fade-in dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-200"
+                                class="flex animate-in items-start gap-2.5 rounded-xl border border-sky-300 bg-sky-100 p-3 text-xs font-bold text-sky-950 fade-in dark:border-[#3484a5] dark:bg-[#153542]/60 dark:text-sky-200"
                             >
                                 <AlertCircle
-                                    class="mt-0.5 size-4 shrink-0 text-rose-800"
+                                    class="mt-0.5 size-4 shrink-0 text-[#296d88]"
                                 />
                                 <span>{{ submitError }}</span>
                             </div>

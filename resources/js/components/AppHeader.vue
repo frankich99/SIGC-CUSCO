@@ -5,12 +5,10 @@ import {
     GraduationCap,
     LayoutGrid,
     Menu,
-    Plus,
     PlusCircle,
     Globe,
     ChevronDown,
     Award,
-    QrCode,
     ShieldCheck,
     LogIn,
     UserPlus,
@@ -32,6 +30,7 @@ import {
 import {
     Sheet,
     SheetContent,
+    SheetDescription,
     SheetHeader,
     SheetTitle,
     SheetTrigger,
@@ -47,7 +46,7 @@ type Props = {
     breadcrumbs?: BreadcrumbItem[];
 };
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
 });
 
@@ -83,7 +82,7 @@ function roleBadge(role?: string) {
         case 'admin':
             return {
                 label: 'Administrador',
-                class: 'bg-rose-900 text-white font-extrabold shadow-2xs',
+                class: 'bg-[#3484a5] text-white font-extrabold shadow-2xs',
             };
         case 'docente':
             return {
@@ -100,14 +99,14 @@ function roleBadge(role?: string) {
 </script>
 
 <template>
-    <!-- CABECERA INSTITUCIONAL RESPONSIVE - GRANATE IMPERIAL CUSCO -->
+    <!-- CABECERA INSTITUCIONAL RESPONSIVE - AZUL SAN JERÓNIMO MDSJ -->
     <header
         class="sticky top-0 z-40 w-full border-b border-slate-200/90 bg-white/95 shadow-xs backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/95"
     >
         <div
             class="mx-auto flex h-16 w-full max-w-7xl min-w-0 items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6 lg:px-8"
         >
-            <!-- 1. GRUPO IZQUIERDO: BOTÓN MÓVIL + LOGO + NAVEGACIÓN DOCKING (alineada a la izquierda, no centrada) -->
+            <!-- 1. GRUPO IZQUIERDO: BOTÓN MÓVIL + LOGO + NAVEGACIÓN DOCKING -->
             <div class="flex min-w-0 items-center gap-2 sm:gap-3 lg:gap-4">
                 <!-- Mobile Trigger (< xl) -->
                 <div class="xl:hidden">
@@ -126,127 +125,90 @@ function roleBadge(role?: string) {
                             side="left"
                             class="w-[300px] border-r border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-950"
                         >
-                            <SheetTitle class="sr-only"
-                                >Menú de Navegación</SheetTitle
-                            >
+                            <SheetTitle class="sr-only">Menú de Navegación</SheetTitle>
+                            <SheetDescription class="sr-only">
+                                Navegación del sistema y accesos rápidos
+                            </SheetDescription>
                             <SheetHeader
                                 class="flex items-center gap-2 border-b border-slate-200 pb-4 dark:border-slate-800"
                             >
                                 <AppLogo />
                             </SheetHeader>
 
-                            <div
-                                class="flex h-full flex-col justify-between space-y-6 py-4"
-                            >
+                            <div class="flex h-full flex-col justify-between space-y-6 py-4">
                                 <nav class="space-y-4">
-                                    <!-- Botón de acción rápida en móvil si tiene permisos -->
-                                    <div v-if="canCreateCourse" class="pb-1">
-                                        <Link
-                                            href="/courses/create"
-                                            class="flex items-center justify-center gap-2 rounded-lg bg-rose-900 px-3.5 py-2.5 text-xs font-black text-white shadow-xs transition-colors hover:bg-rose-950"
-                                            @click="isMobileMenuOpen = false"
-                                        >
-                                            <Plus
-                                                class="size-4 stroke-[2.5] text-amber-300"
-                                            />
-                                            <span>+ Agregar Curso</span>
-                                        </Link>
-                                    </div>
-
                                     <!-- SI ES USUARIO AUTENTICADO: NAVEGACIÓN INTRANET -->
                                     <template v-if="user">
                                         <div class="space-y-1">
                                             <div
-                                                class="px-3 text-[11px] font-extrabold tracking-wider text-rose-900 uppercase dark:text-rose-400"
+                                                class="px-3 text-[11px] font-extrabold tracking-wider text-[#3484a5] uppercase dark:text-[#88c0d7]"
                                             >
                                                 Navegación
                                             </div>
                                             <Link
                                                 :href="dashboard()"
-                                                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold text-slate-900 hover:bg-rose-50 dark:text-white dark:hover:bg-rose-950/40"
+                                                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold text-slate-900 hover:bg-sky-50 dark:text-white dark:hover:bg-[#256883]/40"
                                                 :class="
                                                     isCurrentUrl(dashboard())
-                                                        ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200'
+                                                        ? 'bg-sky-100/80 text-sky-950 dark:bg-sky-950 dark:text-sky-200'
                                                         : ''
                                                 "
-                                                @click="
-                                                    isMobileMenuOpen = false
-                                                "
+                                                @click="isMobileMenuOpen = false"
                                             >
-                                                <LayoutGrid
-                                                    class="size-4 text-rose-800"
-                                                />
+                                                <LayoutGrid class="size-4 text-[#296d88]" />
                                                 <span>Panel de Control</span>
                                             </Link>
                                             <Link
                                                 href="/courses"
-                                                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 hover:bg-rose-50 dark:text-white dark:hover:bg-rose-950/40"
+                                                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 hover:bg-sky-50 dark:text-white dark:hover:bg-[#256883]/40"
                                                 :class="
                                                     isCoursesActive
-                                                        ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200'
+                                                        ? 'bg-sky-100/80 text-sky-950 dark:bg-sky-950 dark:text-sky-200'
                                                         : ''
                                                 "
-                                                @click="
-                                                    isMobileMenuOpen = false
-                                                "
+                                                @click="isMobileMenuOpen = false"
                                             >
-                                                <GraduationCap
-                                                    class="size-4 text-rose-800"
-                                                />
+                                                <GraduationCap class="size-4 text-[#296d88]" />
                                                 <span>Capacitaciones</span>
                                             </Link>
                                             <Link
                                                 href="/certificates"
-                                                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 hover:bg-rose-50 dark:text-white dark:hover:bg-rose-950/40"
+                                                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 hover:bg-sky-50 dark:text-white dark:hover:bg-[#256883]/40"
                                                 :class="
                                                     isCertificatesActive
-                                                        ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200'
+                                                        ? 'bg-sky-100/80 text-sky-950 dark:bg-sky-950 dark:text-sky-200'
                                                         : ''
                                                 "
-                                                @click="
-                                                    isMobileMenuOpen = false
-                                                "
+                                                @click="isMobileMenuOpen = false"
                                             >
-                                                <Award
-                                                    class="size-4 text-amber-600"
-                                                />
-                                                <span
-                                                    >Validar Certificados</span
-                                                >
+                                                <Award class="size-4 text-amber-600" />
+                                                <span>Validar Certificados</span>
                                             </Link>
                                             <Link
                                                 v-if="user?.role === 'admin'"
                                                 href="/users"
-                                                class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold text-slate-900 hover:bg-rose-50 dark:text-white dark:hover:bg-rose-950/40"
+                                                class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold text-slate-900 hover:bg-sky-50 dark:text-white dark:hover:bg-[#256883]/40"
                                                 :class="
                                                     isUsersActive
-                                                        ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200'
+                                                        ? 'bg-sky-100/80 text-sky-950 dark:bg-sky-950 dark:text-sky-200'
                                                         : ''
                                                 "
-                                                @click="
-                                                    isMobileMenuOpen = false
-                                                "
+                                                @click="isMobileMenuOpen = false"
                                             >
-                                                <ShieldCheck
-                                                    class="size-4 text-emerald-600"
-                                                />
+                                                <ShieldCheck class="size-4 text-emerald-600" />
                                                 <span>Usuarios y Roles</span>
                                             </Link>
                                             <Link
                                                 href="/"
-                                                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 hover:bg-rose-50 dark:text-white dark:hover:bg-rose-950/40"
+                                                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 hover:bg-sky-50 dark:text-white dark:hover:bg-[#256883]/40"
                                                 :class="
                                                     isHomeActive
-                                                        ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200'
+                                                        ? 'bg-sky-100/80 text-sky-950 dark:bg-sky-950 dark:text-sky-200'
                                                         : ''
                                                 "
-                                                @click="
-                                                    isMobileMenuOpen = false
-                                                "
+                                                @click="isMobileMenuOpen = false"
                                             >
-                                                <Globe
-                                                    class="size-4 text-blue-600"
-                                                />
+                                                <Globe class="size-4 text-blue-600" />
                                                 <span>Portal Público</span>
                                             </Link>
                                         </div>
@@ -256,62 +218,48 @@ function roleBadge(role?: string) {
                                     <template v-else>
                                         <div class="space-y-1">
                                             <div
-                                                class="px-3 text-[11px] font-extrabold tracking-wider text-rose-900 uppercase dark:text-rose-400"
+                                                class="px-3 text-[11px] font-extrabold tracking-wider text-[#3484a5] uppercase dark:text-[#88c0d7]"
                                             >
                                                 Navegación
                                             </div>
                                             <Link
                                                 href="/"
-                                                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold text-slate-900 hover:bg-rose-50 dark:text-white dark:hover:bg-rose-950/40"
+                                                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold text-slate-900 hover:bg-sky-50 dark:text-white dark:hover:bg-[#256883]/40"
                                                 :class="
                                                     isHomeActive
-                                                        ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200'
+                                                        ? 'bg-sky-100/80 text-sky-950 dark:bg-sky-950 dark:text-sky-200'
                                                         : ''
                                                 "
-                                                @click="
-                                                    isMobileMenuOpen = false
-                                                "
+                                                @click="isMobileMenuOpen = false"
                                             >
-                                                <Home
-                                                    class="size-4 text-rose-800"
-                                                />
+                                                <Home class="size-4 text-[#296d88]" />
                                                 <span>Inicio</span>
                                             </Link>
                                             <Link
                                                 href="/courses"
-                                                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 hover:bg-rose-50 dark:text-white dark:hover:bg-rose-950/40"
+                                                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 hover:bg-sky-50 dark:text-white dark:hover:bg-[#256883]/40"
                                                 :class="
                                                     isCoursesActive
-                                                        ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200'
+                                                        ? 'bg-sky-100/80 text-sky-950 dark:bg-sky-950 dark:text-sky-200'
                                                         : ''
                                                 "
-                                                @click="
-                                                    isMobileMenuOpen = false
-                                                "
+                                                @click="isMobileMenuOpen = false"
                                             >
-                                                <GraduationCap
-                                                    class="size-4 text-rose-800"
-                                                />
+                                                <GraduationCap class="size-4 text-[#296d88]" />
                                                 <span>Capacitaciones</span>
                                             </Link>
                                             <Link
                                                 href="/certificates"
-                                                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 hover:bg-rose-50 dark:text-white dark:hover:bg-rose-950/40"
+                                                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 hover:bg-sky-50 dark:text-white dark:hover:bg-[#256883]/40"
                                                 :class="
                                                     isCertificatesActive
-                                                        ? 'bg-rose-100/80 text-rose-950 dark:bg-rose-950 dark:text-rose-200'
+                                                        ? 'bg-sky-100/80 text-sky-950 dark:bg-sky-950 dark:text-sky-200'
                                                         : ''
                                                 "
-                                                @click="
-                                                    isMobileMenuOpen = false
-                                                "
+                                                @click="isMobileMenuOpen = false"
                                             >
-                                                <Award
-                                                    class="size-4 text-amber-600"
-                                                />
-                                                <span
-                                                    >Validar Certificados</span
-                                                >
+                                                <Award class="size-4 text-amber-600" />
+                                                <span>Validar Certificados</span>
                                             </Link>
                                         </div>
                                     </template>
@@ -320,9 +268,7 @@ function roleBadge(role?: string) {
                                 <div
                                     class="flex items-center justify-between border-t border-slate-200 px-2 pt-3 pb-1 dark:border-slate-800"
                                 >
-                                    <span
-                                        class="text-xs font-bold text-slate-700 dark:text-slate-300"
-                                    >
+                                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300">
                                         Modo Visual
                                     </span>
                                     <ThemeToggle size="sm" :show-label="true" />
@@ -334,7 +280,7 @@ function roleBadge(role?: string) {
                                 >
                                     <div class="flex items-center gap-2.5">
                                         <Avatar
-                                            class="size-8.5 shrink-0 rounded-full ring-1 ring-rose-900/30"
+                                            class="size-8.5 shrink-0 rounded-full ring-1 ring-[#3484a5]/30"
                                         >
                                             <AvatarImage
                                                 v-if="user.avatar"
@@ -342,7 +288,7 @@ function roleBadge(role?: string) {
                                                 :alt="user.name"
                                             />
                                             <AvatarFallback
-                                                class="bg-rose-900 text-xs font-black text-white"
+                                                class="bg-[#3484a5] text-xs font-black text-white"
                                             >
                                                 {{ getInitials(user.name) }}
                                             </AvatarFallback>
@@ -353,16 +299,12 @@ function roleBadge(role?: string) {
                                             >
                                                 {{ user.name }}
                                             </span>
-                                            <span
-                                                class="truncate text-[10px] text-slate-500"
-                                            >
+                                            <span class="truncate text-[10px] text-slate-500">
                                                 {{ user.email }}
                                             </span>
                                         </div>
                                     </div>
-                                    <div
-                                        class="flex items-center justify-between pt-0.5"
-                                    >
+                                    <div class="flex items-center justify-between pt-0.5">
                                         <span
                                             class="rounded-full px-2 py-0.5 text-[9px] font-black uppercase shadow-2xs"
                                             :class="roleBadge(user.role).class"
@@ -373,7 +315,7 @@ function roleBadge(role?: string) {
                                             href="/logout"
                                             method="post"
                                             as="button"
-                                            class="cursor-pointer text-xs font-bold text-rose-800 hover:text-rose-950 dark:text-rose-400"
+                                            class="cursor-pointer text-xs font-bold text-[#296d88] hover:text-sky-950 dark:text-[#88c0d7]"
                                             @click="isMobileMenuOpen = false"
                                         >
                                             Cerrar sesión
@@ -385,7 +327,7 @@ function roleBadge(role?: string) {
                                     class="space-y-2 border-t border-slate-200 px-2 pt-4 dark:border-slate-800"
                                 >
                                     <div
-                                        class="mb-1 text-[11px] font-extrabold tracking-wider text-rose-900 uppercase dark:text-rose-400"
+                                        class="mb-1 text-[11px] font-extrabold tracking-wider text-[#3484a5] uppercase dark:text-[#88c0d7]"
                                     >
                                         Acceso al Sistema
                                     </div>
@@ -399,15 +341,13 @@ function roleBadge(role?: string) {
                                             openLogin();
                                         "
                                     >
-                                        <LogIn
-                                            class="mr-1.5 size-3.5 text-rose-900"
-                                        />
+                                        <LogIn class="mr-1.5 size-3.5 text-[#3484a5]" />
                                         Iniciar Sesión
                                     </Button>
                                     <Button
                                         type="button"
                                         size="sm"
-                                        class="w-full cursor-pointer justify-center bg-rose-900 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
+                                        class="w-full cursor-pointer justify-center bg-[#3484a5] text-xs font-bold text-white shadow-xs hover:bg-[#256883]"
                                         @click="
                                             isMobileMenuOpen = false;
                                             openRegister();
@@ -445,8 +385,8 @@ function roleBadge(role?: string) {
                         class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black transition-all"
                         :class="
                             isHomeActive
-                                ? 'bg-rose-900 text-white shadow-xs'
-                                : 'text-slate-800 hover:bg-rose-50 hover:text-rose-900 dark:text-slate-200 dark:hover:bg-rose-950/40'
+                                ? 'bg-[#3484a5] text-white shadow-xs'
+                                : 'text-slate-800 hover:bg-sky-50 hover:text-[#3484a5] dark:text-slate-200 dark:hover:bg-[#256883]/40'
                         "
                     >
                         <Home class="size-4" />
@@ -458,8 +398,8 @@ function roleBadge(role?: string) {
                         class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black transition-all"
                         :class="
                             isCoursesActive
-                                ? 'bg-rose-900 text-white shadow-xs'
-                                : 'text-slate-800 hover:bg-rose-50 hover:text-rose-900 dark:text-slate-200 dark:hover:bg-rose-950/40'
+                                ? 'bg-[#3484a5] text-white shadow-xs'
+                                : 'text-slate-800 hover:bg-sky-50 hover:text-[#3484a5] dark:text-slate-200 dark:hover:bg-[#256883]/40'
                         "
                     >
                         <GraduationCap
@@ -467,7 +407,7 @@ function roleBadge(role?: string) {
                             :class="
                                 isCoursesActive
                                     ? 'text-amber-300'
-                                    : 'text-rose-800'
+                                    : 'text-[#296d88]'
                             "
                         />
                         <span>Capacitaciones</span>
@@ -478,8 +418,8 @@ function roleBadge(role?: string) {
                         class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black transition-all"
                         :class="
                             isCertificatesActive
-                                ? 'bg-rose-900 text-white shadow-xs'
-                                : 'text-slate-800 hover:bg-rose-50 hover:text-rose-900 dark:text-slate-200 dark:hover:bg-rose-950/40'
+                                ? 'bg-[#3484a5] text-white shadow-xs'
+                                : 'text-slate-800 hover:bg-sky-50 hover:text-[#3484a5] dark:text-slate-200 dark:hover:bg-[#256883]/40'
                         "
                     >
                         <Award
@@ -505,8 +445,8 @@ function roleBadge(role?: string) {
                         class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black transition-all"
                         :class="
                             isCurrentUrl(dashboard())
-                                ? 'bg-rose-900 text-white shadow-xs'
-                                : 'text-slate-800 hover:bg-rose-50 hover:text-rose-900 dark:text-slate-200 dark:hover:bg-rose-950/40'
+                                ? 'bg-[#3484a5] text-white shadow-xs'
+                                : 'text-slate-800 hover:bg-sky-50 hover:text-[#3484a5] dark:text-slate-200 dark:hover:bg-[#256883]/40'
                         "
                     >
                         <LayoutGrid class="size-4" />
@@ -521,8 +461,8 @@ function roleBadge(role?: string) {
                                 class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black transition-all"
                                 :class="
                                     isCoursesActive
-                                        ? 'bg-rose-900 text-white shadow-xs'
-                                        : 'text-slate-800 hover:bg-rose-50 hover:text-rose-900 dark:text-slate-200 dark:hover:bg-rose-950/40'
+                                        ? 'bg-[#3484a5] text-white shadow-xs'
+                                        : 'text-slate-800 hover:bg-sky-50 hover:text-[#3484a5] dark:text-slate-200 dark:hover:bg-[#256883]/40'
                                 "
                             >
                                 <GraduationCap class="size-4 text-amber-600" />
@@ -535,17 +475,17 @@ function roleBadge(role?: string) {
                             class="w-64 rounded-2xl border border-slate-200/90 bg-white/95 p-2 shadow-2xl backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95"
                         >
                             <DropdownMenuLabel
-                                class="px-2 text-[11px] font-black tracking-wider text-rose-900 uppercase dark:text-rose-400"
+                                class="px-2 text-[11px] font-black tracking-wider text-[#3484a5] uppercase dark:text-[#88c0d7]"
                             >
                                 Gestión Académica
                             </DropdownMenuLabel>
                             <DropdownMenuItem as-child>
                                 <Link
                                     href="/courses"
-                                    class="flex cursor-pointer items-start gap-2.5 rounded-xl p-2.5 transition-colors hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                    class="flex cursor-pointer items-start gap-2.5 rounded-xl p-2.5 transition-colors hover:bg-sky-50 dark:hover:bg-[#256883]/40"
                                 >
                                     <GraduationCap
-                                        class="mt-0.5 size-4 text-rose-800 dark:text-rose-400"
+                                        class="mt-0.5 size-4 text-[#296d88] dark:text-[#88c0d7]"
                                     />
                                     <div>
                                         <div
@@ -564,7 +504,7 @@ function roleBadge(role?: string) {
                             <DropdownMenuItem as-child>
                                 <Link
                                     :href="`${dashboard()}#mis-cursos`"
-                                    class="flex cursor-pointer items-start gap-2.5 rounded-xl p-2.5 transition-colors hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                    class="flex cursor-pointer items-start gap-2.5 rounded-xl p-2.5 transition-colors hover:bg-sky-50 dark:hover:bg-[#256883]/40"
                                 >
                                     <BookOpen
                                         class="mt-0.5 size-4 text-amber-700 dark:text-amber-400"
@@ -590,19 +530,19 @@ function roleBadge(role?: string) {
                                 <DropdownMenuItem as-child>
                                     <Link
                                         href="/courses/create"
-                                        class="flex cursor-pointer items-start gap-2.5 rounded-xl bg-rose-50/80 p-2.5 transition-colors hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-950/70"
+                                        class="flex cursor-pointer items-start gap-2.5 rounded-xl bg-sky-50/80 p-2.5 transition-colors hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-[#256883]/70"
                                     >
                                         <PlusCircle
-                                            class="mt-0.5 size-4 text-rose-800 dark:text-rose-400"
+                                            class="mt-0.5 size-4 text-[#296d88] dark:text-[#88c0d7]"
                                         />
                                         <div>
                                             <div
-                                                class="text-xs font-black text-rose-900 dark:text-rose-300"
+                                                class="text-xs font-black text-[#3484a5] dark:text-[#badbe9]"
                                             >
                                                 Agregar Curso
                                             </div>
                                             <div
-                                                class="text-[11px] text-rose-700 dark:text-rose-400"
+                                                class="text-[11px] text-[#22596f] dark:text-[#88c0d7]"
                                             >
                                                 Registrar curso institucional
                                             </div>
@@ -619,8 +559,8 @@ function roleBadge(role?: string) {
                         class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-black transition-all"
                         :class="
                             isCertificatesActive
-                                ? 'bg-rose-900 text-white shadow-xs'
-                                : 'text-slate-800 hover:bg-rose-50 hover:text-rose-900 dark:text-slate-200 dark:hover:bg-rose-950/40'
+                                ? 'bg-[#3484a5] text-white shadow-xs'
+                                : 'text-slate-800 hover:bg-sky-50 hover:text-[#3484a5] dark:text-slate-200 dark:hover:bg-[#256883]/40'
                         "
                         title="Validar y Consultar Certificados"
                     >
@@ -632,10 +572,7 @@ function roleBadge(role?: string) {
                                     : 'text-amber-600'
                             "
                         />
-                        <span
-                            ><span class="hidden 2xl:inline">Validar </span
-                            >Certificados</span
-                        >
+                        <span><span class="hidden 2xl:inline">Validar </span>Certificados</span>
                     </Link>
 
                     <!-- Usuarios y Roles (Solo Admin) -->
@@ -645,8 +582,8 @@ function roleBadge(role?: string) {
                         class="inline-flex shrink-0 items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-black transition-all"
                         :class="
                             isUsersActive
-                                ? 'bg-rose-900 text-white shadow-xs'
-                                : 'text-slate-800 hover:bg-rose-50 hover:text-rose-900 dark:text-slate-200 dark:hover:bg-rose-950/40'
+                                ? 'bg-[#3484a5] text-white shadow-xs'
+                                : 'text-slate-800 hover:bg-sky-50 hover:text-[#3484a5] dark:text-slate-200 dark:hover:bg-[#256883]/40'
                         "
                         title="Administración de Usuarios y Roles Institucionales"
                     >
@@ -658,58 +595,47 @@ function roleBadge(role?: string) {
                                     : 'text-emerald-600'
                             "
                         />
-                        <span
-                            >Usuarios<span class="hidden 2xl:inline">
-                                y Roles</span
-                            ></span
-                        >
+                        <span>Usuarios<span class="hidden 2xl:inline"> y Roles</span></span>
                     </Link>
 
                     <!-- Ir al Portal Web -->
                     <Link
                         href="/"
-                        class="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-black text-slate-800 transition-all hover:bg-rose-50 hover:text-rose-900 dark:text-slate-200 dark:hover:bg-rose-950/40"
-                        title="Ir a la página principal pública de SIGC-CUSCO"
+                        class="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-black transition-all"
+                        :class="
+                            isHomeActive
+                                ? 'bg-[#3484a5] text-white shadow-xs'
+                                : 'text-slate-800 hover:bg-sky-50 hover:text-[#3484a5] dark:text-slate-200 dark:hover:bg-[#256883]/40'
+                        "
+                        title="Ir a la página principal pública de SIGC-MDSJ"
                     >
-                        <Globe class="size-4 shrink-0 text-blue-600" />
-                        <span class="hidden 2xl:inline">Portal</span>
+                        <Globe
+                            class="size-4 shrink-0"
+                            :class="isHomeActive ? 'text-amber-300' : 'text-blue-600 dark:text-blue-400'"
+                        />
+                        <span>Portal</span>
                     </Link>
                 </nav>
             </div>
 
-            <!-- 2. GRUPO DERECHO: ACCIÓN DESTACADA (+ AGREGAR CURSO) + TEMA + ROL + AVATAR -->
-            <div class="flex shrink-0 items-center gap-1.5 sm:gap-2.5 lg:gap-3">
-                <!-- Conmutador Interactivo Modo Oscuro / Claro (Unificado y Responsivo) -->
+            <!-- 2. GRUPO DERECHO: CONMUTADOR DE TEMA + PERFIL DE USUARIO (SIN BOTÓN REDUNDANTE) -->
+            <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+                <!-- Conmutador Interactivo Modo Oscuro / Claro -->
                 <ThemeToggle />
 
-                <!-- Botón de Acción Directo: Agregar Curso (Visible para admin y docente) -->
-                <Button
-                    v-if="canCreateCourse"
-                    as-child
-                    size="sm"
-                    class="flex h-8.5 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-rose-800 bg-rose-900 px-2 py-1.5 text-xs font-extrabold whitespace-nowrap text-white shadow-xs transition-all hover:bg-rose-950 hover:shadow-sm sm:px-3"
-                >
-                    <Link href="/courses/create">
-                        <Plus class="size-3.5 stroke-[2.5] text-amber-300" />
-                        <span class="hidden sm:inline 2xl:hidden">Curso</span>
-                        <span class="hidden 2xl:inline">Agregar Curso</span>
-                        <span class="text-[11px] sm:hidden">Curso</span>
-                    </Link>
-                </Button>
-
-                <!-- Divisor vertical si hay botón -->
+                <!-- Divisor sutil entre controles de tema y usuario -->
                 <div
-                    v-if="canCreateCourse"
+                    v-if="auth.user"
                     class="hidden h-5 w-px shrink-0 bg-slate-200 sm:block dark:bg-slate-800"
                 />
 
                 <template v-if="auth.user">
-                    <!-- Rol del Usuario con Granate Imperial -->
+                    <!-- Rol del Usuario con Azul San Jerónimo -->
                     <div
                         class="hidden min-w-0 flex-col items-end text-right md:flex"
                     >
                         <span
-                            class="max-w-[100px] truncate text-xs leading-tight font-black text-slate-950 xl:max-w-[120px] 2xl:max-w-[160px] dark:text-white"
+                            class="max-w-[100px] truncate text-xs leading-tight font-black text-slate-950 xl:max-w-[130px] 2xl:max-w-[180px] dark:text-white"
                             :title="auth.user.name"
                         >
                             {{ auth.user.name }}
@@ -727,7 +653,7 @@ function roleBadge(role?: string) {
                         <DropdownMenuTrigger as-child>
                             <button
                                 type="button"
-                                class="relative size-9 shrink-0 cursor-pointer rounded-full p-0.5 ring-2 ring-rose-900/40 transition-all hover:ring-rose-900 sm:size-10"
+                                class="relative size-9 shrink-0 cursor-pointer rounded-full p-0.5 ring-2 ring-[#3484a5]/40 transition-all hover:ring-[#3484a5] sm:size-10"
                                 aria-label="Menú de perfil de usuario"
                             >
                                 <Avatar
@@ -739,7 +665,7 @@ function roleBadge(role?: string) {
                                         :alt="auth.user.name"
                                     />
                                     <AvatarFallback
-                                        class="bg-rose-900 text-xs font-black text-white"
+                                        class="bg-[#3484a5] text-xs font-black text-white"
                                     >
                                         {{ getInitials(auth.user.name) }}
                                     </AvatarFallback>
@@ -760,17 +686,17 @@ function roleBadge(role?: string) {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            class="cursor-pointer px-2 text-xs font-bold text-slate-800 hover:text-rose-900 sm:px-3 dark:text-slate-200"
+                            class="cursor-pointer px-2 text-xs font-bold text-slate-800 hover:text-[#3484a5] sm:px-3 dark:text-slate-200"
                             @click="openLogin"
                         >
-                            <LogIn class="size-3.5 text-rose-900 sm:mr-1" />
+                            <LogIn class="size-3.5 text-[#3484a5] sm:mr-1" />
                             <span class="hidden sm:inline">Iniciar Sesión</span>
                             <span class="sm:hidden">Ingresar</span>
                         </Button>
                         <Button
                             type="button"
                             size="sm"
-                            class="cursor-pointer bg-rose-900 px-2.5 text-xs font-bold text-white shadow-xs hover:bg-rose-950 sm:px-3"
+                            class="hidden cursor-pointer bg-[#3484a5] px-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#256883] min-[420px]:inline-flex sm:px-3"
                             @click="openRegister"
                         >
                             <UserPlus class="size-3.5 sm:mr-1" />

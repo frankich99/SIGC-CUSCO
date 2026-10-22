@@ -1,25 +1,34 @@
 /**
- * Centralized Design System & Theme Utilities for SIGC-CUSCO.
- * Palette: Granate Imperial (#800020 / Rose 900-950) & Sol Dorado (#d97706 / Amber 600-700).
+ * Centralized Design System & Theme Utilities for SIGC-MDSJ.
+ * Municipalidad Distrital de San Jerónimo - Cusco.
+ * Palette: Azul San Jerónimo (#3484A5), Verde Turquesa (#2CA792) & Sol Dorado (#F0C84F).
  * Standardized for responsive modals, unified buttons, badges, and accessible contrast.
  */
 
-export const CUSCO_PALETTE = {
-    granate: {
-        primary: '#800020',
-        deep: '#4c0519',
-        imperial: '#701a31',
-        vibrant: '#9f1239',
-        dark: '#881337',
-        border: '#fecdd3',
-        light: '#fff1f2',
-        badgeBg: 'bg-rose-900',
+export const MDSJ_PALETTE = {
+    blue: {
+        primary: '#3484A5',
+        deep: '#0b1e27',
+        imperial: '#153542',
+        vibrant: '#296d88',
+        dark: '#1b4556',
+        border: '#badbe9',
+        light: '#f0f7fa',
+        badgeBg: 'bg-[#3484a5]',
+        badgeText: 'text-white',
+    },
+    green: {
+        primary: '#2CA792',
+        light: '#effaf7',
+        dark: '#1c6d5f',
+        border: '#b0e7db',
+        badgeBg: 'bg-[#2ca792]',
         badgeText: 'text-white',
     },
     gold: {
-        primary: '#d97706',
-        light: '#fef3c7',
-        dark: '#92400e',
+        primary: '#F0C84F',
+        light: '#fef9e7',
+        dark: '#b45309',
         border: '#fde68a',
     },
     slate: {
@@ -30,19 +39,29 @@ export const CUSCO_PALETTE = {
     },
 } as const;
 
+/** Alias de compatibilidad hacia la paleta institucional MDSJ */
+export const CUSCO_PALETTE = {
+    granate: MDSJ_PALETTE.blue,
+    gold: MDSJ_PALETTE.gold,
+    slate: MDSJ_PALETTE.slate,
+} as const;
+
 /**
  * Reusable Unified Button Styles
  */
 export const THEME_BUTTONS = {
     primary:
-        'bg-rose-900 hover:bg-rose-950 text-white font-bold shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-rose-900/40',
+        'bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm shadow-emerald-600/25 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500/40 active:scale-[0.98]',
     secondary:
-        'bg-white hover:bg-rose-50 text-rose-950 border border-rose-200 dark:border-rose-900 dark:bg-slate-900 dark:text-rose-200 font-bold shadow-2xs transition-all',
-    gold: 'bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-sm transition-all',
+        'bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700/80 font-bold shadow-2xs transition-all',
+    institutional:
+        'bg-[#3484a5] hover:bg-[#296d88] text-white font-bold shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-[#3484a5]/40',
+    gold: 'bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold shadow-sm transition-all',
+    green: 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm transition-all',
     outline:
-        'border-slate-300 dark:border-slate-700 hover:border-rose-800 text-slate-800 dark:text-slate-200 hover:text-rose-900 dark:hover:text-rose-300 font-semibold transition-all',
-    ghost: 'text-slate-700 dark:text-slate-300 hover:text-rose-900 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-semibold transition-all',
-    danger: 'bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-sm transition-all',
+        'border-2 border-slate-300 dark:border-slate-700 hover:border-emerald-600 text-slate-900 dark:text-slate-100 hover:text-emerald-700 dark:hover:text-emerald-400 font-bold transition-all',
+    ghost: 'text-slate-800 dark:text-slate-200 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50/60 dark:hover:bg-slate-800/60 font-semibold transition-all',
+    danger: 'bg-red-600 hover:bg-red-700 text-white font-bold shadow-sm transition-all',
 } as const;
 
 /**
@@ -50,21 +69,27 @@ export const THEME_BUTTONS = {
  */
 export const THEME_BADGES = {
     abierto:
-        'bg-rose-100 text-rose-950 border border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800 font-bold',
+        'bg-emerald-100 text-emerald-950 border border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-600 font-bold',
     en_curso:
-        'bg-sky-100 text-sky-950 border border-sky-300 dark:bg-sky-950 dark:text-sky-200 dark:border-sky-800 font-bold',
+        'bg-sky-100 text-[#0c2d3d] border border-sky-300 dark:bg-[#153542] dark:text-sky-200 dark:border-[#296d88] font-bold',
     concluido:
-        'bg-slate-100 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 font-bold',
+        'bg-rose-100 text-rose-950 border border-rose-300 dark:bg-rose-950/80 dark:text-rose-200 dark:border-rose-600 font-bold',
+    cerrado:
+        'bg-rose-100 text-rose-950 border border-rose-300 dark:bg-rose-950/80 dark:text-rose-200 dark:border-rose-600 font-bold',
+    agotado:
+        'bg-amber-100 text-amber-950 border border-amber-300 dark:bg-amber-950/80 dark:text-amber-200 dark:border-amber-600 font-bold',
     cancelado:
-        'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-400 dark:border-rose-900 font-semibold',
+        'bg-red-100 text-red-950 border border-red-300 dark:bg-red-950/90 dark:text-red-300 dark:border-red-600 font-extrabold',
     inscrito:
-        'bg-sky-100 text-sky-950 border border-sky-300 dark:bg-sky-950 dark:text-sky-200 dark:border-sky-800 font-bold',
+        'bg-sky-100 text-[#0c2d3d] border border-sky-300 dark:bg-[#153542] dark:text-sky-200 dark:border-[#296d88] font-bold',
     aprobado:
-        'bg-emerald-100 text-emerald-950 border border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-200 dark:border-emerald-800 font-bold',
+        'bg-teal-100 text-teal-950 border border-teal-300 dark:bg-teal-950/80 dark:text-teal-200 dark:border-teal-600 font-bold',
     reprobado:
-        'bg-rose-100 text-rose-950 border border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800 font-bold',
+        'bg-red-100 text-red-950 border border-red-300 dark:bg-red-950/90 dark:text-red-300 dark:border-red-600 font-bold',
+    urgent:
+        'bg-red-100 text-red-950 border border-red-300 dark:bg-red-950/90 dark:text-red-200 dark:border-red-600 font-extrabold',
     official:
-        'bg-rose-50 text-rose-900 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-800 font-bold',
+        'bg-slate-100 text-[#0c2d3d] border border-slate-300 dark:bg-sky-950/60 dark:text-sky-200 dark:border-sky-800 font-bold',
 } as const;
 
 /**
@@ -85,10 +110,20 @@ export function getCourseStatusBadge(status?: string | null): {
                 label: 'En Curso',
                 class: THEME_BADGES.en_curso,
             };
+        case 'cerrado':
+            return {
+                label: 'Cerrado',
+                class: THEME_BADGES.cerrado,
+            };
         case 'concluido':
             return {
                 label: 'Concluido',
                 class: THEME_BADGES.concluido,
+            };
+        case 'agotado':
+            return {
+                label: 'Agotado',
+                class: THEME_BADGES.agotado,
             };
         case 'cancelado':
             return {
@@ -151,9 +186,12 @@ export function getEnrollmentStatusBadge(status?: string | null): {
  * Standardized Slim & Responsive Modal Layout Configurations
  */
 export const THEME_MODAL = {
-    // Narrow & slim auth modal dialog (Login / Register permanecen compactos)
+    // Modal armónico para formularios de autenticación (Login / Register)
     authDialog:
-        'w-[92vw] sm:max-w-sm max-h-[92vh] flex flex-col p-0 rounded-2xl shadow-2xl border border-rose-200 dark:border-rose-900 bg-white dark:bg-slate-950 overflow-hidden',
+        'w-[94vw] sm:max-w-md max-h-[92vh] flex flex-col p-0 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 overflow-hidden',
+    // Modal mediano estándar para credenciales, códigos QR y confirmaciones
+    mediumDialog:
+        'w-[94vw] sm:max-w-lg max-h-[90vh] flex flex-col p-0 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 overflow-hidden',
     // Modal amplio, espacioso y estructurado para formularios complejos (Inscripción / Matrícula)
     enrollmentDialog:
         'w-[96vw] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl max-h-[90vh] flex flex-col p-0 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 overflow-hidden',
@@ -167,5 +205,5 @@ export const THEME_MODAL = {
  */
 export const THEME_INPUT = {
     focusRing:
-        'focus:border-rose-900 focus:ring-rose-900/20 focus:outline-hidden',
+        'focus:border-[#3484a5] focus:ring-[#3484a5]/20 focus:outline-hidden',
 } as const;

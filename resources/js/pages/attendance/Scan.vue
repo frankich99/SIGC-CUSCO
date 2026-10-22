@@ -63,10 +63,10 @@ function registerAttendance(): void {
             class="min-h-[calc(100vh-8rem)] bg-slate-50 px-4 py-10 sm:px-6 dark:bg-slate-950"
         >
             <Card
-                class="mx-auto max-w-lg overflow-hidden border-rose-900/20 shadow-lg dark:border-rose-900/40"
+                class="mx-auto max-w-lg overflow-hidden border-[#3484a5]/20 shadow-lg dark:border-[#3484a5]/40"
             >
                 <CardHeader
-                    class="bg-gradient-to-br from-rose-950 via-rose-900 to-rose-950 text-white"
+                    class="bg-[#153542] text-white"
                 >
                     <div class="flex items-center gap-3">
                         <div
@@ -78,7 +78,7 @@ function registerAttendance(): void {
                             <CardTitle class="text-xl"
                                 >Asistencia digital</CardTitle
                             >
-                            <CardDescription class="text-rose-200">
+                            <CardDescription class="text-sky-200">
                                 {{ course.code }} · Sesión {{ session }}
                             </CardDescription>
                         </div>
@@ -88,7 +88,7 @@ function registerAttendance(): void {
                 <CardContent class="space-y-6 p-6 sm:p-8">
                     <div class="space-y-1 text-center">
                         <p
-                            class="text-xs font-black tracking-wider text-rose-900 uppercase dark:text-rose-300"
+                            class="text-xs font-black tracking-wider text-[#3484a5] uppercase dark:text-[#badbe9]"
                         >
                             {{ course.title }}
                         </p>
@@ -135,7 +135,7 @@ function registerAttendance(): void {
                     <Button
                         v-else
                         type="button"
-                        class="h-12 w-full bg-rose-900 text-sm font-black text-white hover:bg-rose-950"
+                        class="h-12 w-full bg-[#3484a5] text-sm font-black text-white hover:bg-[#153542]"
                         :disabled="processing"
                         @click="registerAttendance"
                     >

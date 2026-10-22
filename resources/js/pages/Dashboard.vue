@@ -43,6 +43,9 @@ import {
     ExternalLink,
 } from '@lucide/vue';
 import type { BreadcrumbItem } from '@/types';
+import { useBranding } from '@/composables/useBranding';
+
+const { systemName, institutionName, primaryColor } = useBranding();
 
 interface InstructorSnippet {
     id: number;
@@ -205,7 +208,7 @@ function roleBadgeData(role?: string) {
             return {
                 label: 'Administrador General',
                 desc: 'Control integral de programas, docentes, cupos y actas académicas.',
-                badgeClass: 'bg-rose-900 text-white font-black shadow-xs',
+                badgeClass: 'bg-[#3484a5] text-white font-black shadow-xs',
             };
         case 'docente':
             return {
@@ -229,29 +232,25 @@ function enrollmentStatusBadge(status: string) {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Panel de Control - SIGC-CUSCO" />
+        <Head title="Panel de Control - SIGC-MDSJ" />
 
         <div
             class="mx-auto w-full max-w-7xl min-w-0 space-y-8 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
         >
-            <!-- BANNER PRINCIPAL: GRANATE IMPERIAL CUSCO (UNSAAC) -->
+            <!-- BANNER PRINCIPAL INSTITUCIONAL -->
             <div
-                class="relative overflow-hidden rounded-2xl border-2 border-rose-900/40 bg-gradient-to-r from-[#4c0519] via-[#701a31] to-slate-950 p-6 text-white shadow-xl sm:p-8"
+                class="relative overflow-hidden rounded-2xl border border-slate-700/60 bg-[#121e27] dark:bg-[#0b1319] p-6 text-white shadow-xl sm:p-8"
+                :style="{ borderLeft: `6px solid ${primaryColor || 'var(--institutional, #3484a5)'}` }"
             >
-                <!-- Background decorative glow -->
-                <div
-                    class="pointer-events-none absolute -right-10 -bottom-10 size-64 rounded-full bg-amber-500/10 blur-3xl"
-                ></div>
-
                 <div
                     class="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
                 >
                     <div class="space-y-3">
                         <div class="flex flex-wrap items-center gap-2">
                             <span
-                                class="rounded-full border border-white/20 bg-white/20 px-3 py-1 text-[11px] font-black tracking-wider text-white uppercase backdrop-blur-sm"
+                                class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-black tracking-wider text-white uppercase"
                             >
-                                SIGC-CUSCO • Sistema Integral
+                                {{ systemName }} • {{ institutionName }}
                             </span>
                             <span
                                 class="rounded-full px-3 py-1 text-[11px] tracking-wider uppercase"
@@ -268,13 +267,13 @@ function enrollmentStatusBadge(status: string) {
                         </h1>
 
                         <p
-                            class="max-w-2xl text-xs leading-relaxed font-medium text-rose-100 sm:text-sm"
+                            class="max-w-2xl text-xs leading-relaxed font-medium text-sky-100 sm:text-sm"
                         >
                             {{ roleBadgeData(user?.role).desc }}
                         </p>
                     </div>
 
-                    <!-- Botones de Acción Primarios Granate y Dorado -->
+                    <!-- Botones de Acción Primarios Azul y Dorado -->
                     <div class="flex flex-wrap items-center gap-3">
                         <Button
                             v-if="
@@ -297,11 +296,11 @@ function enrollmentStatusBadge(status: string) {
                             as-child
                             size="default"
                             variant="secondary"
-                            class="bg-white text-xs font-bold text-rose-950 shadow-md hover:bg-rose-50"
+                            class="bg-white text-xs font-bold text-slate-900 shadow-md hover:bg-slate-100"
                         >
                             <Link href="/courses">
                                 <GraduationCap
-                                    class="mr-1.5 size-4 text-rose-900"
+                                    class="mr-1.5 size-4 text-[#3484a5]"
                                 />
                                 Catálogo Completo
                             </Link>
@@ -314,7 +313,7 @@ function enrollmentStatusBadge(status: string) {
                     v-if="user?.role === 'admin'"
                     class="relative z-10 mt-6 flex flex-wrap items-center gap-2 border-t border-white/20 pt-4"
                 >
-                    <span class="mr-2 text-xs font-bold text-rose-200"
+                    <span class="mr-2 text-xs font-bold text-sky-200"
                         >Modo de visualización:</span
                     >
                     <button
@@ -323,7 +322,7 @@ function enrollmentStatusBadge(status: string) {
                         class="cursor-pointer rounded-lg px-3.5 py-1.5 text-xs font-black transition-all"
                         :class="
                             activeDashboardTab === 'organizador'
-                                ? 'bg-white text-rose-950 shadow-md ring-2 ring-amber-400'
+                                ? 'bg-white text-sky-950 shadow-md ring-2 ring-amber-400'
                                 : 'bg-white/10 text-white hover:bg-white/20'
                         "
                     >
@@ -335,7 +334,7 @@ function enrollmentStatusBadge(status: string) {
                         class="cursor-pointer rounded-lg px-3.5 py-1.5 text-xs font-black transition-all"
                         :class="
                             activeDashboardTab === 'participante'
-                                ? 'bg-white text-rose-950 shadow-md ring-2 ring-amber-400'
+                                ? 'bg-white text-sky-950 shadow-md ring-2 ring-amber-400'
                                 : 'bg-white/10 text-white hover:bg-white/20'
                         "
                     >
@@ -355,21 +354,21 @@ function enrollmentStatusBadge(status: string) {
                 "
                 class="space-y-8"
             >
-                <!-- Grilla de Métricas: Granate, Dorado y Alto Contraste -->
+                <!-- Grilla de Métricas: Azul San Jerónimo, Dorado y Alto Contraste -->
                 <div
                     class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
                 >
-                    <!-- Métrica 1: Cursos Asignados (Granate Cusco) -->
+                    <!-- Métrica 1: Cursos Asignados (Verde Esmeralda) -->
                     <Card
-                        class="border-2 border-rose-300 bg-rose-50/40 shadow-sm transition-all hover:shadow-md dark:border-rose-900 dark:bg-rose-950/20"
+                        class="border border-slate-200 bg-white shadow-sm transition-all hover:border-emerald-500 hover:shadow-md dark:border-slate-800 dark:bg-card"
                     >
                         <CardHeader class="pb-2">
                             <CardDescription
-                                class="flex items-center justify-between text-xs font-bold text-rose-950 dark:text-rose-300"
+                                class="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300"
                             >
                                 <span>Cursos a mi Cargo</span>
                                 <div
-                                    class="flex size-8 items-center justify-center rounded-lg bg-rose-900 text-white shadow-xs"
+                                    class="flex size-8 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-xs"
                                 >
                                     <BookOpen class="size-4" />
                                 </div>
@@ -439,27 +438,27 @@ function enrollmentStatusBadge(status: string) {
                         <CardContent
                             class="text-xs font-bold text-slate-700 dark:text-slate-300"
                         >
-                            Registradas en SIGC-CUSCO
+                            Registradas en SIGC-MDSJ
                         </CardContent>
                     </Card>
 
                     <!-- Métrica 4: Asistencia QR Dinámica -->
                     <Card
-                        class="border-2 border-rose-400 bg-rose-100/50 shadow-sm transition-all hover:shadow-md dark:border-rose-800 dark:bg-rose-950/30"
+                        class="border-2 border-sky-400 bg-sky-100/50 shadow-sm transition-all hover:shadow-md dark:border-[#296d88] dark:bg-[#153542]/30"
                     >
                         <CardHeader class="pb-2">
                             <CardDescription
-                                class="flex items-center justify-between text-xs font-bold text-rose-950 dark:text-rose-200"
+                                class="flex items-center justify-between text-xs font-bold text-sky-950 dark:text-sky-200"
                             >
                                 <span>Asistencia QR en Vivo</span>
                                 <div
-                                    class="flex size-8 items-center justify-center rounded-lg bg-rose-950 text-white shadow-xs"
+                                    class="flex size-8 items-center justify-center rounded-lg bg-[#153542] text-white shadow-xs"
                                 >
                                     <QrCode class="size-4" />
                                 </div>
                             </CardDescription>
                             <CardTitle
-                                class="pt-2 text-base font-black text-rose-950 dark:text-rose-200"
+                                class="pt-2 text-base font-black text-sky-950 dark:text-sky-200"
                             >
                                 Proyección en Aula
                             </CardTitle>
@@ -481,7 +480,7 @@ function enrollmentStatusBadge(status: string) {
                             <h2
                                 class="flex items-center gap-2 text-xl font-black tracking-tight text-slate-950 dark:text-white"
                             >
-                                <BookOpen class="size-5 text-rose-800" />
+                                <BookOpen class="size-5 text-[#296d88]" />
                                 Mis Capacitaciones Asignadas
                             </h2>
                             <p
@@ -495,7 +494,7 @@ function enrollmentStatusBadge(status: string) {
                             as-child
                             variant="outline"
                             size="sm"
-                            class="border-slate-300 text-xs font-bold text-slate-800 hover:text-rose-900"
+                            class="border-slate-300 text-xs font-bold text-slate-800 hover:text-[#3484a5]"
                         >
                             <Link href="/courses">Ver Catálogo General →</Link>
                         </Button>
@@ -507,7 +506,7 @@ function enrollmentStatusBadge(status: string) {
                         class="space-y-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-10 text-center dark:bg-slate-900"
                     >
                         <div
-                            class="mx-auto flex size-16 items-center justify-center rounded-full bg-rose-100 text-rose-800"
+                            class="mx-auto flex size-16 items-center justify-center rounded-full bg-sky-100 text-[#296d88]"
                         >
                             <BookOpen class="size-8" />
                         </div>
@@ -530,7 +529,7 @@ function enrollmentStatusBadge(status: string) {
                             "
                             as-child
                             size="sm"
-                            class="mt-2 bg-rose-900 text-xs font-bold text-white hover:bg-rose-950"
+                            class="mt-2 bg-[#3484a5] text-xs font-bold text-white hover:bg-[#153542]"
                         >
                             <Link
                                 href="/courses/create"
@@ -552,7 +551,7 @@ function enrollmentStatusBadge(status: string) {
                         <Card
                             v-for="course in taughtCourses"
                             :key="course.id"
-                            class="flex max-w-full min-w-0 flex-col justify-between overflow-hidden rounded-xl border-2 border-slate-200 bg-white shadow-sm transition-all hover:border-rose-800 hover:shadow-lg dark:border-slate-800 dark:bg-slate-950"
+                            class="flex max-w-full min-w-0 flex-col justify-between overflow-hidden rounded-xl border-2 border-slate-200 bg-white shadow-sm transition-all hover:border-[#296d88] hover:shadow-lg dark:border-slate-800 dark:bg-slate-950"
                         >
                             <CardHeader
                                 class="max-w-full min-w-0 space-y-2 p-4 pb-3 sm:p-5"
@@ -561,7 +560,7 @@ function enrollmentStatusBadge(status: string) {
                                     class="flex w-full min-w-0 items-center justify-between gap-1.5 text-xs"
                                 >
                                     <span
-                                        class="shrink-0 rounded border border-rose-200 bg-rose-100 px-2.5 py-1 font-mono font-bold text-rose-950 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                                        class="shrink-0 rounded border border-sky-200 bg-sky-100 px-2.5 py-1 font-mono font-bold text-sky-950 dark:border-[#296d88] dark:bg-[#153542] dark:text-sky-200"
                                     >
                                         {{ course.code }}
                                     </span>
@@ -585,7 +584,7 @@ function enrollmentStatusBadge(status: string) {
                                 </CardTitle>
                                 <div
                                     v-if="course.institution"
-                                    class="w-full max-w-full min-w-0 truncate overflow-hidden text-xs font-bold text-rose-800 dark:text-rose-400"
+                                    class="w-full max-w-full min-w-0 truncate overflow-hidden text-xs font-bold text-[#296d88] dark:text-[#88c0d7]"
                                 >
                                     {{ course.institution }}
                                 </div>
@@ -593,7 +592,7 @@ function enrollmentStatusBadge(status: string) {
                                     class="flex min-w-0 items-center gap-1.5 pt-1 text-xs font-bold text-slate-700 dark:text-slate-300"
                                 >
                                     <Calendar
-                                        class="size-3.5 shrink-0 text-rose-800"
+                                        class="size-3.5 shrink-0 text-[#296d88]"
                                     />
                                     <span class="truncate"
                                         >Inicio:
@@ -623,7 +622,7 @@ function enrollmentStatusBadge(status: string) {
                                         >Inscritos / Aforo:</span
                                     >
                                     <span
-                                        class="font-extrabold text-rose-900 dark:text-rose-400"
+                                        class="font-extrabold text-[#3484a5] dark:text-[#88c0d7]"
                                     >
                                         {{ course.enrollments_count || 0 }} de
                                         {{ course.capacity }} vacantes
@@ -633,7 +632,7 @@ function enrollmentStatusBadge(status: string) {
                                     class="h-2.5 w-full overflow-hidden rounded-full border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800"
                                 >
                                     <div
-                                        class="h-full rounded-full bg-rose-900 transition-all"
+                                        class="h-full rounded-full bg-[#3484a5] transition-all"
                                         :style="{
                                             width: `${Math.min(100, ((course.enrollments_count || 0) / course.capacity) * 100)}%`,
                                         }"
@@ -647,18 +646,18 @@ function enrollmentStatusBadge(status: string) {
                                 <Button
                                     size="sm"
                                     variant="outline"
-                                    class="h-9 border-rose-800 text-xs font-bold text-rose-900 hover:bg-rose-50"
+                                    class="h-9 border-[#3484a5] text-xs font-bold text-[#3484a5] hover:bg-slate-100 dark:border-[#3484a5] dark:text-[#88c0d7] dark:hover:bg-slate-800"
                                     @click="openQrProjection(course)"
                                 >
                                     <QrCode
-                                        class="mr-1.5 size-4 text-rose-800"
+                                        class="mr-1.5 size-4 text-[#3484a5] dark:text-[#88c0d7]"
                                     />
                                     Proyectar QR
                                 </Button>
                                 <Button
                                     as-child
                                     size="sm"
-                                    class="h-9 bg-rose-900 text-xs font-bold text-white hover:bg-rose-950"
+                                    class="h-9 bg-emerald-600 text-xs font-bold text-white shadow-xs hover:bg-emerald-700"
                                 >
                                     <Link :href="`/courses/${course.id}`">
                                         Ver Alumnos →
@@ -685,15 +684,15 @@ function enrollmentStatusBadge(status: string) {
                 <!-- Métricas del Participante -->
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <Card
-                        class="border-2 border-rose-300 bg-rose-50/40 shadow-sm dark:border-rose-900 dark:bg-rose-950/20"
+                        class="border border-slate-200 bg-white shadow-sm transition-all hover:border-emerald-500 hover:shadow-md dark:border-slate-800 dark:bg-card"
                     >
                         <CardHeader class="pb-2">
                             <CardDescription
-                                class="flex items-center justify-between text-xs font-bold text-rose-950 dark:text-rose-300"
+                                class="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300"
                             >
                                 <span>Mis Cursos Matriculados</span>
                                 <div
-                                    class="flex size-8 items-center justify-center rounded-lg bg-rose-900 text-white shadow-xs"
+                                    class="flex size-8 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-xs"
                                 >
                                     <GraduationCap class="size-4" />
                                 </div>
@@ -787,7 +786,7 @@ function enrollmentStatusBadge(status: string) {
                             <h2
                                 class="flex items-center gap-2 text-xl font-black tracking-tight text-slate-950 dark:text-white"
                             >
-                                <GraduationCap class="size-5 text-rose-800" />
+                                <GraduationCap class="size-5 text-[#296d88]" />
                                 Mis Capacitaciones Inscritas
                             </h2>
                             <p
@@ -804,7 +803,7 @@ function enrollmentStatusBadge(status: string) {
                         class="space-y-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-10 text-center dark:bg-slate-900"
                     >
                         <div
-                            class="mx-auto flex size-16 items-center justify-center rounded-full bg-rose-100 text-rose-800"
+                            class="mx-auto flex size-16 items-center justify-center rounded-full bg-sky-100 text-[#296d88]"
                         >
                             <GraduationCap class="size-8" />
                         </div>
@@ -822,7 +821,7 @@ function enrollmentStatusBadge(status: string) {
                         <Button
                             as-child
                             size="default"
-                            class="bg-rose-900 text-xs font-bold text-white hover:bg-rose-950"
+                            class="bg-[#3484a5] text-xs font-bold text-white hover:bg-[#153542]"
                         >
                             <a href="#cursos-abiertos">Ver Cursos Abiertos</a>
                         </Button>
@@ -833,12 +832,12 @@ function enrollmentStatusBadge(status: string) {
                         <Card
                             v-for="item in studentEnrollments"
                             :key="item.id"
-                            class="flex flex-col justify-between overflow-hidden rounded-xl border-2 border-slate-200 bg-white shadow-sm transition-all hover:border-rose-800 hover:shadow-lg dark:border-slate-800 dark:bg-slate-950"
+                            class="flex flex-col justify-between overflow-hidden rounded-xl border-2 border-slate-200 bg-white shadow-sm transition-all hover:border-[#296d88] hover:shadow-lg dark:border-slate-800 dark:bg-slate-950"
                         >
                             <CardHeader class="space-y-2 pb-3">
                                 <div class="flex items-center justify-between">
                                     <span
-                                        class="rounded border border-rose-200 bg-rose-100 px-2.5 py-1 font-mono text-xs font-bold text-rose-950 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                                        class="rounded border border-sky-200 bg-sky-100 px-2.5 py-1 font-mono text-xs font-bold text-sky-950 dark:border-[#296d88] dark:bg-[#153542] dark:text-sky-200"
                                     >
                                         {{ item.course?.code }}
                                     </span>
@@ -860,17 +859,37 @@ function enrollmentStatusBadge(status: string) {
                                 >
                                     {{ item.course?.title }}
                                 </CardTitle>
-                                <CardDescription
-                                    class="text-xs font-bold text-slate-700 dark:text-slate-300"
+
+                                <!-- Entidad Organizadora Destacada (Azul Institucional MDSJ) -->
+                                <div
+                                    class="flex w-full max-w-full min-w-0 items-center gap-1.5 overflow-hidden rounded-lg border border-[#1a6b8a]/20 bg-[#1a6b8a]/5 px-2.5 py-1 text-xs font-bold text-[#1a6b8a] dark:border-[#3484a5]/40 dark:bg-[#1a6b8a]/20 dark:text-[#88c0d7]"
                                 >
-                                    Ponente / Docente:
-                                    {{
-                                        item.course?.instructor
-                                            ? `${item.course.instructor.name} ${item.course.instructor.paterno || ''}`
-                                            : item.course?.instructor_name ||
-                                              'Por asignar'
-                                    }}
-                                </CardDescription>
+                                    <Building2
+                                        class="size-3.5 shrink-0 text-[#1a6b8a] dark:text-[#3484a5]"
+                                    />
+                                    <span class="block min-w-0 flex-1 truncate">
+                                        <span class="font-extrabold text-[#1a6b8a] dark:text-[#88c0d7]">Organiza:</span>
+                                        {{ item.course?.institution || institutionName || 'Municipalidad de San Jerónimo' }}
+                                    </span>
+                                </div>
+
+                                <!-- Ponente / Docente a Cargo (Ámbar Vivo) -->
+                                <div
+                                    class="flex max-w-full min-w-0 items-center gap-2 rounded-lg border border-amber-200/90 bg-amber-50/90 px-2.5 py-1.5 text-xs font-bold text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
+                                >
+                                    <GraduationCap
+                                        class="size-4 shrink-0 text-amber-600 dark:text-amber-400"
+                                    />
+                                    <span class="min-w-0 flex-1 truncate">
+                                        <span class="font-extrabold text-amber-700 dark:text-amber-400">Ponente / Docente:</span>
+                                        {{
+                                            item.course?.instructor
+                                                ? `${item.course.instructor.name} ${item.course.instructor.paterno || ''}`
+                                                : item.course?.instructor_name ||
+                                                  'Por asignar'
+                                        }}
+                                    </span>
+                                </div>
                             </CardHeader>
 
                             <CardContent class="space-y-3 text-xs">
@@ -879,7 +898,7 @@ function enrollmentStatusBadge(status: string) {
                                 >
                                     <div class="flex items-center gap-1.5">
                                         <Calendar
-                                            class="size-3.5 shrink-0 text-rose-800"
+                                            class="size-3.5 shrink-0 text-[#296d88]"
                                         />
                                         <span
                                             >Inicio:
@@ -912,7 +931,7 @@ function enrollmentStatusBadge(status: string) {
                                             >Asistencia:</span
                                         >
                                         <span
-                                            class="font-black text-rose-900 dark:text-rose-300"
+                                            class="font-black text-[#3484a5] dark:text-[#badbe9]"
                                         >
                                             {{ item.attended_sessions }} de
                                             {{
@@ -927,7 +946,7 @@ function enrollmentStatusBadge(status: string) {
                                         class="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"
                                     >
                                         <div
-                                            class="h-2 rounded-full bg-rose-800 transition-all duration-500"
+                                            class="h-2 rounded-full bg-[#296d88] transition-all duration-500"
                                             :style="{
                                                 width: `${Math.min(100, Math.round(((item.attended_sessions || 0) / (item.course?.total_sessions || 4)) * 100))}%`,
                                             }"
@@ -1014,11 +1033,11 @@ function enrollmentStatusBadge(status: string) {
                                 <Button
                                     size="sm"
                                     variant="outline"
-                                    class="h-9 min-w-[120px] flex-1 cursor-pointer border-rose-300 text-xs font-bold text-rose-950 hover:bg-rose-50"
+                                    class="h-9 min-w-[120px] flex-1 cursor-pointer border-[#3484a5] text-xs font-bold text-[#3484a5] hover:bg-slate-100 dark:border-[#3484a5] dark:text-[#88c0d7] dark:hover:bg-slate-800"
                                     @click="openCredentialModal(item)"
                                 >
                                     <QrCode
-                                        class="mr-1.5 size-4 text-rose-800"
+                                        class="mr-1.5 size-4 text-[#3484a5] dark:text-[#88c0d7]"
                                     />
                                     Mi Credencial QR
                                 </Button>
@@ -1026,11 +1045,11 @@ function enrollmentStatusBadge(status: string) {
                                     as-child
                                     variant="outline"
                                     size="sm"
-                                    class="h-9 min-w-[100px] flex-1 border-slate-300 text-xs font-bold text-slate-800 hover:text-rose-900"
+                                    class="h-9 min-w-[100px] flex-1 border-slate-300 text-xs font-bold text-slate-800 hover:text-[#3484a5] dark:border-slate-700 dark:text-slate-200 dark:hover:text-white dark:bg-slate-800/80"
                                 >
                                     <Link :href="`/courses/${item.course_id}`">
                                         <BookOpen
-                                            class="mr-1.5 size-4 text-slate-700"
+                                            class="mr-1.5 size-4 text-slate-700 dark:text-slate-300"
                                         />
                                         Ver Curso
                                     </Link>
@@ -1084,7 +1103,7 @@ function enrollmentStatusBadge(status: string) {
                             as-child
                             variant="outline"
                             size="sm"
-                            class="border-slate-300 text-xs font-bold text-slate-800 hover:text-rose-900"
+                            class="border-slate-300 text-xs font-bold text-slate-800 hover:text-[#3484a5]"
                         >
                             <Link href="/courses">Ver Catálogo Completo →</Link>
                         </Button>
@@ -1096,7 +1115,7 @@ function enrollmentStatusBadge(status: string) {
                         <Card
                             v-for="course in openCourses"
                             :key="course.id"
-                            class="flex max-w-full min-w-0 flex-col justify-between overflow-hidden rounded-xl border-2 border-slate-200 bg-white shadow-sm transition-all hover:border-rose-800 hover:shadow-lg dark:border-slate-800 dark:bg-slate-950"
+                            class="flex max-w-full min-w-0 flex-col justify-between overflow-hidden rounded-xl border-2 border-slate-200 bg-white shadow-sm transition-all hover:border-[#296d88] hover:shadow-lg dark:border-slate-800 dark:bg-slate-950"
                         >
                             <CardHeader
                                 class="max-w-full min-w-0 space-y-1.5 p-4 pb-3 sm:p-5"
@@ -1105,7 +1124,7 @@ function enrollmentStatusBadge(status: string) {
                                     class="flex w-full min-w-0 items-center justify-between gap-1.5 text-xs"
                                 >
                                     <span
-                                        class="shrink-0 rounded border border-rose-200 bg-rose-100 px-2.5 py-0.5 font-mono font-bold text-rose-950 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                                        class="shrink-0 rounded border border-sky-200 bg-sky-100 px-2.5 py-0.5 font-mono font-bold text-sky-950 dark:border-[#296d88] dark:bg-[#153542] dark:text-sky-200"
                                     >
                                         {{ course.code }}
                                     </span>
@@ -1120,19 +1139,41 @@ function enrollmentStatusBadge(status: string) {
                                 >
                                     {{ course.title }}
                                 </CardTitle>
+
+                                <!-- Entidad Organizadora (Azul Institucional MDSJ) -->
                                 <div
-                                    class="w-full max-w-full min-w-0 truncate overflow-hidden text-xs font-bold text-rose-900 dark:text-rose-400"
+                                    class="flex w-full max-w-full min-w-0 items-center gap-1.5 overflow-hidden rounded-lg border border-[#1a6b8a]/20 bg-[#1a6b8a]/5 px-2.5 py-1 text-xs font-bold text-[#1a6b8a] dark:border-[#3484a5]/40 dark:bg-[#1a6b8a]/20 dark:text-[#88c0d7]"
                                 >
-                                    {{
-                                        course.institution ||
-                                        'Entidad Organizadora'
-                                    }}
+                                    <Building2
+                                        class="size-3.5 shrink-0 text-[#1a6b8a] dark:text-[#3484a5]"
+                                    />
+                                    <span class="block min-w-0 flex-1 truncate">
+                                        <span class="font-extrabold text-[#1a6b8a] dark:text-[#88c0d7]">Organiza:</span>
+                                        {{ course.institution || institutionName || 'Municipalidad de San Jerónimo' }}
+                                    </span>
+                                </div>
+
+                                <!-- Ponente / Docente a Cargo (Ámbar Vivo) -->
+                                <div
+                                    class="flex max-w-full min-w-0 items-center gap-2 rounded-lg border border-amber-200/90 bg-amber-50/90 px-2.5 py-1 text-xs font-bold text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
+                                >
+                                    <GraduationCap
+                                        class="size-3.5 shrink-0 text-amber-600 dark:text-amber-400"
+                                    />
+                                    <span class="min-w-0 flex-1 truncate">
+                                        <span class="font-extrabold text-amber-700 dark:text-amber-400">Ponente:</span>
+                                        {{
+                                            course.instructor
+                                                ? `${course.instructor.name} ${course.instructor.paterno || ''}`
+                                                : 'Docente asignado'
+                                        }}
+                                    </span>
                                 </div>
                                 <CardDescription
                                     class="flex min-w-0 items-center gap-1.5 pt-1 text-xs font-bold text-slate-700 dark:text-slate-300"
                                 >
                                     <Calendar
-                                        class="size-3.5 shrink-0 text-rose-800"
+                                        class="size-3.5 shrink-0 text-[#296d88]"
                                     />
                                     <span class="truncate"
                                         >Inicio:
@@ -1159,7 +1200,7 @@ function enrollmentStatusBadge(status: string) {
                                 >
                                     <span>Vacantes disponibles:</span>
                                     <strong
-                                        class="text-sm font-black text-rose-900 dark:text-rose-400"
+                                        class="text-sm font-black text-[#3484a5] dark:text-[#88c0d7]"
                                     >
                                         {{
                                             Math.max(
@@ -1181,7 +1222,7 @@ function enrollmentStatusBadge(status: string) {
                                     as-child
                                     variant="outline"
                                     size="sm"
-                                    class="h-9 flex-1 border-slate-300 text-xs font-bold text-slate-800 hover:text-slate-900"
+                                    class="h-9 flex-1 border-slate-300 text-xs font-bold text-slate-800 hover:text-slate-900 dark:border-slate-700 dark:text-slate-200 dark:hover:text-white dark:bg-slate-800/80"
                                 >
                                     <Link :href="`/courses/${course.id}`"
                                         >Temario</Link
@@ -1189,7 +1230,7 @@ function enrollmentStatusBadge(status: string) {
                                 </Button>
                                 <Button
                                     size="sm"
-                                    class="h-9 flex-1 bg-rose-900 px-4 text-xs font-black text-white shadow-sm hover:bg-rose-950"
+                                    class="h-9 flex-1 bg-[#3484a5] px-4 text-xs font-black text-white shadow-sm hover:bg-[#153542]"
                                     @click="openEnroll(course)"
                                 >
                                     <CheckCircle2 class="mr-1.5 size-4" />
@@ -1204,16 +1245,16 @@ function enrollmentStatusBadge(status: string) {
             <!-- MODAL: PROYECCIÓN QR (PARA DOCENTE) -->
             <Dialog :open="isQrModalOpen" @update:open="isQrModalOpen = $event">
                 <DialogContent
-                    class="flex max-h-[92vh] w-[96vw] flex-col overflow-hidden rounded-2xl border-4 border-rose-900 bg-white p-0 text-center shadow-2xl sm:max-w-2xl md:max-w-3xl dark:bg-slate-900"
+                    class="flex max-h-[92vh] w-[96vw] flex-col overflow-hidden rounded-2xl border-4 border-[#3484a5] bg-white p-0 text-center shadow-2xl sm:max-w-2xl md:max-w-3xl dark:bg-slate-900"
                 >
                     <div
                         class="shrink-0 border-b border-slate-200 p-6 pr-12 pb-4 dark:border-slate-800"
                     >
                         <DialogHeader class="space-y-2">
                             <div
-                                class="mx-auto inline-flex items-center gap-2 rounded-full bg-rose-100 px-3 py-1 text-xs font-black tracking-wider text-rose-950 uppercase"
+                                class="mx-auto inline-flex items-center gap-2 rounded-full bg-sky-100 px-3 py-1 text-xs font-black tracking-wider text-sky-950 uppercase"
                             >
-                                <QrCode class="size-4 text-rose-800" />
+                                <QrCode class="size-4 text-[#296d88]" />
                                 <span>Control de Asistencia Digital</span>
                             </div>
                             <DialogTitle
@@ -1237,24 +1278,24 @@ function enrollmentStatusBadge(status: string) {
                     >
                         <div
                             v-if="isQrLoading"
-                            class="inline-flex min-h-[280px] min-w-[280px] items-center justify-center rounded-3xl border-4 border-rose-900 bg-white p-6 text-xs font-bold text-slate-500"
+                            class="inline-flex min-h-[280px] min-w-[280px] items-center justify-center rounded-3xl border-4 border-slate-200 bg-white p-6 text-xs font-bold text-slate-500 dark:border-slate-800"
                         >
                             Generando QR...
                         </div>
                         <div
                             v-else-if="activeQrSvg"
-                            class="inline-block rounded-3xl border-4 border-rose-900 bg-white p-6 shadow-xl"
+                            class="inline-block rounded-3xl border-4 border-[#3484a5] bg-white p-6 shadow-xl"
                             v-html="activeQrSvg"
                         ></div>
                         <div
                             v-else
-                            class="rounded-3xl border-2 border-rose-200 bg-rose-50 p-6 text-xs font-bold text-rose-900 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
+                            class="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-xs font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300"
                         >
                             No se pudo generar el QR. Intenta nuevamente.
                         </div>
                         <div class="space-y-2">
                             <div
-                                class="inline-block rounded-full border-2 border-rose-300 bg-rose-100 px-5 py-2 font-mono text-sm font-black tracking-widest text-rose-950 shadow-sm sm:text-base dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
+                                class="inline-block rounded-full border-2 border-emerald-500/40 bg-emerald-50 px-5 py-2 font-mono text-sm font-black tracking-widest text-emerald-900 shadow-sm sm:text-base dark:border-emerald-600/40 dark:bg-emerald-950/40 dark:text-emerald-200"
                             >
                                 CAPACITACIÓN: {{ activeQrCourse?.code }}
                             </div>
@@ -1270,7 +1311,7 @@ function enrollmentStatusBadge(status: string) {
                         <div class="pt-2">
                             <Button
                                 @click="isQrModalOpen = false"
-                                class="h-11 w-full cursor-pointer bg-rose-900 text-sm font-bold text-white shadow-md hover:bg-rose-950"
+                                class="h-11 w-full cursor-pointer bg-emerald-600 text-sm font-bold text-white shadow-md hover:bg-emerald-700"
                             >
                                 Finalizar y Cerrar Proyección
                             </Button>
@@ -1293,10 +1334,10 @@ function enrollmentStatusBadge(status: string) {
             @update:open="isCredentialModalOpen = $event"
         >
             <DialogContent
-                class="w-[94vw] overflow-hidden rounded-3xl border border-rose-200 bg-white p-0 shadow-2xl sm:max-w-md dark:bg-slate-950"
+                class="w-[94vw] overflow-hidden rounded-3xl border border-sky-200 bg-white p-0 shadow-2xl sm:max-w-md dark:bg-slate-950"
             >
                 <div
-                    class="space-y-1 bg-gradient-to-br from-rose-950 via-rose-900 to-rose-950 p-6 text-center text-white"
+                    class="space-y-1 bg-gradient-to-br from-[#0b1e27] via-[#153542] to-[#296d88] p-6 text-center text-white"
                 >
                     <Badge
                         variant="outline"
@@ -1308,7 +1349,7 @@ function enrollmentStatusBadge(status: string) {
                         {{ activeCredentialEnrollment?.nombres }}
                         {{ activeCredentialEnrollment?.paterno }}
                     </h3>
-                    <p class="font-mono text-xs text-rose-200">
+                    <p class="font-mono text-xs text-sky-200">
                         DNI: {{ activeCredentialEnrollment?.dni }}
                     </p>
                 </div>
@@ -1318,18 +1359,18 @@ function enrollmentStatusBadge(status: string) {
                 >
                     <div
                         v-if="isCredentialQrLoading"
-                        class="flex min-h-[260px] min-w-[260px] items-center justify-center rounded-2xl border-4 border-rose-950/20 bg-white p-3 text-xs font-bold text-slate-500 shadow-md"
+                        class="flex min-h-[260px] min-w-[260px] items-center justify-center rounded-2xl border-4 border-slate-200 bg-white p-3 text-xs font-bold text-slate-500 shadow-md dark:border-slate-800"
                     >
                         Generando QR...
                     </div>
                     <div
                         v-else-if="activeCredentialQrSvg"
-                        class="rounded-2xl border-4 border-rose-950/20 bg-white p-3 shadow-md"
+                        class="rounded-2xl border-4 border-[#3484a5] bg-white p-3 shadow-md"
                         v-html="activeCredentialQrSvg"
                     ></div>
                     <div
                         v-else
-                        class="rounded-2xl border-2 border-rose-200 bg-rose-50 p-3 text-xs font-bold text-rose-900 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
+                        class="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs font-bold text-slate-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-300"
                     >
                         No se pudo generar el QR de la credencial.
                     </div>
@@ -1341,7 +1382,7 @@ function enrollmentStatusBadge(status: string) {
                             Código Único de Matrícula
                         </div>
                         <div
-                            class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-1 font-mono text-lg font-black tracking-wider text-rose-950 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
+                            class="rounded-lg border border-slate-200 bg-slate-100 px-4 py-1.5 font-mono text-lg font-black tracking-wider text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                         >
                             {{
                                 activeCredentialEnrollment?.credential_code ||
@@ -1360,7 +1401,7 @@ function enrollmentStatusBadge(status: string) {
                     <Button
                         variant="outline"
                         size="sm"
-                        class="text-xs font-bold"
+                        class="border-[#3484a5] text-xs font-bold text-[#3484a5] hover:bg-slate-100 dark:border-[#3484a5] dark:text-[#88c0d7] dark:hover:bg-slate-800"
                         @click="isCredentialModalOpen = false"
                     >
                         Cerrar Credencial

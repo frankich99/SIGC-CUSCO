@@ -26,21 +26,21 @@ return [
     ],
 
     'institution' => [
-        'name' => 'Universidad Nacional de San Antonio Abad del Cusco',
-        'acronym' => 'UNSAAC',
-        'campus' => 'Ciudad Universitaria de Perayoc',
-        'address' => 'Av. de la Cultura 733, Wanchaq, Cusco 08000',
+        'name' => 'Municipalidad Distrital de San Jerónimo',
+        'acronym' => 'MDSJ',
+        'campus' => 'Sede Central - Palacio Municipal',
+        'address' => 'Plaza de Armas s/n, San Jerónimo, Cusco 08005',
         'city' => 'Cusco',
         'department' => 'Cusco',
         'province' => 'Cusco',
-        'district' => 'Wanchaq',
-        'postal_code' => '08000',
-        'ubigeo' => '080101',
+        'district' => 'San Jerónimo',
+        'postal_code' => '08005',
+        'ubigeo' => '080104',
         'coordinates' => [
-            'latitude' => -13.52264,
-            'longitude' => -71.96734,
+            'latitude' => -13.55167,
+            'longitude' => -71.88417,
         ],
-        'google_maps_url' => 'https://maps.google.com/?q=-13.52264,-71.96734',
+        'google_maps_url' => 'https://maps.google.com/?q=-13.55167,-71.88417',
     ],
 
     /*

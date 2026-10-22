@@ -1,29 +1,34 @@
 <script setup lang="ts">
-import { usePage } from '@inertiajs/vue3';
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import { useBranding } from '@/composables/useBranding';
 
-const name = usePage().props.name || 'SIGC-CUSCO';
+const { systemName, institutionName, logoUrl } = useBranding();
 </script>
 
 <template>
-    <div class="flex items-center gap-2 sm:gap-2.5">
+    <div class="flex items-center gap-2.5 sm:gap-3">
         <div
-            class="flex size-8.5 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-[#701a31] to-[#800020] text-white shadow-xs ring-1 ring-rose-950/20 sm:size-9"
+            class="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-1 shadow-xs ring-1 ring-slate-950/15 transition-transform hover:scale-105 sm:size-10 dark:bg-slate-900 dark:ring-white/20"
         >
-            <AppLogoIcon
-                class="size-4.5 stroke-[2.2] text-amber-300 sm:size-5"
+            <img
+                :src="logoUrl"
+                :alt="systemName"
+                class="size-full object-contain"
+                width="40"
+                height="40"
+                loading="eager"
             />
         </div>
-        <div class="flex shrink-0 flex-col text-left leading-tight">
+        <div class="flex min-w-0 flex-col text-left leading-tight">
             <span
-                class="text-xs font-black tracking-tight text-slate-950 sm:text-sm dark:text-white"
+                class="truncate text-xs font-black tracking-tight text-slate-950 sm:text-sm dark:text-white"
             >
-                {{ name }}
+                {{ systemName }}
             </span>
             <span
-                class="text-[9px] font-extrabold tracking-widest text-amber-600 uppercase sm:text-[10px] dark:text-amber-400"
+                class="hidden max-w-[150px] truncate text-[9px] font-extrabold tracking-wider uppercase min-[440px]:block sm:max-w-xs md:max-w-sm lg:max-w-none sm:text-[10px]"
+                :style="{ color: 'var(--institutional, #3484a5)' }"
             >
-                UNSAAC • Cusco
+                {{ institutionName }}
             </span>
         </div>
     </div>

@@ -7,6 +7,7 @@ import { GraduationCap } from '@lucide/vue';
 import GlobalToast from '@/components/GlobalToast.vue';
 import LoginModal from '@/components/auth/LoginModal.vue';
 import RegisterModal from '@/components/auth/RegisterModal.vue';
+import { useBranding } from '@/composables/useBranding';
 import type { BreadcrumbItem } from '@/types';
 
 type Props = {
@@ -16,6 +17,8 @@ type Props = {
 withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
 });
+
+const { systemName, institutionName } = useBranding();
 </script>
 
 <template>
@@ -36,15 +39,15 @@ withDefaults(defineProps<Props>(), {
                     class="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-200"
                 >
                     <GraduationCap
-                        class="size-4 text-rose-900 dark:text-rose-400"
+                        class="size-4 text-[#3484a5] dark:text-[#88c0d7]"
                     />
-                    <span>SIGC-CUSCO</span>
+                    <span>{{ systemName }}</span>
                     <span class="font-normal text-slate-400 dark:text-slate-600"
                         >•</span
                     >
                     <span
                         class="text-xs font-semibold text-slate-600 dark:text-slate-400"
-                        >Sistema Integral de Gestión de Capacitaciones</span
+                        >{{ institutionName }}</span
                     >
                 </div>
                 <div class="flex items-center">

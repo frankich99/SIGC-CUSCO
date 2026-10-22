@@ -22,6 +22,25 @@
             })();
         </script>
 
+        {{-- Inline script to apply custom institutional branding colors immediately before render --}}
+        <script>
+            (function() {
+                try {
+                    const raw = localStorage.getItem('sigc_branding');
+                    if (raw) {
+                        const b = JSON.parse(raw);
+                        if (b.primaryColor) {
+                            const root = document.documentElement;
+                            root.style.setProperty('--institutional', b.primaryColor);
+                            root.style.setProperty('--color-institutional', b.primaryColor);
+                            root.style.setProperty('--primary', b.primaryColor);
+                            root.style.setProperty('--ring', b.primaryColor);
+                        }
+                    }
+                } catch (e) {}
+            })();
+        </script>
+
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
             html {
@@ -47,7 +66,7 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
         <x-inertia::head>
-            <title>{{ config('app.name', 'Laravel') }}</title>
+            <title>{{ config('app.name', 'SIGC-MDSJ') }}</title>
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased overflow-x-hidden min-h-screen">

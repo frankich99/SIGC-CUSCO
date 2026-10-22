@@ -29,11 +29,11 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Iniciar sesión - SIGC-CUSCO" />
+    <Head title="Iniciar sesión - SIGC-MDSJ" />
 
     <div
         v-if="status"
-        class="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-center text-xs font-bold text-rose-900"
+        class="mb-4 rounded-lg border border-sky-200 bg-sky-50 p-2.5 text-center text-xs font-bold text-sky-950"
     >
         {{ status }}
     </div>
@@ -63,7 +63,7 @@ defineProps<{
                     :tabindex="1"
                     autocomplete="username"
                     placeholder="correo@ejemplo.com o DNI"
-                    class="text-xs font-medium text-slate-900"
+                    class="text-xs font-medium text-slate-900 dark:text-slate-100"
                 />
                 <InputError :message="errors.email" />
             </div>
@@ -79,7 +79,7 @@ defineProps<{
                     <TextLink
                         v-if="canResetPassword"
                         :href="request()"
-                        class="text-xs font-bold text-rose-900 hover:underline dark:text-rose-400"
+                        class="text-xs font-bold text-[#3484a5] hover:underline dark:text-[#88c0d7]"
                         :tabindex="5"
                     >
                         ¿Olvidaste tu contraseña?
@@ -92,7 +92,7 @@ defineProps<{
                     :tabindex="2"
                     autocomplete="current-password"
                     placeholder="••••••••"
-                    class="text-xs text-slate-900"
+                    class="text-xs text-slate-900 dark:text-slate-100"
                 />
                 <InputError :message="errors.password" />
             </div>
@@ -109,7 +109,7 @@ defineProps<{
 
             <Button
                 type="submit"
-                class="mt-2 h-10 w-full cursor-pointer bg-rose-900 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
+                class="mt-2 h-10 w-full cursor-pointer bg-[#3484a5] text-xs font-bold text-white shadow-xs hover:bg-[#256883]"
                 :tabindex="4"
                 :disabled="processing"
                 data-test="login-button"
@@ -127,7 +127,7 @@ defineProps<{
             <TextLink
                 :href="register()"
                 :tabindex="5"
-                class="ml-1 font-bold text-rose-900 hover:underline dark:text-rose-400"
+                class="ml-1 font-bold text-[#3484a5] hover:underline dark:text-[#88c0d7]"
             >
                 Regístrate aquí
             </TextLink>

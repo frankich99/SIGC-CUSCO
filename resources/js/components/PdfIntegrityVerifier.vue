@@ -101,7 +101,7 @@ function resetVerification() {
         <CardHeader class="border-b bg-white pb-3 dark:bg-slate-950">
             <div class="flex items-center gap-2">
                 <div
-                    class="flex size-8 items-center justify-center rounded-lg bg-rose-900 font-black text-white"
+                    class="flex size-8 items-center justify-center rounded-lg bg-[#1a6b8a] font-black text-white"
                 >
                     <ShieldCheck class="size-4" />
                 </div>
@@ -125,7 +125,7 @@ function resetVerification() {
             <!-- Zona de Carga / Arrastre del PDF -->
             <div
                 v-if="!selectedFileName"
-                class="relative space-y-2 rounded-xl border-2 border-dashed border-rose-300 p-6 text-center transition-colors hover:bg-rose-50/40 dark:border-rose-900"
+                class="relative space-y-2 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-6 text-center transition-colors hover:border-[#1a6b8a] hover:bg-sky-50/50 dark:hover:border-[#3484a5] dark:hover:bg-sky-950/20"
             >
                 <input
                     type="file"
@@ -134,7 +134,7 @@ function resetVerification() {
                     @change="handleFileChange"
                 />
                 <div
-                    class="mx-auto flex size-10 items-center justify-center rounded-full bg-rose-100 text-rose-900 dark:bg-rose-950"
+                    class="mx-auto flex size-10 items-center justify-center rounded-full bg-[#1a6b8a]/10 text-[#1a6b8a] dark:bg-[#1a6b8a]/30 dark:text-[#88c0d7]"
                 >
                     <UploadCloud class="size-5" />
                 </div>
@@ -154,7 +154,7 @@ function resetVerification() {
                     class="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-950"
                 >
                     <div class="flex items-center gap-2">
-                        <FileCheck class="size-5 shrink-0 text-rose-900" />
+                        <FileCheck class="size-5 shrink-0 text-[#1a6b8a] dark:text-[#88c0d7]" />
                         <div>
                             <div
                                 class="max-w-xs truncate font-bold text-slate-900 dark:text-white"
@@ -178,9 +178,9 @@ function resetVerification() {
 
                 <div
                     v-if="isCalculating"
-                    class="flex items-center justify-center gap-2 py-4 font-bold text-slate-600"
+                    class="flex items-center justify-center gap-2 py-4 font-bold text-slate-600 dark:text-slate-300"
                 >
-                    <Loader2 class="size-4 animate-spin text-rose-800" />
+                    <Loader2 class="size-4 animate-spin text-[#1a6b8a] dark:text-[#88c0d7]" />
                     <span>Calculando huella SHA-256 en tiempo real...</span>
                 </div>
 
@@ -193,7 +193,7 @@ function resetVerification() {
                                 >Hash SHA-256 Calculado en Navegador:</span
                             >
                             <div
-                                class="mt-0.5 rounded bg-slate-100 p-1.5 font-black break-all text-rose-950 select-all dark:bg-slate-800 dark:text-rose-200"
+                                class="mt-0.5 rounded bg-slate-100 p-1.5 font-black break-all text-slate-900 select-all dark:bg-slate-800 dark:text-slate-100"
                             >
                                 {{ calculatedHash }}
                             </div>
@@ -229,7 +229,7 @@ function resetVerification() {
                             </div>
                             <div class="text-[11px] font-normal">
                                 La huella calculada coincide exactamente con el
-                                registro original emitido por SIGC-CUSCO.
+                                registro original emitido por SIGC-MDSJ.
                             </div>
                         </div>
                     </div>
@@ -257,9 +257,9 @@ function resetVerification() {
 
                     <div
                         v-else
-                        class="flex items-center gap-2 rounded-xl border border-sky-300 bg-sky-50 p-3 font-bold text-sky-900 dark:bg-sky-950/40 dark:text-sky-200"
+                        class="flex items-center gap-2 rounded-xl border border-sky-200 dark:border-sky-800 bg-sky-50 p-3 font-bold text-sky-950 dark:bg-sky-950/40 dark:text-sky-100"
                     >
-                        <CheckCircle2 class="size-5 shrink-0 text-sky-700" />
+                        <CheckCircle2 class="size-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
                         <div>
                             <div class="font-black">
                                 Huella SHA-256 Obtenida con Éxito

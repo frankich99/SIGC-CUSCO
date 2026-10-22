@@ -18,6 +18,8 @@ import {
     LogIn,
     UserPlus,
     Plus,
+    XCircle,
+    AlertCircle,
 } from '@lucide/vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +41,9 @@ import PeruGeoBadge from '@/components/PeruGeoBadge.vue';
 import { useAuthModal } from '@/composables/useAuthModal';
 import { formatDate, formatDateRange, formatHours } from '@/lib/formatters';
 import { getCourseStatusBadge } from '@/lib/theme';
+import { useBranding } from '@/composables/useBranding';
+
+const { institutionName, systemName, systemSubtitle, primaryColor } = useBranding();
 
 interface CourseItem {
     id: number;
@@ -72,10 +77,6 @@ const props = defineProps<{
 
 const page = usePage();
 const authUser = computed(() => page.props.auth?.user);
-const canCreateCourse = computed(
-    () =>
-        authUser.value?.role === 'admin' || authUser.value?.role === 'docente',
-);
 
 // Search & Filter state
 const searchQuery = ref('');
@@ -130,17 +131,17 @@ function statusBadgeInfo(status: string) {
 </script>
 
 <template>
-    <Head title="SIGC-CUSCO — Catálogo de Capacitaciones y Certificación" />
+    <Head :title="`${systemName} — Capacitaciones y Certificación • ${institutionName}`" />
 
     <div
-        class="min-h-screen max-w-full overflow-x-hidden bg-slate-50/50 text-slate-900 antialiased selection:bg-rose-900 selection:text-white dark:bg-neutral-950 dark:text-neutral-100"
+        class="min-h-screen max-w-full overflow-x-hidden bg-slate-50/50 text-slate-900 antialiased selection:bg-emerald-600 selection:text-white dark:bg-background dark:text-foreground"
     >
         <!-- TOP NAVBAR UNIFICADA -->
         <AppHeader />
 
         <!-- HERO SECTION -->
         <section
-            class="relative overflow-hidden bg-gradient-to-b from-rose-50/70 via-transparent to-transparent pt-12 pb-16 md:pt-20 md:pb-24 dark:from-rose-950/20"
+            class="relative overflow-hidden bg-gradient-to-b from-emerald-50/40 via-transparent to-transparent pt-12 pb-16 md:pt-20 md:pb-24 dark:from-emerald-950/15"
         >
             <div
                 class="mx-auto max-w-7xl space-y-6 px-4 text-center sm:px-6 lg:px-8"
@@ -148,10 +149,10 @@ function statusBadgeInfo(status: string) {
                 <!-- Pill tags -->
                 <div class="flex flex-wrap items-center justify-center gap-2">
                     <div
-                        class="inline-flex items-center gap-1.5 rounded-full border border-rose-300 bg-rose-100/90 px-3 py-1 text-xs font-bold text-rose-950 shadow-xs dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-200"
+                        class="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-950 shadow-xs dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200"
                     >
-                        <Sparkles class="size-3.5 text-rose-800" />
-                        <span>Convocatorias 2026 • Cusco</span>
+                        <Sparkles class="size-3.5 text-emerald-700 dark:text-emerald-400" />
+                        <span>Convocatorias 2026 • {{ institutionName }}</span>
                     </div>
                     <PeruGeoBadge />
                 </div>
@@ -162,7 +163,7 @@ function statusBadgeInfo(status: string) {
                 >
                     Capacitaciones con
                     <span
-                        class="text-rose-900 underline decoration-amber-500 decoration-4 underline-offset-8 dark:text-rose-400"
+                        class="text-emerald-600 underline decoration-[#f0c84f] decoration-4 underline-offset-8 dark:text-emerald-400"
                         >Asistencia QR</span
                     >
                     y Certificación Oficial
@@ -170,7 +171,7 @@ function statusBadgeInfo(status: string) {
 
                 <!-- Subtitle -->
                 <p
-                    class="mx-auto max-w-3xl text-base leading-relaxed font-semibold text-slate-700 sm:text-lg md:text-xl dark:text-neutral-300"
+                    class="mx-auto max-w-3xl text-base leading-relaxed font-semibold text-slate-700 sm:text-lg md:text-xl dark:text-slate-300"
                 >
                     Inscripción inmediata con DNI, control de asistencia por
                     código QR y diplomas digitales con validación web
@@ -184,10 +185,10 @@ function statusBadgeInfo(status: string) {
                     <Button
                         as-child
                         size="lg"
-                        class="w-full bg-rose-900 px-7 py-6 text-sm font-bold text-white shadow-md shadow-rose-900/20 hover:bg-rose-950 sm:w-auto sm:text-base"
+                        class="w-full bg-emerald-600 px-7 py-6 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition-transform hover:scale-[1.02] hover:bg-emerald-700 sm:w-auto sm:text-base"
                     >
                         <a href="#cursos">
-                            <GraduationCap class="mr-2 size-5 text-amber-300" />
+                            <GraduationCap class="mr-2 size-5 text-[#f0c84f]" />
                             Ver Cursos Disponibles
                         </a>
                     </Button>
@@ -195,10 +196,10 @@ function statusBadgeInfo(status: string) {
                         as-child
                         variant="outline"
                         size="lg"
-                        class="w-full border-slate-300 px-7 py-6 text-sm font-bold text-slate-900 hover:bg-rose-50 hover:text-rose-900 sm:w-auto sm:text-base"
+                        class="w-full border-2 border-[#153542] px-7 py-6 text-sm font-bold text-[#153542] hover:bg-[#153542] hover:text-white dark:border-sky-400 dark:text-sky-200 dark:hover:bg-sky-950 sm:w-auto sm:text-base transition-all"
                     >
                         <Link href="/certificates">
-                            <Award class="mr-2 size-5 text-rose-800" />
+                            <Award class="mr-2 size-5 text-amber-500" />
                             Consultar Certificado por DNI
                         </Link>
                     </Button>
@@ -209,7 +210,7 @@ function statusBadgeInfo(status: string) {
         <!-- CATALOG SECTION ("EN AFUERA") -->
         <section
             id="cursos"
-            class="border-t border-slate-200/80 bg-white py-12 md:py-20 dark:border-neutral-800 dark:bg-neutral-900/50"
+            class="border-t border-slate-200/80 bg-white py-12 md:py-20 dark:border-border dark:bg-background"
         >
             <div class="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
                 <!-- Section Header -->
@@ -218,7 +219,7 @@ function statusBadgeInfo(status: string) {
                 >
                     <div class="space-y-1">
                         <div
-                            class="text-xs font-bold tracking-wider text-rose-900 uppercase dark:text-rose-400"
+                            class="text-xs font-extrabold tracking-wider text-emerald-700 uppercase dark:text-emerald-400"
                         >
                             Convocatorias Abiertas
                         </div>
@@ -228,7 +229,7 @@ function statusBadgeInfo(status: string) {
                             Cursos y Capacitaciones
                         </h2>
                         <p
-                            class="max-w-xl text-xs font-medium text-slate-600 sm:text-sm dark:text-neutral-400"
+                            class="max-w-xl text-xs font-medium text-slate-600 sm:text-sm dark:text-slate-400"
                         >
                             Capacitaciones con entidad convocante, aforo oficial
                             e inscripción directa con DNI.
@@ -237,16 +238,16 @@ function statusBadgeInfo(status: string) {
 
                     <!-- Filter Chips -->
                     <div
-                        class="flex flex-wrap items-center gap-1.5 self-start rounded-lg bg-slate-100 p-1 dark:bg-neutral-800"
+                        class="flex flex-wrap items-center gap-1.5 self-start rounded-xl border border-slate-200 bg-slate-100 p-1 dark:border-slate-800 dark:bg-slate-900"
                     >
                         <button
                             type="button"
                             @click="selectedStatus = 'all'"
-                            class="rounded-md px-3 py-1 text-xs font-bold transition-all"
+                            class="rounded-lg px-3 py-1 text-xs font-bold transition-all"
                             :class="
                                 selectedStatus === 'all'
-                                    ? 'bg-white text-slate-900 shadow-xs dark:bg-neutral-700 dark:text-white'
-                                    : 'text-slate-600 hover:text-slate-900 dark:text-neutral-400'
+                                    ? 'bg-white text-slate-900 shadow-xs dark:bg-slate-800 dark:text-white'
+                                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400'
                             "
                         >
                             Todos ({{ courses.length }})
@@ -254,11 +255,11 @@ function statusBadgeInfo(status: string) {
                         <button
                             type="button"
                             @click="selectedStatus = 'abierto'"
-                            class="rounded-md px-3 py-1 text-xs font-bold transition-all"
+                            class="rounded-lg px-3 py-1 text-xs font-bold transition-all"
                             :class="
                                 selectedStatus === 'abierto'
-                                    ? 'bg-rose-900 text-white shadow-xs'
-                                    : 'text-slate-600 hover:text-slate-900 dark:text-neutral-400'
+                                    ? 'bg-emerald-600 text-white shadow-xs'
+                                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400'
                             "
                         >
                             Abiertos
@@ -266,11 +267,11 @@ function statusBadgeInfo(status: string) {
                         <button
                             type="button"
                             @click="selectedStatus = 'en_curso'"
-                            class="rounded-md px-3 py-1 text-xs font-bold transition-all"
+                            class="rounded-lg px-3 py-1 text-xs font-bold transition-all"
                             :class="
                                 selectedStatus === 'en_curso'
-                                    ? 'bg-amber-700 text-white shadow-xs'
-                                    : 'text-slate-600 hover:text-slate-900 dark:text-neutral-400'
+                                    ? 'bg-amber-600 text-white shadow-xs'
+                                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400'
                             "
                         >
                             En Curso
@@ -281,13 +282,13 @@ function statusBadgeInfo(status: string) {
                 <!-- Search Bar -->
                 <div class="relative max-w-md">
                     <Search
-                        class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-400"
+                        class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
                     />
                     <Input
                         v-model="searchQuery"
                         type="search"
                         placeholder="Buscar por título, entidad organizadora, código o docente..."
-                        class="bg-neutral-50/60 pl-9 text-xs dark:bg-neutral-900"
+                        class="bg-slate-50/80 pl-9 text-xs dark:bg-card"
                     />
                 </div>
 
@@ -327,7 +328,7 @@ function statusBadgeInfo(status: string) {
                     <Card
                         v-for="course in filteredCourses"
                         :key="course.id"
-                        class="flex max-w-full min-w-0 flex-col overflow-hidden border border-slate-200 bg-white transition-all duration-200 hover:border-rose-400/80 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900"
+                        class="flex max-w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-200 hover:border-emerald-500/80 hover:shadow-md dark:border-border dark:bg-card dark:hover:border-emerald-500/80"
                     >
                         <!-- Card Header -->
                         <CardHeader
@@ -337,7 +338,7 @@ function statusBadgeInfo(status: string) {
                                 class="flex w-full min-w-0 items-center justify-between gap-1.5"
                             >
                                 <span
-                                    class="shrink-0 rounded border border-rose-200 bg-rose-50 px-2 py-0.5 font-mono text-[11px] font-bold text-rose-900 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300"
+                                    class="shrink-0 rounded border border-slate-200 bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-bold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
                                 >
                                     {{ course.code }}
                                 </span>
@@ -352,26 +353,26 @@ function statusBadgeInfo(status: string) {
                             </div>
 
                             <CardTitle
-                                class="line-clamp-2 min-w-0 text-base leading-snug font-bold break-words text-slate-900 sm:text-lg dark:text-white"
+                                class="line-clamp-2 min-w-0 text-base leading-snug font-bold break-words text-slate-950 sm:text-lg dark:text-white"
                             >
                                 {{ course.title }}
                             </CardTitle>
 
-                            <!-- Organizing Entity / Institución -->
+                            <!-- Entidad Organizadora (Azul Institucional MDSJ) -->
                             <div
-                                class="flex w-full max-w-full min-w-0 items-center gap-1.5 overflow-hidden rounded-md border border-rose-200/80 bg-rose-50/80 px-2.5 py-1 text-xs font-semibold text-rose-950 dark:border-rose-800/60 dark:bg-rose-950/40 dark:text-rose-200"
+                                class="flex w-full max-w-full min-w-0 items-center gap-1.5 overflow-hidden rounded-lg border border-[#1a6b8a]/20 bg-[#1a6b8a]/5 px-2.5 py-1 text-xs font-bold text-[#1a6b8a] dark:border-[#3484a5]/40 dark:bg-[#1a6b8a]/20 dark:text-[#88c0d7]"
                             >
                                 <Building2
-                                    class="size-3.5 shrink-0 text-rose-800 dark:text-rose-400"
+                                    class="size-3.5 shrink-0 text-[#1a6b8a] dark:text-[#3484a5]"
                                 />
-                                <span class="block min-w-0 flex-1 truncate">{{
-                                    course.institution ||
-                                    'Dirección Académica • Cusco'
-                                }}</span>
+                                <span class="block min-w-0 flex-1 truncate">
+                                    <span class="font-extrabold text-[#1a6b8a] dark:text-[#88c0d7]">Organiza:</span>
+                                    {{ course.institution || institutionName || 'Municipalidad de San Jerónimo' }}
+                                </span>
                             </div>
 
                             <CardDescription
-                                class="line-clamp-2 min-w-0 text-xs font-medium break-words text-slate-600 dark:text-neutral-400"
+                                class="line-clamp-2 min-w-0 text-xs font-medium break-words text-slate-600 dark:text-slate-400"
                             >
                                 {{
                                     course.description ||
@@ -384,37 +385,33 @@ function statusBadgeInfo(status: string) {
                         <CardContent
                             class="max-w-full min-w-0 flex-1 space-y-3 overflow-hidden p-4 pt-0 text-xs sm:p-5"
                         >
-                            <!-- Instructor snippet -->
+                            <!-- Ponente / Docente a Cargo (Ámbar Vivo) -->
                             <div
-                                class="flex max-w-full min-w-0 items-center gap-2 border-t border-slate-100 pt-2 text-slate-800 dark:border-neutral-800 dark:text-neutral-200"
+                                class="flex max-w-full min-w-0 items-center gap-2 rounded-lg border border-amber-200/90 bg-amber-50/90 px-2.5 py-1.5 text-xs font-bold text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
                             >
-                                <div
-                                    class="flex size-6 shrink-0 items-center justify-center rounded-full bg-rose-100 text-[10px] font-bold text-rose-900 dark:bg-rose-950 dark:text-rose-300"
-                                >
-                                    {{
-                                        (course.instructor?.name ||
-                                            course.instructor_name ||
-                                            'P')[0]
-                                    }}
-                                </div>
+                                <GraduationCap
+                                    class="size-4 shrink-0 text-amber-600 dark:text-amber-400"
+                                />
                                 <span class="min-w-0 flex-1 truncate">
-                                    Ponente / Docente:
-                                    <strong>{{
+                                    <span class="font-extrabold text-amber-700 dark:text-amber-400">Ponente / Docente:</span>
+                                    {{
                                         course.instructor
                                             ? `${course.instructor.name} ${course.instructor.paterno || ''}`
                                             : course.instructor_name ||
                                               'Por asignar'
-                                    }}</strong>
+                                    }}
                                 </span>
                             </div>
 
                             <!-- Meta info: dates & hours -->
                             <div
-                                class="grid min-w-0 grid-cols-2 gap-2 text-xs font-semibold text-slate-800 dark:text-slate-200"
+                                class="grid min-w-0 grid-cols-2 gap-2 text-xs"
                             >
-                                <div class="flex min-w-0 items-center gap-1.5">
+                                <div
+                                    class="flex min-w-0 items-center gap-1.5 rounded-md border border-slate-200/80 bg-slate-50 px-2 py-1 font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-200"
+                                >
                                     <Calendar
-                                        class="size-3.5 shrink-0 text-rose-800 dark:text-rose-400"
+                                        class="size-3.5 shrink-0 text-sky-600 dark:text-sky-400"
                                     />
                                     <span class="truncate"
                                         >Inicio:
@@ -426,9 +423,11 @@ function statusBadgeInfo(status: string) {
                                         }}</strong></span
                                     >
                                 </div>
-                                <div class="flex min-w-0 items-center gap-1.5">
+                                <div
+                                    class="flex min-w-0 items-center gap-1.5 rounded-md border border-slate-200/80 bg-slate-50 px-2 py-1 font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-200"
+                                >
                                     <Clock
-                                        class="size-3.5 shrink-0 text-amber-700 dark:text-amber-400"
+                                        class="size-3.5 shrink-0 text-amber-600 dark:text-amber-400"
                                     />
                                     <span class="truncate"
                                         ><strong>{{
@@ -438,23 +437,23 @@ function statusBadgeInfo(status: string) {
                                 </div>
                             </div>
 
-                            <!-- Vacantes / Capacity Bar -->
+                            <!-- Vacantes / Capacity Bar con Alerta Viva -->
                             <div class="max-w-full min-w-0 space-y-1.5 pt-1">
                                 <div
                                     class="flex min-w-0 items-center justify-between gap-2 text-[11px]"
                                 >
                                     <span
-                                        class="truncate font-medium text-slate-600 dark:text-neutral-400"
+                                        class="truncate font-medium text-slate-600 dark:text-slate-400"
                                         >Vacantes Disponibles:</span
                                     >
                                     <span
                                         class="shrink-0 font-bold"
                                         :class="
-                                            course.capacity -
-                                                course.enrollments_count >
-                                            0
-                                                ? 'text-rose-900 dark:text-rose-300'
-                                                : 'text-rose-600'
+                                            course.capacity - course.enrollments_count <= 5 && course.capacity - course.enrollments_count > 0
+                                                ? 'text-red-600 dark:text-red-400 font-extrabold'
+                                                : course.capacity - course.enrollments_count > 5
+                                                  ? 'text-emerald-700 dark:text-emerald-400 font-bold'
+                                                  : 'text-slate-600 dark:text-slate-400'
                                         "
                                     >
                                         {{
@@ -468,10 +467,10 @@ function statusBadgeInfo(status: string) {
                                     </span>
                                 </div>
                                 <div
-                                    class="h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-neutral-800"
+                                    class="h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
                                 >
                                     <div
-                                        class="h-full rounded-full bg-rose-900 transition-all"
+                                        class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all"
                                         :style="{
                                             width: `${Math.min(100, (course.enrollments_count / course.capacity) * 100)}%`,
                                         }"
@@ -482,13 +481,13 @@ function statusBadgeInfo(status: string) {
 
                         <!-- Card Footer Action -->
                         <CardFooter
-                            class="flex max-w-full min-w-0 items-center justify-between gap-2 border-t border-slate-100 bg-slate-50/50 p-4 pt-3 sm:p-5 dark:border-neutral-800 dark:bg-neutral-900/50"
+                            class="flex max-w-full min-w-0 items-center justify-between gap-2 border-t border-slate-100 bg-slate-50/50 p-4 pt-3 sm:p-5 dark:border-slate-800 dark:bg-slate-900/50"
                         >
                             <Button
                                 as-child
-                                variant="ghost"
+                                variant="outline"
                                 size="sm"
-                                class="flex-1 text-xs font-semibold text-slate-700 hover:text-rose-900"
+                                class="flex-1 border-slate-300 text-xs font-bold text-slate-800 hover:border-[#153542] hover:text-[#153542] dark:border-slate-700 dark:text-slate-200 dark:hover:border-sky-400 dark:hover:text-sky-200"
                             >
                                 <Link :href="`/courses/${course.id}`">
                                     Detalles
@@ -502,25 +501,35 @@ function statusBadgeInfo(status: string) {
                                         0
                                 "
                                 size="sm"
-                                class="flex-1 bg-rose-900 text-xs font-bold text-white shadow-xs hover:bg-rose-950"
+                                class="flex-1 bg-emerald-600 text-xs font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700 active:scale-95 transition-all"
                                 @click="openEnrollment(course)"
                             >
                                 <CheckCircle2 class="mr-1.5 size-3.5" />
                                 Inscribirme
                             </Button>
-                            <Button
+                            <div
                                 v-else
-                                size="sm"
-                                variant="secondary"
-                                disabled
-                                class="flex-1 text-xs font-medium opacity-75"
+                                class="flex-1 flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black shadow-xs transition-all select-none"
+                                :class="
+                                    course.status !== 'abierto'
+                                        ? 'border border-rose-300 bg-rose-100/90 text-rose-800 dark:border-rose-600 dark:bg-rose-950/80 dark:text-rose-200'
+                                        : 'border border-amber-300 bg-amber-100/90 text-amber-900 dark:border-amber-600 dark:bg-amber-950/80 dark:text-amber-200'
+                                "
                             >
-                                {{
+                                <XCircle
+                                    v-if="course.status !== 'abierto'"
+                                    class="size-3.5 shrink-0 text-rose-600 dark:text-rose-300"
+                                />
+                                <AlertCircle
+                                    v-else
+                                    class="size-3.5 shrink-0 text-amber-600 dark:text-amber-300"
+                                />
+                                <span>{{
                                     course.status !== 'abierto'
                                         ? 'Cerrado'
                                         : 'Agotado'
-                                }}
-                            </Button>
+                                }}</span>
+                            </div>
                         </CardFooter>
                     </Card>
                 </div>
@@ -530,17 +539,17 @@ function statusBadgeInfo(status: string) {
         <!-- SYSTEM FEATURES / BENEFITS -->
         <section
             id="beneficios"
-            class="border-t border-slate-200/80 bg-white py-12 md:py-20 dark:border-neutral-800 dark:bg-neutral-900/60"
+            class="border-t border-slate-200/80 bg-white py-12 md:py-20 dark:border-border dark:bg-background"
         >
             <div class="mx-auto max-w-7xl space-y-12 px-4 sm:px-6 lg:px-8">
                 <div class="mx-auto max-w-2xl space-y-2 text-center">
                     <h2
                         class="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl dark:text-white"
                     >
-                        ¿Por qué elegir la plataforma SIGC-CUSCO?
+                        ¿Por qué capacitarte con {{ institutionName }}?
                     </h2>
                     <p
-                        class="text-xs font-medium text-slate-600 sm:text-sm dark:text-neutral-400"
+                        class="text-xs font-medium text-slate-600 sm:text-sm dark:text-slate-400"
                     >
                         Tecnología moderna para entidades educativas,
                         instituciones y empresas capacitadoras.
@@ -549,10 +558,10 @@ function statusBadgeInfo(status: string) {
 
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                     <div
-                        class="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-6 dark:border-neutral-800 dark:bg-neutral-900/30"
+                        class="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-6 dark:border-border dark:bg-card"
                     >
                         <div
-                            class="flex size-10 items-center justify-center rounded-xl bg-rose-100 font-bold text-rose-900 dark:bg-rose-950 dark:text-rose-300"
+                            class="flex size-10 items-center justify-center rounded-xl bg-emerald-100 font-bold text-emerald-950 dark:bg-emerald-950 dark:text-emerald-200"
                         >
                             <QrCode class="size-5" />
                         </div>
@@ -562,7 +571,7 @@ function statusBadgeInfo(status: string) {
                             Control de Asistencia con QR
                         </h3>
                         <p
-                            class="text-xs leading-relaxed font-medium text-slate-600 dark:text-neutral-400"
+                            class="text-xs leading-relaxed font-medium text-slate-600 dark:text-slate-400"
                         >
                             El docente proyecta un código QR dinámico por sesión
                             de clase. Los alumnos escanean el código en segundos
@@ -571,7 +580,7 @@ function statusBadgeInfo(status: string) {
                     </div>
 
                     <div
-                        class="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-6 dark:border-neutral-800 dark:bg-neutral-900/30"
+                        class="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-6 dark:border-border dark:bg-card"
                     >
                         <div
                             class="flex size-10 items-center justify-center rounded-xl bg-amber-100 font-bold text-amber-800 dark:bg-amber-950 dark:text-amber-300"
@@ -584,7 +593,7 @@ function statusBadgeInfo(status: string) {
                             Cero Falsificaciones RENIEC
                         </h3>
                         <p
-                            class="text-xs leading-relaxed font-medium text-slate-600 dark:text-neutral-400"
+                            class="text-xs leading-relaxed font-medium text-slate-600 dark:text-slate-400"
                         >
                             Integración en tiempo real con RENIEC Perú para
                             validar nombres legítimos y generar certificados
@@ -593,10 +602,10 @@ function statusBadgeInfo(status: string) {
                     </div>
 
                     <div
-                        class="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-6 dark:border-neutral-800 dark:bg-neutral-900/30"
+                        class="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-6 dark:border-border dark:bg-card"
                     >
                         <div
-                            class="flex size-10 items-center justify-center rounded-xl bg-indigo-100 font-bold text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300"
+                            class="flex size-10 items-center justify-center rounded-xl bg-sky-100 font-bold text-sky-950 dark:bg-sky-950 dark:text-sky-200"
                         >
                             <Award class="size-5" />
                         </div>
@@ -606,7 +615,7 @@ function statusBadgeInfo(status: string) {
                             Certificación Digital Inmediata
                         </h3>
                         <p
-                            class="text-xs leading-relaxed font-medium text-slate-600 dark:text-neutral-400"
+                            class="text-xs leading-relaxed font-medium text-slate-600 dark:text-slate-400"
                         >
                             Al completar los criterios de asistencia y
                             evaluación, el participante descarga su certificado
@@ -620,25 +629,25 @@ function statusBadgeInfo(status: string) {
 
         <!-- FOOTER -->
         <footer
-            class="border-t border-slate-200/80 bg-slate-100/60 py-8 text-xs text-slate-600 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-400"
+            class="border-t border-slate-200/80 bg-slate-100/60 py-8 text-xs text-slate-600 dark:border-border dark:bg-background dark:text-slate-400"
         >
             <div
                 class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 lg:px-8"
             >
                 <div class="flex items-center gap-2 font-medium">
-                    <GraduationCap class="size-4 text-rose-900" />
+                    <GraduationCap class="size-4 text-emerald-600 dark:text-emerald-400" />
                     <span
-                        class="font-bold text-slate-900 dark:text-neutral-200"
+                        class="font-bold text-slate-900 dark:text-white"
                     >
-                        SIGC-CUSCO
+                        {{ systemName }}
                     </span>
                     <span
-                        >— Sistema Integral de Gestión de Capacitaciones •
-                        Cusco</span
+                        >— {{ systemSubtitle }} •
+                        {{ institutionName }}</span
                     >
                 </div>
                 <div class="font-medium">
-                    Gestión Académica e Institucional • Cusco, Perú 2026
+                    Gestión Institucional y Comunitaria • San Jerónimo, Cusco 2026
                 </div>
             </div>
         </footer>
