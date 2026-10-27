@@ -27,6 +27,9 @@ class EnrollmentController extends Controller
             'materno' => ['nullable', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'regex:/^9[0-9]{8}$/'],
+            'organizational_unit' => ['nullable', 'string', 'max:100'],
+            'position' => ['nullable', 'string', 'max:120'],
+            'employment_regime' => ['nullable', 'string', 'max:50'],
         ], [
             'dni.required' => 'El número de DNI es obligatorio.',
             'dni.size' => 'El DNI debe contener exactamente 8 dígitos.',
@@ -98,6 +101,18 @@ class EnrollmentController extends Controller
                 $participantData['materno'] = $user->materno ?? $validated['materno'] ?? null;
                 $participantData['email'] = $user->email;
                 $participantData['phone'] = $user->phone ?? $validated['phone'] ?? null;
+                $participantData['organizational_unit'] = $validated['organizational_unit'] ?? $user->organizational_unit ?? null;
+                $participantData['position'] = $validated['position'] ?? $user->position ?? null;
+                $participantData['employment_regime'] = $validated['employment_regime'] ?? $user->employment_regime ?? null;
+
+                // Actualizar datos laborales del usuario si no los tenía
+                if (! $user->organizational_unit && ! empty($participantData['organizational_unit'])) {
+                    $user->update([
+                        'organizational_unit' => $participantData['organizational_unit'],
+                        'position' => $participantData['position'],
+                        'employment_regime' => $participantData['employment_regime'],
+                    ]);
+                }
             }
 
             Enrollment::create([
@@ -109,6 +124,9 @@ class EnrollmentController extends Controller
                 'materno' => ! empty($participantData['materno']) ? mb_strtoupper($participantData['materno']) : null,
                 'email' => $participantData['email'],
                 'phone' => $participantData['phone'] ?? null,
+                'organizational_unit' => $participantData['organizational_unit'] ?? null,
+                'position' => $participantData['position'] ?? null,
+                'employment_regime' => $participantData['employment_regime'] ?? null,
                 'status' => 'inscrito',
                 'attended_sessions' => 0,
             ]);
@@ -130,6 +148,9 @@ class EnrollmentController extends Controller
             'final_grade' => ['nullable', 'numeric', 'min:0', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'regex:/^9[0-9]{8}$/'],
+            'organizational_unit' => ['nullable', 'string', 'max:100'],
+            'position' => ['nullable', 'string', 'max:120'],
+            'employment_regime' => ['nullable', 'string', 'max:50'],
         ], [
             'phone.regex' => 'El número de celular debe contener exactamente 9 dígitos e iniciar con 9 (ej. 9XXXXXXXX).',
         ]);

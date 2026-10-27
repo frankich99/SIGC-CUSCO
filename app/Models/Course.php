@@ -6,6 +6,7 @@ use App\Enums\CourseStatus;
 use Database\Factories\CourseFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +16,14 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $code
+ * @property string|null $pdp_code
+ * @property int $pdp_year
+ * @property string $pdp_category
+ * @property string $modality
+ * @property string $course_type
+ * @property float $budget_allocated
+ * @property float $budget_executed
+ * @property string|null $virtual_meeting_url
  * @property string $title
  * @property string|null $institution
  * @property string|null $description
@@ -33,9 +42,34 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read User|null $instructor
  * @property-read User|null $actaCloser
+ * @property-read Collection<int, CourseMaterial> $materials
  * @property-read string $instructor_display_name
  */
-#[Fillable(['code', 'title', 'institution', 'description', 'instructor_id', 'instructor_name', 'start_date', 'end_date', 'hours', 'total_sessions', 'min_attendance_percentage', 'capacity', 'status', 'acta_closed_at', 'acta_closed_by'])]
+#[Fillable([
+    'code',
+    'pdp_code',
+    'pdp_year',
+    'pdp_category',
+    'modality',
+    'course_type',
+    'budget_allocated',
+    'budget_executed',
+    'virtual_meeting_url',
+    'title',
+    'institution',
+    'description',
+    'instructor_id',
+    'instructor_name',
+    'start_date',
+    'end_date',
+    'hours',
+    'total_sessions',
+    'min_attendance_percentage',
+    'capacity',
+    'status',
+    'acta_closed_at',
+    'acta_closed_by',
+])]
 class Course extends Model
 {
     /** @use HasFactory<CourseFactory> */
@@ -56,6 +90,9 @@ class Course extends Model
     protected function casts(): array
     {
         return [
+            'pdp_year' => 'integer',
+            'budget_allocated' => 'decimal:2',
+            'budget_executed' => 'decimal:2',
             'start_date' => 'date:Y-m-d',
             'end_date' => 'date:Y-m-d',
             'hours' => 'integer',
@@ -131,6 +168,16 @@ class Course extends Model
     public function attendanceRecords(): HasMany
     {
         return $this->hasMany(AttendanceRecord::class);
+    }
+
+    /**
+     * Recursos y materiales didácticos o grabaciones del curso.
+     *
+     * @return HasMany<CourseMaterial, $this>
+     */
+    public function materials(): HasMany
+    {
+        return $this->hasMany(CourseMaterial::class);
     }
 
     /**

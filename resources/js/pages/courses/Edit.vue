@@ -44,6 +44,14 @@ interface Instructor {
 interface CourseData {
     id: number;
     code: string;
+    pdp_code?: string | null;
+    pdp_year?: number | null;
+    pdp_category?: string | null;
+    modality?: string | null;
+    course_type?: string | null;
+    budget_allocated?: number | string | null;
+    budget_executed?: number | string | null;
+    virtual_meeting_url?: string | null;
     title: string;
     institution?: string;
     description?: string;
@@ -73,6 +81,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const form = useForm({
     code: props.course.code,
+    pdp_code: props.course.pdp_code || '',
+    pdp_year: props.course.pdp_year ?? 2026,
+    pdp_category: props.course.pdp_category || 'Desarrollo de Competencias',
+    modality: props.course.modality || 'presencial',
+    course_type: props.course.course_type || 'interno',
+    budget_allocated: Number(props.course.budget_allocated || 0),
+    budget_executed: Number(props.course.budget_executed || 0),
+    virtual_meeting_url: props.course.virtual_meeting_url || '',
     title: props.course.title,
     institution: props.course.institution || '',
     description: props.course.description || '',
@@ -339,6 +355,113 @@ function submit() {
                                 >
                                     {{ form.errors.status }}
                                 </span>
+                            </div>
+                        </div>
+
+                        <!-- Sección Institucional: Plan de Desarrollo de Personas (PDP • SERVIR • MDSJ) -->
+                        <div class="rounded-2xl border border-sky-200 bg-sky-50/40 p-4 space-y-4 dark:border-sky-900/60 dark:bg-[#153542]/30">
+                            <div class="flex items-center gap-2 border-b border-sky-200 pb-2.5 text-xs font-black text-sky-950 uppercase dark:border-sky-800 dark:text-sky-200">
+                                <Building2 class="size-4 text-[#3484a5]" />
+                                <span>Alineación al Plan de Desarrollo de Personas (PDP • SERVIR • San Jerónimo)</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                <div class="space-y-1.5">
+                                    <Label for="pdp_code" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                        Código de Acción PDP
+                                    </Label>
+                                    <Input
+                                        id="pdp_code"
+                                        v-model="form.pdp_code"
+                                        placeholder="Ej: PDP-2026-001"
+                                        class="h-10 rounded-xl border-slate-300 font-mono text-xs font-bold"
+                                    />
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <Label for="modality" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                        Modalidad de Clase
+                                    </Label>
+                                    <select
+                                        id="modality"
+                                        v-model="form.modality"
+                                        class="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs font-bold text-slate-900 focus:border-[#3484a5] focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                                    >
+                                        <option value="presencial">Presencial (Auditorio)</option>
+                                        <option value="virtual">Virtual (Remoto)</option>
+                                        <option value="hibrido">Híbrido (Mixto)</option>
+                                    </select>
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <Label for="course_type" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                        Tipo de Capacitación
+                                    </Label>
+                                    <select
+                                        id="course_type"
+                                        v-model="form.course_type"
+                                        class="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs font-bold text-slate-900 focus:border-[#3484a5] focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                                    >
+                                        <option value="interno">Interno (Organizado por MDSJ)</option>
+                                        <option value="externo">Externo (Entidad Invitada)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                <div class="space-y-1.5">
+                                    <Label for="pdp_category" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                        Categoría / Eje SERVIR
+                                    </Label>
+                                    <Input
+                                        id="pdp_category"
+                                        v-model="form.pdp_category"
+                                        placeholder="Ej: Seguridad SOMA, Cero Papel..."
+                                        class="h-10 rounded-xl border-slate-300 text-xs font-medium"
+                                    />
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <Label for="budget_allocated" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                        Presupuesto Programado (S/.)
+                                    </Label>
+                                    <Input
+                                        id="budget_allocated"
+                                        v-model.number="form.budget_allocated"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        placeholder="0.00"
+                                        class="h-10 rounded-xl border-slate-300 font-mono text-xs font-bold"
+                                    />
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <Label for="budget_executed" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                        Presupuesto Ejecutado (S/.)
+                                    </Label>
+                                    <Input
+                                        id="budget_executed"
+                                        v-model.number="form.budget_executed"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        placeholder="0.00"
+                                        class="h-10 rounded-xl border-slate-300 font-mono text-xs font-bold"
+                                    />
+                                </div>
+                            </div>
+
+                            <div v-if="form.modality !== 'presencial'" class="space-y-1.5">
+                                <Label for="virtual_url" class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                    Enlace a Sala Virtual (Google Meet / Zoom)
+                                </Label>
+                                <Input
+                                    id="virtual_url"
+                                    v-model="form.virtual_meeting_url"
+                                    placeholder="https://meet.google.com/..."
+                                    class="h-10 rounded-xl border-slate-300 text-xs font-medium"
+                                />
                             </div>
                         </div>
 

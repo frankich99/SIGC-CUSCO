@@ -69,6 +69,8 @@ Route::get('certificates/verify/{code}', function (string $code) {
 
 Route::get('api/dni/{dni}', [DniController::class, 'lookup'])->name('dni.lookup')->middleware('throttle:dni-lookup');
 
+Route::get('api/sgd/servants/{dni}', [CourseAcademicController::class, 'sgdServantRecords'])->name('api.sgd.servants')->middleware('throttle:60,1');
+
 Route::get('api/certificates/lookup', function (Request $request) {
     $dni = trim((string) $request->query('dni', ''));
     $code = trim((string) $request->query('code', ''));
@@ -184,6 +186,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->take(6)
             ->get();
 
+        // Métricas avanzadas para la gestión del PDP (SERVIR • MDSJ)
+        $pdpTotal = Course::whereNotNull('pdp_code')->count();
+        $pdpCompleted = Course::whereNotNull('pdp_code')->where('status', 'concluido')->count();
+        $pdpRate = $pdpTotal > 0 ? round(($pdpCompleted / $pdpTotal) * 100, 1) : 0.0;
+
+        $pdpMetrics = [
+            'pdpTotal' => $pdpTotal,
+            'pdpCompleted' => $pdpCompleted,
+            'pdpExecutionRate' => $pdpRate,
+            'budgetAllocated' => (float) Course::sum('budget_allocated'),
+            'budgetExecuted' => (float) Course::sum('budget_executed'),
+            'totalTrainingHours' => (int) Course::sum('hours'),
+            'unitBreakdown' => Enrollment::whereNotNull('organizational_unit')
+                ->where('status', '!=', 'cancelado')
+                ->selectRaw('organizational_unit, count(*) as total')
+                ->groupBy('organizational_unit')
+                ->orderByDesc('total')
+                ->take(6)
+                ->get(),
+            'modalityBreakdown' => Course::selectRaw('modality, count(*) as total')
+                ->groupBy('modality')
+                ->get(),
+        ];
+
         return Inertia::render('Dashboard', [
             'metrics' => [
                 'totalCourses' => Course::count(),
@@ -191,6 +217,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 'taughtCount' => $user->isDocente() ? Course::where('instructor_id', $user->id)->count() : Course::count(),
                 'enrolledCount' => count($studentEnrollments),
             ],
+            'pdpMetrics' => $pdpMetrics,
             'taughtCourses' => $taughtCourses,
             'studentEnrollments' => $studentEnrollments,
             'openCourses' => $openCourses,
@@ -222,6 +249,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('courses/{course}/reports/acta-csv', [CourseAcademicController::class, 'exportActaCsv'])->name('courses.reports.acta-csv');
     Route::get('courses/{course}/reports/acta', [CourseAcademicController::class, 'reportActa'])->name('courses.reports.acta');
     Route::post('courses/{course}/attendance/by-credential', [CourseAcademicController::class, 'recordByCredential'])->name('courses.attendance.by-credential');
+    Route::post('courses/{course}/attendance/permanence', [CourseAcademicController::class, 'recordPermanenceAttendance'])->name('courses.attendance.permanence');
+    Route::post('courses/{course}/materials', [CourseAcademicController::class, 'storeMaterial'])->name('courses.materials.store');
+    Route::delete('courses/{course}/materials/{material}', [CourseAcademicController::class, 'destroyMaterial'])->name('courses.materials.destroy');
 
     // Administración Institucional de Usuarios, Roles y Permisos (Solo Administrador)
     Route::get('users', [UserController::class, 'index'])->name('users.index');

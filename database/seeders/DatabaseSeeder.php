@@ -3,8 +3,11 @@
 namespace Database\Seeders;
 
 use App\Enums\CourseStatus;
+use App\Enums\MunicipalUnit;
 use App\Enums\UserRole;
+use App\Models\AttendanceRecord;
 use App\Models\Course;
+use App\Models\CourseMaterial;
 use App\Models\Enrollment;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -28,6 +31,9 @@ class DatabaseSeeder extends Seeder
                 'materno' => 'Quispe',
                 'dni' => '13396200',
                 'role' => UserRole::Admin,
+                'organizational_unit' => MunicipalUnit::OTI->value,
+                'position' => 'Líder Técnico OTI',
+                'employment_regime' => 'CAS',
                 'email_verified_at' => now(),
                 'password' => 'password',
             ]
@@ -42,6 +48,9 @@ class DatabaseSeeder extends Seeder
                 'materno' => 'Achahui',
                 'dni' => '10317900',
                 'role' => UserRole::Docente,
+                'organizational_unit' => MunicipalUnit::OTI->value,
+                'position' => 'Especialista en Infraestructura OTI',
+                'employment_regime' => 'CAS',
                 'email_verified_at' => now(),
                 'password' => 'password',
             ]
@@ -56,13 +65,16 @@ class DatabaseSeeder extends Seeder
                 'materno' => 'Enriquez',
                 'dni' => '21092100',
                 'role' => UserRole::Docente,
+                'organizational_unit' => MunicipalUnit::SOMA->value,
+                'position' => 'Coordinadora SOMA',
+                'employment_regime' => 'D.L. 728',
                 'email_verified_at' => now(),
                 'password' => 'password',
             ]
         );
 
         // 4. Participante / Alumno
-        User::firstOrCreate(
+        $alumno = User::firstOrCreate(
             ['email' => 'alumno@sigc.unsaac.edu.pe'],
             [
                 'name' => 'Juan',
@@ -70,38 +82,57 @@ class DatabaseSeeder extends Seeder
                 'materno' => 'Condori',
                 'dni' => '70123456',
                 'role' => UserRole::Participante,
+                'organizational_unit' => MunicipalUnit::RRHH->value,
+                'position' => 'Asistente de Recursos Humanos',
+                'employment_regime' => 'CAS',
                 'email_verified_at' => now(),
                 'password' => 'password',
             ]
         );
 
-        // 5. Cursos de ejemplo
-        Course::firstOrCreate(
+        // 5. Cursos de ejemplo adaptados al PDP de San Jerónimo
+        $course1 = Course::firstOrCreate(
             ['code' => 'SIGC-2026-001'],
             [
+                'pdp_code' => 'PDP-2026-001',
+                'pdp_year' => 2026,
+                'pdp_category' => 'Competencias Digitales y Gestión Documental',
+                'modality' => 'presencial',
+                'course_type' => 'interno',
                 'title' => 'Desarrollo Web Moderno con Laravel 13 e Inertia Vue',
-                'institution' => 'Colegio de Ingenieros del Perú - CD Cusco',
+                'institution' => 'Municipalidad Distrital de San Jerónimo',
                 'description' => 'Aprende a construir aplicaciones web completas utilizando la arquitectura monolítica moderna con Laravel 13, Inertia v3 y Vue 3.',
                 'instructor_id' => $docente1->id,
                 'start_date' => now()->addDays(5)->format('Y-m-d'),
                 'end_date' => now()->addDays(25)->format('Y-m-d'),
                 'hours' => 40,
+                'total_sessions' => 4,
                 'capacity' => 30,
+                'budget_allocated' => 3500.00,
+                'budget_executed' => 2800.00,
                 'status' => CourseStatus::Abierto,
             ]
         );
 
-        Course::firstOrCreate(
+        $course2 = Course::firstOrCreate(
             ['code' => 'SIGC-2026-002'],
             [
-                'title' => 'Ciberseguridad y Ethical Hacking para Redes Corporativas',
-                'institution' => 'Cámara de Comercio de Cusco & Ciberdefensa',
-                'description' => 'Taller intensivo sobre auditoría de seguridad, análisis de vulnerabilidades y defensa perimetral.',
+                'pdp_code' => 'PDP-2026-002',
+                'pdp_year' => 2026,
+                'pdp_category' => 'Seguridad y Salud en el Trabajo (SOMA)',
+                'modality' => 'presencial',
+                'course_type' => 'interno',
+                'title' => 'Seguridad en el Trabajo, Primeros Auxilios y Ergonomía Municipal',
+                'institution' => 'Municipalidad Distrital de San Jerónimo',
+                'description' => 'Taller obligatorio SOMA de prevención de riesgos laborales y ergonomía para servidores de todas las áreas municipales.',
                 'instructor_id' => $docente2->id,
                 'start_date' => now()->addDays(10)->format('Y-m-d'),
                 'end_date' => now()->addDays(30)->format('Y-m-d'),
                 'hours' => 30,
-                'capacity' => 25,
+                'total_sessions' => 4,
+                'capacity' => 45,
+                'budget_allocated' => 2500.00,
+                'budget_executed' => 2000.00,
                 'status' => CourseStatus::Abierto,
             ]
         );
@@ -109,14 +140,23 @@ class DatabaseSeeder extends Seeder
         $course3 = Course::firstOrCreate(
             ['code' => 'SIGC-2026-003'],
             [
-                'title' => 'Gestión Ágil de Proyectos con Scrum, Kanban y XP',
-                'institution' => 'Dirección Regional de Educación Cusco',
-                'description' => 'Metodologías ágiles aplicadas al desarrollo de software en entornos académicos e industriales.',
+                'pdp_code' => 'PDP-2026-003',
+                'pdp_year' => 2026,
+                'pdp_category' => 'Gestión Pública y Cero Papel',
+                'modality' => 'virtual',
+                'course_type' => 'interno',
+                'virtual_meeting_url' => 'https://meet.google.com/mdsj-pdp-2026',
+                'title' => 'Gestión Pública Digital, Cero Papel y Sistema de Trámite SGD',
+                'institution' => 'Municipalidad Distrital de San Jerónimo',
+                'description' => 'Capacitación oficial sobre interoperabilidad, firma digital y Sistema de Gestión Documental para servidores públicos.',
                 'instructor_id' => $admin->id,
                 'start_date' => now()->subDays(10)->format('Y-m-d'),
                 'end_date' => now()->addDays(10)->format('Y-m-d'),
                 'hours' => 20,
-                'capacity' => 40,
+                'total_sessions' => 4,
+                'capacity' => 60,
+                'budget_allocated' => 1800.00,
+                'budget_executed' => 1800.00,
                 'status' => CourseStatus::EnCurso,
             ]
         );
@@ -125,7 +165,7 @@ class DatabaseSeeder extends Seeder
         $course1 = Course::where('code', 'SIGC-2026-001')->first();
 
         // 6.1 Franki Choquenaira (Admin matriculado y aprobado con 20)
-        Enrollment::firstOrCreate(
+        $enr1 = Enrollment::firstOrCreate(
             [
                 'course_id' => $course1->id,
                 'dni' => '13396200',
@@ -137,28 +177,34 @@ class DatabaseSeeder extends Seeder
                 'materno' => 'QUISPE',
                 'email' => 'heall2099@gmail.com',
                 'phone' => '984123456',
+                'organizational_unit' => MunicipalUnit::OTI->value,
+                'position' => 'Líder Técnico OTI',
+                'employment_regime' => 'CAS',
                 'status' => 'aprobado',
-                'attended_sessions' => 12,
+                'attended_sessions' => 4,
                 'final_grade' => 20.00,
                 'certificate_code' => 'CERT-2026-13396200',
             ]
         );
 
         // 6.2 Juan Carlos Pérez (Participante aprobado con 18)
-        Enrollment::firstOrCreate(
+        $enr2 = Enrollment::firstOrCreate(
             [
                 'course_id' => $course1->id,
                 'dni' => '70123456',
             ],
             [
-                'user_id' => User::where('email', 'alumno@sigc.unsaac.edu.pe')->first()->id,
+                'user_id' => $alumno->id,
                 'nombres' => 'JUAN CARLOS',
                 'paterno' => 'PEREZ',
                 'materno' => 'CONDORI',
                 'email' => 'alumno@sigc.unsaac.edu.pe',
                 'phone' => '984000111',
+                'organizational_unit' => MunicipalUnit::RRHH->value,
+                'position' => 'Asistente de Recursos Humanos',
+                'employment_regime' => 'CAS',
                 'status' => 'aprobado',
-                'attended_sessions' => 10,
+                'attended_sessions' => 4,
                 'final_grade' => 18.00,
                 'certificate_code' => 'CERT-2026-70123456',
             ]
@@ -173,12 +219,15 @@ class DatabaseSeeder extends Seeder
                 'materno' => 'Mamani',
                 'email' => 'mquispe@unsaac.edu.pe',
                 'role' => UserRole::Participante,
+                'organizational_unit' => MunicipalUnit::SOMA->value,
+                'position' => 'Supervisora Ambiental',
+                'employment_regime' => 'D.L. 728',
                 'password' => 'password',
                 'email_verified_at' => now(),
             ]
         );
 
-        Enrollment::firstOrCreate(
+        $enr3 = Enrollment::firstOrCreate(
             [
                 'course_id' => $course1->id,
                 'dni' => '45678901',
@@ -190,8 +239,11 @@ class DatabaseSeeder extends Seeder
                 'materno' => 'MAMANI',
                 'email' => 'mquispe@unsaac.edu.pe',
                 'phone' => '984555888',
+                'organizational_unit' => MunicipalUnit::SOMA->value,
+                'position' => 'Supervisora Ambiental',
+                'employment_regime' => 'D.L. 728',
                 'status' => 'aprobado',
-                'attended_sessions' => 11,
+                'attended_sessions' => 4,
                 'final_grade' => 19.00,
                 'certificate_code' => 'CERT-2026-45678901',
             ]
@@ -265,6 +317,78 @@ class DatabaseSeeder extends Seeder
                 'phone' => '984000111',
                 'status' => 'en_curso',
                 'attended_sessions' => 5,
+            ]
+        );
+
+        // 7. Materiales y Recursos Didácticos / Grabaciones
+        CourseMaterial::firstOrCreate(
+            [
+                'course_id' => $course1->id,
+                'title' => 'Manual de Arquitectura Limpia con Laravel 13 (MDSJ)',
+            ],
+            [
+                'type' => 'documento',
+                'url' => 'https://transparencia.munisanjeronimo.gob.pe/pdp/manual-laravel-mdsj.pdf',
+                'description' => 'Guía técnica institucional de buenas prácticas de desarrollo para el área de TI.',
+            ]
+        );
+
+        CourseMaterial::firstOrCreate(
+            [
+                'course_id' => $course1->id,
+                'title' => 'Diapositivas Sesión 1: Inyección de Dependencias y Servicios Atómicos',
+            ],
+            [
+                'type' => 'diapositiva',
+                'url' => 'https://transparencia.munisanjeronimo.gob.pe/pdp/presentacion-modulo1.pdf',
+                'description' => 'Presentación oficial proyectada en el auditorio municipal.',
+            ]
+        );
+
+        CourseMaterial::firstOrCreate(
+            [
+                'course_id' => $course3->id,
+                'title' => 'Grabación de Sesión Virtual: Cero Papel y Sistema de Trámite SGD',
+            ],
+            [
+                'type' => 'video',
+                'url' => 'https://youtube.com/watch?v=mdsj-pdp-demo',
+                'description' => 'Grabación completa de la capacitación sincrónica transmitida por Google Meet.',
+            ]
+        );
+
+        // 8. Control de Asistencia y Permanencia en Auditorio (Check-In y Check-Out)
+        AttendanceRecord::firstOrCreate(
+            [
+                'course_id' => $course1->id,
+                'enrollment_id' => $enr1->id,
+                'session_number' => 1,
+            ],
+            [
+                'status' => 'presente',
+                'method' => 'scan_dni_auditorio',
+                'check_in_at' => now()->setTime(8, 5, 0),
+                'check_out_at' => now()->setTime(12, 10, 0),
+                'minutes_attended' => 245,
+                'recorded_at' => now(),
+                'recorded_by' => $admin->id,
+            ]
+        );
+
+        AttendanceRecord::firstOrCreate(
+            [
+                'course_id' => $course1->id,
+                'enrollment_id' => $enr2->id,
+                'session_number' => 1,
+            ],
+            [
+                'status' => 'presente',
+                'method' => 'scan_dni_auditorio',
+                'check_in_at' => now()->setTime(8, 12, 0),
+                'check_out_at' => now()->setTime(12, 5, 0),
+                'minutes_attended' => 233,
+                'recorded_at' => now(),
+                'recorded_by' => $admin->id,
             ]
         );
     }

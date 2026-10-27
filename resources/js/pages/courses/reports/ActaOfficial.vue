@@ -18,6 +18,9 @@ import {
 interface CourseData {
     id: number;
     code: string;
+    pdp_code?: string | null;
+    pdp_category?: string | null;
+    modality?: string | null;
     title: string;
     institution: string;
     hours: number;
@@ -45,6 +48,8 @@ interface ParticipantData {
     id: number;
     dni: string;
     full_name: string;
+    organizational_unit?: string | null;
+    position?: string | null;
     attended_sessions: number;
     attendance_percentage: number;
     final_grade: string;
@@ -238,6 +243,35 @@ function printDocument(): void {
                             11.00</span
                         >
                     </div>
+                    <div
+                        v-if="course.pdp_code"
+                        class="col-span-2 border-t border-slate-200 pt-2"
+                    >
+                        <span
+                            class="block text-[10px] font-bold text-sky-800 uppercase"
+                            >Plan de Desarrollo de Personas (PDP / MDSJ):</span
+                        >
+                        <span class="font-mono font-bold text-slate-900">{{
+                            course.pdp_code
+                        }}</span>
+                        <span
+                            v-if="course.pdp_category"
+                            class="ml-2 rounded bg-sky-50 px-1.5 py-0.5 text-[10px] font-semibold text-sky-800"
+                            >{{ course.pdp_category }}</span
+                        >
+                    </div>
+                    <div
+                        v-if="course.modality"
+                        class="col-span-2 border-t border-slate-200 pt-2"
+                    >
+                        <span
+                            class="block text-[10px] font-bold text-slate-500 uppercase"
+                            >Modalidad de Capacitación:</span
+                        >
+                        <span class="font-bold text-slate-900 capitalize">{{
+                            course.modality
+                        }}</span>
+                    </div>
                 </section>
 
                 <!-- CUADRO DE RESUMEN ESTADÍSTICO -->
@@ -383,7 +417,18 @@ function printDocument(): void {
                                     <td
                                         class="border border-slate-300 px-3 py-1.5 font-bold text-slate-900 uppercase"
                                     >
-                                        {{ p.full_name }}
+                                        <div>{{ p.full_name }}</div>
+                                        <div
+                                            v-if="p.organizational_unit || p.position"
+                                            class="mt-0.5 flex flex-wrap items-center gap-1.5 text-[9px] font-normal normal-case text-slate-500 print:text-[8px]"
+                                        >
+                                            <span
+                                                v-if="p.organizational_unit"
+                                                class="rounded bg-slate-100 px-1 py-0.2 font-semibold text-slate-700"
+                                                >{{ p.organizational_unit }}</span
+                                            >
+                                            <span v-if="p.position">{{ p.position }}</span>
+                                        </div>
                                     </td>
                                     <td
                                         class="border border-slate-300 px-2 py-1.5 text-center font-semibold"

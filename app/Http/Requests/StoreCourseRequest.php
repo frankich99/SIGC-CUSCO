@@ -71,6 +71,14 @@ class StoreCourseRequest extends FormRequest
     {
         return [
             'code' => ['nullable', 'string', 'max:50', 'unique:courses,code'],
+            'pdp_code' => ['nullable', 'string', 'max:50'],
+            'pdp_year' => ['nullable', 'integer', 'min:2020', 'max:2050'],
+            'pdp_category' => ['nullable', 'string', 'max:100'],
+            'modality' => ['nullable', 'string', 'in:presencial,virtual,hibrido'],
+            'course_type' => ['nullable', 'string', 'in:interno,externo'],
+            'budget_allocated' => ['nullable', 'numeric', 'min:0'],
+            'budget_executed' => ['nullable', 'numeric', 'min:0'],
+            'virtual_meeting_url' => ['nullable', 'string', 'max:500'],
             'title' => ['required', 'string', 'max:255'],
             'institution' => ['nullable', 'string', 'max:150'],
             'description' => ['nullable', 'string'],

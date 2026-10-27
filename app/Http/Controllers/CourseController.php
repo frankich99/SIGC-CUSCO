@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CourseStatus;
+use App\Enums\MunicipalUnit;
 use App\Enums\UserRole;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
@@ -116,6 +117,7 @@ class CourseController extends Controller
             'instructors' => $instructors,
             'statuses' => $statuses,
             'suggestedCode' => $suggestedCode,
+            'municipalUnits' => MunicipalUnit::options(),
         ]);
     }
 
@@ -172,6 +174,7 @@ class CourseController extends Controller
 
         $course->load([
             'instructor:'.$instructorFields,
+            'materials',
         ]);
 
         $myEnrollment = null;
@@ -241,6 +244,7 @@ class CourseController extends Controller
             'isStaff' => $isStaff,
             'myEnrollment' => $myEnrollment,
             'modules' => $modules,
+            'municipalUnits' => MunicipalUnit::options(),
             'can' => [
                 'update' => $user?->isAdmin() ?? false,
                 'delete' => $user?->isAdmin() ?? false,
@@ -273,6 +277,7 @@ class CourseController extends Controller
             'course' => $course,
             'instructors' => $instructors,
             'statuses' => $statuses,
+            'municipalUnits' => MunicipalUnit::options(),
         ]);
     }
 

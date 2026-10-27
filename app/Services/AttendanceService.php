@@ -6,6 +6,7 @@ use App\Models\AttendanceRecord;
 use App\Models\Course;
 use App\Models\Enrollment;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -95,6 +96,82 @@ class AttendanceService
     }
 
     /**
+     * Record or update permanence (Check-in / Check-out) for municipal auditoriums.
+     *
+     * @param  'check_in'|'check_out'|'auto'  $action
+     * @return array{record: AttendanceRecord, action_performed: string, minutes: int}
+     */
+    public function recordPermanence(
+        Course $course,
+        Enrollment $enrollment,
+        int $session,
+        string $action = 'auto',
+        string $method = 'scan_dni_pistola',
+        int|string|null $recordedBy = null,
+        ?CarbonInterface $timestamp = null,
+    ): array {
+        return DB::transaction(function () use ($course, $enrollment, $session, $action, $method, $recordedBy, $timestamp): array {
+            $lockedCourse = Course::query()->whereKey($course->getKey())->lockForUpdate()->firstOrFail();
+            $lockedEnrollment = Enrollment::query()->whereKey($enrollment->getKey())->lockForUpdate()->firstOrFail();
+
+            $this->assertRecordable($lockedCourse, $lockedEnrollment, $session, 'presente');
+
+            /** @var AttendanceRecord|null $record */
+            $record = AttendanceRecord::query()
+                ->where('enrollment_id', $lockedEnrollment->getKey())
+                ->where('session_number', $session)
+                ->lockForUpdate()
+                ->first();
+
+            $now = $timestamp ? Carbon::instance($timestamp) : now();
+            $actualAction = $action;
+
+            if ($action === 'auto') {
+                $actualAction = (! $record || $record->check_in_at === null) ? 'check_in' : 'check_out';
+            }
+
+            if (! $record) {
+                $record = AttendanceRecord::create([
+                    'course_id' => $lockedCourse->getKey(),
+                    'enrollment_id' => $lockedEnrollment->getKey(),
+                    'session_number' => $session,
+                    'status' => 'presente',
+                    'method' => $method,
+                    'check_in_at' => $actualAction === 'check_in' ? $now : null,
+                    'check_out_at' => $actualAction === 'check_out' ? $now : null,
+                    'minutes_attended' => 0,
+                    'recorded_at' => $now,
+                    'recorded_by' => $recordedBy !== null ? (int) $recordedBy : null,
+                ]);
+            } else {
+                if ($actualAction === 'check_in') {
+                    $record->check_in_at = $now;
+                } else {
+                    $record->check_out_at = $now;
+                }
+
+                if ($record->check_in_at && $record->check_out_at) {
+                    $record->minutes_attended = max(0, (int) $record->check_in_at->diffInMinutes($record->check_out_at));
+                }
+
+                $record->method = $method;
+                $record->save();
+            }
+
+            $lockedEnrollment->update([
+                'attended_sessions' => $this->recalculate($lockedEnrollment),
+                'status' => $lockedEnrollment->status === 'inscrito' ? 'en_curso' : $lockedEnrollment->status,
+            ]);
+
+            return [
+                'record' => $record,
+                'action_performed' => $actualAction,
+                'minutes' => (int) $record->minutes_attended,
+            ];
+        });
+    }
+
+    /**
      * Recalculate the denormalized attendance counter from the attendance ledger.
      */
     public function recalculate(Enrollment $enrollment): int
@@ -159,13 +236,16 @@ class AttendanceService
             return null;
         }
 
+        $now = $recordedAt ?? now();
+
         $record = AttendanceRecord::create([
             'course_id' => $course->getKey(),
             'enrollment_id' => $enrollment->getKey(),
             'session_number' => $session,
             'status' => $status,
             'method' => $method,
-            'recorded_at' => $recordedAt ?? now(),
+            'check_in_at' => $now,
+            'recorded_at' => $now,
             'recorded_by' => $recordedBy !== null ? (int) $recordedBy : null,
         ]);
 

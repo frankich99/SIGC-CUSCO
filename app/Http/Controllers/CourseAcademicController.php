@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttendanceRecord;
 use App\Models\Course;
+use App\Models\CourseMaterial;
 use App\Models\Enrollment;
 use App\Services\AttendanceQrService;
 use App\Services\AttendanceService;
@@ -493,6 +495,8 @@ class CourseAcademicController extends Controller
                 'final_grade' => $grade !== null ? number_format($grade, 1) : '-',
                 'final_grade_text' => $grade !== null ? CertificateService::formatGradeText($grade) : '-',
                 'status' => $enrollment->status,
+                'organizational_unit' => $enrollment->organizational_unit ?: 'MDSJ',
+                'position' => $enrollment->position ?: 'Servidor Municipal',
                 'certificate_code' => $enrollment->certificate_code ?: '-',
                 'certificate_hash' => $enrollment->certificate_hash ?: '-',
             ];
@@ -506,6 +510,9 @@ class CourseAcademicController extends Controller
             'course' => [
                 'id' => $course->id,
                 'code' => $course->code,
+                'pdp_code' => $course->pdp_code,
+                'pdp_category' => $course->pdp_category,
+                'modality' => $course->modality,
                 'title' => $course->title,
                 'institution' => $course->institution,
                 'hours' => $course->hours,
@@ -595,6 +602,169 @@ class CourseAcademicController extends Controller
                 'attendance_percentage' => $enrollment->attendance_percentage,
                 'status' => $enrollment->status,
             ],
+        ]);
+    }
+
+    /**
+     * Registrar control de permanencia (Entrada y Salida en auditorio con lector de DNI).
+     */
+    public function recordPermanenceAttendance(Request $request, Course $course, AttendanceService $attendanceService): JsonResponse
+    {
+        $this->authorizeStaff($course);
+
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'max:50'],
+            'session_number' => ['required', 'integer', 'min:1', 'max:'.$course->total_sessions],
+            'action' => ['nullable', 'string', 'in:auto,check_in,check_out'],
+        ], [
+            'code.required' => 'El código de barras del DNI o credencial es obligatorio.',
+            'session_number.required' => 'Debe especificar el número de sesión.',
+            'session_number.min' => 'El número de sesión debe ser al menos 1.',
+            'session_number.max' => "El número de sesión no puede ser mayor a {$course->total_sessions}.",
+        ]);
+
+        if ($course->isActaClosed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se puede registrar asistencia porque el acta oficial del curso está cerrada.',
+            ], 422);
+        }
+
+        $cleanCode = trim($validated['code']);
+        $enrollment = $course->enrollments()
+            ->where(function ($query) use ($cleanCode) {
+                $query->where('credential_code', $cleanCode)
+                    ->orWhere('dni', $cleanCode);
+            })
+            ->where('status', '!=', 'cancelado')
+            ->first();
+
+        if (! $enrollment) {
+            return response()->json([
+                'success' => false,
+                'message' => "No se encontró ningún participante inscrito en este curso con el DNI o código '{$cleanCode}'.",
+            ], 404);
+        }
+
+        $result = $attendanceService->recordPermanence(
+            $course,
+            $enrollment,
+            (int) $validated['session_number'],
+            $validated['action'] ?? 'auto',
+            'scan_dni_auditorio',
+            Auth::id(),
+        );
+
+        $enrollment->refresh();
+        /** @var AttendanceRecord $record */
+        $record = $result['record'];
+        $actionText = $result['action_performed'] === 'check_in' ? 'ENTRADA' : 'SALIDA';
+
+        return response()->json([
+            'success' => true,
+            'action_performed' => $result['action_performed'],
+            'message' => "¡Marcación de {$actionText} registrada para {$enrollment->full_name}!",
+            'participant' => [
+                'id' => $enrollment->id,
+                'full_name' => $enrollment->full_name,
+                'dni' => $enrollment->dni,
+                'organizational_unit' => $enrollment->organizational_unit ?: 'Sin área asignada',
+                'position' => $enrollment->position ?: 'Servidor Municipal',
+                'attended_sessions' => $enrollment->attended_sessions,
+                'attendance_percentage' => $enrollment->attendance_percentage,
+                'status' => $enrollment->status,
+                'check_in_at' => $record->check_in_at?->format('H:i:s'),
+                'check_out_at' => $record->check_out_at?->format('H:i:s'),
+                'minutes_attended' => $record->minutes_attended,
+            ],
+        ]);
+    }
+
+    /**
+     * Agregar material de capacitación o enlace de video/grabación.
+     */
+    public function storeMaterial(Request $request, Course $course): RedirectResponse
+    {
+        $this->authorizeStaff($course);
+
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:150'],
+            'type' => ['required', 'string', 'in:documento,video,diapositiva,enlace'],
+            'url' => ['required', 'string', 'max:1000'],
+            'description' => ['nullable', 'string', 'max:500'],
+        ], [
+            'title.required' => 'El título del material es obligatorio.',
+            'type.required' => 'Debe seleccionar el tipo de recurso.',
+            'url.required' => 'El enlace o URL del recurso es obligatorio.',
+        ]);
+
+        $course->materials()->create($validated);
+
+        return back()->with('success', 'Recurso / material agregado exitosamente.');
+    }
+
+    /**
+     * Eliminar material didáctico del curso.
+     */
+    public function destroyMaterial(Course $course, CourseMaterial $material): RedirectResponse
+    {
+        $this->authorizeStaff($course);
+
+        if ($material->course_id !== $course->id) {
+            abort(404);
+        }
+
+        $material->delete();
+
+        return back()->with('success', 'Material eliminado correctamente.');
+    }
+
+    /**
+     * Consulta interoperable para el Sistema de Gestión Documental (SGD) Cero Papel.
+     * Retorna el legajo digital de certificaciones del servidor municipal por DNI.
+     */
+    public function sgdServantRecords(string $dni): JsonResponse
+    {
+        $cleanDni = trim($dni);
+        if (! preg_match('/^\d{8}$/', $cleanDni)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El DNI debe contener exactamente 8 dígitos.',
+            ], 422);
+        }
+
+        $enrollments = Enrollment::with(['course.instructor:id,name,paterno,materno'])
+            ->where('dni', $cleanDni)
+            ->where('status', '!=', 'cancelado')
+            ->whereNotNull('certificate_code')
+            ->whereNotNull('certificate_hash')
+            ->latest('id')
+            ->get();
+
+        $totalHours = (int) $enrollments->sum(fn ($e) => (int) ($e->course?->hours ?: 0));
+
+        return response()->json([
+            'success' => true,
+            'institution' => 'Municipalidad Distrital de San Jerónimo',
+            'system' => 'SIGC-MDSJ Interoperabilidad SGD Cero Papel',
+            'dni' => $cleanDni,
+            'servant_name' => $enrollments->first()?->full_name,
+            'student_name' => $enrollments->first()?->full_name,
+            'organizational_unit' => $enrollments->first()?->organizational_unit,
+            'position' => $enrollments->first()?->position,
+            'total_accredited_hours' => $totalHours,
+            'certificates_count' => $enrollments->count(),
+            'records' => $enrollments->map(fn ($e) => [
+                'certificate_code' => $e->certificate_code,
+                'certificate_hash' => $e->certificate_hash,
+                'course_code' => $e->course?->code,
+                'course_title' => $e->course?->title,
+                'pdp_code' => $e->course?->pdp_code,
+                'hours' => $e->course?->hours,
+                'final_grade' => $e->final_grade,
+                'issued_at' => $e->certificate_issued_at?->toIso8601String(),
+                'verification_url' => route('certificates.index', ['code' => $e->certificate_code]),
+            ]),
         ]);
     }
 

@@ -20,6 +20,9 @@ use Illuminate\Support\Carbon;
  * @property string|null $materno
  * @property string $email
  * @property string|null $phone
+ * @property string|null $organizational_unit
+ * @property string|null $position
+ * @property string|null $employment_regime
  * @property string $status
  * @property int $attended_sessions
  * @property string|float|null $final_grade
@@ -51,6 +54,9 @@ class Enrollment extends Model
         'materno',
         'email',
         'phone',
+        'organizational_unit',
+        'position',
+        'employment_regime',
         'status',
         'attended_sessions',
         'final_grade',

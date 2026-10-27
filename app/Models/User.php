@@ -24,6 +24,9 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property string|null $materno
  * @property string $email
  * @property UserRole|string $role
+ * @property string|null $organizational_unit
+ * @property string|null $position
+ * @property string|null $employment_regime
  * @property string|null $phone
  * @property Carbon|null $email_verified_at
  * @property string $password
@@ -34,7 +37,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['dni', 'name', 'paterno', 'materno', 'email', 'role', 'phone', 'password'])]
+#[Fillable(['dni', 'name', 'paterno', 'materno', 'email', 'role', 'organizational_unit', 'position', 'employment_regime', 'phone', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {

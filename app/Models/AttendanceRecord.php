@@ -15,6 +15,9 @@ use Illuminate\Support\Carbon;
  * @property int $session_number
  * @property string $status
  * @property string $method
+ * @property Carbon|null $check_in_at
+ * @property Carbon|null $check_out_at
+ * @property int $minutes_attended
  * @property Carbon|null $recorded_at
  * @property int|null $recorded_by
  * @property Carbon|null $created_at
@@ -37,6 +40,9 @@ class AttendanceRecord extends Model
         'session_number',
         'status',
         'method',
+        'check_in_at',
+        'check_out_at',
+        'minutes_attended',
         'recorded_at',
         'recorded_by',
     ];
@@ -48,6 +54,9 @@ class AttendanceRecord extends Model
     {
         return [
             'session_number' => 'integer',
+            'check_in_at' => 'datetime',
+            'check_out_at' => 'datetime',
+            'minutes_attended' => 'integer',
             'recorded_at' => 'datetime',
         ];
     }

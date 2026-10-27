@@ -2,7 +2,7 @@
 
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
 
 import AppLayout from '@/layouts/AppLayout.vue';
 
@@ -127,6 +127,9 @@ import {
     RefreshCw,
 
     FileSpreadsheet,
+    Barcode,
+    DoorOpen,
+    Video,
 
     Lock,
 
@@ -357,6 +360,184 @@ type AcademicTab =
 const activeTab = ref<AcademicTab>('matriculados');
 
 
+
+
+// =========================================================================
+// MÓDULO CONTROL DE PERMANENCIA AUDITORIO MDSJ (LECTOR DE CÓDIGOS DE BARRA)
+// =========================================================================
+const barcodeInputRef = ref<HTMLInputElement | null>(null);
+const permanenceDni = ref('');
+const permanenceSession = ref<number>(1);
+const permanenceAction = ref<'auto' | 'check_in' | 'check_out'>('auto');
+const isSubmittingPermanence = ref(false);
+const lastPermanenceResult = ref<{
+    success: boolean;
+    action_performed?: 'check_in' | 'check_out';
+    message: string;
+    participant?: {
+        id: number;
+        full_name: string;
+        dni: string;
+        organizational_unit: string;
+        position: string;
+        check_in_at?: string;
+        check_out_at?: string;
+        minutes_attended?: number;
+    };
+} | null>(null);
+
+const doorLog = ref<Array<{
+    id: number;
+    full_name: string;
+    dni: string;
+    organizational_unit: string;
+    position: string;
+    action_performed: 'check_in' | 'check_out';
+    time: string;
+    minutes_attended?: number;
+}>>([]);
+
+function playAudioFeedback(type: 'success' | 'error') {
+    try {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioContextClass) return;
+        const ctx = new AudioContextClass();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'success') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+            osc.frequency.setValueAtTime(880.00, ctx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.25, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.25);
+        } else {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, ctx.currentTime);
+            osc.frequency.setValueAtTime(160, ctx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.3);
+        }
+    } catch {
+        // Audio unavailable
+    }
+}
+
+async function handleBarcodeScan() {
+    const rawCode = permanenceDni.value.trim();
+    if (!rawCode) return;
+
+    isSubmittingPermanence.value = true;
+    try {
+        const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
+        const response = await fetch(`/courses/${props.course.id}/attendance/permanence`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': token,
+            },
+            body: JSON.stringify({
+                code: rawCode,
+                session_number: permanenceSession.value,
+                action: permanenceAction.value,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            playAudioFeedback('success');
+            lastPermanenceResult.value = {
+                success: true,
+                action_performed: data.action_performed,
+                message: data.message,
+                participant: data.participant,
+            };
+
+            const nowStr = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            doorLog.value.unshift({
+                id: Date.now(),
+                full_name: data.participant.full_name,
+                dni: data.participant.dni,
+                organizational_unit: data.participant.organizational_unit,
+                position: data.participant.position,
+                action_performed: data.action_performed,
+                time: nowStr,
+                minutes_attended: data.participant.minutes_attended,
+            });
+
+            notify.success(data.message);
+        } else {
+            playAudioFeedback('error');
+            lastPermanenceResult.value = {
+                success: false,
+                message: data.message || 'Código o DNI no reconocido.',
+            };
+            notify.error(data.message || 'Error al procesar marcación.');
+        }
+    } catch (err: any) {
+        playAudioFeedback('error');
+        lastPermanenceResult.value = {
+            success: false,
+            message: 'Error de conexión con el servidor municipal.',
+        };
+        notify.error('Error de red al registrar marcación.');
+    } finally {
+        isSubmittingPermanence.value = false;
+        permanenceDni.value = '';
+        if (barcodeInputRef.value) {
+            barcodeInputRef.value.focus();
+        }
+    }
+}
+
+function manualScanDni(code: string) {
+    permanenceDni.value = code;
+    handleBarcodeScan();
+}
+
+// =========================================================================
+// MÓDULO MATERIALES Y GRABACIONES DE CAPACITACIÓN MDSJ
+// =========================================================================
+const isMaterialModalOpen = ref(false);
+const materialForm = useForm({
+    title: '',
+    type: 'documento' as 'documento' | 'video' | 'diapositiva' | 'enlace',
+    url: '',
+    description: '',
+});
+
+function submitMaterial() {
+    materialForm.post(`/courses/${props.course.id}/materials`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            isMaterialModalOpen.value = false;
+            materialForm.reset();
+            notify.success('Recurso o grabación adjuntada exitosamente.');
+        },
+        onError: () => {
+            notify.error('Por favor revise los campos ingresados.');
+        },
+    });
+}
+
+function deleteMaterial(materialId: number) {
+    if (confirm('¿Está seguro de eliminar este material didáctico del curso?')) {
+        router.delete(`/courses/${props.course.id}/materials/${materialId}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                notify.success('Material eliminado correctamente.');
+            },
+        });
+    }
+}
 
 const selectedSession = ref<number>(1);
 
@@ -1926,7 +2107,85 @@ onUnmounted(() => {
 
                                 </Button>
 
-                            </template>
+                                    <!-- Modal para Agregar Material o Grabación Didáctica -->
+        <Dialog v-model:open="isMaterialModalOpen">
+            <DialogContent class="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle class="flex items-center gap-2 text-base font-black text-slate-950 dark:text-white">
+                        <Video class="size-5 text-[#3484a5]" />
+                        Agregar Material o Grabación
+                    </DialogTitle>
+                    <DialogDescription class="text-xs text-slate-500">
+                        Adjunte enlaces de Google Drive, OneDrive, YouTube o repositorios normativos.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <form @submit.prevent="submitMaterial" class="space-y-4 py-2">
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Título del Recurso *</Label>
+                        <Input
+                            v-model="materialForm.title"
+                            placeholder="Ej: Diapositivas Sesión 1 - Gestión Pública"
+                            required
+                        />
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Tipo de Recurso *</Label>
+                        <select
+                            v-model="materialForm.type"
+                            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                        >
+                            <option value="documento">📄 Documento (PDF, Word, Guía)</option>
+                            <option value="diapositiva">📊 Presentación / Diapositivas</option>
+                            <option value="video">🎥 Grabación de Video / Sesión</option>
+                            <option value="enlace">🔗 Enlace Externo</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Enlace o URL del Recurso *</Label>
+                        <Input
+                            v-model="materialForm.url"
+                            type="url"
+                            placeholder="https://drive.google.com/... o https://youtube.com/..."
+                            required
+                        />
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Descripción / Observación (Opcional)</Label>
+                        <textarea
+                            v-model="materialForm.description"
+                            rows="2"
+                            placeholder="Breve detalle del contenido..."
+                            class="w-full rounded-md border border-slate-300 bg-white p-2.5 text-xs text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                        ></textarea>
+                    </div>
+
+                    <DialogFooter class="gap-2 pt-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            @click="isMaterialModalOpen = false"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            type="submit"
+                            size="sm"
+                            :disabled="materialForm.processing"
+                            class="bg-[#3484a5] font-bold text-white hover:bg-[#286a85]"
+                        >
+                            <Loader2 v-if="materialForm.processing" class="mr-1.5 size-3.5 animate-spin" />
+                            Guardar Recurso
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+</template>
 
                             <Badge
 
@@ -1962,6 +2221,39 @@ onUnmounted(() => {
 
                         <!-- Etiquetas de Informacion Academica Destacada (Organizador y Ponente) -->
                         <div class="flex flex-wrap items-center gap-2 pt-2">
+                            <!-- Código PDP - SERVIR / MDSJ -->
+                            <div
+                                v-if="course.pdp_code"
+                                class="flex items-center gap-1.5 rounded-lg border border-indigo-200/90 bg-indigo-50/90 px-3 py-1.5 text-xs font-bold text-indigo-950 dark:border-indigo-900/60 dark:bg-indigo-950/40 dark:text-indigo-200"
+                            >
+                                <ShieldCheck class="size-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
+                                <span><span class="font-extrabold text-indigo-700 dark:text-indigo-400">PDP SERVIR:</span> {{ course.pdp_code }} <span v-if="course.pdp_category" class="font-normal text-indigo-600 text-[11px]">({{ course.pdp_category }})</span></span>
+                            </div>
+
+                            <!-- Modalidad de Capacitación -->
+                            <div
+                                v-if="course.modality"
+                                class="flex items-center gap-1.5 rounded-lg border border-emerald-200/90 bg-emerald-50/90 px-3 py-1.5 text-xs font-bold text-emerald-950 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200"
+                            >
+                                <Users v-if="course.modality === 'presencial'" class="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                <Video v-else-if="course.modality === 'virtual'" class="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                <DoorOpen v-else class="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                <span class="capitalize">Modalidad: <strong>{{ course.modality }}</strong></span>
+                            </div>
+
+                            <!-- Botón Sala Virtual (Si aplica) -->
+                            <a
+                                v-if="course.virtual_meeting_url"
+                                :href="course.virtual_meeting_url"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-3 py-1.5 text-xs font-bold text-purple-700 transition-colors hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 dark:hover:bg-purple-900/50"
+                            >
+                                <Video class="size-4 shrink-0 text-purple-600" />
+                                <span>Ingresar a Sala Virtual</span>
+                                <ExternalLink class="size-3 text-purple-400" />
+                            </a>
+
                             <!-- Entidad Organizadora (Azul Institucional MDSJ) -->
                             <div
                                 class="flex items-center gap-1.5 rounded-lg border border-[#1a6b8a]/20 bg-[#1a6b8a]/5 px-3 py-1.5 text-xs font-bold text-[#1a6b8a] dark:border-[#3484a5]/40 dark:bg-[#1a6b8a]/20 dark:text-[#88c0d7]"
@@ -2567,6 +2859,21 @@ onUnmounted(() => {
 
 
                         <button
+                            type="button"
+                            @click="activeTab = 'auditorio'"
+                            :class="[
+                                'flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-black transition-all',
+                                activeTab === 'auditorio'
+                                    ? 'text-white shadow-sm ring-1 ring-black/10'
+                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
+                            ]"
+                            :style="activeTab === 'auditorio' ? { backgroundColor: 'var(--institutional, #3484a5)' } : {}"
+                        >
+                            <Barcode class="size-3.5" />
+                            <span>Permanencia Auditorio</span>
+                        </button>
+
+                        <button
 
                             type="button"
 
@@ -2653,6 +2960,31 @@ onUnmounted(() => {
                         </button>
 
 
+
+                        <button
+                            type="button"
+                            @click="activeTab = 'materiales'"
+                            :class="[
+                                'flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-black transition-all',
+                                activeTab === 'materiales'
+                                    ? 'text-white shadow-sm ring-1 ring-black/10'
+                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800',
+                            ]"
+                            :style="activeTab === 'materiales' ? { backgroundColor: 'var(--institutional, #3484a5)' } : {}"
+                        >
+                            <Video class="size-3.5" />
+                            <span>Materiales y Grabaciones</span>
+                            <span
+                                :class="[
+                                    'py-0.2 rounded-full px-1.5 text-[10px] font-bold',
+                                    activeTab === 'materiales'
+                                        ? 'bg-white/20 text-white'
+                                        : 'bg-sky-100 text-[#3484a5] dark:bg-[#153542] dark:text-sky-200',
+                                ]"
+                            >
+                                {{ course.materials?.length || 0 }}
+                            </span>
+                        </button>
 
                         <button
 
@@ -3139,6 +3471,29 @@ onUnmounted(() => {
                                                         · {{ enrollment.phone }}
 
                                                     </span>
+                                                <div
+                                                    v-if="enrollment.organizational_unit || enrollment.position"
+                                                    class="mt-1 flex flex-wrap items-center gap-1.5 text-[11px]"
+                                                >
+                                                    <span
+                                                        v-if="enrollment.organizational_unit"
+                                                        class="inline-flex items-center rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-bold text-sky-800 dark:bg-sky-950/60 dark:text-sky-300"
+                                                    >
+                                                        🏛️ {{ enrollment.organizational_unit }}
+                                                    </span>
+                                                    <span
+                                                        v-if="enrollment.position"
+                                                        class="text-[11px] font-medium text-slate-600 dark:text-slate-300"
+                                                    >
+                                                        {{ enrollment.position }}
+                                                    </span>
+                                                    <span
+                                                        v-if="enrollment.employment_regime"
+                                                        class="text-[10px] text-slate-400 dark:text-slate-500"
+                                                    >
+                                                        ({{ enrollment.employment_regime }})
+                                                    </span>
+                                                </div>
 
                                                     <span
 
@@ -4332,6 +4687,327 @@ onUnmounted(() => {
 
 
 
+
+                <!-- ============================================================ -->
+                <!-- CONTENIDO: PERMANENCIA EN AUDITORIO CON PISTOLA LECTORA DNI  -->
+                <!-- ============================================================ -->
+                <div v-if="activeTab === 'auditorio'" class="space-y-6">
+                    <Card class="overflow-hidden border-slate-200 shadow-sm dark:border-slate-800">
+                        <CardHeader class="border-b border-slate-200 bg-slate-50/70 p-4 sm:p-5 dark:border-slate-800 dark:bg-slate-900/40">
+                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <CardTitle class="flex items-center gap-2 text-base font-black text-slate-950 sm:text-lg dark:text-white">
+                                        <Barcode class="size-5 text-[#3484a5]" />
+                                        Control de Permanencia en Auditorio / Sala
+                                    </CardTitle>
+                                    <CardDescription class="text-xs text-slate-500">
+                                        Escanee el código de barras del DNI o credencial del servidor municipal al ingresar y al salir del auditorio.
+                                    </CardDescription>
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <!-- Selector de Sesión -->
+                                    <div class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs dark:border-slate-700 dark:bg-slate-800">
+                                        <span class="font-bold text-slate-600 dark:text-slate-300">Sesión:</span>
+                                        <select
+                                            v-model.number="permanenceSession"
+                                            class="bg-transparent font-bold text-[#3484a5] focus:outline-none"
+                                        >
+                                            <option v-for="s in totalSessions" :key="s" :value="s">
+                                                Sesión {{ s }} de {{ totalSessions }}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Modo de Marcación -->
+                                    <div class="flex rounded-lg border border-slate-200 bg-white p-0.5 text-xs dark:border-slate-700 dark:bg-slate-800">
+                                        <button
+                                            type="button"
+                                            @click="permanenceAction = 'auto'"
+                                            class="rounded-md px-2.5 py-1 font-bold transition-colors"
+                                            :class="permanenceAction === 'auto' ? 'bg-[#3484a5] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300'"
+                                        >
+                                            🔄 Auto (Alternar)
+                                        </button>
+                                        <button
+                                            type="button"
+                                            @click="permanenceAction = 'check_in'"
+                                            class="rounded-md px-2.5 py-1 font-bold transition-colors"
+                                            :class="permanenceAction === 'check_in' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300'"
+                                        >
+                                            🟢 Entrada
+                                        </button>
+                                        <button
+                                            type="button"
+                                            @click="permanenceAction = 'check_out'"
+                                            class="rounded-md px-2.5 py-1 font-bold transition-colors"
+                                            :class="permanenceAction === 'check_out' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300'"
+                                        >
+                                            🔴 Salida
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardHeader>
+
+                        <CardContent class="p-4 sm:p-6 space-y-6">
+                            <!-- Input para la Pistola Lectora de Códigos de Barras -->
+                            <div class="rounded-2xl border-2 border-dashed border-[#3484a5]/40 bg-[#3484a5]/5 p-5 dark:border-[#3484a5]/30 dark:bg-[#3484a5]/10">
+                                <form @submit.prevent="handleBarcodeScan" class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                                    <div class="relative flex-1">
+                                        <Barcode class="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-[#3484a5]" />
+                                        <input
+                                            ref="barcodeInputRef"
+                                            v-model="permanenceDni"
+                                            type="text"
+                                            autocomplete="off"
+                                            autofocus
+                                            placeholder="Pase el lector de código de barras por el DNI o escriba el número..."
+                                            class="w-full rounded-xl border border-slate-300 bg-white py-3 pl-11 pr-4 font-mono text-sm font-bold text-slate-900 shadow-xs placeholder:font-sans placeholder:font-normal placeholder:text-slate-400 focus:border-[#3484a5] focus:outline-none focus:ring-2 focus:ring-[#3484a5]/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                                            :disabled="isSubmittingPermanence"
+                                        />
+                                    </div>
+
+                                    <Button
+                                        type="submit"
+                                        :disabled="isSubmittingPermanence || !permanenceDni.trim()"
+                                        class="bg-[#3484a5] font-bold text-white hover:bg-[#286a85] py-3 px-6 h-auto"
+                                    >
+                                        <Loader2 v-if="isSubmittingPermanence" class="mr-2 size-4 animate-spin" />
+                                        <CheckCircle2 v-else class="mr-2 size-4" />
+                                        Registrar Marcación
+                                    </Button>
+                                </form>
+                                <p class="mt-2 text-center sm:text-left text-[11px] text-slate-500 dark:text-slate-400">
+                                    💡 <strong>Modo Lector Activo:</strong> El campo procesa lecturas automáticamente al presionar Enter con el escáner USB.
+                                </p>
+                            </div>
+
+                            <!-- Tarjeta de Última Marcación Realizada -->
+                            <div
+                                v-if="lastPermanenceResult"
+                                class="rounded-xl border p-4 transition-all"
+                                :class="[
+                                    lastPermanenceResult.success
+                                        ? lastPermanenceResult.action_performed === 'check_in'
+                                            ? 'border-emerald-300 bg-emerald-50/80 text-emerald-950 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200'
+                                            : 'border-sky-300 bg-sky-50/80 text-sky-950 dark:border-sky-900 dark:bg-sky-950/30 dark:text-sky-200'
+                                        : 'border-rose-300 bg-rose-50/80 text-rose-950 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-200'
+                                ]"
+                            >
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="flex size-12 shrink-0 items-center justify-center rounded-xl font-black text-xl shadow-xs"
+                                            :class="[
+                                                lastPermanenceResult.success
+                                                    ? lastPermanenceResult.action_performed === 'check_in'
+                                                        ? 'bg-emerald-600 text-white'
+                                                        : 'bg-sky-600 text-white'
+                                                    : 'bg-rose-600 text-white'
+                                            ]"
+                                        >
+                                            <DoorOpen v-if="lastPermanenceResult.success" class="size-6" />
+                                            <AlertCircle v-else class="size-6" />
+                                        </div>
+
+                                        <div>
+                                            <div class="flex items-center gap-2">
+                                                <span
+                                                    v-if="lastPermanenceResult.success"
+                                                    class="rounded-md px-2 py-0.5 text-xs font-black uppercase tracking-wider"
+                                                    :class="lastPermanenceResult.action_performed === 'check_in' ? 'bg-emerald-200 text-emerald-900' : 'bg-sky-200 text-sky-900'"
+                                                >
+                                                    {{ lastPermanenceResult.action_performed === 'check_in' ? '🟢 ENTRADA REGISTRADA' : '🔴 SALIDA REGISTRADA' }}
+                                                </span>
+                                                <span v-else class="rounded-md bg-rose-200 px-2 py-0.5 text-xs font-black uppercase text-rose-900">
+                                                    ⚠️ ERROR DE MARCACIÓN
+                                                </span>
+                                            </div>
+
+                                            <div v-if="lastPermanenceResult.participant" class="mt-1">
+                                                <h4 class="text-base font-black text-slate-950 uppercase dark:text-white">
+                                                    {{ lastPermanenceResult.participant.full_name }}
+                                                </h4>
+                                                <div class="flex flex-wrap items-center gap-2 text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                                                    <span>DNI: <strong class="font-mono">{{ lastPermanenceResult.participant.dni }}</strong></span>
+                                                    <span>·</span>
+                                                    <span>Unidad: <strong>{{ lastPermanenceResult.participant.organizational_unit }}</strong></span>
+                                                    <span>·</span>
+                                                    <span>Cargo: <strong>{{ lastPermanenceResult.participant.position }}</strong></span>
+                                                    <span v-if="lastPermanenceResult.participant.minutes_attended">
+                                                        · ⏱️ <strong>{{ lastPermanenceResult.participant.minutes_attended }} min de permanencia</strong>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <p v-else class="mt-1 text-sm font-semibold">
+                                                {{ lastPermanenceResult.message }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Historial en Vivo de Puerta (Auditorio) -->
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-black text-slate-950 dark:text-white flex items-center gap-2">
+                                        <Clock class="size-4 text-[#3484a5]" />
+                                        Historial de Marcaciones de Puerta (Sesión Actual)
+                                    </h3>
+                                    <span class="text-xs font-bold text-slate-500">
+                                        {{ doorLog.length }} marcaciones registradas
+                                    </span>
+                                </div>
+
+                                <div v-if="doorLog.length === 0" class="rounded-xl border border-slate-200 p-8 text-center text-xs text-slate-400 dark:border-slate-800">
+                                    No hay marcaciones registradas en esta sesión. Use el escáner de código de barras para comenzar.
+                                </div>
+
+                                <div v-else class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                                    <table class="w-full text-left text-xs">
+                                        <thead class="border-b border-slate-200 bg-slate-50 text-[10px] font-bold uppercase text-slate-600 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400">
+                                            <tr>
+                                                <th class="px-3 py-2.5">Hora</th>
+                                                <th class="px-3 py-2.5">Tipo</th>
+                                                <th class="px-3 py-2.5">DNI</th>
+                                                <th class="px-3 py-2.5">Servidor Municipal</th>
+                                                <th class="px-3 py-2.5">Unidad Orgánica</th>
+                                                <th class="px-3 py-2.5 text-right">Permanencia</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                            <tr v-for="item in doorLog" :key="item.id" class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
+                                                <td class="px-3 py-2 font-mono font-bold text-slate-600 dark:text-slate-300">{{ item.time }}</td>
+                                                <td class="px-3 py-2">
+                                                    <span
+                                                        class="rounded px-1.5 py-0.5 text-[10px] font-black uppercase"
+                                                        :class="item.action_performed === 'check_in' ? 'bg-emerald-100 text-emerald-800' : 'bg-sky-100 text-sky-800'"
+                                                    >
+                                                        {{ item.action_performed === 'check_in' ? 'Entrada' : 'Salida' }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-3 py-2 font-mono font-bold text-slate-900 dark:text-white">{{ item.dni }}</td>
+                                                <td class="px-3 py-2 font-bold text-slate-900 dark:text-white">{{ item.full_name }}</td>
+                                                <td class="px-3 py-2 text-slate-600 dark:text-slate-300">{{ item.organizational_unit }}</td>
+                                                <td class="px-3 py-2 text-right font-mono font-bold text-slate-800 dark:text-slate-200">
+                                                    {{ item.minutes_attended ? `${item.minutes_attended} min` : '-' }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <!-- ============================================================ -->
+                <!-- CONTENIDO: MATERIALES Y GRABACIONES DE CAPACITACIÓN MDSJ     -->
+                <!-- ============================================================ -->
+                <div v-if="activeTab === 'materiales'" class="space-y-6">
+                    <Card class="overflow-hidden border-slate-200 shadow-sm dark:border-slate-800">
+                        <CardHeader class="border-b border-slate-200 bg-slate-50/70 p-4 sm:p-5 dark:border-slate-800 dark:bg-slate-900/40">
+                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <CardTitle class="flex items-center gap-2 text-base font-black text-slate-950 sm:text-lg dark:text-white">
+                                        <Video class="size-5 text-[#3484a5]" />
+                                        Recursos Didácticos y Grabaciones Oficiales
+                                    </CardTitle>
+                                    <CardDescription class="text-xs text-slate-500">
+                                        Repositorio institucional de diapositivas, normativas, materiales de lectura y grabaciones de las sesiones.
+                                    </CardDescription>
+                                </div>
+
+                                <Button
+                                    v-if="can.manage_enrollments"
+                                    type="button"
+                                    size="sm"
+                                    class="bg-[#3484a5] font-bold text-white hover:bg-[#286a85]"
+                                    @click="isMaterialModalOpen = true"
+                                >
+                                    <Plus class="mr-1.5 size-4" />
+                                    Agregar Material / Grabación
+                                </Button>
+                            </div>
+                        </CardHeader>
+
+                        <CardContent class="p-4 sm:p-6">
+                            <div v-if="!course.materials || course.materials.length === 0" class="rounded-xl border border-dashed border-slate-300 p-12 text-center dark:border-slate-700">
+                                <Video class="mx-auto size-10 text-slate-300 dark:text-slate-600 mb-2" />
+                                <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300">No hay materiales didácticos registrados</h4>
+                                <p class="text-xs text-slate-500 mt-1">El ponente o administrador aún no ha cargado diapositivas o grabaciones para este curso.</p>
+                                <Button
+                                    v-if="can.manage_enrollments"
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    class="mt-4 text-xs font-bold"
+                                    @click="isMaterialModalOpen = true"
+                                >
+                                    <Plus class="mr-1.5 size-3.5" />
+                                    Adjuntar primer recurso
+                                </Button>
+                            </div>
+
+                            <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                <div
+                                    v-for="mat in course.materials"
+                                    :key="mat.id"
+                                    class="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+                                >
+                                    <div>
+                                        <div class="flex items-center justify-between gap-2">
+                                            <span
+                                                class="rounded-md px-2 py-0.5 text-[10px] font-black uppercase"
+                                                :class="[
+                                                    mat.type === 'video' ? 'bg-rose-100 text-rose-800' :
+                                                    mat.type === 'diapositiva' ? 'bg-amber-100 text-amber-800' :
+                                                    mat.type === 'documento' ? 'bg-blue-100 text-blue-800' :
+                                                    'bg-purple-100 text-purple-800'
+                                                ]"
+                                            >
+                                                {{ mat.type }}
+                                            </span>
+
+                                            <button
+                                                v-if="can.manage_enrollments"
+                                                type="button"
+                                                @click="deleteMaterial(mat.id)"
+                                                class="text-slate-400 hover:text-rose-600 transition-colors"
+                                                title="Eliminar recurso"
+                                            >
+                                                <Trash2 class="size-4" />
+                                            </button>
+                                        </div>
+
+                                        <h4 class="mt-2.5 text-sm font-black text-slate-950 dark:text-white line-clamp-2">
+                                            {{ mat.title }}
+                                        </h4>
+
+                                        <p v-if="mat.description" class="mt-1 text-xs text-slate-500 line-clamp-3">
+                                            {{ mat.description }}
+                                        </p>
+                                    </div>
+
+                                    <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                                        <a
+                                            :href="mat.url"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#3484a5]/10 px-3 py-2 text-xs font-bold text-[#3484a5] hover:bg-[#3484a5] hover:text-white transition-colors"
+                                        >
+                                            <ExternalLink class="size-3.5" />
+                                            <span>Abrir Recurso / Enlace</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+
                 <!-- ============================================================ -->
 
                 <!-- CONTENIDO DE LA PESTAÑA 3: NOTAS Y ACTA OFICIAL              -->
@@ -4456,7 +5132,85 @@ onUnmounted(() => {
 
                                     </Button>
 
-                                </template>
+                                        <!-- Modal para Agregar Material o Grabación Didáctica -->
+        <Dialog v-model:open="isMaterialModalOpen">
+            <DialogContent class="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle class="flex items-center gap-2 text-base font-black text-slate-950 dark:text-white">
+                        <Video class="size-5 text-[#3484a5]" />
+                        Agregar Material o Grabación
+                    </DialogTitle>
+                    <DialogDescription class="text-xs text-slate-500">
+                        Adjunte enlaces de Google Drive, OneDrive, YouTube o repositorios normativos.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <form @submit.prevent="submitMaterial" class="space-y-4 py-2">
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Título del Recurso *</Label>
+                        <Input
+                            v-model="materialForm.title"
+                            placeholder="Ej: Diapositivas Sesión 1 - Gestión Pública"
+                            required
+                        />
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Tipo de Recurso *</Label>
+                        <select
+                            v-model="materialForm.type"
+                            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                        >
+                            <option value="documento">📄 Documento (PDF, Word, Guía)</option>
+                            <option value="diapositiva">📊 Presentación / Diapositivas</option>
+                            <option value="video">🎥 Grabación de Video / Sesión</option>
+                            <option value="enlace">🔗 Enlace Externo</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Enlace o URL del Recurso *</Label>
+                        <Input
+                            v-model="materialForm.url"
+                            type="url"
+                            placeholder="https://drive.google.com/... o https://youtube.com/..."
+                            required
+                        />
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Descripción / Observación (Opcional)</Label>
+                        <textarea
+                            v-model="materialForm.description"
+                            rows="2"
+                            placeholder="Breve detalle del contenido..."
+                            class="w-full rounded-md border border-slate-300 bg-white p-2.5 text-xs text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                        ></textarea>
+                    </div>
+
+                    <DialogFooter class="gap-2 pt-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            @click="isMaterialModalOpen = false"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            type="submit"
+                            size="sm"
+                            :disabled="materialForm.processing"
+                            class="bg-[#3484a5] font-bold text-white hover:bg-[#286a85]"
+                        >
+                            <Loader2 v-if="materialForm.processing" class="mr-1.5 size-3.5 animate-spin" />
+                            Guardar Recurso
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+</template>
 
                                 <Button
 
@@ -6802,5 +7556,83 @@ onUnmounted(() => {
 
     </AppLayout>
 
+        <!-- Modal para Agregar Material o Grabación Didáctica -->
+        <Dialog v-model:open="isMaterialModalOpen">
+            <DialogContent class="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle class="flex items-center gap-2 text-base font-black text-slate-950 dark:text-white">
+                        <Video class="size-5 text-[#3484a5]" />
+                        Agregar Material o Grabación
+                    </DialogTitle>
+                    <DialogDescription class="text-xs text-slate-500">
+                        Adjunte enlaces de Google Drive, OneDrive, YouTube o repositorios normativos.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <form @submit.prevent="submitMaterial" class="space-y-4 py-2">
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Título del Recurso *</Label>
+                        <Input
+                            v-model="materialForm.title"
+                            placeholder="Ej: Diapositivas Sesión 1 - Gestión Pública"
+                            required
+                        />
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Tipo de Recurso *</Label>
+                        <select
+                            v-model="materialForm.type"
+                            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                        >
+                            <option value="documento">📄 Documento (PDF, Word, Guía)</option>
+                            <option value="diapositiva">📊 Presentación / Diapositivas</option>
+                            <option value="video">🎥 Grabación de Video / Sesión</option>
+                            <option value="enlace">🔗 Enlace Externo</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Enlace o URL del Recurso *</Label>
+                        <Input
+                            v-model="materialForm.url"
+                            type="url"
+                            placeholder="https://drive.google.com/... o https://youtube.com/..."
+                            required
+                        />
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <Label class="text-xs font-bold">Descripción / Observación (Opcional)</Label>
+                        <textarea
+                            v-model="materialForm.description"
+                            rows="2"
+                            placeholder="Breve detalle del contenido..."
+                            class="w-full rounded-md border border-slate-300 bg-white p-2.5 text-xs text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                        ></textarea>
+                    </div>
+
+                    <DialogFooter class="gap-2 pt-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            @click="isMaterialModalOpen = false"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            type="submit"
+                            size="sm"
+                            :disabled="materialForm.processing"
+                            class="bg-[#3484a5] font-bold text-white hover:bg-[#286a85]"
+                        >
+                            <Loader2 v-if="materialForm.processing" class="mr-1.5 size-3.5 animate-spin" />
+                            Guardar Recurso
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
 </template>
 

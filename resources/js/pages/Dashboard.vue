@@ -41,6 +41,9 @@ import {
     Sparkles,
     Download,
     ExternalLink,
+    Building2,
+    TrendingUp,
+    DollarSign,
 } from '@lucide/vue';
 import type { BreadcrumbItem } from '@/types';
 import { useBranding } from '@/composables/useBranding';
@@ -103,6 +106,16 @@ const props = defineProps<{
         openCourses: number;
         taughtCount: number;
         enrolledCount: number;
+    };
+    pdpMetrics?: {
+        pdpTotal: number;
+        pdpCompleted: number;
+        pdpExecutionRate: number;
+        budgetAllocated: number;
+        budgetExecuted: number;
+        totalTrainingHours: number;
+        unitBreakdown: Array<{ organizational_unit: string; total: number }>;
+        modalityBreakdown: Array<{ modality: string; total: number }>;
     };
     taughtCourses: CourseItem[];
     studentEnrollments: EnrollmentItem[];
@@ -469,6 +482,117 @@ function enrollmentStatusBadge(status: string) {
                             Genera códigos QR dinámicos para tus clases
                         </CardContent>
                     </Card>
+                </div>
+
+                <!-- Panel Municipal: Tablero de Control del Plan de Desarrollo de Personas (PDP • SERVIR • MDSJ) -->
+                <div v-if="pdpMetrics" class="rounded-2xl border border-sky-300/80 bg-linear-to-br from-sky-50/90 via-white to-sky-100/50 p-5 shadow-sm dark:border-sky-900/60 dark:from-[#112833] dark:via-slate-900 dark:to-[#0f242e]">
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-sky-200/80 pb-4 dark:border-sky-800/60">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="rounded-md bg-[#3484a5] px-2 py-0.5 font-mono text-[10px] font-black text-white uppercase tracking-wider">
+                                    SERVIR • MDSJ
+                                </span>
+                                <h3 class="text-lg font-black text-slate-950 dark:text-white flex items-center gap-2">
+                                    <TrendingUp class="size-5 text-[#3484a5]" />
+                                    Tablero de Control del Plan de Desarrollo de Personas (PDP 2026)
+                                </h3>
+                            </div>
+                            <p class="text-xs font-medium text-slate-600 dark:text-slate-400 mt-1">
+                                Supervisión de ejecución de capacitaciones institucionales, presupuesto y participación por área municipal.
+                            </p>
+                        </div>
+                        <Badge class="self-start sm:self-auto rounded-full bg-sky-100 text-[#3484a5] border-sky-300 dark:bg-[#153542] dark:text-sky-200 font-extrabold text-xs px-3 py-1">
+                            Municipalidad Distrital de San Jerónimo
+                        </Badge>
+                    </div>
+
+                    <!-- 3 Métricas Estratégicas del PDP -->
+                    <div class="grid grid-cols-1 gap-4 pt-5 sm:grid-cols-3">
+                        <!-- KPI 1: Avance de Metas PDP -->
+                        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-950/70">
+                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Avance del PDP Anual</span>
+                            <div class="mt-2 flex items-baseline justify-between">
+                                <span class="text-2xl font-black text-[#3484a5] dark:text-sky-300">
+                                    {{ pdpMetrics.pdpExecutionRate }}%
+                                </span>
+                                <span class="text-xs font-bold text-slate-600 dark:text-slate-400">
+                                    {{ pdpMetrics.pdpCompleted }} de {{ pdpMetrics.pdpTotal }} concluidos
+                                </span>
+                            </div>
+                            <!-- Barra de Progreso -->
+                            <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                                <div
+                                    class="h-full rounded-full bg-[#3484a5] transition-all duration-500"
+                                    :style="{ width: `${Math.min(100, pdpMetrics.pdpExecutionRate)}%` }"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- KPI 2: Presupuesto Municipal Ejecutado -->
+                        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-950/70">
+                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Presupuesto Municipal</span>
+                            <div class="mt-2 flex items-baseline justify-between">
+                                <span class="text-xl font-black text-emerald-700 dark:text-emerald-400">
+                                    S/. {{ pdpMetrics.budgetExecuted.toLocaleString('es-PE', { minimumFractionDigits: 2 }) }}
+                                </span>
+                                <span class="text-[11px] font-medium text-slate-500">
+                                    de S/. {{ pdpMetrics.budgetAllocated.toLocaleString('es-PE', { minimumFractionDigits: 2 }) }}
+                                </span>
+                            </div>
+                            <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                                <div
+                                    class="h-full rounded-full bg-emerald-600 transition-all duration-500"
+                                    :style="{ width: `${pdpMetrics.budgetAllocated > 0 ? Math.min(100, Math.round((pdpMetrics.budgetExecuted / pdpMetrics.budgetAllocated) * 100)) : 0}%` }"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- KPI 3: Horas de Formación Acreditables -->
+                        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-950/70">
+                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Carga Horaria Acreditable</span>
+                            <div class="mt-2 flex items-baseline justify-between">
+                                <span class="text-2xl font-black text-amber-600 dark:text-amber-400">
+                                    {{ pdpMetrics.totalTrainingHours }} hrs.
+                                </span>
+                                <span class="text-xs font-bold text-slate-600 dark:text-slate-400">
+                                    Oferta SERVIR
+                                </span>
+                            </div>
+                            <p class="mt-3 text-[11px] font-medium text-slate-500">
+                                Horas acumulables para el legajo digital Cero Papel.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Desglose por Unidades Orgánicas (Áreas Municipales) -->
+                    <div class="mt-5 pt-4 border-t border-sky-200/60 dark:border-sky-800/40">
+                        <h4 class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5 mb-3">
+                            <Building2 class="size-3.5 text-[#3484a5]" />
+                            Servidores Capacitados por Unidad Orgánica (MDSJ)
+                        </h4>
+
+                        <div v-if="pdpMetrics.unitBreakdown.length > 0" class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+                            <div
+                                v-for="unit in pdpMetrics.unitBreakdown"
+                                :key="unit.organizational_unit"
+                                class="rounded-xl border border-slate-200 bg-white p-2.5 text-center dark:border-slate-800 dark:bg-slate-950/80 shadow-2xs"
+                            >
+                                <span class="block text-xs font-black text-[#3484a5] dark:text-sky-300 truncate" :title="unit.organizational_unit">
+                                    {{ unit.organizational_unit }}
+                                </span>
+                                <span class="block text-lg font-black text-slate-900 dark:text-white mt-0.5">
+                                    {{ unit.total }}
+                                </span>
+                                <span class="block text-[10px] font-bold text-slate-500">
+                                    inscritos
+                                </span>
+                            </div>
+                        </div>
+
+                        <div v-else class="text-xs font-medium text-slate-500 italic py-2">
+                            Aún no se registran matrículas con área organizativa en el año en curso.
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Sección: Mis Cursos Asignados -->

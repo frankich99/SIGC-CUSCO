@@ -73,7 +73,33 @@ const paterno = ref('');
 const materno = ref('');
 const email = ref('');
 const phone = ref('');
+const organizationalUnit = ref('OTI');
+const position = ref('');
+const employmentRegime = ref('CAS');
 const termsAccepted = ref(true);
+
+const MUNICIPAL_UNITS = [
+    { value: 'OTI', label: 'Oficina de Tecnologías de la Información (OTI)' },
+    { value: 'RRHH', label: 'Subgerencia de Recursos Humanos' },
+    { value: 'SOMA', label: 'Seguridad, Salud en el Trabajo y Medio Ambiente (SOMA)' },
+    { value: 'GDUR', label: 'Gerencia de Desarrollo Urbano y Rural' },
+    { value: 'GDSH', label: 'Gerencia de Desarrollo Social y Humano' },
+    { value: 'GAF', label: 'Gerencia de Administración y Finanzas' },
+    { value: 'GSMA', label: 'Gerencia de Servicios Municipales y Medio Ambiente' },
+    { value: 'GDE', label: 'Gerencia de Desarrollo Económico' },
+    { value: 'GAT', label: 'Gerencia de Administración Tributaria (Rentas)' },
+    { value: 'PPM', label: 'Procuraduría Pública Municipal' },
+    { value: 'ALC', label: 'Alcaldía y Secretaría General' },
+    { value: 'EXTERNO', label: 'Participante Externo / Comunidad' },
+];
+
+const EMPLOYMENT_REGIMES = [
+    'CAS',
+    'D.L. 276',
+    'D.L. 728',
+    'Locación de Servicios',
+    'Otro / Externo',
+];
 
 const isLookingUpDni = ref(false);
 const dniLookupSuccess = ref(false);
@@ -155,6 +181,11 @@ watch(
                 materno.value = authUser.value.materno || '';
                 email.value = authUser.value.email || '';
                 phone.value = authUser.value.phone || '';
+                organizationalUnit.value =
+                    (authUser.value as any).organizational_unit || 'OTI';
+                position.value = (authUser.value as any).position || '';
+                employmentRegime.value =
+                    (authUser.value as any).employment_regime || 'CAS';
                 if (authUser.value.dni && authUser.value.dni.length === 8) {
                     dniLookupSuccess.value = true;
                 } else {
@@ -167,6 +198,9 @@ watch(
                 materno.value = '';
                 email.value = '';
                 phone.value = '';
+                organizationalUnit.value = 'OTI';
+                position.value = '';
+                employmentRegime.value = 'CAS';
                 dniLookupSuccess.value = false;
             }
         }
@@ -298,6 +332,9 @@ function submitEnrollment() {
             materno: materno.value.trim() || null,
             email: email.value.trim(),
             phone: phone.value.trim() || null,
+            organizational_unit: organizationalUnit.value || null,
+            position: position.value.trim() || null,
+            employment_regime: employmentRegime.value || null,
         },
         {
             preserveScroll: true,
@@ -1075,6 +1112,81 @@ function closeModal() {
                                             El número de celular debe contener 9
                                             dígitos numéricos e iniciar con 9.
                                         </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Paso 4: Datos del Servidor Municipal (MDSJ • SERVIR) -->
+                            <div
+                                class="space-y-3 rounded-xl border border-sky-200 bg-sky-50/50 p-4 dark:border-sky-900/60 dark:bg-[#153542]/40"
+                            >
+                                <div
+                                    class="flex items-center gap-1.5 border-b border-sky-200 pb-2 text-xs font-black text-sky-950 dark:border-sky-800 dark:text-sky-200"
+                                >
+                                    <Building2 class="size-3.5 text-[#3484a5]" />
+                                    <span>Paso 4: Clasificación Municipal (MDSJ • SERVIR)</span>
+                                </div>
+
+                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                    <div class="space-y-1 sm:col-span-2">
+                                        <Label
+                                            for="org_unit"
+                                            class="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200"
+                                        >
+                                            <span>Unidad Orgánica / Área Municipal</span>
+                                            <span class="text-[10px] font-normal text-slate-500">Plan de Desarrollo de Personas</span>
+                                        </Label>
+                                        <select
+                                            id="org_unit"
+                                            v-model="organizationalUnit"
+                                            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-900 focus:border-[#3484a5] focus:outline-none focus:ring-2 focus:ring-[#3484a5]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                                        >
+                                            <option
+                                                v-for="unit in MUNICIPAL_UNITS"
+                                                :key="unit.value"
+                                                :value="unit.value"
+                                            >
+                                                {{ unit.label }}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <Label
+                                            for="pos"
+                                            class="text-xs font-bold text-slate-800 dark:text-slate-200"
+                                        >
+                                            Cargo / Puesto del Servidor
+                                        </Label>
+                                        <Input
+                                            id="pos"
+                                            v-model="position"
+                                            type="text"
+                                            placeholder="Ej. Especialista TI, Inspector SOMA..."
+                                            class="text-xs font-medium text-slate-900 dark:text-white"
+                                        />
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <Label
+                                            for="regime"
+                                            class="text-xs font-bold text-slate-800 dark:text-slate-200"
+                                        >
+                                            Régimen Laboral
+                                        </Label>
+                                        <select
+                                            id="regime"
+                                            v-model="employmentRegime"
+                                            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-900 focus:border-[#3484a5] focus:outline-none focus:ring-2 focus:ring-[#3484a5]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                                        >
+                                            <option
+                                                v-for="r in EMPLOYMENT_REGIMES"
+                                                :key="r"
+                                                :value="r"
+                                            >
+                                                {{ r }}
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
