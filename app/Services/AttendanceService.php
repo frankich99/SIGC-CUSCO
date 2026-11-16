@@ -13,6 +13,8 @@ class AttendanceService
 {
     /**
      * Record one attendance event while serializing concurrent writes.
+     *
+     * @param  array{minutes_present?: int|null}  $attributes  Extra columns (e.g. permanence minutes, SC-32).
      */
     public function record(
         Course $course,
@@ -22,8 +24,9 @@ class AttendanceService
         string $method,
         int|string|null $recordedBy = null,
         ?CarbonInterface $recordedAt = null,
+        array $attributes = [],
     ): ?AttendanceRecord {
-        return DB::transaction(function () use ($course, $enrollment, $session, $status, $method, $recordedBy, $recordedAt): ?AttendanceRecord {
+        return DB::transaction(function () use ($course, $enrollment, $session, $status, $method, $recordedBy, $recordedAt, $attributes): ?AttendanceRecord {
             $lockedCourse = Course::query()
                 ->whereKey($course->getKey())
                 ->lockForUpdate()
@@ -43,6 +46,7 @@ class AttendanceService
                 $method,
                 $recordedBy,
                 $recordedAt,
+                $attributes,
             );
         });
     }
@@ -101,7 +105,7 @@ class AttendanceService
     {
         return AttendanceRecord::query()
             ->where('enrollment_id', $enrollment->getKey())
-            ->whereIn('status', ['presente', 'tardanza'])
+            ->whereIn('status', AttendanceRecord::COUNTED_STATUSES)
             ->count();
     }
 
@@ -133,13 +137,16 @@ class AttendanceService
             ]);
         }
 
-        if (! in_array($status, ['presente', 'tardanza', 'falta'], true)) {
+        if (! in_array($status, AttendanceRecord::STATUSES, true)) {
             throw ValidationException::withMessages([
                 'status' => 'El estado de asistencia no es válido.',
             ]);
         }
     }
 
+    /**
+     * @param  array{minutes_present?: int|null}  $attributes
+     */
     private function createRecord(
         Course $course,
         Enrollment $enrollment,
@@ -148,6 +155,7 @@ class AttendanceService
         string $method,
         int|string|null $recordedBy,
         ?CarbonInterface $recordedAt,
+        array $attributes = [],
     ): ?AttendanceRecord {
         $alreadyRecorded = AttendanceRecord::query()
             ->where('enrollment_id', $enrollment->getKey())
@@ -167,6 +175,7 @@ class AttendanceService
             'method' => $method,
             'recorded_at' => $recordedAt ?? now(),
             'recorded_by' => $recordedBy !== null ? (int) $recordedBy : null,
+            'minutes_present' => $attributes['minutes_present'] ?? null,
         ]);
 
         $enrollment->update([

@@ -22,6 +22,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import EnrollmentModal from '@/components/EnrollmentModal.vue';
+import SessionRosterPanel from '@/components/SessionRosterPanel.vue';
 import { formatDate, formatDateRange } from '@/lib/formatters';
 import {
     THEME_BUTTONS,
@@ -71,6 +72,7 @@ import {
     Copy,
     Eye,
     Printer,
+    ScanBarcode,
 } from '@lucide/vue';
 import type { BreadcrumbItem } from '@/types';
 import CoursePublicView, {
@@ -91,9 +93,11 @@ interface Instructor {
 interface AttendanceRecordItem {
     id: number;
     session_number: number;
-    status: 'presente' | 'tardanza' | 'falta';
+    status: 'presente' | 'tardanza' | 'falta' | 'parcial' | 'sin_salida';
     recorded_at?: string;
     method?: string;
+    minutes_present?: number | null;
+    justification?: string | null;
 }
 
 interface EnrollmentItem {
@@ -186,6 +190,7 @@ const currentTime = ref('');
 let timeInterval: any = null;
 
 function updateCuscoTime() {
+    nowMs.value = Date.now();
     currentTime.value = new Intl.DateTimeFormat('es-PE', {
         timeZone: 'America/Lima',
         hour: '2-digit',
@@ -198,13 +203,44 @@ function updateCuscoTime() {
 const sessionQrSvg = ref('');
 const isLoadingQr = ref(false);
 const qrLoadError = ref<string | null>(null);
+// SC-31: el QR expira; se renueva solo unos segundos antes para que el proyector nunca muestre uno vencido.
+const QR_REFRESH_MARGIN_MS = 10_000;
+const qrExpiresAt = ref<number | null>(null);
+const nowMs = ref(Date.now());
+let qrRefreshTimer: ReturnType<typeof setTimeout> | null = null;
 
-async function loadSessionQr() {
+const qrSecondsLeft = computed(() =>
+    qrExpiresAt.value === null
+        ? null
+        : Math.max(0, Math.ceil((qrExpiresAt.value - nowMs.value) / 1000)),
+);
+
+function clearQrRefreshTimer() {
+    if (qrRefreshTimer) clearTimeout(qrRefreshTimer);
+    qrRefreshTimer = null;
+}
+
+function scheduleQrRefresh() {
+    clearQrRefreshTimer();
+    if (!isQrProjectorOpen.value || qrExpiresAt.value === null) return;
+
+    const delay = Math.max(
+        1_000,
+        qrExpiresAt.value - Date.now() - QR_REFRESH_MARGIN_MS,
+    );
+    qrRefreshTimer = setTimeout(() => loadSessionQr(true), delay);
+}
+
+async function loadSessionQr(silent = false) {
     if (!isQrProjectorOpen.value) return;
 
-    isLoadingQr.value = true;
+    const requestedSession = selectedSession.value;
+    isLoadingQr.value = !silent;
     qrLoadError.value = null;
-    sessionQrSvg.value = '';
+    if (!silent) {
+        sessionQrSvg.value = '';
+        qrExpiresAt.value = null;
+    }
 
     try {
         const response = await fetch(
@@ -225,12 +261,27 @@ async function loadSessionQr() {
             );
         }
 
+        // Ignorar respuestas tardías si se cambió de sesión o se cerró el proyector.
+        if (
+            !isQrProjectorOpen.value ||
+            requestedSession !== selectedSession.value
+        ) {
+            return;
+        }
+
         sessionQrSvg.value = data.svg;
+        qrExpiresAt.value = data.expires_at
+            ? new Date(data.expires_at).getTime()
+            : null;
+        scheduleQrRefresh();
     } catch (e) {
         qrLoadError.value =
             e instanceof Error
                 ? e.message
                 : 'No se pudo generar el código QR de la sesión.';
+        // Reintentar pronto: un corte breve de red no debe dejar el proyector sin QR.
+        clearQrRefreshTimer();
+        qrRefreshTimer = setTimeout(() => loadSessionQr(true), 5_000);
     } finally {
         isLoadingQr.value = false;
     }
@@ -275,6 +326,9 @@ function saveOfflineQueue() {
     }
 }
 
+const sessionRosterPanel = ref<InstanceType<typeof SessionRosterPanel> | null>(
+    null,
+);
 const manualIdentifier = ref('');
 const manualStatus = ref<'presente' | 'tardanza'>('presente');
 const isSubmittingAttendance = ref(false);
@@ -324,6 +378,7 @@ function registerManualAttendance() {
             onSuccess: () => {
                 isSubmittingAttendance.value = false;
                 manualIdentifier.value = '';
+                void sessionRosterPanel.value?.refresh(true);
                 attendanceFeedback.value = {
                     type: 'success',
                     text: `✓ Asistencia registrada para la sesión ${selectedSession.value}.`,
@@ -788,11 +843,15 @@ onMounted(() => {
 watch([selectedSession, isQrProjectorOpen], () => {
     if (isQrProjectorOpen.value) {
         loadSessionQr();
+    } else {
+        clearQrRefreshTimer();
+        qrExpiresAt.value = null;
     }
 });
 
 onUnmounted(() => {
     if (timeInterval) clearInterval(timeInterval);
+    clearQrRefreshTimer();
 });
 </script>
 
@@ -1872,17 +1931,32 @@ onUnmounted(() => {
                                 </div>
                             </div>
 
-                            <Button
-                                size="sm"
-                                :class="[
-                                    THEME_BUTTONS.primary,
-                                    'h-8 shrink-0 text-xs font-black shadow-xs',
-                                ]"
-                                @click="isQrProjectorOpen = true"
-                            >
-                                <Maximize2 class="mr-1.5 size-3.5" />
-                                Proyectar QR (Sesión {{ selectedSession }})
-                            </Button>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <Button
+                                    as-child
+                                    size="sm"
+                                    variant="outline"
+                                    class="h-8 shrink-0 border-slate-300 text-xs font-bold hover:text-rose-900"
+                                >
+                                    <Link
+                                        :href="`/courses/${course.id}/kiosco/${selectedSession}?modo=entrada`"
+                                    >
+                                        <ScanBarcode class="mr-1.5 size-3.5" />
+                                        Kiosco DNI (ingreso/salida)
+                                    </Link>
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    :class="[
+                                        THEME_BUTTONS.primary,
+                                        'h-8 shrink-0 text-xs font-black shadow-xs',
+                                    ]"
+                                    @click="isQrProjectorOpen = true"
+                                >
+                                    <Maximize2 class="mr-1.5 size-3.5" />
+                                    Proyectar QR (Sesión {{ selectedSession }})
+                                </Button>
+                            </div>
                         </div>
 
                         <!-- Formulario de Registro Manual Rápido -->
@@ -1944,6 +2018,13 @@ onUnmounted(() => {
                             <span>{{ attendanceFeedback.text }}</span>
                         </div>
                     </div>
+
+                    <!-- SC-33: lista en vivo de la sesión seleccionada (presentes, ausentes y hora) -->
+                    <SessionRosterPanel
+                        ref="sessionRosterPanel"
+                        :course-id="course.id"
+                        :session="selectedSession"
+                    />
 
                     <!-- Card de la Matriz Integral de Asistencias (Misma Dimensión y Borde que las demás pestañas) -->
                     <Card
@@ -2102,6 +2183,34 @@ onUnmounted(() => {
                                                     class="inline-flex size-5 items-center justify-center rounded-full bg-amber-100 text-[11px] font-black text-amber-800"
                                                     title="Tardanza"
                                                     >T</span
+                                                >
+                                                <span
+                                                    v-else-if="
+                                                        enrollment.attendance_records?.some(
+                                                            (r) =>
+                                                                r.session_number ===
+                                                                    s &&
+                                                                r.status ===
+                                                                    'parcial',
+                                                        )
+                                                    "
+                                                    class="inline-flex size-5 items-center justify-center rounded-full bg-orange-100 text-[11px] font-black text-orange-800"
+                                                    title="Asistencia parcial (no suma)"
+                                                    >P</span
+                                                >
+                                                <span
+                                                    v-else-if="
+                                                        enrollment.attendance_records?.some(
+                                                            (r) =>
+                                                                r.session_number ===
+                                                                    s &&
+                                                                r.status ===
+                                                                    'sin_salida',
+                                                        )
+                                                    "
+                                                    class="inline-flex size-5 items-center justify-center rounded-full bg-rose-100 text-[10px] font-black text-rose-800"
+                                                    title="Sin salida (no suma)"
+                                                    >S</span
                                                 >
                                                 <span
                                                     v-else
@@ -2844,7 +2953,7 @@ onUnmounted(() => {
                         <Loader2 class="size-8 animate-spin text-rose-900" />
                     </div>
                     <div
-                        v-else-if="qrLoadError"
+                        v-else-if="qrLoadError && !sessionQrSvg"
                         class="max-w-sm rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs font-bold text-rose-900"
                     >
                         {{ qrLoadError }}
@@ -2854,12 +2963,28 @@ onUnmounted(() => {
                         class="rounded-2xl border-4 border-rose-950/20 bg-white p-4 shadow-md"
                         v-html="sessionQrSvg"
                     ></div>
+                    <p
+                        v-if="qrLoadError && sessionQrSvg"
+                        class="text-[11px] font-bold text-amber-700"
+                    >
+                        No se pudo renovar el QR; reintentando…
+                    </p>
 
                     <div class="space-y-1 text-center">
+                        <p
+                            v-if="qrSecondsLeft !== null"
+                            class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-black text-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
+                        >
+                            <RefreshCw class="size-3.5" />
+                            Este QR se renueva solo · vence en
+                            {{ Math.floor(qrSecondsLeft / 60) }}:{{
+                                String(qrSecondsLeft % 60).padStart(2, '0')
+                            }}
+                        </p>
                         <p class="max-w-sm text-[11px] text-slate-500">
                             Escanea con tu cámara para confirmar tu asistencia
                             desde tu cuenta verificada. El enlace expira
-                            automáticamente.
+                            automáticamente y se genera uno nuevo.
                         </p>
                     </div>
 
