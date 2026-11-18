@@ -13,11 +13,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import SessionRosterPanel from '@/components/SessionRosterPanel.vue';
 import { firstErrorMessage, postJson } from '@/lib/http';
+import { useOnlineStatus } from '@/composables/useOnlineStatus';
 import {
     countPendingMarks,
-    enqueueMark,
     isOfflineStorageAvailable,
 } from '@/lib/offline/markQueue';
+import { queueOfflineMark } from '@/lib/offline/queueOfflineMark';
 import {
     formatLimaTime,
     type MarkOrigin,
@@ -81,6 +82,15 @@ type KioskResult = Omit<MarkResult, 'result'> & { result: KioskResultKind };
 
 const lastResult = ref<(KioskResult & { tone: Tone }) | null>(null);
 const pendingOffline = ref(0);
+
+/** Modo offline (SC-38, ADR 0001). */
+const connection = useOnlineStatus();
+const isOffline = connection.isOffline;
+/** Sin respuesta en este tiempo, la marcación se guarda en el dispositivo. */
+const MARK_TIMEOUT_MS = 8000;
+/** Tras un fallo de red, cada cuánto se vuelve a intentar con el servidor. */
+const SERVER_RETRY_MS = 30000;
+let lastNetworkFailureAt = 0;
 const showPrivacyNotice = ref(false);
 let resultTimer: ReturnType<typeof setTimeout> | null = null;
 let privacyTimer: ReturnType<typeof setTimeout> | null = null;
@@ -164,10 +174,17 @@ async function submitMark(): Promise<void> {
     identifier.value = '';
 
     try {
+        if (shouldSkipServer()) {
+            await saveMarkOffline(value);
+            return;
+        }
+
         const { data, status } = await postJson<MarkResult>(
             `/courses/${props.course.id}/sessions/${session.value}/marks`,
             { identifier: value, type: mode.value, origin: origin.value },
+            { timeoutMs: MARK_TIMEOUT_MS },
         );
+        connection.reportNetworkSuccess();
 
         if (data && typeof data === 'object' && 'result' in data) {
             showResult(data);
@@ -189,6 +206,9 @@ async function submitMark(): Promise<void> {
 
         void rosterPanel.value?.refresh(true);
     } catch {
+        // Sin red o sin respuesta a tiempo: el servidor no decidió nada.
+        connection.reportNetworkFailure();
+        lastNetworkFailureAt = Date.now();
         await saveMarkOffline(value);
     } finally {
         isSubmitting.value = false;
@@ -197,9 +217,22 @@ async function submitMark(): Promise<void> {
 }
 
 /**
- * Prototipo del spike SC-37: si el servidor no responde, la marcación se
- * guarda en el dispositivo (IndexedDB) en lugar de perderse. La sincronización
- * con el servidor llega en SC-39.
+ * No intentar con el servidor si el navegador dice que no hay red, o si el
+ * último envío falló hace menos de SERVER_RETRY_MS (evita esperar 8 s en cada
+ * lectura mientras la red sigue caída).
+ */
+function shouldSkipServer(): boolean {
+    if (!connection.browserOnline.value) return true;
+
+    return (
+        connection.serverUnreachable.value &&
+        Date.now() - lastNetworkFailureAt < SERVER_RETRY_MS
+    );
+}
+
+/**
+ * Sin conexión la marcación se guarda en el dispositivo (IndexedDB) en lugar
+ * de perderse. La sincronización con el servidor llega en SC-39.
  */
 async function saveMarkOffline(value: string): Promise<void> {
     const failure: KioskResult = {
@@ -218,19 +251,39 @@ async function saveMarkOffline(value: string): Promise<void> {
     }
 
     try {
-        const saved = await enqueueMark({
-            course_id: props.course.id,
+        const outcome = await queueOfflineMark({
+            courseId: props.course.id,
             session: session.value,
             identifier: value,
             type: mode.value,
             origin: origin.value,
         });
+
+        if (outcome.kind === 'invalid_dni') {
+            showResult({
+                ...failure,
+                message:
+                    'La lectura no contiene un DNI válido de 8 dígitos. Vuelva a escanear.',
+            });
+            return;
+        }
+
+        if (outcome.kind === 'already_pending') {
+            showResult({
+                ...failure,
+                result: 'duplicada',
+                message: `Sin conexión: la ${mode.value} del DNI ${outcome.mark.dni ?? outcome.mark.identifier} ya estaba guardada en este dispositivo. No se registró de nuevo.`,
+                marked_at: outcome.mark.captured_at,
+            });
+            return;
+        }
+
         await refreshPendingOffline();
         showResult({
             ...failure,
             result: 'guardada_offline',
-            message: `Sin conexión: la ${mode.value} del DNI ${saved.identifier} quedó guardada en este dispositivo y se enviará cuando vuelva la red.`,
-            marked_at: saved.captured_at,
+            message: `Sin conexión: la ${mode.value} del DNI ${outcome.mark.dni ?? outcome.mark.identifier} quedó guardada en este dispositivo y se enviará cuando vuelva la red.`,
+            marked_at: outcome.mark.captured_at,
         });
     } catch {
         showResult(failure);
@@ -366,6 +419,16 @@ onUnmounted(() => {
             >
                 El acta oficial de esta capacitación está cerrada. No se pueden
                 registrar marcas.
+            </div>
+
+            <div
+                v-if="isOffline"
+                class="flex items-center gap-3 rounded-xl border border-sky-300 bg-sky-50 p-3 text-sm font-bold text-sky-900"
+                role="status"
+            >
+                <CloudOff class="size-5 shrink-0" />
+                Sin conexión con el servidor. Las marcaciones se guardan en este
+                dispositivo y se enviarán cuando vuelva la red.
             </div>
 
             <!-- Sesión -->
