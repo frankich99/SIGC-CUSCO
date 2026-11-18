@@ -50,4 +50,44 @@ IndexedDB cubre ese caso sin service worker. Se deja como mejora posible
 
 ## SC-46: prototipo
 
-_Ver la sección «Resultado del prototipo» (se completa con SC-46)._
+### Qué se construyó
+
+- `resources/js/lib/offline/markQueue.ts`: cola en IndexedDB (base
+  `sigc-kiosco-offline`, almacén `marks`, clave `client_uuid`, índice
+  `by_session` por `[course_id, session]`). Funciones: `enqueueMark`,
+  `listPendingMarks`, `countPendingMarks`, `removeMark`.
+- `Kiosk.vue`: si el envío de la marcación falla por red, la marcación se
+  guarda en la cola, el kiosco muestra un aviso celeste («quedó guardada en
+  este dispositivo») y debajo del campo de lectura aparece cuántas
+  marcaciones de la sesión están pendientes. El contador se lee de IndexedDB
+  al abrir la página, así que sobrevive a una recarga.
+- `markQueue.test.ts`: 8 pruebas con Vitest y `fake-indexeddb` (`npm test`).
+
+### Hallazgos
+
+1. **`crypto.randomUUID()` no sirve siempre.** Solo existe en contextos
+   seguros (HTTPS o `localhost`). Si el kiosco se abre por
+   `http://192.168.x.x`, no está; por eso `generateClientUuid()` arma el UUID
+   v4 con `crypto.getRandomValues()`, que sí está disponible.
+2. **La hora que cuenta es la del escaneo**, no la del envío. Se guarda
+   `captured_at` con la hora del dispositivo; el servidor (SC-52) deberá
+   usarla para calcular la permanencia y validar que no sea absurda (p. ej.
+   posterior a la hora del servidor).
+3. **El `client_uuid` como clave evita duplicados en el propio dispositivo**:
+   guardar dos veces la misma marcación la sobrescribe (lo cubre una prueba).
+   Para el servidor hace falta la columna única de SC-51.
+4. **Sin conexión el kiosco no puede validar el DNI** (si está matriculado,
+   si ya marcó). Esa respuesta llega al sincronizar; por eso SC-56 debe
+   avisar al docente de las marcaciones rechazadas.
+
+### Cómo probarlo a mano
+
+1. Abrir el kiosco de una sesión (`/courses/{id}/kiosco/{sesión}`).
+2. En DevTools → Network, elegir **Offline**.
+3. Pasar un DNI: aparece el aviso celeste y el contador «1 marcación
+   guardada…».
+4. Volver a **No throttling** y recargar la página: el contador se mantiene
+   (DevTools → Application → IndexedDB → `sigc-kiosco-offline` muestra el
+   registro). Todavía no se envía solo; eso es SC-39.
+
+La decisión técnica para SC-38 y SC-39 queda en el ADR (SC-47).
