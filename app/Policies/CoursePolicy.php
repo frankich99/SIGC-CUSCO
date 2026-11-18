@@ -40,6 +40,14 @@ class CoursePolicy
     }
 
     /**
+     * Determine whether the user can run attendance control (kiosk, live roster) for the course.
+     */
+    public function manageAttendance(User $user, Course $course): bool
+    {
+        return $user->isAdmin() || ($user->isDocente() && $course->instructor_id === $user->id);
+    }
+
+    /**
      * Determine whether the user can delete the course.
      */
     public function delete(User $user, Course $course): bool

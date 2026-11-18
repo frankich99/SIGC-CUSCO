@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceKioskController;
 use App\Http\Controllers\AttendanceScanController;
 use App\Http\Controllers\CourseAcademicController;
 use App\Http\Controllers\CourseController;
@@ -208,6 +209,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('courses/{course}/sessions/{session}/attendance', [CourseAcademicController::class, 'recordSessionAttendance'])->name('courses.sessions.attendance');
     Route::get('courses/{course}/sessions/{session}/qr', [CourseAcademicController::class, 'sessionQr'])->name('courses.sessions.qr');
     Route::post('courses/{course}/attendance/sync', [CourseAcademicController::class, 'syncOfflineAttendance'])->name('courses.attendance.sync');
+
+    // Control de permanencia con lector de DNI (SC-32) y padrón en vivo por sesión (SC-33)
+    Route::get('courses/{course}/kiosco/{session}', [AttendanceKioskController::class, 'show'])->whereNumber('session')->name('courses.sessions.kiosk');
+    Route::post('courses/{course}/sessions/{session}/marks', [AttendanceKioskController::class, 'storeMark'])->whereNumber('session')->name('courses.sessions.marks');
+    Route::get('courses/{course}/sessions/{session}/roster', [AttendanceKioskController::class, 'roster'])->whereNumber('session')->name('courses.sessions.roster');
+    Route::post('courses/{course}/sessions/{session}/close', [AttendanceKioskController::class, 'close'])->whereNumber('session')->name('courses.sessions.close');
+    Route::post('courses/{course}/sessions/{session}/justify/{enrollment}', [AttendanceKioskController::class, 'justify'])->whereNumber('session')->name('courses.sessions.justify');
 
     Route::get('attendance/scan/{course}/{session}', [AttendanceScanController::class, 'show'])
         ->middleware('signed')

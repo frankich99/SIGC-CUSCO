@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttendanceRecord;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Services\AttendanceQrService;
@@ -342,6 +343,7 @@ class CourseAcademicController extends Controller
         }
         $headers[] = 'Total Asistencias';
         $headers[] = '% Asistencia';
+        $headers[] = 'Horas Efectivas (control de permanencia)';
         $headers[] = 'Estado';
 
         $output = fopen('php://temp', 'r+');
@@ -366,11 +368,16 @@ class CourseAcademicController extends Controller
 
             for ($i = 1; $i <= $totalSessions; $i++) {
                 $rec = $recordsBySession->get($i);
-                $row[] = $rec ? mb_strtoupper($rec->status) : 'FALTA';
+                $row[] = $rec ? $this->formatAttendanceCell($rec) : 'FALTA';
             }
+
+            $trackedRecords = $enrollment->attendanceRecords->whereNotNull('minutes_present');
 
             $row[] = $enrollment->attended_sessions;
             $row[] = "{$enrollment->attendance_percentage}%";
+            $row[] = $trackedRecords->isEmpty()
+                ? '-'
+                : number_format($trackedRecords->sum('minutes_present') / 60, 2);
             $row[] = mb_strtoupper($enrollment->status);
 
             fputcsv($output, $row, ';');
@@ -573,7 +580,7 @@ class CourseAcademicController extends Controller
         }
 
         $status = $validated['status'] ?? 'presente';
-        $attendanceService->record(
+        $record = $attendanceService->record(
             $course,
             $enrollment,
             (int) $validated['session_number'],
@@ -581,6 +588,14 @@ class CourseAcademicController extends Controller
             'scan',
             Auth::id(),
         );
+
+        if ($record === null) {
+            return response()->json([
+                'success' => false,
+                'already_recorded' => true,
+                'message' => "{$enrollment->full_name} ya está registrado en la sesión {$validated['session_number']}.",
+            ], 422);
+        }
 
         $enrollment->refresh();
 
@@ -596,6 +611,33 @@ class CourseAcademicController extends Controller
                 'status' => $enrollment->status,
             ],
         ]);
+    }
+
+    /**
+     * Celda de la matriz CSV: estado, origen de la marca y minutos de permanencia (SC-32).
+     */
+    private function formatAttendanceCell(AttendanceRecord $record): string
+    {
+        $origin = match ($record->method) {
+            'dni_lector' => 'lector DNI',
+            'qr_proyeccion' => 'QR',
+            'manual' => 'manual',
+            'offline_sync' => 'offline',
+            'scan' => 'credencial',
+            default => $record->method,
+        };
+
+        $cell = mb_strtoupper(str_replace('_', ' ', $record->status))." ({$origin})";
+
+        if ($record->minutes_present !== null) {
+            $cell .= " {$record->minutes_present} min";
+        }
+
+        if ($record->justification) {
+            $cell .= ' [justificada]';
+        }
+
+        return $cell;
     }
 
     /**

@@ -134,6 +134,16 @@ class Enrollment extends Model
     }
 
     /**
+     * Marcas de ingreso y salida registradas en el kiosco (SC-32).
+     *
+     * @return HasMany<AttendanceMark, $this>
+     */
+    public function attendanceMarks(): HasMany
+    {
+        return $this->hasMany(AttendanceMark::class);
+    }
+
+    /**
      * Nombre completo del participante.
      */
     public function getFullNameAttribute(): string

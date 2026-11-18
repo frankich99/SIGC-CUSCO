@@ -125,6 +125,9 @@ test('CP-05 admin creates valid course with external ponente and stores in mysql
 test('authenticated user can query dni endpoint without receiving unnecessary PII', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
 
+    // Sin clave el servicio ni llama a la API (devuelve 404); en CI el .env no la trae.
+    config(['services.perudevs.key' => 'test-key']);
+
     Http::fake([
         'api.perudevs.com/*' => Http::response([
             'estado' => true,
