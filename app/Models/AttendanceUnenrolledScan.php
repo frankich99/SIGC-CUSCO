@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property string $reason
  * @property Carbon $scanned_at
  * @property int|null $recorded_by
+ * @property string|null $client_uuid UUID generado por el kiosco sin conexión (SC-51).
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Course $course
@@ -34,6 +35,7 @@ class AttendanceUnenrolledScan extends Model
         'reason',
         'scanned_at',
         'recorded_by',
+        'client_uuid',
     ];
 
     /**
