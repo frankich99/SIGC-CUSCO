@@ -79,6 +79,35 @@ class AttendanceKioskController extends Controller
     }
 
     /**
+     * Sincronizar las marcaciones que el kiosco guardó sin conexión (SC-52, HU-11.3).
+     *
+     * Responde una línea por `client_uuid`; reenviar el mismo lote es seguro.
+     */
+    public function syncMarks(Request $request, Course $course, int $session): JsonResponse
+    {
+        Gate::authorize('manageAttendance', $course);
+
+        $validated = $request->validate([
+            'marks' => ['required', 'array', 'min:1', 'max:'.AttendancePermanenceService::SYNC_MAX_BATCH],
+            'marks.*.client_uuid' => ['required', 'uuid', 'distinct'],
+            'marks.*.identifier' => ['required', 'string', 'max:50'],
+            'marks.*.type' => ['required', Rule::in([AttendanceMark::TYPE_ENTRY, AttendanceMark::TYPE_EXIT])],
+            'marks.*.origin' => ['nullable', Rule::in([AttendanceMark::ORIGIN_DNI_READER, AttendanceMark::ORIGIN_MANUAL])],
+            'marks.*.captured_at' => ['required', 'date'],
+        ], [
+            'marks.max' => 'Envíe como máximo '.AttendancePermanenceService::SYNC_MAX_BATCH.' marcaciones por lote.',
+            'marks.*.client_uuid.distinct' => 'El lote tiene marcaciones repetidas.',
+        ]);
+
+        /** @var list<array{client_uuid: string, identifier: string, type: string, origin?: string|null, captured_at: string}> $marks */
+        $marks = $validated['marks'];
+
+        return response()->json([
+            'results' => $this->permanence->syncMarks($course, $session, $marks, $request->user()?->id),
+        ]);
+    }
+
+    /**
      * Padrón en vivo de la sesión (presentes, ausentes, hora de marcación, origen y «No inscritos»).
      */
     public function roster(Course $course, int $session): JsonResponse

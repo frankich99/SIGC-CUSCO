@@ -64,7 +64,9 @@ export interface MarkResult {
         | 'duplicada'
         | 'sin_ingreso'
         | 'no_inscrito'
-        | 'dni_invalido';
+        | 'dni_invalido'
+        /** Solo al sincronizar: la hora del dispositivo está fuera de rango (SC-52). */
+        | 'hora_invalida';
     message: string;
     first_mark: boolean;
     participant: { id: number; dni: string; full_name: string } | null;

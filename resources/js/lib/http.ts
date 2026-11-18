@@ -19,10 +19,27 @@ function xsrfToken(): string {
     return match ? decodeURIComponent(match.split('=')[1]) : '';
 }
 
+export interface RequestOptions {
+    /**
+     * Abortar si el servidor no responde en este tiempo. La promesa se rechaza
+     * con un `NetworkTimeoutError`, igual que si no hubiera red.
+     */
+    timeoutMs?: number;
+}
+
+/** El servidor no respondió dentro de `timeoutMs`. */
+export class NetworkTimeoutError extends Error {
+    constructor(timeoutMs: number) {
+        super(`Sin respuesta del servidor en ${timeoutMs} ms.`);
+        this.name = 'NetworkTimeoutError';
+    }
+}
+
 async function requestJson<T>(
     method: 'GET' | 'POST',
     url: string,
     body?: unknown,
+    options: RequestOptions = {},
 ): Promise<JsonResult<T>> {
     const init: RequestInit = {
         method,
@@ -39,27 +56,53 @@ async function requestJson<T>(
         init.body = JSON.stringify(body);
     }
 
-    const response = await fetch(url, init);
+    const { timeoutMs } = options;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let timedOut = false;
 
-    let data: unknown = null;
-    try {
-        data = await response.json();
-    } catch {
-        data = null;
+    if (timeoutMs !== undefined) {
+        const controller = new AbortController();
+        init.signal = controller.signal;
+        timer = setTimeout(() => {
+            timedOut = true;
+            controller.abort();
+        }, timeoutMs);
     }
 
-    return { ok: response.ok, status: response.status, data: data as T };
+    try {
+        const response = await fetch(url, init);
+
+        let data: unknown = null;
+        try {
+            data = await response.json();
+        } catch {
+            data = null;
+        }
+
+        return { ok: response.ok, status: response.status, data: data as T };
+    } catch (error) {
+        if (timedOut && timeoutMs !== undefined) {
+            throw new NetworkTimeoutError(timeoutMs);
+        }
+        throw error;
+    } finally {
+        if (timer) clearTimeout(timer);
+    }
 }
 
-export function getJson<T>(url: string): Promise<JsonResult<T>> {
-    return requestJson<T>('GET', url);
+export function getJson<T>(
+    url: string,
+    options?: RequestOptions,
+): Promise<JsonResult<T>> {
+    return requestJson<T>('GET', url, undefined, options);
 }
 
 export function postJson<T>(
     url: string,
     body: unknown = {},
+    options?: RequestOptions,
 ): Promise<JsonResult<T>> {
-    return requestJson<T>('POST', url, body);
+    return requestJson<T>('POST', url, body, options);
 }
 
 /**

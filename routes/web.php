@@ -213,6 +213,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Control de permanencia con lector de DNI (SC-32) y padrón en vivo por sesión (SC-33)
     Route::get('courses/{course}/kiosco/{session}', [AttendanceKioskController::class, 'show'])->whereNumber('session')->name('courses.sessions.kiosk');
     Route::post('courses/{course}/sessions/{session}/marks', [AttendanceKioskController::class, 'storeMark'])->whereNumber('session')->name('courses.sessions.marks');
+    Route::post('courses/{course}/sessions/{session}/marks/sync', [AttendanceKioskController::class, 'syncMarks'])->whereNumber('session')->name('courses.sessions.marks.sync');
     Route::get('courses/{course}/sessions/{session}/roster', [AttendanceKioskController::class, 'roster'])->whereNumber('session')->name('courses.sessions.roster');
     Route::post('courses/{course}/sessions/{session}/close', [AttendanceKioskController::class, 'close'])->whereNumber('session')->name('courses.sessions.close');
     Route::post('courses/{course}/sessions/{session}/justify/{enrollment}', [AttendanceKioskController::class, 'justify'])->whereNumber('session')->name('courses.sessions.justify');
