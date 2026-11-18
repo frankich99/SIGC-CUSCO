@@ -1,13 +1,21 @@
 /**
  * Sincronización de las marcaciones guardadas sin conexión (SC-53 / HU-11.3).
  *
- * Envía la cola local por lotes a POST .../marks/sync y borra de la cola cada
+ * Envía la cola local por lotes a POST .../marks/sync y saca de la cola cada
  * marcación que el servidor contestó, sea cual sea el resultado: el servidor
- * ya decidió y reenviarla no cambiaría nada (ver ADR 0001).
+ * ya decidió y reenviarla no cambiaría nada (ver ADR 0001). Las que no se
+ * registraron pasan a la lista de rechazadas para que el docente las revise
+ * (SC-56).
  */
 import { firstErrorMessage, postJson, type RequestOptions } from '@/lib/http';
 import type { MarkResult } from '@/types/attendance';
-import { countPendingMarks, listPendingMarks, removeMark } from './markQueue';
+import {
+    countPendingMarks,
+    listPendingMarks,
+    moveToRejected,
+    removeMark,
+    type RejectedMark,
+} from './markQueue';
 
 export type SyncedMarkResult = MarkResult & { client_uuid: string };
 
@@ -16,6 +24,8 @@ export interface SyncBatchSummary {
     results: SyncedMarkResult[];
     /** Marcaciones que siguen en la cola de la sesión. */
     remaining: number;
+    /** Las que el servidor no registró; quedan para revisión del docente. */
+    rejected: RejectedMark[];
 }
 
 /** Resultados que significan que la marcación no quedó registrada. */
@@ -77,7 +87,7 @@ export async function syncPendingBatch(
     );
 
     if (batch.length === 0) {
-        return { results: [], remaining: 0 };
+        return { results: [], remaining: 0, rejected: [] };
     }
 
     const response = await post(
@@ -108,18 +118,28 @@ export async function syncPendingBatch(
         );
     }
 
-    const sent = new Set(batch.map((mark) => mark.client_uuid));
+    const sent = new Map(batch.map((mark) => [mark.client_uuid, mark]));
     const results = data.results.filter((result) =>
         sent.has(result.client_uuid),
     );
+    const rejected: RejectedMark[] = [];
 
     for (const result of results) {
-        await removeMark(result.client_uuid);
+        const mark = sent.get(result.client_uuid);
+
+        if (mark && REJECTED_RESULTS.has(result.result)) {
+            rejected.push(
+                await moveToRejected(mark, result.result, result.message),
+            );
+        } else {
+            await removeMark(result.client_uuid);
+        }
     }
 
     return {
         results,
         remaining: await countPendingMarks(courseId, session),
+        rejected,
     };
 }
 

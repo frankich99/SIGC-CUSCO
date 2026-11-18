@@ -32,26 +32,60 @@ export type NewQueuedMark = Pick<
 > &
     Partial<Pick<QueuedMark, 'client_uuid' | 'captured_at'>>;
 
+/**
+ * Marcación guardada sin conexión que el servidor no registró al sincronizar
+ * (SC-56). Queda en el dispositivo hasta que el docente la revise.
+ */
+export interface RejectedMark {
+    client_uuid: string;
+    course_id: number;
+    session: number;
+    identifier: string;
+    dni: string | null;
+    type: MarkType;
+    captured_at: string;
+    /** Resultado del servidor: no_inscrito, sin_ingreso, dni_invalido, hora_invalida. */
+    result: string;
+    /** Motivo que explicó el servidor. */
+    message: string;
+    rejected_at: string;
+}
+
 interface KioskOfflineDB extends DBSchema {
     marks: {
         key: string;
         value: QueuedMark;
         indexes: { by_session: [number, number] };
     };
+    rejected: {
+        key: string;
+        value: RejectedMark;
+        indexes: { by_session: [number, number] };
+    };
 }
 
 export const OFFLINE_DB_NAME = 'sigc-kiosco-offline';
-const OFFLINE_DB_VERSION = 1;
+/** v1: cola de marcaciones (SC-46) · v2: rechazadas al sincronizar (SC-56). */
+const OFFLINE_DB_VERSION = 2;
 
 let dbPromise: Promise<IDBPDatabase<KioskOfflineDB>> | null = null;
 
 function database(): Promise<IDBPDatabase<KioskOfflineDB>> {
     dbPromise ??= openDB<KioskOfflineDB>(OFFLINE_DB_NAME, OFFLINE_DB_VERSION, {
-        upgrade(db) {
-            const store = db.createObjectStore('marks', {
-                keyPath: 'client_uuid',
-            });
-            store.createIndex('by_session', ['course_id', 'session']);
+        upgrade(db, oldVersion) {
+            if (oldVersion < 1) {
+                const marks = db.createObjectStore('marks', {
+                    keyPath: 'client_uuid',
+                });
+                marks.createIndex('by_session', ['course_id', 'session']);
+            }
+
+            if (oldVersion < 2) {
+                const rejected = db.createObjectStore('rejected', {
+                    keyPath: 'client_uuid',
+                });
+                rejected.createIndex('by_session', ['course_id', 'session']);
+            }
         },
     });
 
@@ -160,6 +194,71 @@ export async function countPendingMarks(
 export async function removeMark(clientUuid: string): Promise<void> {
     const db = await database();
     await db.delete('marks', clientUuid);
+}
+
+/**
+ * Pasa una marcación de la cola a la lista de rechazadas, en una sola
+ * transacción: no puede quedar en las dos ni perderse entre ambas (SC-56).
+ */
+export async function moveToRejected(
+    mark: QueuedMark,
+    result: string,
+    message: string,
+): Promise<RejectedMark> {
+    const rejected: RejectedMark = {
+        client_uuid: mark.client_uuid,
+        course_id: mark.course_id,
+        session: mark.session,
+        identifier: mark.identifier,
+        dni: mark.dni ?? extractDni(mark.identifier),
+        type: mark.type,
+        captured_at: mark.captured_at,
+        result,
+        message,
+        rejected_at: new Date().toISOString(),
+    };
+
+    const db = await database();
+    const tx = db.transaction(['marks', 'rejected'], 'readwrite');
+    await Promise.all([
+        tx.objectStore('rejected').put(rejected),
+        tx.objectStore('marks').delete(mark.client_uuid),
+        tx.done,
+    ]);
+
+    return rejected;
+}
+
+/** Rechazadas de una sesión, en el orden en que se escanearon. */
+export async function listRejectedMarks(
+    courseId: number,
+    session: number,
+): Promise<RejectedMark[]> {
+    const db = await database();
+    const rejected = await db.getAllFromIndex('rejected', 'by_session', [
+        courseId,
+        session,
+    ]);
+
+    return rejected.sort((a, b) => a.captured_at.localeCompare(b.captured_at));
+}
+
+/** El docente ya revisó la rechazada: se quita del dispositivo. */
+export async function dismissRejectedMark(clientUuid: string): Promise<void> {
+    const db = await database();
+    await db.delete('rejected', clientUuid);
+}
+
+export async function dismissAllRejectedMarks(
+    courseId: number,
+    session: number,
+): Promise<void> {
+    const db = await database();
+    const tx = db.transaction('rejected', 'readwrite');
+    const keys = await tx.store
+        .index('by_session')
+        .getAllKeys([courseId, session]);
+    await Promise.all([...keys.map((key) => tx.store.delete(key)), tx.done]);
 }
 
 /** Cierra la conexión; la siguiente operación la vuelve a abrir. */

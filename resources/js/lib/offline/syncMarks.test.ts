@@ -5,6 +5,7 @@ import {
     closeOfflineDatabase,
     countPendingMarks,
     enqueueMark,
+    listRejectedMarks,
 } from './markQueue';
 import {
     REJECTED_RESULTS,
@@ -69,6 +70,7 @@ describe('syncPendingBatch', () => {
         await expect(syncPendingBatch(7, 2, { post })).resolves.toEqual({
             results: [],
             remaining: 0,
+            rejected: [],
         });
         expect(post).not.toHaveBeenCalled();
     });
@@ -109,8 +111,8 @@ describe('syncPendingBatch', () => {
         expect(await countPendingMarks(7, 3)).toBe(1);
     });
 
-    it('también borra las rechazadas: el servidor ya decidió', async () => {
-        await queue('87654321', '2026-11-17T14:00:00.000Z');
+    it('pasa las rechazadas a la lista para el docente (SC-56)', async () => {
+        const mark = await queue('87654321', '2026-11-17T14:00:00.000Z');
 
         const summary = await syncPendingBatch(7, 2, {
             post: serverAnswering('no_inscrito'),
@@ -118,6 +120,28 @@ describe('syncPendingBatch', () => {
 
         expect(summary.results[0].result).toBe('no_inscrito');
         expect(REJECTED_RESULTS.has(summary.results[0].result)).toBe(true);
+        // Sale de la cola (el servidor ya decidió) …
+        expect(await countPendingMarks(7, 2)).toBe(0);
+        // … pero queda para que el docente la revise.
+        expect(summary.rejected).toHaveLength(1);
+        const [rejected] = await listRejectedMarks(7, 2);
+        expect(rejected).toMatchObject({
+            client_uuid: mark.client_uuid,
+            dni: '87654321',
+            type: 'entrada',
+            captured_at: '2026-11-17T14:00:00.000Z',
+            result: 'no_inscrito',
+            message: 'no_inscrito',
+        });
+    });
+
+    it('las registradas y las duplicadas no van a la lista de rechazadas', async () => {
+        await queue('11111111', '2026-11-17T14:00:00.000Z');
+        await queue('22222222', '2026-11-17T14:01:00.000Z');
+
+        await syncPendingBatch(7, 2, { post: serverAnswering('duplicada') });
+
+        expect(await listRejectedMarks(7, 2)).toEqual([]);
         expect(await countPendingMarks(7, 2)).toBe(0);
     });
 

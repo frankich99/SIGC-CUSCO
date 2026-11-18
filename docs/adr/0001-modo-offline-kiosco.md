@@ -68,7 +68,9 @@ mismo DNI y del mismo tipo (ingreso o salida) en esa sesión. Si la hay, avisa
   `duplicada` sin volver a registrar. Esto hace que reenviar el mismo lote
   sea seguro.
 - El kiosco borra de la cola toda marcación que tenga respuesta del servidor,
-  sea cual sea el resultado. Las rechazadas se muestran al docente (SC-56).
+  sea cual sea el resultado. Las rechazadas pasan, en la misma transacción,
+  a un segundo almacén `rejected` (base v2) y se muestran al docente hasta que
+  las descarte (SC-56).
 - Si el lote falla por red, se reintenta con espera creciente (5 s, 10 s,
   20 s… hasta 2 minutos) y también al volver el evento `online`.
 
