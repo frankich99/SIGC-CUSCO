@@ -6,7 +6,7 @@
  * y envía Enter. El campo de lectura mantiene el foco para que cada servidor
  * solo tenga que pasar su DNI.
  */
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,13 @@ import {
     isOfflineStorageAvailable,
 } from '@/lib/offline/markQueue';
 import { queueOfflineMark } from '@/lib/offline/queueOfflineMark';
+import {
+    REJECTED_RESULTS,
+    SyncRejectedError,
+    createSyncLoop,
+    syncPendingBatch,
+    type SyncStep,
+} from '@/lib/offline/syncMarks';
 import {
     formatLimaTime,
     type MarkOrigin,
@@ -91,6 +98,12 @@ const MARK_TIMEOUT_MS = 8000;
 /** Tras un fallo de red, cada cuánto se vuelve a intentar con el servidor. */
 const SERVER_RETRY_MS = 30000;
 let lastNetworkFailureAt = 0;
+
+/** Sincronización de la cola local (SC-53). */
+const isSyncing = ref(false);
+const syncedCount = ref(0);
+const syncRejectedCount = ref(0);
+const syncError = ref<string | null>(null);
 const showPrivacyNotice = ref(false);
 let resultTimer: ReturnType<typeof setTimeout> | null = null;
 let privacyTimer: ReturnType<typeof setTimeout> | null = null;
@@ -103,6 +116,7 @@ const TONE_BY_RESULT: Record<KioskResultKind, Tone> = {
     sin_ingreso: 'error',
     no_inscrito: 'error',
     dni_invalido: 'error',
+    hora_invalida: 'error',
     guardada_offline: 'offline',
 };
 
@@ -205,11 +219,15 @@ async function submitMark(): Promise<void> {
         }
 
         void rosterPanel.value?.refresh(true);
+
+        // El servidor vuelve a responder: enviar lo que quedó guardado.
+        if (pendingOffline.value > 0) void syncLoop.trigger();
     } catch {
         // Sin red o sin respuesta a tiempo: el servidor no decidió nada.
         connection.reportNetworkFailure();
         lastNetworkFailureAt = Date.now();
         await saveMarkOffline(value);
+        void syncLoop.kick();
     } finally {
         isSubmitting.value = false;
         focusInput();
@@ -290,6 +308,61 @@ async function saveMarkOffline(value: string): Promise<void> {
     }
 }
 
+/**
+ * Un paso de la sincronización: envía un lote de la cola de esta sesión.
+ * Sin red devuelve `retry` (createSyncLoop reintenta con espera creciente).
+ */
+async function syncStep(): Promise<SyncStep> {
+    if (!isOfflineStorageAvailable() || props.course.is_acta_closed) {
+        return 'stop';
+    }
+    if (!connection.browserOnline.value) return 'retry';
+
+    isSyncing.value = true;
+    try {
+        const summary = await syncPendingBatch(props.course.id, session.value);
+        connection.reportNetworkSuccess();
+        syncError.value = null;
+
+        if (summary.results.length > 0) {
+            syncedCount.value += summary.results.length;
+            syncRejectedCount.value += summary.results.filter((result) =>
+                REJECTED_RESULTS.has(result.result),
+            ).length;
+            void rosterPanel.value?.refresh(true);
+        }
+
+        await refreshPendingOffline();
+
+        if (summary.remaining === 0) return 'done';
+        // Si el servidor no contestó ninguna, no insistir en bucle.
+        return summary.results.length > 0 ? 'more' : 'stop';
+    } catch (error) {
+        if (error instanceof SyncRejectedError) {
+            syncError.value = error.message;
+            return 'stop';
+        }
+
+        connection.reportNetworkFailure();
+        lastNetworkFailureAt = Date.now();
+        return 'retry';
+    } finally {
+        isSyncing.value = false;
+    }
+}
+
+const syncLoop = createSyncLoop(syncStep);
+
+// Al volver la red, enviar enseguida lo guardado.
+watch(connection.browserOnline, (online) => {
+    if (online) void syncLoop.trigger();
+});
+
+function syncNow(): void {
+    void syncLoop.trigger();
+    focusInput();
+}
+
 async function refreshPendingOffline(): Promise<void> {
     if (!isOfflineStorageAvailable()) return;
 
@@ -353,7 +426,9 @@ onMounted(() => {
     clockTimer = setInterval(tick, 1000);
     focusInput();
     window.addEventListener('click', onWindowClick);
-    void refreshPendingOffline();
+    void refreshPendingOffline().then(() => {
+        if (pendingOffline.value > 0) void syncLoop.trigger();
+    });
 });
 
 onUnmounted(() => {
@@ -361,6 +436,7 @@ onUnmounted(() => {
     if (resultTimer) clearTimeout(resultTimer);
     if (privacyTimer) clearTimeout(privacyTimer);
     window.removeEventListener('click', onWindowClick);
+    syncLoop.stop();
 });
 </script>
 
@@ -568,18 +644,70 @@ onUnmounted(() => {
                     </span>
                 </div>
 
-                <p
+                <div
                     v-if="pendingOffline > 0"
-                    class="flex items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-bold text-sky-900"
+                    class="flex flex-wrap items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-bold text-sky-900"
                 >
                     <CloudOff class="size-4 shrink-0" />
-                    {{ pendingOffline }}
+                    <span>
+                        {{ pendingOffline }}
+                        {{
+                            pendingOffline === 1
+                                ? 'marcación guardada'
+                                : 'marcaciones guardadas'
+                        }}
+                        en este dispositivo, pendientes de enviar al servidor.
+                    </span>
+                    <span
+                        v-if="isSyncing"
+                        class="ml-auto inline-flex items-center gap-1"
+                    >
+                        <Loader2 class="size-3.5 animate-spin" />
+                        Enviando…
+                    </span>
+                    <button
+                        v-else
+                        type="button"
+                        class="ml-auto underline underline-offset-2 hover:text-sky-700"
+                        @click="syncNow"
+                    >
+                        Enviar ahora
+                    </button>
+                </div>
+
+                <p
+                    v-if="syncError"
+                    class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-800"
+                    role="alert"
+                >
+                    No se pudieron enviar las marcaciones guardadas:
+                    {{ syncError }}
+                </p>
+                <p
+                    v-else-if="syncedCount > 0"
+                    :class="[
+                        'rounded-lg border px-3 py-2 text-xs font-bold',
+                        syncRejectedCount > 0
+                            ? 'border-amber-200 bg-amber-50 text-amber-900'
+                            : 'border-emerald-200 bg-emerald-50 text-emerald-900',
+                    ]"
+                    role="status"
+                >
+                    Se enviaron {{ syncedCount }}
                     {{
-                        pendingOffline === 1
+                        syncedCount === 1
                             ? 'marcación guardada'
                             : 'marcaciones guardadas'
                     }}
-                    en este dispositivo, pendientes de enviar al servidor.
+                    sin conexión.
+                    <template v-if="syncRejectedCount > 0">
+                        {{ syncRejectedCount }} no
+                        {{
+                            syncRejectedCount === 1
+                                ? 'se registró'
+                                : 'se registraron'
+                        }}; revise la lista de la sesión y «No inscritos».
+                    </template>
                 </p>
             </form>
 
