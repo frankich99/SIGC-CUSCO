@@ -16,7 +16,11 @@ import { firstErrorMessage, postJson } from '@/lib/http';
 import { useOnlineStatus } from '@/composables/useOnlineStatus';
 import {
     countPendingMarks,
+    dismissAllRejectedMarks,
+    dismissRejectedMark,
     isOfflineStorageAvailable,
+    listRejectedMarks,
+    type RejectedMark,
 } from '@/lib/offline/markQueue';
 import { queueOfflineMark } from '@/lib/offline/queueOfflineMark';
 import {
@@ -26,6 +30,7 @@ import {
     syncPendingBatch,
     type SyncStep,
 } from '@/lib/offline/syncMarks';
+import { syncBadge, type SyncBadgeState } from '@/lib/offline/syncStatus';
 import {
     formatLimaTime,
     type MarkOrigin,
@@ -38,7 +43,9 @@ import {
     ArrowLeft,
     CheckCircle2,
     Clock,
+    CloudCheck,
     CloudOff,
+    CloudUpload,
     Keyboard,
     Loader2,
     LogIn,
@@ -48,6 +55,7 @@ import {
     ShieldCheck,
     TriangleAlert,
     CircleX,
+    X,
 } from '@lucide/vue';
 
 const props = defineProps<{
@@ -104,6 +112,34 @@ const isSyncing = ref(false);
 const syncedCount = ref(0);
 const syncRejectedCount = ref(0);
 const syncError = ref<string | null>(null);
+
+/** Indicador del encabezado (SC-55). */
+const badge = computed(() =>
+    syncBadge({
+        offline: isOffline.value,
+        syncing: isSyncing.value,
+        pending: pendingOffline.value,
+        synced: syncedCount.value,
+    }),
+);
+
+const BADGE_CLASSES: Record<SyncBadgeState, string> = {
+    offline: 'border-sky-300/60 bg-sky-500/25 text-sky-50',
+    syncing: 'border-amber-300/60 bg-amber-400/20 text-amber-100',
+    pending: 'border-amber-300/60 bg-amber-400/20 text-amber-100',
+    synced: 'border-emerald-300/60 bg-emerald-500/25 text-emerald-50',
+    hidden: '',
+};
+
+/** Marcaciones guardadas sin conexión que el servidor no registró (SC-56). */
+const rejectedMarks = ref<RejectedMark[]>([]);
+
+const REJECTED_REASON_LABELS: Record<string, string> = {
+    no_inscrito: 'No inscrito',
+    sin_ingreso: 'Salida sin ingreso',
+    dni_invalido: 'DNI inválido',
+    hora_invalida: 'Hora inválida',
+};
 const showPrivacyNotice = ref(false);
 let resultTimer: ReturnType<typeof setTimeout> | null = null;
 let privacyTimer: ReturnType<typeof setTimeout> | null = null;
@@ -332,6 +368,7 @@ async function syncStep(): Promise<SyncStep> {
             void rosterPanel.value?.refresh(true);
         }
 
+        if (summary.rejected.length > 0) await refreshRejected();
         await refreshPendingOffline();
 
         if (summary.remaining === 0) return 'done';
@@ -360,6 +397,31 @@ watch(connection.browserOnline, (online) => {
 
 function syncNow(): void {
     void syncLoop.trigger();
+    focusInput();
+}
+
+async function refreshRejected(): Promise<void> {
+    if (!isOfflineStorageAvailable()) return;
+
+    try {
+        rejectedMarks.value = await listRejectedMarks(
+            props.course.id,
+            session.value,
+        );
+    } catch {
+        rejectedMarks.value = [];
+    }
+}
+
+async function dismissRejected(clientUuid: string): Promise<void> {
+    await dismissRejectedMark(clientUuid);
+    await refreshRejected();
+    focusInput();
+}
+
+async function dismissAllRejected(): Promise<void> {
+    await dismissAllRejectedMarks(props.course.id, session.value);
+    await refreshRejected();
     focusInput();
 }
 
@@ -426,6 +488,7 @@ onMounted(() => {
     clockTimer = setInterval(tick, 1000);
     focusInput();
     window.addEventListener('click', onWindowClick);
+    void refreshRejected();
     void refreshPendingOffline().then(() => {
         if (pendingOffline.value > 0) void syncLoop.trigger();
     });
@@ -452,11 +515,38 @@ onUnmounted(() => {
                 class="flex flex-col gap-3 rounded-2xl bg-gradient-to-br from-rose-950 via-rose-900 to-rose-950 p-5 text-white shadow-md sm:flex-row sm:items-center sm:justify-between"
             >
                 <div class="space-y-1">
-                    <div
-                        class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-black tracking-wider text-amber-300 uppercase"
-                    >
-                        <Clock class="size-3.5" />
-                        {{ currentTime }}
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div
+                            class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-black tracking-wider text-amber-300 uppercase"
+                        >
+                            <Clock class="size-3.5" />
+                            {{ currentTime }}
+                        </div>
+                        <!-- Estado de sincronización (SC-55) -->
+                        <div
+                            v-if="badge.state !== 'hidden'"
+                            :class="[
+                                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-black',
+                                BADGE_CLASSES[badge.state],
+                            ]"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <CloudOff
+                                v-if="badge.state === 'offline'"
+                                class="size-3.5"
+                            />
+                            <Loader2
+                                v-else-if="badge.state === 'syncing'"
+                                class="size-3.5 animate-spin"
+                            />
+                            <CloudUpload
+                                v-else-if="badge.state === 'pending'"
+                                class="size-3.5"
+                            />
+                            <CloudCheck v-else class="size-3.5" />
+                            {{ badge.label }}
+                        </div>
                     </div>
                     <h1 class="text-xl font-black tracking-tight sm:text-2xl">
                         Control de ingreso y salida · Sesión {{ session }}
@@ -706,10 +796,80 @@ onUnmounted(() => {
                             syncRejectedCount === 1
                                 ? 'se registró'
                                 : 'se registraron'
-                        }}; revise la lista de la sesión y «No inscritos».
+                        }}; revise la lista de abajo.
                     </template>
                 </p>
             </form>
+
+            <!-- Rechazadas al sincronizar (SC-56) -->
+            <section
+                v-if="rejectedMarks.length > 0"
+                class="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 text-amber-950"
+                aria-labelledby="kiosk-rejected-title"
+            >
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h2
+                        id="kiosk-rejected-title"
+                        class="flex items-center gap-2 text-sm font-black"
+                    >
+                        <TriangleAlert class="size-4 shrink-0" />
+                        Marcaciones sin conexión que no se registraron ({{
+                            rejectedMarks.length
+                        }})
+                    </h2>
+                    <button
+                        type="button"
+                        class="text-xs font-bold underline underline-offset-2 hover:text-amber-700"
+                        @click="dismissAllRejected"
+                    >
+                        Descartar todas
+                    </button>
+                </div>
+                <p class="mt-1 text-xs">
+                    Se guardaron en este dispositivo sin conexión, pero al
+                    enviarlas el servidor no las aceptó. Revise cada caso y, si
+                    corresponde, regístrelo en la pestaña Asistencia del curso.
+                </p>
+                <ul class="mt-3 divide-y divide-amber-200">
+                    <li
+                        v-for="item in rejectedMarks"
+                        :key="item.client_uuid"
+                        class="flex items-start gap-3 py-2 text-xs"
+                    >
+                        <div class="min-w-0 flex-1 space-y-0.5">
+                            <p class="font-bold">
+                                <span class="font-mono"
+                                    >DNI {{ item.dni ?? item.identifier }}</span
+                                >
+                                ·
+                                {{
+                                    item.type === 'entrada'
+                                        ? 'Ingreso'
+                                        : 'Salida'
+                                }}
+                                · {{ formatLimaTime(item.captured_at) }}
+                            </p>
+                            <p>
+                                <span class="font-black"
+                                    >{{
+                                        REJECTED_REASON_LABELS[item.result] ??
+                                        item.result
+                                    }}:</span
+                                >
+                                {{ item.message }}
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            class="rounded-md p-1 hover:bg-amber-100"
+                            :aria-label="`Descartar la marcación del DNI ${item.dni ?? item.identifier}`"
+                            @click="dismissRejected(item.client_uuid)"
+                        >
+                            <X class="size-4" />
+                        </button>
+                    </li>
+                </ul>
+            </section>
 
             <!-- Resultado de la última lectura -->
             <div
