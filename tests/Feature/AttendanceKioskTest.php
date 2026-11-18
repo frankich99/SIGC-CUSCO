@@ -275,9 +275,11 @@ test('CA7: la primera marca del servidor activa el aviso de datos personales y s
     $columns = Schema::getColumnListing('attendance_marks');
     sort($columns);
 
+    // client_uuid (SC-51) es un identificador aleatorio que genera el kiosco
+    // sin conexión para no duplicar marcaciones; no es un dato personal.
     expect($columns)->toBe([
-        'course_id', 'created_at', 'enrollment_id', 'id', 'marked_at', 'origin',
-        'recorded_by', 'session_number', 'type', 'updated_at',
+        'client_uuid', 'course_id', 'created_at', 'enrollment_id', 'id', 'marked_at',
+        'origin', 'recorded_by', 'session_number', 'type', 'updated_at',
     ]);
 });
 
