@@ -14,6 +14,11 @@ import { Input } from '@/components/ui/input';
 import SessionRosterPanel from '@/components/SessionRosterPanel.vue';
 import { firstErrorMessage, postJson } from '@/lib/http';
 import {
+    countPendingMarks,
+    enqueueMark,
+    isOfflineStorageAvailable,
+} from '@/lib/offline/markQueue';
+import {
     formatLimaTime,
     type MarkOrigin,
     type MarkResult,
@@ -25,6 +30,7 @@ import {
     ArrowLeft,
     CheckCircle2,
     Clock,
+    CloudOff,
     Keyboard,
     Loader2,
     LogIn,
@@ -67,13 +73,19 @@ const inputRef = ref<InstanceType<typeof Input> | null>(null);
 const rosterPanel = ref<InstanceType<typeof SessionRosterPanel> | null>(null);
 const summary = ref(props.roster.summary);
 
-type Tone = 'success' | 'partial' | 'warning' | 'error';
-const lastResult = ref<(MarkResult & { tone: Tone }) | null>(null);
+type Tone = 'success' | 'partial' | 'warning' | 'error' | 'offline';
+
+/** Resultado que muestra el kiosco: el del servidor o «guardada sin conexión» (SC-46). */
+type KioskResultKind = MarkResult['result'] | 'guardada_offline';
+type KioskResult = Omit<MarkResult, 'result'> & { result: KioskResultKind };
+
+const lastResult = ref<(KioskResult & { tone: Tone }) | null>(null);
+const pendingOffline = ref(0);
 const showPrivacyNotice = ref(false);
 let resultTimer: ReturnType<typeof setTimeout> | null = null;
 let privacyTimer: ReturnType<typeof setTimeout> | null = null;
 
-const TONE_BY_RESULT: Record<MarkResult['result'], Tone> = {
+const TONE_BY_RESULT: Record<KioskResultKind, Tone> = {
     ingreso_registrado: 'success',
     asistida: 'success',
     parcial: 'partial',
@@ -81,6 +93,7 @@ const TONE_BY_RESULT: Record<MarkResult['result'], Tone> = {
     sin_ingreso: 'error',
     no_inscrito: 'error',
     dni_invalido: 'error',
+    guardada_offline: 'offline',
 };
 
 const TONE_CLASSES: Record<Tone, string> = {
@@ -88,6 +101,7 @@ const TONE_CLASSES: Record<Tone, string> = {
     partial: 'border-orange-300 bg-orange-50 text-orange-900',
     warning: 'border-amber-300 bg-amber-50 text-amber-900',
     error: 'border-red-300 bg-red-50 text-red-900',
+    offline: 'border-sky-300 bg-sky-50 text-sky-900',
 };
 
 function focusInput(): void {
@@ -124,7 +138,7 @@ function beep(tone: Tone): void {
     }
 }
 
-function showResult(result: MarkResult): void {
+function showResult(result: KioskResult): void {
     const tone = TONE_BY_RESULT[result.result] ?? 'error';
     lastResult.value = { ...result, tone };
     beep(tone);
@@ -175,18 +189,64 @@ async function submitMark(): Promise<void> {
 
         void rosterPanel.value?.refresh(true);
     } catch {
-        showResult({
-            result: 'dni_invalido',
-            message:
-                'Sin conexión con el servidor. Use el registro manual de la pestaña Asistencia cuando vuelva la red.',
-            first_mark: false,
-            participant: null,
-            marked_at: null,
-            permanence: null,
-        });
+        await saveMarkOffline(value);
     } finally {
         isSubmitting.value = false;
         focusInput();
+    }
+}
+
+/**
+ * Prototipo del spike SC-37: si el servidor no responde, la marcación se
+ * guarda en el dispositivo (IndexedDB) en lugar de perderse. La sincronización
+ * con el servidor llega en SC-39.
+ */
+async function saveMarkOffline(value: string): Promise<void> {
+    const failure: KioskResult = {
+        result: 'dni_invalido',
+        message:
+            'Sin conexión con el servidor. Use el registro manual de la pestaña Asistencia cuando vuelva la red.',
+        first_mark: false,
+        participant: null,
+        marked_at: null,
+        permanence: null,
+    };
+
+    if (!isOfflineStorageAvailable()) {
+        showResult(failure);
+        return;
+    }
+
+    try {
+        const saved = await enqueueMark({
+            course_id: props.course.id,
+            session: session.value,
+            identifier: value,
+            type: mode.value,
+            origin: origin.value,
+        });
+        await refreshPendingOffline();
+        showResult({
+            ...failure,
+            result: 'guardada_offline',
+            message: `Sin conexión: la ${mode.value} del DNI ${saved.identifier} quedó guardada en este dispositivo y se enviará cuando vuelva la red.`,
+            marked_at: saved.captured_at,
+        });
+    } catch {
+        showResult(failure);
+    }
+}
+
+async function refreshPendingOffline(): Promise<void> {
+    if (!isOfflineStorageAvailable()) return;
+
+    try {
+        pendingOffline.value = await countPendingMarks(
+            props.course.id,
+            session.value,
+        );
+    } catch {
+        pendingOffline.value = 0;
     }
 }
 
@@ -240,6 +300,7 @@ onMounted(() => {
     clockTimer = setInterval(tick, 1000);
     focusInput();
     window.addEventListener('click', onWindowClick);
+    void refreshPendingOffline();
 });
 
 onUnmounted(() => {
@@ -443,6 +504,20 @@ onUnmounted(() => {
                         >.
                     </span>
                 </div>
+
+                <p
+                    v-if="pendingOffline > 0"
+                    class="flex items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-bold text-sky-900"
+                >
+                    <CloudOff class="size-4 shrink-0" />
+                    {{ pendingOffline }}
+                    {{
+                        pendingOffline === 1
+                            ? 'marcación guardada'
+                            : 'marcaciones guardadas'
+                    }}
+                    en este dispositivo, pendientes de enviar al servidor.
+                </p>
             </form>
 
             <!-- Resultado de la última lectura -->
@@ -457,6 +532,10 @@ onUnmounted(() => {
             >
                 <CheckCircle2
                     v-if="lastResult.tone === 'success'"
+                    class="size-10 shrink-0"
+                />
+                <CloudOff
+                    v-else-if="lastResult.tone === 'offline'"
                     class="size-10 shrink-0"
                 />
                 <TriangleAlert
