@@ -16,6 +16,8 @@ export interface QueuedMark {
     session: number;
     /** DNI tal como lo leyó el lector o lo digitó el operador. */
     identifier: string;
+    /** Los 8 dígitos del DNI extraídos de `identifier` (como en el servidor). */
+    dni: string | null;
     type: MarkType;
     origin: MarkOrigin;
     /** Hora del dispositivo al escanear (ISO 8601). */
@@ -56,6 +58,14 @@ function database(): Promise<IDBPDatabase<KioskOfflineDB>> {
     return dbPromise;
 }
 
+/**
+ * Igual que AttendancePermanenceService::extractDni(): el primer grupo de 8
+ * dígitos de la lectura (el lector puede enviar más caracteres).
+ */
+export function extractDni(raw: string): string | null {
+    return /(\d{8})/.exec(raw)?.[1] ?? null;
+}
+
 export function isOfflineStorageAvailable(): boolean {
     return typeof indexedDB !== 'undefined';
 }
@@ -91,6 +101,7 @@ export async function enqueueMark(input: NewQueuedMark): Promise<QueuedMark> {
         course_id: input.course_id,
         session: input.session,
         identifier: input.identifier.trim(),
+        dni: extractDni(input.identifier),
         type: input.type,
         origin: input.origin,
         captured_at: input.captured_at ?? new Date().toISOString(),
@@ -115,6 +126,25 @@ export async function listPendingMarks(
     ]);
 
     return marks.sort((a, b) => a.captured_at.localeCompare(b.captured_at));
+}
+
+/**
+ * Marcación pendiente del mismo DNI y tipo en la sesión, si la hay (SC-49).
+ * Evita guardar dos veces el mismo ingreso o la misma salida sin conexión.
+ */
+export async function findPendingMark(
+    courseId: number,
+    session: number,
+    dni: string,
+    type: MarkType,
+): Promise<QueuedMark | undefined> {
+    const pending = await listPendingMarks(courseId, session);
+
+    return pending.find(
+        (mark) =>
+            mark.type === type &&
+            (mark.dni ?? extractDni(mark.identifier)) === dni,
+    );
 }
 
 export async function countPendingMarks(
