@@ -8,6 +8,7 @@ use App\Models\AttendanceUnenrolledScan;
 use App\Models\Course;
 use App\Models\Enrollment;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -37,6 +38,18 @@ class AttendancePermanenceService
     public const RESULT_NOT_ENROLLED = 'no_inscrito';
 
     public const RESULT_INVALID_DNI = 'dni_invalido';
+
+    /** Marcación sincronizada con una hora de dispositivo fuera de rango (SC-52). */
+    public const RESULT_INVALID_TIME = 'hora_invalida';
+
+    /** Máximo de marcaciones por lote de sincronización. */
+    public const SYNC_MAX_BATCH = 50;
+
+    /** Desfase permitido del reloj del dispositivo hacia el futuro. */
+    public const SYNC_CLOCK_TOLERANCE_MINUTES = 2;
+
+    /** Antigüedad máxima de una marcación guardada sin conexión. */
+    public const SYNC_MAX_AGE_HOURS = 24;
 
     public function __construct(private readonly AttendanceService $attendanceService) {}
 
@@ -80,6 +93,7 @@ class AttendancePermanenceService
         string $origin,
         ?int $recordedBy = null,
         ?CarbonInterface $at = null,
+        ?string $clientUuid = null,
     ): array {
         $this->assertSession($course, $session);
         $this->attendanceService->assertCourseOpen($course);
@@ -91,9 +105,26 @@ class AttendancePermanenceService
             return $this->response(self::RESULT_INVALID_DNI, 'La lectura no contiene un DNI válido de 8 dígitos. Vuelva a escanear.');
         }
 
-        return DB::transaction(function () use ($course, $session, $dni, $type, $origin, $recordedBy, $at): array {
+        return DB::transaction(function () use ($course, $session, $dni, $type, $origin, $recordedBy, $at, $clientUuid): array {
             // Same lock order as AttendanceService (course, then enrollment) to avoid deadlocks.
             Course::query()->whereKey($course->getKey())->lockForUpdate()->firstOrFail();
+
+            // SC-52: una marcación del kiosco sin conexión que ya se recibió no se registra otra vez.
+            if ($clientUuid !== null) {
+                $synced = AttendanceMark::query()->where('client_uuid', $clientUuid)->with('enrollment')->first();
+
+                if ($synced) {
+                    return $this->response(self::RESULT_DUPLICATE, 'Marcación ya sincronizada.', [
+                        'id' => $synced->enrollment->id,
+                        'dni' => $synced->enrollment->dni,
+                        'full_name' => $synced->enrollment->full_name,
+                    ], $synced->marked_at);
+                }
+
+                if (AttendanceUnenrolledScan::query()->where('client_uuid', $clientUuid)->exists()) {
+                    return $this->response(self::RESULT_NOT_ENROLLED, 'Esta lectura ya está en la lista «No inscritos».');
+                }
+            }
 
             $enrollment = Enrollment::query()
                 ->where('course_id', $course->id)
@@ -115,6 +146,7 @@ class AttendancePermanenceService
                     'reason' => $reason,
                     'scanned_at' => $at,
                     'recorded_by' => $recordedBy,
+                    'client_uuid' => $clientUuid,
                 ]);
 
                 return $this->response(self::RESULT_NOT_ENROLLED, "{$reason} Se agregó a la lista «No inscritos» para que RR.HH. decida.");
@@ -152,6 +184,7 @@ class AttendancePermanenceService
                 'origin' => $origin,
                 'marked_at' => $at,
                 'recorded_by' => $recordedBy,
+                'client_uuid' => $clientUuid,
             ]);
 
             if ($type === AttendanceMark::TYPE_ENTRY) {
@@ -198,6 +231,61 @@ class AttendancePermanenceService
                 $firstMark,
             );
         });
+    }
+
+    /**
+     * Registra un lote de marcaciones que el kiosco guardó sin conexión (SC-52, ADR 0001).
+     *
+     * Usa la hora del dispositivo al escanear, las procesa en orden cronológico
+     * (el ingreso antes que la salida) y es idempotente por `client_uuid`:
+     * reenviar el mismo lote no duplica nada.
+     *
+     * @param  list<array{client_uuid: string, identifier: string, type: string, origin?: string|null, captured_at: string}>  $items
+     * @return list<array<string, mixed>>
+     */
+    public function syncMarks(Course $course, int $session, array $items, ?int $recordedBy = null): array
+    {
+        $this->assertSession($course, $session);
+        $this->attendanceService->assertCourseOpen($course);
+
+        $now = now();
+        $latestAllowed = $now->copy()->addMinutes(self::SYNC_CLOCK_TOLERANCE_MINUTES);
+        $earliestAllowed = $now->copy()->subHours(self::SYNC_MAX_AGE_HOURS);
+
+        $queue = array_map(fn (array $item): array => [
+            'item' => $item,
+            'at' => Carbon::parse($item['captured_at'])->setTimezone($now->getTimezone()),
+        ], $items);
+
+        // Orden cronológico; a igual hora, el ingreso antes que la salida.
+        usort($queue, fn (array $a, array $b): int => [$a['at']->getTimestamp(), $a['item']['type'] === AttendanceMark::TYPE_ENTRY ? 0 : 1]
+            <=> [$b['at']->getTimestamp(), $b['item']['type'] === AttendanceMark::TYPE_ENTRY ? 0 : 1]);
+
+        $results = [];
+
+        foreach ($queue as ['item' => $item, 'at' => $at]) {
+            if ($at->greaterThan($latestAllowed) || $at->lessThan($earliestAllowed)) {
+                $results[] = ['client_uuid' => $item['client_uuid']] + $this->response(
+                    self::RESULT_INVALID_TIME,
+                    'La hora de la marcación ('.$at->format('d/m/Y H:i').') no es válida: está en el futuro o tiene más de '.self::SYNC_MAX_AGE_HOURS.' horas. Revise el reloj del equipo del kiosco.',
+                );
+
+                continue;
+            }
+
+            $results[] = ['client_uuid' => $item['client_uuid']] + $this->registerMark(
+                $course,
+                $session,
+                $item['identifier'],
+                $item['type'],
+                $item['origin'] ?? AttendanceMark::ORIGIN_DNI_READER,
+                $recordedBy,
+                $at,
+                $item['client_uuid'],
+            );
+        }
+
+        return $results;
     }
 
     /**
